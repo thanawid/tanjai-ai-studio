@@ -7,13 +7,22 @@ TANJAI.commonData = function(prefix){
   return {
     title: v("title") || "หัวข้องาน",
     orgName: v("orgName") || "ทันใจ AI Studio",
+    orgType: v("orgType") || "ไม่ระบุ",
     audience: v("audience") || "ประชาชนทั่วไป",
     tone: v("tone") || "ทางการ สุภาพ อ่านง่าย",
+    mainCategory: v("mainCategory") || "ไม่ระบุ",
+    subCategory: v("subCategory") || "ไม่ระบุ",
+    channel: v("channel") || "",
+    length: v("length") || "",
     detail: v("detail") || "ยังไม่ได้ระบุรายละเอียดเพิ่มเติม",
     dateTime: v("dateTime") || "",
     place: v("place") || "",
     people: v("people") || "",
     style: v("style") || "Modern Premium Clean",
+    layout: v("layout") || "Split Layout ซ้ายข้อความ ขวาภาพ",
+    density: v("density") || "สมดุล อ่านง่าย",
+    focus: v("focus") || "เน้นหัวข้อหลัก",
+    colorTone: v("colorTone") || "ให้ AI เลือกให้เหมาะสม",
     size: v("size") || "4:5 Facebook / Line 1080x1350",
     avoid: v("avoid") || "ห้ามสร้าง QR Code ปลอม ห้ามวาดโลโก้ใหม่ ข้อความภาษาไทยต้องสะกดถูก"
   };

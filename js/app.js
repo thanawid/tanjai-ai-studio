@@ -17,18 +17,42 @@ document.addEventListener("DOMContentLoaded", () => {
     </div>
     <div class="button-row"><button class="btn primary" id="makeImage">สร้าง Prompt ภาพ</button><button class="btn secondary" id="saveImage">บันทึก</button></div>
   `;
-  $("#postForm").innerHTML = TANJAI.field("post") + `<div class="button-row"><button class="btn primary" id="makePost">สร้างโพสต์</button><button class="btn secondary" id="savePost">บันทึก</button></div>`;
+  $("#postForm").innerHTML = TANJAI.field("post") + `
+    <div class="form-section"><div class="section-title"><b>2</b><h4>ตั้งค่าโพสต์</h4></div>
+      <div class="form-grid">
+        <label>ช่องทาง<select id="post-channel">${opts(toolOptions.channels)}</select></label>
+        <label>ความยาวโพสต์<select id="post-length">${opts(toolOptions.postLengths)}</select></label>
+        <label>หมวดงานหลัก<select id="post-mainCategory">${opts(toolOptions.mainCategories)}</select></label>
+        <label>หัวข้องานย่อย<select id="post-subCategory">${opts(toolOptions.subCategories)}</select></label>
+      </div>
+    </div>
+    <div class="button-row"><button class="btn primary" id="makePost">สร้างโพสต์</button><button class="btn secondary" id="savePost">บันทึก</button></div>`;
   $("#videoForm").innerHTML = TANJAI.field("video") + `
-    <div class="form-section"><div class="section-title"><b>2</b><h4>ตั้งค่าวิดีโอ</h4></div>
-      <div class="form-grid"><label>ความยาว<select id="video-length">${TANJAI.categories.videoLengths.map(x=>`<option>${x}</option>`).join("")}</select></label><label>รูปแบบ<select id="video-format"><option>คลิปประชาสัมพันธ์</option><option>คลิปรีวิว</option><option>คลิปโซเชียล</option><option>คลิปข่าวด่วน</option></select></label></div>
-    </div><div class="button-row"><button class="btn primary" id="makeVideo">สร้าง Storyboard</button><button class="btn secondary" id="saveVideo">บันทึก</button></div>`;
+    <div class="form-note">เมนูนี้ใช้ทำวิดีโอหรือทำคลิปได้โดยตรง สร้าง Hook, Storyboard, Voice Over และข้อความบนจอ</div>
+    <div class="form-section"><div class="section-title"><b>2</b><h4>ตั้งค่าวิดีโอ / คลิป</h4></div>
+      <div class="form-grid">
+        <label>ความยาว<select id="video-length">${opts(TANJAI.categories.videoLengths)}</select></label>
+        <label>รูปแบบคลิป<select id="video-format">${opts(toolOptions.videoFormats)}</select></label>
+        <label>ช่องทาง<select id="video-channel">${opts(toolOptions.channels)}</select></label>
+        <label>หมวดงาน<select id="video-mainCategory">${opts(toolOptions.mainCategories)}</select></label>
+      </div>
+    </div><div class="button-row"><button class="btn primary" id="makeVideo">สร้าง Storyboard / คลิป</button><button class="btn secondary" id="saveVideo">บันทึก</button></div>`;
   $("#voiceForm").innerHTML = TANJAI.field("voice") + `
     <div class="form-section"><div class="section-title"><b>2</b><h4>ตั้งค่าเสียง</h4></div>
-      <div class="form-grid"><label>ความยาวเสียง<select id="voice-length">${TANJAI.categories.voiceLengths.map(x=>`<option>${x}</option>`).join("")}</select></label><label>สไตล์เสียง<select id="voice-style">${TANJAI.categories.voiceStyles.map(x=>`<option>${x}</option>`).join("")}</select></label></div>
+      <div class="form-grid">
+        <label>ความยาวเสียง<select id="voice-length">${opts(TANJAI.categories.voiceLengths)}</select></label>
+        <label>สไตล์เสียง<select id="voice-style">${opts(TANJAI.categories.voiceStyles)}</select></label>
+        <label>ช่องทางใช้งาน<select id="voice-channel">${opts(toolOptions.channels)}</select></label>
+        <label>หมวดงาน<select id="voice-mainCategory">${opts(toolOptions.mainCategories)}</select></label>
+      </div>
     </div><div class="button-row"><button class="btn primary" id="makeVoice">สร้างสคริปต์เสียง</button><button class="btn secondary" id="speakVoice">ทดลองอ่านเสียง</button><button class="btn secondary" id="stopVoice">หยุดอ่าน</button><button class="btn secondary" id="saveVoice">บันทึก</button></div>`;
   $("#deckForm").innerHTML = TANJAI.field("deck") + `
     <div class="form-section"><div class="section-title"><b>2</b><h4>ตั้งค่าสไลด์</h4></div>
-      <div class="form-grid"><label>จำนวนสไลด์<select id="deck-count"><option>6</option><option selected>8</option><option>10</option><option>12</option></select></label></div>
+      <div class="form-grid">
+        <label>จำนวนสไลด์<select id="deck-count"><option>6</option><option selected>8</option><option>10</option><option>12</option></select></label>
+        <label>รูปแบบสไลด์<select id="deck-format">${opts(toolOptions.slideStyles)}</select></label>
+        <label>หมวดงาน<select id="deck-mainCategory">${opts(toolOptions.mainCategories)}</select></label>
+      </div>
     </div><div class="button-row"><button class="btn primary" id="makeDeck">สร้าง Outline</button><button class="btn secondary" id="saveDeck">บันทึก</button></div>`;
   $("#kitForm").innerHTML = TANJAI.field("kit") + `<div class="button-row"><button class="btn primary" id="makeKit">สร้างชุดสื่อ</button><button class="btn secondary" id="saveKit">บันทึก</button></div>`;
 
