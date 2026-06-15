@@ -73,3 +73,22 @@
   - สคริปต์สรุปงาน: ChatGPT / Notebook Tool / Canva / CapCut
 - คงหน้าแรกเดิมให้มากที่สุด
 - อย่างอื่นคงเดิมจากฐานล่าสุด
+
+
+## v6.2.1 Brand Title + Logo Final
+- เปลี่ยน Title Tag เป็น: ทันใจ AI Studio | สร้างสื่อไว ด้วยพลัง AI
+- หน้าแรกใช้หัวข้อ:
+  - AI Media Hub
+  - สร้างสื่อไว ด้วยพลัง AI
+- ใช้โลโก้จากไฟล์แนบเป็น:
+  - assets/logo.jpg
+  - favicon.ico
+  - assets/favicon-32.png
+  - assets/favicon-48.png
+  - assets/icon-192.png
+  - assets/icon-512.png
+  - assets/apple-touch-icon.png
+- คง Random Preview Cards
+- คง Destination Hub ครบ 6 เครื่องมือ
+- คงผลลัพธ์แนะนำเฉพาะเมนู
+- เช็ก JavaScript syntax ก่อนส่ง
