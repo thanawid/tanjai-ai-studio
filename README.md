@@ -55,55 +55,21 @@
   5. ข้อความบนภาพ/ปกคลิป
 - หมายเหตุ: เวอร์ชัน GitHub Pages ยังไม่วิเคราะห์ภาพเองในเว็บ ต้องนำ Prompt พร้อมรูปไปใช้กับ AI ที่รองรับการวิเคราะห์ภาพ
 
-## v6.1.6 Voice Tool Polish
-- เมนูเสียงพากย์เหลือปุ่ม: สร้างสคริปต์เสียง / คัดลอกสคริปต์ / บันทึก
-- ลบปุ่มทดลองอ่านเสียงและหยุดอ่านออก
-- ผลลัพธ์ที่แนะนำ: เปิด ChatGPT / เปิด CapCut / เปิด Voice Tool
-- ใช้ชื่อกลางว่า Voice Tool ไม่แสดงชื่อ Google AI Studio บนหน้าเว็บ
-- อย่างอื่นคงเดิมจาก v6.1.5
 
-
-## v6.1.7 Destination Voice Tool
-- เพิ่มการ์ด Voice Tool ใน Destination Hub
-- ใช้ชื่อกลางว่า Voice Tool ไม่ใช้ชื่อแบรนด์ภายนอกบนหน้าเว็บหลัก
-- ใช้กับงานเสียงพากย์ / AI Voice
-- อย่างอื่นคงเดิมจาก v6.1.6
-
-
-## v6.1.8 Slide Notebook Voice Tools
-- รวมแก้เมนูเสียงพากย์:
-  - ปุ่มฟอร์ม: สร้างสคริปต์เสียง / คัดลอกสคริปต์ / บันทึก
-  - ผลลัพธ์ที่แนะนำ: เปิด ChatGPT / เปิด CapCut / เปิด Voice Tool
-- ปรับเมนูทำสไลด์:
-  - ปุ่มฟอร์ม: สร้าง Outline / คัดลอก Outline / บันทึก
-  - ผลลัพธ์ที่แนะนำ: เปิด ChatGPT / เปิด Canva / เปิด Slide Tool / เปิด Notebook Tool
-- เพิ่ม Destination Hub:
+## v6.2 Preview Random Cards + Destination Pro
+- แก้หน้าที่ยังไม่ตรงจากที่คุย
+- เพิ่มภาพตัวอย่างแบบสุ่มในการ์ดหน้าแรก
+- การ์ดหน้าแรกยังคลิกได้
+- อัปเดต Destination Hub ให้ครบ:
+  - ChatGPT
+  - Canva
+  - CapCut
   - Voice Tool
   - Slide Tool
   - Notebook Tool
-- ใช้ชื่อกลาง ไม่โชว์ชื่อแบรนด์ภายนอกเป็นหัวข้อหลัก
+- จัดผลลัพธ์ที่แนะนำเฉพาะเมนู:
+  - เสียงพากย์: ChatGPT / CapCut / Voice Tool
+  - ทำสไลด์: ChatGPT / Canva / Slide Tool / Notebook Tool
+  - สคริปต์สรุปงาน: ChatGPT / Notebook Tool / Canva / CapCut
+- คงหน้าแรกเดิมให้มากที่สุด
 - อย่างอื่นคงเดิมจากฐานล่าสุด
-
-
-## v6.1.8 Final Tools Fix
-- แก้ตรงจุดที่ปุ่มปลายทางยังไม่เปลี่ยนจริง
-- เมนูเสียงพากย์:
-  - ปุ่มฟอร์ม: สร้างสคริปต์เสียง / บันทึก
-  - ผลลัพธ์ที่แนะนำ: เปิด ChatGPT / เปิด CapCut / เปิด Voice Tool
-- เมนูทำสไลด์:
-  - ปุ่มฟอร์ม: สร้าง Outline / บันทึก
-  - ผลลัพธ์ที่แนะนำ: เปิด ChatGPT / เปิด Canva / เปิด Slide Tool / เปิด Notebook Tool
-- Destination Hub แสดง Voice Tool / Slide Tool / Notebook Tool ได้จริง
-- อย่างอื่นคงเดิม
-
-
-## v6.1.9 Emergency Click Fix
-- แก้ JavaScript syntax error ที่ทำให้กดเมนู/ปุ่มไม่ได้ทั้งเว็บ
-- ลบโค้ดทดลองอ่านเสียงเดิมที่ค้างอยู่
-- คงเมนูเสียงพากย์:
-  - สร้างสคริปต์เสียง / บันทึก
-  - เปิด ChatGPT / เปิด CapCut / เปิด Voice Tool
-- คงเมนูทำสไลด์:
-  - สร้าง Outline / บันทึก
-  - เปิด ChatGPT / เปิด Canva / เปิด Slide Tool / เปิด Notebook Tool
-- อย่างอื่นคงเดิม

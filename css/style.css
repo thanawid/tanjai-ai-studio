@@ -244,11 +244,40 @@ button,input,select,textarea{font-family:inherit}button{cursor:pointer}
 }
 
 
-/* v6.1.7 Destination Voice Tool */
-.destination-card h3{margin:.55rem 0 .35rem}
-.destination-card p{color:var(--muted);line-height:1.65}
-
-
-/* v6.1.8 Slide Notebook Voice Tools */
-.destination-card h3{margin:.55rem 0 .35rem}
-.destination-card p{color:var(--muted);line-height:1.65}
+/* v6.2 Preview Random Cards + Destination Pro */
+.sample-grid article{
+  position:relative;
+  overflow:hidden;
+}
+.sample-grid article img{
+  transition:transform .28s ease, filter .28s ease;
+  filter:saturate(1.08) contrast(1.04);
+}
+.sample-grid article:hover img{
+  transform:scale(1.045);
+}
+.sample-grid article::after{
+  content:"AI Preview";
+  position:absolute;
+  top:14px;
+  right:14px;
+  z-index:2;
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.06em;
+  color:#fff;
+  padding:6px 9px;
+  border-radius:999px;
+  background:rgba(5,7,17,.54);
+  border:1px solid rgba(255,255,255,.14);
+  backdrop-filter:blur(10px);
+}
+.destination-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin:12px 0 14px;
+}
+.library-card b{
+  font-size:18px;
+}

@@ -102,7 +102,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Results
   $("#imageResult").innerHTML = TANJAI.resultShell("image", "Prompt ภาพ", "คัดลอกไปใช้กับ ChatGPT / Canva / AI สร้างภาพ", "imageOut", `<button class="btn primary" data-copybox="imageOut">คัดลอก Prompt ภาพ</button>`);
-  $("#postResult").innerHTML = TANJAI.resultShell("post", "สคริปต์สรุปงาน", "คัดลอกไปใช้ต่อกับงานนำเสนอ ทำคลิป หรือโพสต์โซเชียล", "postOut", `<button class="btn primary" data-copybox="postOut">คัดลอกสคริปต์สรุปงาน</button>`);
+  $("#postResult").innerHTML = TANJAI.resultShell("post", "สคริปต์สรุปงาน", "ใช้ต่อได้ทั้งนำเสนอ ทำคลิป และโพสต์โซเชียล", "postOut", `<button class="btn primary" data-copybox="postOut">คัดลอกโพสต์</button>`);
   $("#videoResult").innerHTML = TANJAI.resultShell("video", "Storyboard", "คัดลอกไปใช้กับ CapCut / ทีมถ่าย / คลิปสั้น", "videoOut", `<button class="btn primary" data-copybox="videoOut">คัดลอก Storyboard</button>`);
   $("#voiceResult").innerHTML = TANJAI.resultShell("voice", "สคริปต์เสียงพากย์", "คัดลอกไปใช้กับ CapCut หรือ Voice Tool", "voiceOut", `<button class="btn primary" data-copybox="voiceOut">คัดลอกสคริปต์เสียง</button>`);
   $("#deckResult").innerHTML = TANJAI.resultShell("deck", "Outline สไลด์", "คัดลอกไปทำ Canva, Slide Tool หรือ Notebook Tool", "deckOut", `<button class="btn primary" data-copybox="deckOut">คัดลอก Outline</button>`);
@@ -131,6 +131,18 @@ document.addEventListener("DOMContentLoaded", () => {
     if(item && window.matchMedia("(max-width:1180px)").matches) closeSidebar();
   });
 
+
+
+  // v6.2 Random Preview Cards
+  (function(){
+    const imgs = Array.from(document.querySelectorAll("[data-random-previews]"));
+    imgs.forEach(img => {
+      const list = (img.dataset.randomPreviews || "").split("|").map(x=>x.trim()).filter(Boolean);
+      if(list.length){
+        img.src = list[Math.floor(Math.random() * list.length)];
+      }
+    });
+  })();
 
   // Navigation
 
@@ -162,21 +174,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Generators
   $("#makeImage").onclick = () => { const d=TANJAI.commonData("image"); const out=TANJAI.imagePrompt(d); $("#imageOut").textContent=out; TANJAI.state.lastImage=out; TANJAI.toast("สร้าง Prompt ภาพแล้ว"); };
-  $("#makePost").onclick = () => {
-    const d = TANJAI.commonData("post");
-    d.workType = $("#post-workType")?.value || "";
-    d.extra = $("#post-extra")?.value || "";
-    const files = Array.from($("#post-photos")?.files || []);
-    d.photoCount = files.length;
-    d.photoNames = files.map(f => f.name).join(", ");
-    if(d.extra){
-      d.detail = `${d.detail}\n\nสิ่งที่ต้องการเน้นเพิ่มเติม: ${d.extra}`;
-    }
-    const out = TANJAI.workSummaryScript(d);
-    $("#postOut").textContent = out;
-    TANJAI.state.lastPost = out;
-    TANJAI.toast("สร้างสคริปต์สรุปงานแล้ว");
-  };
+  $("#makePost").onclick = () => { const d=TANJAI.commonData("post"); const out=TANJAI.postText(d); $("#postOut").textContent=out; TANJAI.state.lastPost=out; TANJAI.toast("สร้างโพสต์แล้ว"); };
   $("#makeVideo").onclick = () => { const d=TANJAI.commonData("video"); const out=TANJAI.videoStoryboard(d, $("#video-length").value); $("#videoOut").textContent=out; TANJAI.state.lastVideo=out; TANJAI.toast("สร้าง Storyboard แล้ว"); };
   $("#makeVoice").onclick = () => { const d=TANJAI.commonData("voice"); const out=TANJAI.voiceScript(d, $("#voice-length").value, $("#voice-style").value); $("#voiceOut").textContent=out; TANJAI.state.lastVoice=out; TANJAI.toast("สร้างสคริปต์เสียงแล้ว"); };
   $("#makeDeck").onclick = () => { const d=TANJAI.commonData("deck"); const out=TANJAI.deckOutline(d, Number($("#deck-count").value)); $("#deckOut").textContent=out; TANJAI.state.lastDeck=out; TANJAI.toast("สร้าง Outline สไลด์แล้ว"); };
@@ -201,30 +199,9 @@ ${TANJAI.deckOutline(d, 8)}`;
     $("#kitOut").textContent=out; TANJAI.state.lastKit=out; TANJAI.toast("สร้างชุดสื่อแล้ว");
   };
 
-  // Voice playback
 
   // Save
   $("#saveImage").onclick = () => TANJAI.saveProject($("#image-title").value || "สร้างภาพ", $("#imageOut").textContent, "สร้างภาพ");
-
-  // v6.1.5 image preview for work summary
-  const postPhotos = $("#post-photos");
-  const photoPreview = $("#post-photoPreview");
-  if(postPhotos && photoPreview){
-    postPhotos.addEventListener("change", () => {
-      photoPreview.innerHTML = "";
-      Array.from(postPhotos.files || []).slice(0, 12).forEach(file => {
-        const fig = document.createElement("figure");
-        const img = document.createElement("img");
-        img.src = URL.createObjectURL(file);
-        const cap = document.createElement("figcaption");
-        cap.textContent = file.name;
-        fig.appendChild(img);
-        fig.appendChild(cap);
-        photoPreview.appendChild(fig);
-      });
-    });
-  }
-
   $("#savePost").onclick = () => TANJAI.saveProject($("#post-title").value || "เขียนโพสต์", $("#postOut").textContent, "เขียนโพสต์");
   $("#saveVideo").onclick = () => TANJAI.saveProject($("#video-title").value || "ทำวิดีโอ", $("#videoOut").textContent, "ทำวิดีโอ");
   $("#saveVoice").onclick = () => TANJAI.saveProject($("#voice-title").value || "เสียงพากย์", $("#voiceOut").textContent, "เสียงพากย์");
@@ -233,80 +210,3 @@ ${TANJAI.deckOutline(d, 8)}`;
 
   $("#clearProjects").onclick = () => { localStorage.removeItem("tanjaiV5Projects"); TANJAI.renderProjects(); TANJAI.toast("ล้างโปรเจกต์แล้ว"); };
 });
-
-
-  // v6.1.8 Slide Notebook Voice Tools
-  (function(){
-    const openMap = {
-      "เปิด Voice Tool": "https://aistudio.google.com/",
-      "เปิด Slide Tool": "https://gamma.app/",
-      "เปิด Notebook Tool": "https://notebooklm.google.com/"
-    };
-
-    function addButton(row, label){
-      if(!row || row.textContent.includes(label)) return;
-      const b = document.createElement("button");
-      b.className = "btn secondary";
-      b.type = "button";
-      b.textContent = label;
-      b.onclick = () => window.open(openMap[label], "_blank", "noopener,noreferrer");
-      row.appendChild(b);
-    }
-
-    function findActionRow(section, mustContain){
-      if(!section) return null;
-      const rows = Array.from(section.querySelectorAll(".button-row,.result-action,.open-actions,div"));
-      return rows.find(r => {
-        const t = r.textContent || "";
-        return mustContain.every(x => t.includes(x));
-      });
-    }
-
-    const voiceSection = document.getElementById("voice");
-    if(voiceSection){
-      const row = findActionRow(voiceSection, ["เปิด ChatGPT","เปิด CapCut"]);
-      if(row){
-        Array.from(row.querySelectorAll("button,a")).forEach(btn => {
-          if((btn.textContent || "").includes("Canva")) btn.remove();
-        });
-        addButton(row, "เปิด Voice Tool");
-      }
-    }
-
-    const deckSection = document.getElementById("deck");
-    if(deckSection){
-      const row = findActionRow(deckSection, ["เปิด ChatGPT","เปิด Canva"]) || findActionRow(deckSection, ["เปิด Canva"]);
-      if(row){
-        addButton(row, "เปิด Slide Tool");
-        addButton(row, "เปิด Notebook Tool");
-      }
-    }
-
-    const postSection = document.getElementById("post");
-    if(postSection){
-      const row = findActionRow(postSection, ["เปิด ChatGPT"]) || findActionRow(postSection, ["เปิด Canva"]);
-      if(row){
-        addButton(row, "เปิด Notebook Tool");
-      }
-    }
-
-    const destView = document.getElementById("dest") || document.getElementById("destination");
-    if(destView){
-      const grid = destView.querySelector(".library-grid,.tool-grid,.sample-grid,.cards-grid") || destView.querySelector(".section-card");
-      if(grid){
-        const cards = [
-          ["Slide Tool","สไลด์ / Presentation","นำ Outline สไลด์ไปต่อยอดเป็นสไลด์นำเสนอแบบอัตโนมัติ หรือใช้สร้าง Deck อย่างรวดเร็ว","https://gamma.app/"],
-          ["Notebook Tool","เอกสาร / Research","ใช้สรุปไฟล์ เอกสารประชุม โครงการ และข้อมูลยาว ๆ เพื่อต่อยอดเป็นสไลด์ สคริปต์ หรือเสียง","https://notebooklm.google.com/"],
-          ["Voice Tool","เสียง / AI Voice","นำสคริปต์เสียงไปต่อยอดเป็นเสียงพากย์ AI หรือใช้กับเครื่องมือเสียงที่รองรับ","https://aistudio.google.com/"]
-        ];
-        cards.forEach(([title,tag,desc,url])=>{
-          if(destView.textContent.includes(title)) return;
-          const card = document.createElement("article");
-          card.className = "destination-card section-card";
-          card.innerHTML = `<span class="pill">${tag}</span><h3>${title}</h3><p>${desc}</p><button class="btn secondary" type="button">เปิดใช้งาน</button>`;
-          card.querySelector("button").onclick = () => window.open(url,"_blank","noopener,noreferrer");
-          grid.appendChild(card);
-        });
-      }
-    }
-  })();

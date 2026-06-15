@@ -52,23 +52,26 @@ TANJAI.field = function(prefix, data){
 
 TANJAI.resultShell = function(tool, recommended, desc, bodyId, buttons=""){
   const destinationButtons = (()=>{
+    const btn = (label,url)=>`<button class="btn secondary" data-open="${url}">${label}</button>`;
+    if(tool === "image"){
+      return btn("เปิด ChatGPT","https://chatgpt.com/") + btn("เปิด Canva","https://www.canva.com/");
+    }
+    if(tool === "post"){
+      return btn("เปิด ChatGPT","https://chatgpt.com/") + btn("เปิด Notebook Tool","https://notebooklm.google.com/") + btn("เปิด Canva","https://www.canva.com/") + btn("เปิด CapCut","https://www.capcut.com/");
+    }
+    if(tool === "video"){
+      return btn("เปิด ChatGPT","https://chatgpt.com/") + btn("เปิด CapCut","https://www.capcut.com/");
+    }
     if(tool === "voice"){
-      return `
-        <button class="btn secondary" data-open="https://chatgpt.com/">เปิด ChatGPT</button>
-        <button class="btn secondary" data-open="https://www.capcut.com/">เปิด CapCut</button>
-        <button class="btn secondary" data-open="https://aistudio.google.com/">เปิด Voice Tool</button>`;
+      return btn("เปิด ChatGPT","https://chatgpt.com/") + btn("เปิด CapCut","https://www.capcut.com/") + btn("เปิด Voice Tool","https://aistudio.google.com/");
     }
     if(tool === "deck"){
-      return `
-        <button class="btn secondary" data-open="https://chatgpt.com/">เปิด ChatGPT</button>
-        <button class="btn secondary" data-open="https://www.canva.com/">เปิด Canva</button>
-        <button class="btn secondary" data-open="https://gamma.app/">เปิด Slide Tool</button>
-        <button class="btn secondary" data-open="https://notebooklm.google.com/">เปิด Notebook Tool</button>`;
+      return btn("เปิด ChatGPT","https://chatgpt.com/") + btn("เปิด Canva","https://www.canva.com/") + btn("เปิด Slide Tool","https://gamma.app/") + btn("เปิด Notebook Tool","https://notebooklm.google.com/");
     }
-    return `
-      <button class="btn secondary" data-open="https://chatgpt.com/">เปิด ChatGPT</button>
-      <button class="btn secondary" data-open="https://www.canva.com/">เปิด Canva</button>
-      <button class="btn secondary" data-open="https://www.capcut.com/">เปิด CapCut</button>`;
+    if(tool === "kit"){
+      return btn("เปิด ChatGPT","https://chatgpt.com/") + btn("เปิด Canva","https://www.canva.com/") + btn("เปิด CapCut","https://www.capcut.com/") + btn("เปิด Voice Tool","https://aistudio.google.com/") + btn("เปิด Slide Tool","https://gamma.app/");
+    }
+    return btn("เปิด ChatGPT","https://chatgpt.com/") + btn("เปิด Canva","https://www.canva.com/") + btn("เปิด CapCut","https://www.capcut.com/");
   })();
 
   return `
@@ -112,5 +115,11 @@ TANJAI.renderPromptHub = function(){
 };
 TANJAI.renderDestinations = function(){
   const el=TANJAI.$("#destinationGrid"); if(!el) return;
-  el.innerHTML=(TANJAI.destinations||[]).map((d,i)=>`<article class="library-card"><span class="tag">${d.group}</span><b>${d.name}</b><p>${d.desc}</p><div class="button-row"><button class="btn secondary" data-open="${d.url}">เปิดใช้งาน</button></div></article>`).join("");
+  el.innerHTML=(TANJAI.destinations||[]).map((d,i)=>{
+    const name = d.name || d.title || "เครื่องมือ";
+    const group = d.group || d.category || d.tag || "ปลายทาง";
+    const desc = d.desc || d.description || "";
+    const url = d.url || "#";
+    return `<article class="library-card"><span class="tag">${group}</span><b>${name}</b><p>${desc}</p><div class="button-row"><button class="btn secondary" data-open="${url}">เปิดใช้งาน</button></div></article>`;
+  }).join("");
 };
