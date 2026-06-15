@@ -137,3 +137,8 @@
 - เปลี่ยนรหัสได้ใน `js/app.js` ที่ตัวแปร `PASSCODE`
 - เป็นระบบล็อกอินเบาสำหรับเว็บ Static/GitHub Pages ไม่ใช่ระบบสมาชิกจริงระดับ Server
 - อย่างอื่นคงเดิมจาก v6.2.6 Final Ready
+
+
+## v6.2.7 Shortcut Text Polish
+- จัดระเบียบข้อความในกล่อง “ทางลัดการใช้งาน” ให้สั้น กระชับ และตัดบรรทัดสวยขึ้น
+- คง Login Gate, Real Preview Cards Pro, Destination Hub 6 รายการ, favicon TJ และฟังก์ชันอื่นทั้งหมด

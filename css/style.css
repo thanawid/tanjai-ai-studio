@@ -563,3 +563,43 @@ body:not(.auth-locked) .login-gate{
     font-size:26px;
   }
 }
+
+/* v6.2.7 Shortcut Text Polish: compact, balanced Thai wrapping */
+.steps{
+  gap:10px;
+}
+.steps .step-card-v61{
+  display:grid !important;
+  grid-template-columns:38px minmax(0,1fr);
+  column-gap:12px;
+  row-gap:3px;
+  align-items:start;
+  padding:14px 15px !important;
+}
+.steps .step-card-v61 b{
+  float:none !important;
+  grid-row:1 / span 2;
+  width:38px !important;
+  height:38px !important;
+  margin:0 !important;
+  font-size:15px;
+}
+.steps .step-card-v61 strong{
+  display:block;
+  margin:0 !important;
+  line-height:1.25;
+  font-size:15px;
+  word-break:keep-all;
+}
+.steps .step-card-v61 span{
+  display:block;
+  margin:0 !important;
+  font-size:12.8px;
+  line-height:1.48;
+  word-break:keep-all;
+  overflow-wrap:break-word;
+  color:var(--muted);
+}
+.steps .step-card-v61:after{
+  display:none !important;
+}
