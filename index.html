@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>ทันใจ AI Studio v6.1.4 | Responsive All Devices</title>
+  <title>ทันใจ AI Studio v6.1.5 | Work Summary Script</title>
   <link rel="icon" href="favicon.ico">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <link rel="manifest" href="manifest.webmanifest">
@@ -30,7 +30,7 @@
         <button class="nav-link active" data-view="dashboard"><i>🏠</i><b>หน้าหลัก</b></button>
         <button class="nav-link" data-view="router"><i>🧭</i><b>AI Router</b></button>
         <button class="nav-link" data-view="image"><i>🖼️</i><b>สร้างภาพ</b></button>
-        <button class="nav-link" data-view="post"><i>✍️</i><b>เขียนโพสต์</b></button>
+        <button class="nav-link" data-view="post"><i>✍️</i><b>สคริปต์สรุปงาน</b></button>
         <button class="nav-link" data-view="video"><i>🎬</i><b>ทำวิดีโอ</b></button>
         <button class="nav-link" data-view="voice"><i>🎙️</i><b>เสียงพากย์</b></button>
         <button class="nav-link" data-view="deck"><i>📊</i><b>ทำสไลด์</b></button>
@@ -74,7 +74,7 @@
           <div class="hero-copy">
             <p class="eyebrow">ทันใจ AI Studio • สร้างสื่อไว ด้วยพลัง AI</p>
             <h3>AI Media Hub สำหรับงานประชาสัมพันธ์ไทย</h3>
-            <p>ผู้ช่วยคิดงาน จัดคำสั่ง เขียนโพสต์ วางแผนวิดีโอ ทำสคริปต์เสียง และเตรียมสไลด์ เลือกทำทีละอย่างได้ หรือให้ระบบแนะนำทางไปต่อด้วย AI Router</p>
+            <p>ผู้ช่วยคิดงาน จัดคำสั่ง สคริปต์สรุปงาน วางแผนวิดีโอ ทำสคริปต์เสียง และเตรียมสไลด์ เลือกทำทีละอย่างได้ หรือให้ระบบแนะนำทางไปต่อด้วย AI Router</p>
             <div class="hero-actions">
               <button class="btn primary" data-view="router">เริ่มที่ AI Router</button>
               <button class="btn secondary" data-view="image">สร้างภาพ</button>
@@ -99,7 +99,7 @@
         <div class="tool-grid">
           <button class="tool-card highlight" data-view="router"><img src="assets/icons/router.svg" alt=""><b>AI Router</b><span>พิมพ์สิ่งที่อยากทำ แล้วระบบแนะนำเมนูและปลายทางให้</span></button>
           <button class="tool-card" data-view="image"><img src="assets/icons/image.svg" alt=""><b>สร้างภาพ</b><span>สร้าง Prompt ภาพสำหรับ AI / Canva / งานออกแบบ</span></button>
-          <button class="tool-card" data-view="post"><img src="assets/icons/post.svg" alt=""><b>เขียนโพสต์</b><span>Facebook, Line, Caption และข้อความสั้น</span></button>
+          <button class="tool-card" data-view="post"><img src="assets/icons/post.svg" alt=""><b>สคริปต์สรุปงาน</b><span>Facebook, Line, Caption และข้อความสั้น</span></button>
           <button class="tool-card" data-view="video"><img src="assets/icons/video.svg" alt=""><b>ทำวิดีโอ</b><span>Hook, Storyboard, Voice Over และข้อความบนจอ</span></button>
           <button class="tool-card" data-view="voice"><img src="assets/icons/voice.svg" alt=""><b>เสียงพากย์</b><span>สคริปต์เสียง ทดลองอ่าน และคัดลอกไปใช้ TTS</span></button>
           <button class="tool-card" data-view="deck"><img src="assets/icons/deck.svg" alt=""><b>ทำสไลด์</b><span>Outline, Speaker Notes และโครงนำเสนอ</span></button>
@@ -115,7 +115,7 @@
             </div>
             <div class="sample-grid">
               <article class="home-choice-card" data-view="image"><img src="assets/samples/sample-image.jpg" alt=""><b>สร้างภาพ</b><span>Prompt ภาพพร้อมใช้</span></article>
-              <article class="home-choice-card" data-view="post"><img src="assets/samples/sample-post.jpg" alt=""><b>เขียนโพสต์</b><span>โพสต์และแคปชั่น</span></article>
+              <article class="home-choice-card" data-view="post"><img src="assets/samples/sample-post.jpg" alt=""><b>สคริปต์สรุปงาน</b><span>ใช้ต่อได้ทั้งนำเสนอ ทำคลิป และโพสต์โซเชียล</span></article>
               <article class="home-choice-card" data-view="video"><img src="assets/samples/sample-video.jpg" alt=""><b>ทำวิดีโอ / ทำคลิป</b><span>Storyboard + Voice Over</span></article>
               <article class="home-choice-card" data-view="voice"><img src="assets/samples/sample-voice.jpg" alt=""><b>เสียงพากย์</b><span>สคริปต์ + ทดลองอ่าน</span></article>
               <article class="home-choice-card" data-view="deck"><img src="assets/samples/sample-deck.jpg" alt=""><b>ทำสไลด์</b><span>Outline + Speaker Notes</span></article>
@@ -125,7 +125,7 @@
           <aside class="panel">
             <h3>ทางลัดการใช้งาน</h3>
             <div class="steps">
-              <div class="step-card-v61"><b>1</b><strong>เลือกงานที่ต้องการทำ</strong><span>เลือกได้ทีละงาน เช่น สร้างภาพ เขียนโพสต์ ทำคลิป เสียงพากย์ ทำสไลด์ หรือสร้างชุดสื่อ</span></div>
+              <div class="step-card-v61"><b>1</b><strong>เลือกงานที่ต้องการทำ</strong><span>เลือกได้ทีละงาน เช่น สร้างภาพ สคริปต์สรุปงาน ทำคลิป เสียงพากย์ ทำสไลด์ หรือสร้างชุดสื่อ</span></div>
               <div class="step-card-v61"><b>2</b><strong>กรอกข้อมูลของงานนั้น</strong><span>แต่ละเมนูมีฟอร์มเฉพาะของตัวเอง ไม่บังคับให้ใช้เรื่องเดียวกันทุกงาน</span></div>
               <div class="step-card-v61"><b>3</b><strong>กดสร้างผลลัพธ์</strong><span>ระบบจะจัด Prompt โพสต์ Storyboard สคริปต์เสียง หรือ Outline ให้ตามเมนูที่เลือก</span></div>
               <div class="step-card-v61"><b>4</b><strong>คัดลอกไปใช้งานต่อ</strong><span>นำผลลัพธ์ไปวางในเครื่องมือที่ต้องการ เช่น ChatGPT, Canva, CapCut หรือเครื่องมือเสียง</span></div>
@@ -146,7 +146,7 @@
 
       <section id="image" class="view"><div class="studio-layout"><section class="panel form-panel"><div class="panel-head"><div><h3>🖼️ สร้างภาพ</h3><p>สร้าง Prompt ภาพและคำสั่งออกแบบสำหรับนำไปใช้ต่อกับ AI สร้างภาพหรือ Canva</p></div><button class="btn secondary" data-template="municipal">ใส่ตัวอย่าง</button></div><div id="imageForm"></div></section><aside class="panel result-panel"><div id="imageResult"></div></aside></div></section>
 
-      <section id="post" class="view"><div class="studio-layout"><section class="panel form-panel"><div class="panel-head"><div><h3>✍️ เขียนโพสต์</h3><p>เขียนโพสต์ แคปชั่น และข้อความ Line แยกจากงานอื่นได้</p></div><button class="btn secondary" data-template="quote">ใส่ตัวอย่าง</button></div><div id="postForm"></div></section><aside class="panel result-panel"><div id="postResult"></div></aside></div></section>
+      <section id="post" class="view"><div class="studio-layout"><section class="panel form-panel"><div class="panel-head"><div><h3>✍️ สคริปต์สรุปงาน</h3><p>สคริปต์สรุปงาน แคปชั่น และข้อความ Line แยกจากงานอื่นได้</p></div><button class="btn secondary" data-template="quote">ใส่ตัวอย่าง</button></div><div id="postForm"></div></section><aside class="panel result-panel"><div id="postResult"></div></aside></div></section>
 
       <section id="video" class="view"><div class="studio-layout"><section class="panel form-panel"><div class="panel-head"><div><h3>🎬 ทำวิดีโอ</h3><p>สร้าง Hook, Storyboard, Voice Over และข้อความบนจอสำหรับคลิป</p></div><button class="btn secondary" data-template="event">ใส่ตัวอย่าง</button></div><div id="videoForm"></div></section><aside class="panel result-panel"><div id="videoResult"></div></aside></div></section>
 

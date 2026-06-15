@@ -16,7 +16,8 @@ document.addEventListener("DOMContentLoaded", () => {
     focuses: ["เน้นหัวข้อหลัก","เน้นภาพบุคคล","เน้นภาพกิจกรรม","เน้นสินค้า / โปรโมชัน","เน้นบรรยากาศ","เน้นโลโก้หน่วยงาน"],
     colorTones: ["เขียว เหลือง ขาว แบบหน่วยงานท้องถิ่น","ม่วง ทอง เทคโนโลยี","น้ำเงิน ขาว ทางการ","ชมพู ม่วง สดใส","ดำ ทอง พรีเมียม","ให้ AI เลือกให้เหมาะสม"],
     videoFormats: ["คลิปประชาสัมพันธ์","คลิปข่าวด่วน","คลิปกิจกรรม / โครงการ","คลิปรีวิว","คลิปโซเชียลไวรัล","คลิปแนวสารคดีสั้น"],
-    slideStyles: ["ทางการสำหรับผู้บริหาร","สรุปประชุม","นำเสนอโครงการ","รายงานผล","Pitch Deck","สไลด์อบรม"]
+    slideStyles: ["ทางการสำหรับผู้บริหาร","สรุปประชุม","นำเสนอโครงการ","รายงานผล","Pitch Deck","สไลด์อบรม"],
+    workTypes: ["นายกลงพื้นที่","ติดตามปัญหาประชาชน","ตรวจงานโครงการ","กิจกรรมเทศบาล","อบรม / ประชุม","ลงพื้นที่ช่วยเหลือ","รณรงค์ / ประชาสัมพันธ์","อื่น ๆ"]
   };
 
 // Render forms
@@ -47,15 +48,29 @@ document.addEventListener("DOMContentLoaded", () => {
     <div class="button-row"><button class="btn primary" id="makeImage">สร้าง Prompt ภาพ</button><button class="btn secondary" id="saveImage">บันทึก</button></div>
   `;
   $("#postForm").innerHTML = TANJAI.field("post") + `
-    <div class="form-section"><div class="section-title"><b>2</b><h4>ตั้งค่าโพสต์</h4></div>
+    <div class="form-note">เมนูนี้ใช้สรุปงานจากข้อมูลและรูปภาพ เช่น นายกลงพื้นที่ ตรวจงาน ช่วยเหลือประชาชน แล้วนำไปต่อได้ทั้งนำเสนอ ทำคลิป และโพสต์โซเชียล</div>
+    <div class="form-section"><div class="section-title"><b>2</b><h4>ตั้งค่าสคริปต์สรุปงาน</h4></div>
       <div class="form-grid">
-        <label>ช่องทาง<select id="post-channel">${opts(toolOptions.channels)}</select></label>
-        <label>ความยาวโพสต์<select id="post-length">${opts(toolOptions.postLengths)}</select></label>
-        <label>หมวดงานหลัก<select id="post-mainCategory">${opts(toolOptions.mainCategories)}</select></label>
-        <label>หัวข้องานย่อย<select id="post-subCategory">${opts(toolOptions.subCategories)}</select></label>
+        <label>ประเภทงาน<select id="post-workType">${opts(toolOptions.workTypes || ["นายกลงพื้นที่","กิจกรรมเทศบาล","อื่น ๆ"])}</select></label>
+        <label>ใช้ต่อเป็นหลัก<select id="post-channel"><option>ครบชุด: นำเสนอ + ทำคลิป + โพสต์โซเชียล</option><option>สรุปสำหรับผู้บริหาร</option><option>สคริปต์ทำคลิป</option><option>โพสต์ Facebook / Line</option><option>Bullet สำหรับสไลด์</option></select></label>
+        <label>ความยาว<select id="post-length">${opts(toolOptions.postLengths)}</select></label>
+        <label>หมวดงาน<select id="post-mainCategory">${opts(toolOptions.mainCategories)}</select></label>
+        <label class="full">แนบรูปประกอบ / รูปลงพื้นที่
+          <input id="post-photos" type="file" accept="image/*" multiple>
+          <small>หมายเหตุ: เว็บนี้จะช่วยจัด Prompt และแสดงตัวอย่างรูป จากนั้นนำ Prompt พร้อมรูปไปใช้กับ AI ที่วิเคราะห์ภาพได้ เช่น ChatGPT</small>
+          <div id="post-photoPreview" class="upload-preview-grid"></div>
+        </label>
+        <label class="full">สิ่งที่อยากให้เน้นเพิ่มเติม<textarea id="post-extra" placeholder="เช่น เน้นการรับฟังปัญหา การตรวจสอบพื้นที่ การประสานหน่วยงาน หรือผลลัพธ์ที่ประชาชนได้รับ"></textarea></label>
+      </div>
+      <div class="summary-output-tabs">
+        <span class="summary-chip">สรุปผู้บริหาร</span>
+        <span class="summary-chip">สคริปต์คลิป</span>
+        <span class="summary-chip">โพสต์โซเชียล</span>
+        <span class="summary-chip">Bullet สไลด์</span>
+        <span class="summary-chip">ข้อความบนภาพ</span>
       </div>
     </div>
-    <div class="button-row"><button class="btn primary" id="makePost">สร้างโพสต์</button><button class="btn secondary" id="savePost">บันทึก</button></div>`;
+    <div class="button-row"><button class="btn primary" id="makePost">สร้างสคริปต์สรุปงาน</button><button class="btn secondary" id="savePost">บันทึก</button></div>`;
   $("#videoForm").innerHTML = TANJAI.field("video") + `
     <div class="form-note">เมนูนี้ใช้ทำวิดีโอหรือทำคลิปได้โดยตรง สร้าง Hook, Storyboard, Voice Over และข้อความบนจอ</div>
     <div class="form-section"><div class="section-title"><b>2</b><h4>ตั้งค่าวิดีโอ / คลิป</h4></div>
@@ -87,7 +102,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Results
   $("#imageResult").innerHTML = TANJAI.resultShell("image", "Prompt ภาพ", "คัดลอกไปใช้กับ ChatGPT / Canva / AI สร้างภาพ", "imageOut", `<button class="btn primary" data-copybox="imageOut">คัดลอก Prompt ภาพ</button>`);
-  $("#postResult").innerHTML = TANJAI.resultShell("post", "โพสต์พร้อมใช้", "คัดลอกไปวางใน Facebook / Line / Caption", "postOut", `<button class="btn primary" data-copybox="postOut">คัดลอกโพสต์</button>`);
+  $("#postResult").innerHTML = TANJAI.resultShell("post", "สคริปต์สรุปงาน", "คัดลอกไปใช้ต่อกับงานนำเสนอ ทำคลิป หรือโพสต์โซเชียล", "postOut", `<button class="btn primary" data-copybox="postOut">คัดลอกสคริปต์สรุปงาน</button>`);
   $("#videoResult").innerHTML = TANJAI.resultShell("video", "Storyboard", "คัดลอกไปใช้กับ CapCut / ทีมถ่าย / คลิปสั้น", "videoOut", `<button class="btn primary" data-copybox="videoOut">คัดลอก Storyboard</button>`);
   $("#voiceResult").innerHTML = TANJAI.resultShell("voice", "สคริปต์เสียงพากย์", "คัดลอกไปใช้กับ TTS / CapCut หรือกดทดลองอ่านเสียง", "voiceOut", `<button class="btn primary" data-copybox="voiceOut">คัดลอกสคริปต์เสียง</button>`);
   $("#deckResult").innerHTML = TANJAI.resultShell("deck", "Outline สไลด์", "คัดลอกไปทำ PowerPoint / Canva Presentation", "deckOut", `<button class="btn primary" data-copybox="deckOut">คัดลอก Outline</button>`);
@@ -147,7 +162,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Generators
   $("#makeImage").onclick = () => { const d=TANJAI.commonData("image"); const out=TANJAI.imagePrompt(d); $("#imageOut").textContent=out; TANJAI.state.lastImage=out; TANJAI.toast("สร้าง Prompt ภาพแล้ว"); };
-  $("#makePost").onclick = () => { const d=TANJAI.commonData("post"); const out=TANJAI.postText(d); $("#postOut").textContent=out; TANJAI.state.lastPost=out; TANJAI.toast("สร้างโพสต์แล้ว"); };
+  $("#makePost").onclick = () => {
+    const d = TANJAI.commonData("post");
+    d.workType = $("#post-workType")?.value || "";
+    d.extra = $("#post-extra")?.value || "";
+    const files = Array.from($("#post-photos")?.files || []);
+    d.photoCount = files.length;
+    d.photoNames = files.map(f => f.name).join(", ");
+    if(d.extra){
+      d.detail = `${d.detail}\n\nสิ่งที่ต้องการเน้นเพิ่มเติม: ${d.extra}`;
+    }
+    const out = TANJAI.workSummaryScript(d);
+    $("#postOut").textContent = out;
+    TANJAI.state.lastPost = out;
+    TANJAI.toast("สร้างสคริปต์สรุปงานแล้ว");
+  };
   $("#makeVideo").onclick = () => { const d=TANJAI.commonData("video"); const out=TANJAI.videoStoryboard(d, $("#video-length").value); $("#videoOut").textContent=out; TANJAI.state.lastVideo=out; TANJAI.toast("สร้าง Storyboard แล้ว"); };
   $("#makeVoice").onclick = () => { const d=TANJAI.commonData("voice"); const out=TANJAI.voiceScript(d, $("#voice-length").value, $("#voice-style").value); $("#voiceOut").textContent=out; TANJAI.state.lastVoice=out; TANJAI.toast("สร้างสคริปต์เสียงแล้ว"); };
   $("#makeDeck").onclick = () => { const d=TANJAI.commonData("deck"); const out=TANJAI.deckOutline(d, Number($("#deck-count").value)); $("#deckOut").textContent=out; TANJAI.state.lastDeck=out; TANJAI.toast("สร้าง Outline สไลด์แล้ว"); };
@@ -178,6 +207,26 @@ ${TANJAI.deckOutline(d, 8)}`;
 
   // Save
   $("#saveImage").onclick = () => TANJAI.saveProject($("#image-title").value || "สร้างภาพ", $("#imageOut").textContent, "สร้างภาพ");
+
+  // v6.1.5 image preview for work summary
+  const postPhotos = $("#post-photos");
+  const photoPreview = $("#post-photoPreview");
+  if(postPhotos && photoPreview){
+    postPhotos.addEventListener("change", () => {
+      photoPreview.innerHTML = "";
+      Array.from(postPhotos.files || []).slice(0, 12).forEach(file => {
+        const fig = document.createElement("figure");
+        const img = document.createElement("img");
+        img.src = URL.createObjectURL(file);
+        const cap = document.createElement("figcaption");
+        cap.textContent = file.name;
+        fig.appendChild(img);
+        fig.appendChild(cap);
+        photoPreview.appendChild(fig);
+      });
+    });
+  }
+
   $("#savePost").onclick = () => TANJAI.saveProject($("#post-title").value || "เขียนโพสต์", $("#postOut").textContent, "เขียนโพสต์");
   $("#saveVideo").onclick = () => TANJAI.saveProject($("#video-title").value || "ทำวิดีโอ", $("#videoOut").textContent, "ทำวิดีโอ");
   $("#saveVoice").onclick = () => TANJAI.saveProject($("#voice-title").value || "เสียงพากย์", $("#voiceOut").textContent, "เสียงพากย์");
