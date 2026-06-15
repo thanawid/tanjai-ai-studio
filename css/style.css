@@ -242,3 +242,13 @@ button,input,select,textarea{font-family:inherit}button{cursor:pointer}
   font-size:12px;
   font-weight:900;
 }
+
+
+/* v6.1.7 Destination Voice Tool */
+.destination-card h3{margin:.55rem 0 .35rem}
+.destination-card p{color:var(--muted);line-height:1.65}
+
+
+/* v6.1.8 Slide Notebook Voice Tools */
+.destination-card h3{margin:.55rem 0 .35rem}
+.destination-card p{color:var(--muted);line-height:1.65}

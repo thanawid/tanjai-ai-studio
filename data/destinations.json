@@ -22,5 +22,29 @@
     "desc": "ปลายทางกลางสำหรับหาเครื่องมือ AI อื่น ๆ ที่ผู้ใช้เลือกเอง",
     "url": "https://www.google.com/search?q=AI+tools",
     "group": "เครื่องมืออื่น"
+  },
+  {
+    "title": "Voice Tool",
+    "category": "เสียง / AI Voice",
+    "tag": "เสียง / AI Voice",
+    "description": "นำสคริปต์เสียงไปต่อยอดเป็นเสียงพากย์ AI หรือใช้กับเครื่องมือเสียงที่รองรับ",
+    "url": "https://aistudio.google.com/",
+    "button": "เปิดใช้งาน"
+  },
+  {
+    "title": "Slide Tool",
+    "category": "สไลด์ / Presentation",
+    "tag": "สไลด์ / Presentation",
+    "description": "นำ Outline สไลด์ไปต่อยอดเป็นสไลด์นำเสนอแบบอัตโนมัติ หรือใช้สร้าง Deck อย่างรวดเร็ว",
+    "url": "https://gamma.app/",
+    "button": "เปิดใช้งาน"
+  },
+  {
+    "title": "Notebook Tool",
+    "category": "สรุปเอกสาร / ค้นคว้า",
+    "tag": "เอกสาร / Research",
+    "description": "ใช้สรุปไฟล์ เอกสารประชุม โครงการ และข้อมูลยาว ๆ เพื่อต่อยอดเป็นสไลด์ สคริปต์ หรือเสียง",
+    "url": "https://notebooklm.google.com/",
+    "button": "เปิดใช้งาน"
   }
 ]

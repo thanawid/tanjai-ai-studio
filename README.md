@@ -61,3 +61,25 @@
 - ผลลัพธ์ที่แนะนำ: เปิด ChatGPT / เปิด CapCut / เปิด Voice Tool
 - ใช้ชื่อกลางว่า Voice Tool ไม่แสดงชื่อ Google AI Studio บนหน้าเว็บ
 - อย่างอื่นคงเดิมจาก v6.1.5
+
+
+## v6.1.7 Destination Voice Tool
+- เพิ่มการ์ด Voice Tool ใน Destination Hub
+- ใช้ชื่อกลางว่า Voice Tool ไม่ใช้ชื่อแบรนด์ภายนอกบนหน้าเว็บหลัก
+- ใช้กับงานเสียงพากย์ / AI Voice
+- อย่างอื่นคงเดิมจาก v6.1.6
+
+
+## v6.1.8 Slide Notebook Voice Tools
+- รวมแก้เมนูเสียงพากย์:
+  - ปุ่มฟอร์ม: สร้างสคริปต์เสียง / คัดลอกสคริปต์ / บันทึก
+  - ผลลัพธ์ที่แนะนำ: เปิด ChatGPT / เปิด CapCut / เปิด Voice Tool
+- ปรับเมนูทำสไลด์:
+  - ปุ่มฟอร์ม: สร้าง Outline / คัดลอก Outline / บันทึก
+  - ผลลัพธ์ที่แนะนำ: เปิด ChatGPT / เปิด Canva / เปิด Slide Tool / เปิด Notebook Tool
+- เพิ่ม Destination Hub:
+  - Voice Tool
+  - Slide Tool
+  - Notebook Tool
+- ใช้ชื่อกลาง ไม่โชว์ชื่อแบรนด์ภายนอกเป็นหัวข้อหลัก
+- อย่างอื่นคงเดิมจากฐานล่าสุด
