@@ -89,7 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <label>ช่องทางใช้งาน<select id="voice-channel">${opts(toolOptions.channels)}</select></label>
         <label>หมวดงาน<select id="voice-mainCategory">${opts(toolOptions.mainCategories)}</select></label>
       </div>
-    </div><div class="button-row"><button class="btn primary" id="makeVoice">สร้างสคริปต์เสียง</button><button class="btn secondary" data-copybox="voiceOut">คัดลอกสคริปต์</button><button class="btn secondary" id="saveVoice">บันทึก</button></div>`;
+    </div><div class="button-row"><button class="btn primary" id="makeVoice">สร้างสคริปต์เสียง</button><button class="btn secondary" id="saveVoice">บันทึก</button></div>`;
   $("#deckForm").innerHTML = TANJAI.field("deck") + `
     <div class="form-section"><div class="section-title"><b>2</b><h4>ตั้งค่าสไลด์</h4></div>
       <div class="form-grid">
@@ -97,15 +97,15 @@ document.addEventListener("DOMContentLoaded", () => {
         <label>รูปแบบสไลด์<select id="deck-format">${opts(toolOptions.slideStyles)}</select></label>
         <label>หมวดงาน<select id="deck-mainCategory">${opts(toolOptions.mainCategories)}</select></label>
       </div>
-    </div><div class="button-row"><button class="btn primary" id="makeDeck">สร้าง Outline</button><button class="btn secondary" data-copybox="deckOut">คัดลอก Outline</button><button class="btn secondary" id="saveDeck">บันทึก</button></div>`;
+    </div><div class="button-row"><button class="btn primary" id="makeDeck">สร้าง Outline</button><button class="btn secondary" id="saveDeck">บันทึก</button></div>`;
   $("#kitForm").innerHTML = TANJAI.field("kit") + `<div class="button-row"><button class="btn primary" id="makeKit">สร้างชุดสื่อ</button><button class="btn secondary" id="saveKit">บันทึก</button></div>`;
 
   // Results
   $("#imageResult").innerHTML = TANJAI.resultShell("image", "Prompt ภาพ", "คัดลอกไปใช้กับ ChatGPT / Canva / AI สร้างภาพ", "imageOut", `<button class="btn primary" data-copybox="imageOut">คัดลอก Prompt ภาพ</button>`);
   $("#postResult").innerHTML = TANJAI.resultShell("post", "สคริปต์สรุปงาน", "คัดลอกไปใช้ต่อกับงานนำเสนอ ทำคลิป หรือโพสต์โซเชียล", "postOut", `<button class="btn primary" data-copybox="postOut">คัดลอกสคริปต์สรุปงาน</button>`);
   $("#videoResult").innerHTML = TANJAI.resultShell("video", "Storyboard", "คัดลอกไปใช้กับ CapCut / ทีมถ่าย / คลิปสั้น", "videoOut", `<button class="btn primary" data-copybox="videoOut">คัดลอก Storyboard</button>`);
-  $("#voiceResult").innerHTML = TANJAI.resultShell("voice", "สคริปต์เสียงพากย์", "คัดลอกไปใช้กับ CapCut, Voice Tool หรือกดทดลองอ่านเสียง", "voiceOut", `<button class="btn primary" data-copybox="voiceOut">คัดลอกสคริปต์เสียง</button>`);
-  $("#deckResult").innerHTML = TANJAI.resultShell("deck", "Outline สไลด์", "คัดลอกไปทำ PowerPoint / Canva Presentation", "deckOut", `<button class="btn primary" data-copybox="deckOut">คัดลอก Outline</button>`);
+  $("#voiceResult").innerHTML = TANJAI.resultShell("voice", "สคริปต์เสียงพากย์", "คัดลอกไปใช้กับ CapCut หรือ Voice Tool", "voiceOut", `<button class="btn primary" data-copybox="voiceOut">คัดลอกสคริปต์เสียง</button>`);
+  $("#deckResult").innerHTML = TANJAI.resultShell("deck", "Outline สไลด์", "คัดลอกไปทำ Canva, Slide Tool หรือ Notebook Tool", "deckOut", `<button class="btn primary" data-copybox="deckOut">คัดลอก Outline</button>`);
   $("#kitResult").innerHTML = TANJAI.resultShell("kit", "ชุดสื่อครบแพ็ก", "ได้ภาพ โพสต์ วิดีโอ เสียง และสไลด์จากข้อมูลเดียว", "kitOut", `<button class="btn primary" data-copybox="kitOut">คัดลอกชุดสื่อ</button>`);
 
   TANJAI.renderLibrary();
@@ -202,8 +202,8 @@ ${TANJAI.deckOutline(d, 8)}`;
   };
 
   // Voice playback
-  ($("#speakVoice")||{}).onclick = () => { if(!$("#voiceOut").textContent.trim() || $("#voiceOut").textContent.includes("กดปุ่ม")) $("#makeVoice").click(); TANJAI.speak($("#voiceOut").textContent); };
-  ($("#stopVoice")||{}).onclick = TANJAI.stopSpeak;
+  null && ($("#speakVoice")||{}).onclick = () => { if(!$("#voiceOut").textContent.trim() || $("#voiceOut").textContent.includes("กดปุ่ม")) $("#makeVoice").click(); TANJAI.speak($("#voiceOut").textContent); };
+  null && ($("#stopVoice")||{}).onclick = TANJAI.stopSpeak;
 
   // Save
   $("#saveImage").onclick = () => TANJAI.saveProject($("#image-title").value || "สร้างภาพ", $("#imageOut").textContent, "สร้างภาพ");

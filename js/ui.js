@@ -51,15 +51,33 @@ TANJAI.field = function(prefix, data){
 };
 
 TANJAI.resultShell = function(tool, recommended, desc, bodyId, buttons=""){
+  const destinationButtons = (()=>{
+    if(tool === "voice"){
+      return `
+        <button class="btn secondary" data-open="https://chatgpt.com/">เปิด ChatGPT</button>
+        <button class="btn secondary" data-open="https://www.capcut.com/">เปิด CapCut</button>
+        <button class="btn secondary" data-open="https://aistudio.google.com/">เปิด Voice Tool</button>`;
+    }
+    if(tool === "deck"){
+      return `
+        <button class="btn secondary" data-open="https://chatgpt.com/">เปิด ChatGPT</button>
+        <button class="btn secondary" data-open="https://www.canva.com/">เปิด Canva</button>
+        <button class="btn secondary" data-open="https://gamma.app/">เปิด Slide Tool</button>
+        <button class="btn secondary" data-open="https://notebooklm.google.com/">เปิด Notebook Tool</button>`;
+    }
+    return `
+      <button class="btn secondary" data-open="https://chatgpt.com/">เปิด ChatGPT</button>
+      <button class="btn secondary" data-open="https://www.canva.com/">เปิด Canva</button>
+      <button class="btn secondary" data-open="https://www.capcut.com/">เปิด CapCut</button>`;
+  })();
+
   return `
     <div class="result-action">
       <div><small>ผลลัพธ์ที่แนะนำ</small><h4>${recommended}</h4><p>${desc}</p></div>
       ${buttons}
     </div>
     <div class="destination-actions">
-      <button class="btn secondary" data-open="https://chatgpt.com/">เปิด ChatGPT</button>
-      <button class="btn secondary" data-open="https://www.canva.com/">เปิด Canva</button>
-      <button class="btn secondary" data-open="https://www.capcut.com/">เปิด CapCut</button>
+      ${destinationButtons}
     </div>
     <div id="${bodyId}" class="result-box">กดปุ่มสร้าง แล้วผลลัพธ์จะแสดงตรงนี้</div>
   `;
