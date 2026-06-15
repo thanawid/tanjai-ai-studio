@@ -386,3 +386,11 @@ button,input,select,textarea{font-family:inherit}button{cursor:pointer}
 .home-choice-card.tone-voice{--preview-tint-1:rgba(255,141,76,.18);--preview-tint-2:rgba(178,69,30,.24)}
 .home-choice-card.tone-deck{--preview-tint-1:rgba(82,167,255,.18);--preview-tint-2:rgba(30,103,198,.24)}
 .home-choice-card.tone-kit{--preview-tint-1:rgba(255,187,92,.18);--preview-tint-2:rgba(184,113,39,.24)}
+
+
+/* v6.2.6 final: prevent accidental blue text selection in usage shortcut cards */
+.steps,
+.steps *{
+  -webkit-user-select:none;
+  user-select:none;
+}

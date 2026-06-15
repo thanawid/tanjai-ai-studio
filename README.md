@@ -113,3 +113,9 @@
 - เปลี่ยนเฉพาะ favicon และ web app icon/mobile icon เป็นไฟล์ Logo002.jpg ที่แนบมา
 - ไม่เปลี่ยน main logo / hero / sidebar
 - อย่างอื่นคงเดิมจาก v6.2.4
+
+
+## v6.2.6 Final Two Fixes
+- แก้ Destination Hub ให้แสดงครบ 6 เครื่องมือจากแหล่งข้อมูลหลักใน `js/data.js`
+- กันข้อความในกล่อง “ทางลัดการใช้งาน” ถูกลากเลือกจนขึ้นแถบสีน้ำเงิน
+- คง Real Preview Cards Pro, favicon TJ, layout, สีหลัก และฟังก์ชันอื่นทั้งหมด
