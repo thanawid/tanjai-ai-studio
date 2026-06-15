@@ -89,7 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <label>ช่องทางใช้งาน<select id="voice-channel">${opts(toolOptions.channels)}</select></label>
         <label>หมวดงาน<select id="voice-mainCategory">${opts(toolOptions.mainCategories)}</select></label>
       </div>
-    </div><div class="button-row"><button class="btn primary" id="makeVoice">สร้างสคริปต์เสียง</button><button class="btn secondary" id="speakVoice">ทดลองอ่านเสียง</button><button class="btn secondary" id="stopVoice">หยุดอ่าน</button><button class="btn secondary" id="saveVoice">บันทึก</button></div>`;
+    </div><div class="button-row"><button class="btn primary" id="makeVoice">สร้างสคริปต์เสียง</button><button class="btn secondary" data-copybox="voiceOut">คัดลอกสคริปต์</button><button class="btn secondary" id="saveVoice">บันทึก</button></div>`;
   $("#deckForm").innerHTML = TANJAI.field("deck") + `
     <div class="form-section"><div class="section-title"><b>2</b><h4>ตั้งค่าสไลด์</h4></div>
       <div class="form-grid">
@@ -202,8 +202,8 @@ ${TANJAI.deckOutline(d, 8)}`;
   };
 
   // Voice playback
-  $("#speakVoice").onclick = () => { if(!$("#voiceOut").textContent.trim() || $("#voiceOut").textContent.includes("กดปุ่ม")) $("#makeVoice").click(); TANJAI.speak($("#voiceOut").textContent); };
-  $("#stopVoice").onclick = TANJAI.stopSpeak;
+  ($("#speakVoice")||{}).onclick = () => { if(!$("#voiceOut").textContent.trim() || $("#voiceOut").textContent.includes("กดปุ่ม")) $("#makeVoice").click(); TANJAI.speak($("#voiceOut").textContent); };
+  ($("#stopVoice")||{}).onclick = TANJAI.stopSpeak;
 
   // Save
   $("#saveImage").onclick = () => TANJAI.saveProject($("#image-title").value || "สร้างภาพ", $("#imageOut").textContent, "สร้างภาพ");
