@@ -119,3 +119,9 @@
 - แก้ Destination Hub ให้แสดงครบ 6 เครื่องมือจากแหล่งข้อมูลหลักใน `js/data.js`
 - กันข้อความในกล่อง “ทางลัดการใช้งาน” ถูกลากเลือกจนขึ้นแถบสีน้ำเงิน
 - คง Real Preview Cards Pro, favicon TJ, layout, สีหลัก และฟังก์ชันอื่นทั้งหมด
+
+
+## v6.2.6 Final Ready
+- Destination Hub แสดงครบ 6 เครื่องมือ: ChatGPT, Canva, CapCut, Voice Tool, Slide Tool, Notebook Tool
+- ปรับข้อความ “ทางลัดการใช้งาน” ให้สั้นลง จัดบรรทัดให้อ่านสวย ไม่ตัดคำแปลก
+- คง Real Preview Cards Pro, favicon TJ, main logo เดิม, layout, สีหลัก และฟังก์ชันอื่นทั้งหมด
