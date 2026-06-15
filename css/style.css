@@ -59,3 +59,49 @@ button,input,select,textarea{font-family:inherit}button{cursor:pointer}
 .step-card-v61 span{display:block;color:var(--muted);font-size:13px;line-height:1.65}
 .step-card-v61:after{content:"";display:block;clear:both}
 .form-note{border:1px solid rgba(34,211,238,.22);border-radius:18px;background:linear-gradient(135deg,rgba(34,211,238,.08),rgba(139,92,246,.08));color:#dbeafe;padding:14px 16px;line-height:1.65;margin-bottom:14px}
+
+
+/* v6.1.1 Sidebar Fix: ให้เมนูซ้ายเลื่อนสุด ไม่ค้าง ไม่โดนตัด */
+.sidebar{
+  height:100dvh !important;
+  max-height:100dvh !important;
+  overflow-y:auto !important;
+  overflow-x:hidden !important;
+  scrollbar-gutter:stable;
+  padding-bottom:28px !important;
+}
+.sidebar .nav{
+  flex:0 0 auto;
+}
+.sidebar .quick-panel{
+  margin-top:16px !important;
+  flex:0 0 auto;
+}
+.sidebar .copyright{
+  flex:0 0 auto;
+  margin-bottom:6px;
+}
+.sidebar::-webkit-scrollbar{
+  width:8px;
+}
+.sidebar::-webkit-scrollbar-thumb{
+  background:rgba(255,255,255,.18);
+  border-radius:999px;
+}
+.sidebar::-webkit-scrollbar-track{
+  background:rgba(255,255,255,.04);
+}
+
+/* กันปุ่ม/เมนูตัวท้ายติดขอบล่างบนจอเล็ก */
+@media(max-height:820px){
+  .sidebar{
+    gap:12px !important;
+  }
+  .nav-link,.quick-panel button{
+    padding-top:10px !important;
+    padding-bottom:10px !important;
+  }
+  .brand{
+    padding-bottom:12px !important;
+  }
+}
