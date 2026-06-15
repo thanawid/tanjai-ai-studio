@@ -3,16 +3,45 @@ window.TANJAI = window.TANJAI || {};
 document.addEventListener("DOMContentLoaded", () => {
   const $ = TANJAI.$, $$ = TANJAI.$$;
 
-  // Render forms
+  
+  const opts = arr => arr.map(x => `<option>${x}</option>`).join("");
+  const toolOptions = {
+    orgTypes: ["เทศบาล / อบต. / หน่วยงานราชการ","โรงเรียน / ศูนย์พัฒนาเด็กเล็ก","โรงพยาบาล / สาธารณสุข","ร้านค้า / ธุรกิจ / สินค้า","เพจ / ครีเอเตอร์ / ยูทูบเบอร์","ศิลปิน / เพลง / โปรโมทผลงาน","อื่น ๆ"],
+    mainCategories: ["แจ้งข่าว / ประกาศ","กิจกรรม / โครงการ / อบรม","รณรงค์ / ให้ความรู้","คอนเทนต์โซเชียล / คำคม","โปรโมชัน / โฆษณา","สรุปผลงาน / รายงานผล","อื่น ๆ"],
+    subCategories: ["แจ้งข่าวสำคัญ","ข่าวด่วน","เชิญร่วมกิจกรรม","โครงการปลูกต้นไม้","อบรมให้ความรู้","ลงพื้นที่","รณรงค์ป้องกันโรค","คำคม","โปรโมทสินค้า","ปกคลิป / ปกเพลง","ทำคลิปสั้น","กำหนดเอง"],
+    channels: ["Facebook","Line OA","TikTok / Reels","Instagram","YouTube Community","ประกาศภายใน","หลายช่องทาง"],
+    postLengths: ["สั้น กระชับ","มาตรฐาน อ่านง่าย","ละเอียดครบถ้วน","แคปชั่นสั้นมาก"],
+    layouts: ["Hero Center Layout","Split Layout ซ้ายข้อความ ขวาภาพ","Infographic Layout","Poster Layout","Clean Social Card","ภาพเต็ม + กล่องข้อความ"],
+    densities: ["สมดุล อ่านง่าย","โล่งมาก ดูแพง","ข้อมูลเยอะ แต่อ่านง่าย","แน่นแบบ Infographic"],
+    focuses: ["เน้นหัวข้อหลัก","เน้นภาพบุคคล","เน้นภาพกิจกรรม","เน้นสินค้า / โปรโมชัน","เน้นบรรยากาศ","เน้นโลโก้หน่วยงาน"],
+    colorTones: ["เขียว เหลือง ขาว แบบหน่วยงานท้องถิ่น","ม่วง ทอง เทคโนโลยี","น้ำเงิน ขาว ทางการ","ชมพู ม่วง สดใส","ดำ ทอง พรีเมียม","ให้ AI เลือกให้เหมาะสม"],
+    videoFormats: ["คลิปประชาสัมพันธ์","คลิปข่าวด่วน","คลิปกิจกรรม / โครงการ","คลิปรีวิว","คลิปโซเชียลไวรัล","คลิปแนวสารคดีสั้น"],
+    slideStyles: ["ทางการสำหรับผู้บริหาร","สรุปประชุม","นำเสนอโครงการ","รายงานผล","Pitch Deck","สไลด์อบรม"]
+  };
+
+// Render forms
   $("#routerForm").innerHTML = `<div class="form-section"><div class="section-title"><b>?</b><h4>อยากทำอะไรครับ?</h4></div><label class="full">พิมพ์โจทย์ของพี่<textarea id="router-query" placeholder="เช่น อยากทำโพสต์ประชาสัมพันธ์โครงการปลูกต้นไม้ / อยากทำเสียงพากย์คลิปแจ้งข่าว / อยากทำสไลด์นำเสนอ"></textarea></label></div><div class="button-row"><button class="btn primary" id="askRouter">ให้ Router แนะนำ</button><button class="btn secondary" id="goRecommended">ไปที่เมนูที่แนะนำ</button></div>`;
   $("#routerResult").innerHTML = TANJAI.resultShell("คำแนะนำจาก AI Router","ระบบจะแนะนำเมนูและปลายทางที่เหมาะกับโจทย์", "routerOut", `<button class="btn primary" data-copybox="routerOut">คัดลอกคำแนะนำ</button>`);
 
   $("#imageForm").innerHTML = TANJAI.field("image") + `
-    <div class="form-section"><div class="section-title"><b>2</b><h4>ตั้งค่าภาพ</h4></div>
+    <div class="form-note">หน้านี้ใช้สำหรับสร้างภาพโดยเฉพาะ คืน dropdown รายละเอียดแบบเต็ม เพื่อให้ Prompt ภาพแม่นขึ้น</div>
+    <div class="form-section"><div class="section-title"><b>2</b><h4>ประเภทงานและช่องทาง</h4></div>
       <div class="form-grid">
-        <label>สไตล์ภาพ<select id="image-style">${TANJAI.categories.imageStyles.map(x=>`<option>${x}</option>`).join("")}</select></label>
-        <label>ขนาดภาพ<select id="image-size">${TANJAI.categories.sizes.map(x=>`<option>${x}</option>`).join("")}</select></label>
-        <label class="full">ข้อห้าม / หมายเหตุ<textarea id="image-avoid" placeholder="เช่น ห้ามสร้าง QR ปลอม ห้ามวาดโลโก้ใหม่ เว้นพื้นที่ด้านบน"></textarea></label>
+        <label>ประเภทองค์กร<select id="image-orgType">${opts(toolOptions.orgTypes)}</select></label>
+        <label>หมวดงานหลัก<select id="image-mainCategory">${opts(toolOptions.mainCategories)}</select></label>
+        <label>หัวข้องานย่อย<select id="image-subCategory">${opts(toolOptions.subCategories)}</select></label>
+        <label>ช่องทาง / ขนาดภาพ<select id="image-size">${opts(TANJAI.categories.sizes)}</select></label>
+      </div>
+    </div>
+    <div class="form-section"><div class="section-title"><b>3</b><h4>แนวภาพและความสวย</h4></div>
+      <div class="form-grid">
+        <label>สไตล์ภาพ<select id="image-style">${opts(TANJAI.categories.imageStyles)}</select></label>
+        <label>Layout<select id="image-layout">${opts(toolOptions.layouts)}</select></label>
+        <label>โทนสี<select id="image-colorTone">${opts(toolOptions.colorTones)}</select></label>
+        <label>ความหนาแน่น<select id="image-density">${opts(toolOptions.densities)}</select></label>
+        <label>จุดเด่นของภาพ<select id="image-focus">${opts(toolOptions.focuses)}</select></label>
+        <label>โทนภาษา<select id="image-tone">${opts(TANJAI.categories.tones)}</select></label>
+        <label class="full">ข้อห้าม / หมายเหตุ<textarea id="image-avoid" placeholder="เช่น ห้ามสร้าง QR ปลอม ห้ามวาดโลโก้ใหม่ เว้นพื้นที่ด้านบน ใช้รูปจริงตามแนบ"></textarea></label>
       </div>
     </div>
     <div class="button-row"><button class="btn primary" id="makeImage">สร้าง Prompt ภาพ</button><button class="btn secondary" id="saveImage">บันทึก</button></div>
@@ -70,6 +99,16 @@ document.addEventListener("DOMContentLoaded", () => {
   TANJAI.renderProjects();
 
   // Navigation
+
+  // v6.1.2 fallback: กันเมนูซ้าย/การ์ดหน้าแรกคลิกไม่ได้
+  document.addEventListener("click", e => {
+    const viewBtn = e.target.closest("[data-view]");
+    if(viewBtn && viewBtn.dataset.view){
+      e.preventDefault();
+      TANJAI.switchView(viewBtn.dataset.view);
+    }
+  }, true);
+
   $$("[data-view]").forEach(btn => btn.addEventListener("click", () => TANJAI.switchView(btn.dataset.view)));
   document.body.addEventListener("click", e => {
     const t = e.target.closest("[data-template]"); if(t){TANJAI.applyTemplate(t.dataset.template); return;}

@@ -105,3 +105,10 @@ button,input,select,textarea{font-family:inherit}button{cursor:pointer}
     padding-bottom:12px !important;
   }
 }
+
+
+/* v6.1.2 Menu Click Fix */
+.nav-link, [data-view], .home-choice-card{
+  cursor:pointer !important;
+  pointer-events:auto !important;
+}
