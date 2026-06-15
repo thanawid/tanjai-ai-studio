@@ -86,3 +86,24 @@
 - Hero: AI Media Hub / สร้างสื่อไว ด้วยพลัง AI
 - อย่างอื่นคงเดิม
 - เช็ก JavaScript syntax ก่อนส่ง
+
+
+## v6.2.4 Router + Voice Text + TJ Favicon Fix
+- Main logo / Hero / Sidebar ใช้โลโก้หลักเดิม “ทันใจ AI Studio”
+- Favicon / Web app icon / Mobile icon ใช้ TJ
+- Title Tag: ทันใจ AI Studio | สร้างสื่อไว ด้วยพลัง AI
+- แก้ AI Router result box ไม่ให้เพี้ยน
+- ปรับข้อความเมนูเสียงพากย์ให้ใช้คำว่า Voice Tool ทุกจุด
+- เปลี่ยนคำอธิบายเสียงเป็น Voice Tool
+- เมนูเสียงพากย์:
+  - สร้างสคริปต์เสียง
+  - บันทึก
+  - ผลลัพธ์แนะนำ: ChatGPT / CapCut / Voice Tool
+- เมนูทำสไลด์:
+  - สร้าง Outline
+  - บันทึก
+  - ผลลัพธ์แนะนำ: ChatGPT / Canva / Slide Tool / Notebook Tool
+- Destination Hub ครบ 6 เครื่องมือ
+- คง Random Preview Cards หน้าแรก
+- ห้ามกระทบ Layout หลัก สีหลัก เมนู และฟังก์ชันอื่น
+- เช็ก JavaScript syntax ก่อนส่ง

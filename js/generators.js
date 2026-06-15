@@ -138,10 +138,10 @@ TANJAI.routerSuggest = function(text){
   let tool = "สร้างภาพ", view = "image", why = "โจทย์นี้เหมาะกับการสร้าง Prompt ภาพหรืองานออกแบบ";
   if(/โพสต์|แคปชั่น|caption|facebook|line|ข้อความ/.test(q)){ tool="เขียนโพสต์"; view="post"; why="โจทย์นี้เน้นข้อความสำหรับเผยแพร่บนโซเชียล"; }
   if(/วิดีโอ|วีดีโอ|คลิป|storyboard|สตอรี่|capcut|hook/.test(q)){ tool="ทำวิดีโอ"; view="video"; why="โจทย์นี้ต้องการโครงคลิป ฉาก และข้อความบนจอ"; }
-  if(/เสียง|พากย์|voice|tts|อ่าน/.test(q)){ tool="เสียงพากย์"; view="voice"; why="โจทย์นี้เหมาะกับการทำสคริปต์เสียงและทดลองอ่าน"; }
+  if(/เสียง|พากย์|voice|tts|อ่าน/.test(q)){ tool="เสียงพากย์"; view="voice"; why="โจทย์นี้เหมาะกับการทำสคริปต์เสียงและ"; }
   if(/สไลด์|powerpoint|presentation|นำเสนอ/.test(q)){ tool="ทำสไลด์"; view="deck"; why="โจทย์นี้ต้องการโครงนำเสนอและ speaker notes"; }
   if(/ครบชุด|แคมเปญ|ทั้งหมด|ภาพ.*โพสต์|โพสต์.*วิดีโอ/.test(q)){ tool="สร้างชุดสื่อ"; view="kit"; why="โจทย์นี้เหมาะกับการแตกงานออกเป็นหลายสื่อจากข้อมูลเดียว"; }
-  const dest = view === "video" || view === "voice" ? "CapCut / เครื่องมือ TTS / ChatGPT" : view === "image" ? "ChatGPT / Canva / เครื่องมือสร้างภาพ" : view === "deck" ? "Canva / PowerPoint / ChatGPT" : "ChatGPT / Canva";
+  const dest = view === "video" || view === "voice" ? "CapCut / เครื่องมือ Voice Tool / ChatGPT" : view === "image" ? "ChatGPT / Canva / เครื่องมือสร้างภาพ" : view === "deck" ? "Canva / PowerPoint / ChatGPT" : "ChatGPT / Canva";
   return { view, text: `คำแนะนำจาก AI Router
 
 โจทย์ของพี่:
@@ -154,7 +154,7 @@ ${tool}
 ${why}
 
 ผลลัพธ์ที่ควรสร้าง:
-${tool === "สร้างภาพ" ? "Prompt ภาพ + คำสั่งนักออกแบบ" : tool === "เขียนโพสต์" ? "โพสต์หลัก + แคปชั่นสั้น + ข้อความ Line" : tool === "ทำวิดีโอ" ? "Hook + Storyboard + Voice Over + ข้อความบนจอ" : tool === "เสียงพากย์" ? "สคริปต์เสียง + ข้อความสำหรับ TTS + จังหวะอ่าน" : tool === "ทำสไลด์" ? "Outline + Speaker Notes" : "ภาพ + โพสต์ + วิดีโอ + เสียง + สไลด์"}
+${tool === "สร้างภาพ" ? "Prompt ภาพ + คำสั่งนักออกแบบ" : tool === "เขียนโพสต์" ? "โพสต์หลัก + แคปชั่นสั้น + ข้อความ Line" : tool === "ทำวิดีโอ" ? "Hook + Storyboard + Voice Over + ข้อความบนจอ" : tool === "เสียงพากย์" ? "สคริปต์เสียง + ข้อความสำหรับ Voice Tool + จังหวะอ่าน" : tool === "ทำสไลด์" ? "Outline + Speaker Notes" : "ภาพ + โพสต์ + วิดีโอ + เสียง + สไลด์"}
 
 เครื่องมือปลายทางที่เหมาะ:
 ${dest}

@@ -2,7 +2,7 @@ window.TANJAI = window.TANJAI || {};
 
 TANJAI.speak = function(text){
   if(!("speechSynthesis" in window)){
-    TANJAI.toast("เครื่องนี้ยังไม่รองรับการทดลองอ่านเสียง");
+    TANJAI.toast("เครื่องนี้ยังไม่รองรับการ");
     return;
   }
   window.speechSynthesis.cancel();
@@ -14,7 +14,7 @@ TANJAI.speak = function(text){
   const th = voices.find(v => (v.lang || "").toLowerCase().includes("th"));
   if(th) u.voice = th;
   window.speechSynthesis.speak(u);
-  TANJAI.toast("กำลังทดลองอ่านเสียง");
+  TANJAI.toast("กำลัง");
 };
 
 TANJAI.stopSpeak = function(){
