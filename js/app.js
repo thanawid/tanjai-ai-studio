@@ -202,8 +202,6 @@ ${TANJAI.deckOutline(d, 8)}`;
   };
 
   // Voice playback
-  null && ($("#speakVoice")||{}).onclick = () => { if(!$("#voiceOut").textContent.trim() || $("#voiceOut").textContent.includes("กดปุ่ม")) $("#makeVoice").click(); TANJAI.speak($("#voiceOut").textContent); };
-  null && ($("#stopVoice")||{}).onclick = TANJAI.stopSpeak;
 
   // Save
   $("#saveImage").onclick = () => TANJAI.saveProject($("#image-title").value || "สร้างภาพ", $("#imageOut").textContent, "สร้างภาพ");

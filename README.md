@@ -95,3 +95,15 @@
   - ผลลัพธ์ที่แนะนำ: เปิด ChatGPT / เปิด Canva / เปิด Slide Tool / เปิด Notebook Tool
 - Destination Hub แสดง Voice Tool / Slide Tool / Notebook Tool ได้จริง
 - อย่างอื่นคงเดิม
+
+
+## v6.1.9 Emergency Click Fix
+- แก้ JavaScript syntax error ที่ทำให้กดเมนู/ปุ่มไม่ได้ทั้งเว็บ
+- ลบโค้ดทดลองอ่านเสียงเดิมที่ค้างอยู่
+- คงเมนูเสียงพากย์:
+  - สร้างสคริปต์เสียง / บันทึก
+  - เปิด ChatGPT / เปิด CapCut / เปิด Voice Tool
+- คงเมนูทำสไลด์:
+  - สร้าง Outline / บันทึก
+  - เปิด ChatGPT / เปิด Canva / เปิด Slide Tool / เปิด Notebook Tool
+- อย่างอื่นคงเดิม
