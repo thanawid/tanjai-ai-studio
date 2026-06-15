@@ -1,0 +1,20 @@
+{
+  "name": "ทันใจ AI Studio",
+  "short_name": "Tanjai AI",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "theme_color": "#060713",
+  "background_color": "#050611",
+  "icons": [
+    {
+      "src": "assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

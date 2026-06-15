@@ -1,0 +1,6 @@
+.hero-card:after{content:"";position:absolute;inset:-4px;pointer-events:none;opacity:.48;background:linear-gradient(118deg,transparent,rgba(255,255,255,.10),transparent);transform:translateX(-70%);animation:shine 7s infinite}
+@keyframes shine{55%,100%{transform:translateX(72%)}}
+.media-orb{animation:floaty 5.5s ease-in-out infinite}@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.floating-chip{animation:chipFloat 5s ease-in-out infinite}.chip-b{animation-delay:.8s}.chip-c{animation-delay:1.5s}.chip-d{animation-delay:2.1s}@keyframes chipFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.tool-card,.sample-grid article,.project-card,.library-card{position:relative;overflow:hidden}.tool-card:before,.sample-grid article:before,.project-card:before,.library-card:before{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent,rgba(255,255,255,.08),transparent);transform:translateX(-110%);transition:.5s}.tool-card:hover:before,.sample-grid article:hover:before,.project-card:hover:before,.library-card:hover:before{transform:translateX(110%)}
+.view.active{animation:fadeUp .22s ease both}@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}

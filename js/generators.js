@@ -1,0 +1,158 @@
+window.TANJAI = window.TANJAI || {};
+TANJAI.$ = s => document.querySelector(s);
+TANJAI.$$ = s => Array.from(document.querySelectorAll(s));
+
+TANJAI.commonData = function(prefix){
+  const v = id => (TANJAI.$(`#${prefix}-${id}`)?.value || "").trim();
+  return {
+    title: v("title") || "หัวข้องาน",
+    orgName: v("orgName") || "ทันใจ AI Studio",
+    audience: v("audience") || "ประชาชนทั่วไป",
+    tone: v("tone") || "ทางการ สุภาพ อ่านง่าย",
+    detail: v("detail") || "ยังไม่ได้ระบุรายละเอียดเพิ่มเติม",
+    dateTime: v("dateTime") || "",
+    place: v("place") || "",
+    people: v("people") || "",
+    style: v("style") || "Modern Premium Clean",
+    size: v("size") || "4:5 Facebook / Line 1080x1350",
+    avoid: v("avoid") || "ห้ามสร้าง QR Code ปลอม ห้ามวาดโลโก้ใหม่ ข้อความภาษาไทยต้องสะกดถูก"
+  };
+};
+
+TANJAI.imagePrompt = function(d){
+  return `สร้างภาพประชาสัมพันธ์ภาษาไทย หัวข้อ “${d.title}” สำหรับ ${d.orgName}
+กลุ่มเป้าหมาย: ${d.audience}
+ขนาดภาพ: ${d.size}
+รายละเอียดสำคัญ: ${d.detail}
+วันเวลา: ${d.dateTime || "ไม่ระบุ"}
+สถานที่: ${d.place || "ไม่ระบุ"}
+บุคคล/หน่วยงานที่เกี่ยวข้อง: ${d.people || "ไม่ระบุ"}
+
+แนวภาพ: ${d.style}, โทน ${d.tone}, อ่านง่าย ทันสมัย มี visual hierarchy ชัดเจน หัวข้อหลักต้องเด่น รายละเอียดรองอ่านง่าย ไม่รก ใช้พื้นที่ว่างเหมาะสม เหมือนงานกราฟิกดีไซเนอร์มืออาชีพ
+
+ข้อห้าม: ${d.avoid}`;
+};
+
+TANJAI.postText = function(d){
+  return `📌 ${d.title}
+
+${d.detail}
+
+${d.dateTime ? "📅 " + d.dateTime + "\\n" : ""}${d.place ? "📍 " + d.place + "\\n" : ""}${d.people ? "\\n" + d.people + "\\n" : ""}
+${d.orgName} ขอประชาสัมพันธ์ข้อมูลดังกล่าวให้ ${d.audience} ได้รับทราบ
+
+#${d.orgName.replaceAll(" ","")} #ประชาสัมพันธ์ #ทันใจAIStudio`;
+};
+
+TANJAI.videoStoryboard = function(d, length="60 วินาที"){
+  return `Storyboard วิดีโอ: ${d.title}
+ความยาว: ${length}
+โทน: ${d.tone}
+
+Scene 1: เปิดคลิป / Hook
+ภาพ: หัวข้อใหญ่ + ภาพประกอบที่เกี่ยวข้อง
+ข้อความบนจอ: ${d.title}
+เสียงพากย์: เรื่องสำคัญที่ควรรู้จาก ${d.orgName}
+
+Scene 2: อธิบายรายละเอียด
+ภาพ: ภาพกิจกรรม / motion graphic / ภาพประกอบ
+ข้อความบนจอ: รายละเอียดสำคัญ
+เสียงพากย์: ${d.detail}
+
+Scene 3: วันเวลา / สถานที่ / สิ่งที่ต้องทำ
+ภาพ: กล่องข้อมูลอ่านง่าย
+ข้อความบนจอ: ${d.dateTime || "ระบุวันเวลา"} / ${d.place || "ระบุสถานที่"}
+เสียงพากย์: ขอให้ติดตามรายละเอียดและดำเนินการตามข้อมูลดังกล่าว
+
+Scene 4: ปิดคลิป
+ภาพ: โลโก้และชื่อหน่วยงาน
+ข้อความบนจอ: ${d.orgName}
+เสียงพากย์: ด้วยความห่วงใยจาก ${d.orgName}`;
+};
+
+TANJAI.voiceScript = function(d, length="60 วินาที", style="ทางการ สุภาพ"){
+  const opener = style.includes("เร่งด่วน") ? "ขอแจ้งข่าวสำคัญให้ประชาชนได้รับทราบ" : "ขอประชาสัมพันธ์ข้อมูลสำคัญให้ทุกท่านได้รับทราบ";
+  const middle = d.detail;
+  const close = `ติดตามข่าวสารเพิ่มเติมได้ทางช่องทางประชาสัมพันธ์ของ ${d.orgName}`;
+  if(length === "15 วินาที"){
+    return `${opener}
+
+${d.title}
+
+${middle}
+
+${close}`;
+  }
+  if(length === "30 วินาที"){
+    return `${opener}
+
+${d.title}
+
+${middle}
+
+${d.dateTime ? "กำหนดการ: " + d.dateTime + "\\n" : ""}${d.place ? "สถานที่: " + d.place + "\\n" : ""}
+
+${close}`;
+  }
+  return `${opener}
+
+วันนี้ ${d.orgName} มีข้อมูลประชาสัมพันธ์ เรื่อง “${d.title}”
+
+${middle}
+
+${d.dateTime ? "วันและเวลา: " + d.dateTime + "\\n" : ""}${d.place ? "สถานที่: " + d.place + "\\n" : ""}${d.people ? "ผู้เกี่ยวข้อง: " + d.people + "\\n" : ""}
+
+ขอให้ประชาชนและผู้เกี่ยวข้องติดตามข้อมูลดังกล่าว และดำเนินการตามรายละเอียดที่แจ้งไว้
+
+${close}`;
+};
+
+TANJAI.deckOutline = function(d, count=8){
+  const heads = ["หน้าปก","ที่มาและความสำคัญ","วัตถุประสงค์","กลุ่มเป้าหมาย","รายละเอียดกิจกรรม/โครงการ","ขั้นตอนดำเนินงาน","ผลที่คาดว่าจะได้รับ","สรุปและข้อเสนอ","ภาพประกอบ","ถาม-ตอบ"];
+  let out = `Outline สไลด์: ${d.title}
+หน่วยงาน: ${d.orgName}
+กลุ่มผู้ฟัง: ${d.audience}
+
+`;
+  for(let i=0;i<count;i++){
+    out += `Slide ${i+1}: ${heads[i] || "รายละเอียดเพิ่มเติม"}
+เนื้อหา: ${i===0 ? d.title : i===4 ? d.detail : "สรุปประเด็นให้กระชับ อ่านง่าย และเชื่อมโยงกับหัวข้อหลัก"}
+Speaker notes: อธิบายด้วยภาษาสุภาพ ชัดเจน เหมาะกับ ${d.audience}
+
+`;
+  }
+  return out;
+};
+
+TANJAI.routerSuggest = function(text){
+  const q = (text || "").toLowerCase();
+  let tool = "สร้างภาพ", view = "image", why = "โจทย์นี้เหมาะกับการสร้าง Prompt ภาพหรืองานออกแบบ";
+  if(/โพสต์|แคปชั่น|caption|facebook|line|ข้อความ/.test(q)){ tool="เขียนโพสต์"; view="post"; why="โจทย์นี้เน้นข้อความสำหรับเผยแพร่บนโซเชียล"; }
+  if(/วิดีโอ|วีดีโอ|คลิป|storyboard|สตอรี่|capcut|hook/.test(q)){ tool="ทำวิดีโอ"; view="video"; why="โจทย์นี้ต้องการโครงคลิป ฉาก และข้อความบนจอ"; }
+  if(/เสียง|พากย์|voice|tts|อ่าน/.test(q)){ tool="เสียงพากย์"; view="voice"; why="โจทย์นี้เหมาะกับการทำสคริปต์เสียงและทดลองอ่าน"; }
+  if(/สไลด์|powerpoint|presentation|นำเสนอ/.test(q)){ tool="ทำสไลด์"; view="deck"; why="โจทย์นี้ต้องการโครงนำเสนอและ speaker notes"; }
+  if(/ครบชุด|แคมเปญ|ทั้งหมด|ภาพ.*โพสต์|โพสต์.*วิดีโอ/.test(q)){ tool="สร้างชุดสื่อ"; view="kit"; why="โจทย์นี้เหมาะกับการแตกงานออกเป็นหลายสื่อจากข้อมูลเดียว"; }
+  const dest = view === "video" || view === "voice" ? "CapCut / เครื่องมือ TTS / ChatGPT" : view === "image" ? "ChatGPT / Canva / เครื่องมือสร้างภาพ" : view === "deck" ? "Canva / PowerPoint / ChatGPT" : "ChatGPT / Canva";
+  return { view, text: `คำแนะนำจาก AI Router
+
+โจทย์ของพี่:
+${text}
+
+เมนูที่แนะนำ:
+${tool}
+
+เหตุผล:
+${why}
+
+ผลลัพธ์ที่ควรสร้าง:
+${tool === "สร้างภาพ" ? "Prompt ภาพ + คำสั่งนักออกแบบ" : tool === "เขียนโพสต์" ? "โพสต์หลัก + แคปชั่นสั้น + ข้อความ Line" : tool === "ทำวิดีโอ" ? "Hook + Storyboard + Voice Over + ข้อความบนจอ" : tool === "เสียงพากย์" ? "สคริปต์เสียง + ข้อความสำหรับ TTS + จังหวะอ่าน" : tool === "ทำสไลด์" ? "Outline + Speaker Notes" : "ภาพ + โพสต์ + วิดีโอ + เสียง + สไลด์"}
+
+เครื่องมือปลายทางที่เหมาะ:
+${dest}
+
+ขั้นตอนต่อไป:
+1. กดปุ่ม “ไปที่เมนูที่แนะนำ”
+2. กรอกข้อมูลจริงของงาน
+3. กดสร้าง
+4. คัดลอกผลลัพธ์ไปใช้ต่อ` };
+};

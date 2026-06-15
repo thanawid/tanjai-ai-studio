@@ -1,0 +1,26 @@
+[
+  {
+    "name": "ChatGPT",
+    "desc": "ใช้ต่อยอด Prompt, โพสต์, สคริปต์, สไลด์",
+    "url": "https://chatgpt.com/",
+    "group": "ข้อความ / คิดงาน"
+  },
+  {
+    "name": "Canva",
+    "desc": "ใช้จัดภาพ โพสต์ สไลด์ และงานกราฟิก",
+    "url": "https://www.canva.com/",
+    "group": "ออกแบบ"
+  },
+  {
+    "name": "CapCut",
+    "desc": "ใช้ทำคลิป ตัดต่อ ใส่เสียง และสร้างวิดีโอ",
+    "url": "https://www.capcut.com/",
+    "group": "วิดีโอ"
+  },
+  {
+    "name": "ค้นหาเครื่องมือ AI",
+    "desc": "ปลายทางกลางสำหรับหาเครื่องมือ AI อื่น ๆ ที่ผู้ใช้เลือกเอง",
+    "url": "https://www.google.com/search?q=AI+tools",
+    "group": "เครื่องมืออื่น"
+  }
+]
