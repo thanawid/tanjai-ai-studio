@@ -109,7 +109,7 @@
 - เช็ก JavaScript syntax ก่อนส่ง
 
 
-## v6.2.5 Favicon / Web App Icon Update
+## v6.2.6 Favicon / Web App Icon Update
 - เปลี่ยนเฉพาะ favicon และ web app icon/mobile icon เป็นไฟล์ Logo002.jpg ที่แนบมา
 - ไม่เปลี่ยน main logo / hero / sidebar
 - อย่างอื่นคงเดิมจาก v6.2.4

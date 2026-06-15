@@ -358,3 +358,31 @@ button,input,select,textarea{font-family:inherit}button{cursor:pointer}
   .hero-title span:first-child{font-size:40px!important;white-space:normal}
   .hero-title span:last-child{font-size:28px!important}
 }
+
+
+/* v6.2.6 Preview Cards = AI images + tone overlay (no layout changes) */
+.sample-grid article.home-choice-card{position:relative;overflow:hidden}
+.sample-grid article.home-choice-card img{position:relative;z-index:0}
+.sample-grid article.home-choice-card b,.sample-grid article.home-choice-card span{position:relative;z-index:2}
+.sample-grid article.home-choice-card::before{
+  content:"";
+  position:absolute;
+  left:12px; right:12px; top:12px;
+  aspect-ratio:3/2;
+  border-radius:14px;
+  pointer-events:none;
+  z-index:1;
+  background:
+    radial-gradient(circle at 14% 16%, rgba(255,255,255,.18), transparent 16%),
+    radial-gradient(circle at 88% 14%, rgba(255,255,255,.12), transparent 18%),
+    linear-gradient(180deg, rgba(255,255,255,.06) 0%, rgba(255,255,255,0) 28%, rgba(6,7,19,0) 56%, rgba(6,7,19,.38) 100%),
+    linear-gradient(135deg, var(--preview-tint-1, rgba(255,255,255,.08)), var(--preview-tint-2, rgba(255,255,255,.14)));
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08), inset 0 0 0 2px rgba(255,255,255,.03);
+  opacity:.86;
+}
+.home-choice-card.tone-image{--preview-tint-1:rgba(33,214,182,.18);--preview-tint-2:rgba(7,135,118,.24)}
+.home-choice-card.tone-post{--preview-tint-1:rgba(244,107,192,.18);--preview-tint-2:rgba(158,53,135,.24)}
+.home-choice-card.tone-video{--preview-tint-1:rgba(138,102,255,.18);--preview-tint-2:rgba(73,53,198,.24)}
+.home-choice-card.tone-voice{--preview-tint-1:rgba(255,141,76,.18);--preview-tint-2:rgba(178,69,30,.24)}
+.home-choice-card.tone-deck{--preview-tint-1:rgba(82,167,255,.18);--preview-tint-2:rgba(30,103,198,.24)}
+.home-choice-card.tone-kit{--preview-tint-1:rgba(255,187,92,.18);--preview-tint-2:rgba(184,113,39,.24)}
