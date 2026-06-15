@@ -12,7 +12,34 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/animations.css">
 </head>
-<body>
+<body class="auth-locked">
+
+  <section class="login-gate" id="loginGate" aria-label="เข้าสู่ระบบ">
+    <div class="login-card">
+      <div class="login-logo-wrap">
+        <img src="assets/logo.jpg" alt="ทันใจ AI Studio">
+      </div>
+      <p class="eyebrow">PRIVATE ACCESS</p>
+      <h1>ทันใจ AI Studio</h1>
+      <p class="login-subtitle">สร้างสื่อไว ด้วยพลัง AI</p>
+
+      <form id="loginForm" class="login-form">
+        <label>
+          รหัสเข้าใช้งาน
+          <input id="loginPassword" type="password" autocomplete="current-password" placeholder="กรอกรหัสเข้าใช้งาน">
+        </label>
+        <label class="remember-line">
+          <input id="rememberLogin" type="checkbox">
+          <span>จดจำการเข้าใช้งาน</span>
+        </label>
+        <button class="btn primary" type="submit">เข้าสู่ระบบ</button>
+        <p id="loginError" class="login-error" role="alert"></p>
+      </form>
+
+      <small class="login-note">ระบบสำหรับผู้ได้รับสิทธิ์ใช้งานเท่านั้น</small>
+    </div>
+  </section>
+
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
   <div class="ambient"></div>
   <div class="app-shell">
@@ -64,6 +91,7 @@
         </div>
         <div class="top-actions">
           <span class="status-pill">พร้อมใช้งาน</span>
+          <button class="btn secondary logout-btn" id="logoutBtn" type="button">ออกจากระบบ</button>
           <button class="btn secondary" data-view="router">ถาม Router</button>
           <button class="btn primary" data-view="image">+ เริ่มสร้างงาน</button>
         </div>

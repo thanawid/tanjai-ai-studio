@@ -114,6 +114,77 @@ document.addEventListener("DOMContentLoaded", () => {
   TANJAI.renderProjects();
 
 
+
+  // v6.2.7 Login Gate Semi-Pro
+  (function(){
+    const PASSCODE = "tanjai2569"; // เปลี่ยนรหัสได้ที่บรรทัดนี้
+    const AUTH_KEY = "tanjai_ai_auth_until";
+    const SESSION_KEY = "tanjai_ai_session";
+    const REMEMBER_MS = 3 * 24 * 60 * 60 * 1000;
+
+    const loginGate = document.getElementById("loginGate");
+    const loginForm = document.getElementById("loginForm");
+    const loginPassword = document.getElementById("loginPassword");
+    const rememberLogin = document.getElementById("rememberLogin");
+    const loginError = document.getElementById("loginError");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    const now = () => Date.now();
+    const storedUntil = Number(localStorage.getItem(AUTH_KEY) || 0);
+    const hasSession = sessionStorage.getItem(SESSION_KEY) === "1";
+
+    function unlock(){
+      document.body.classList.remove("auth-locked");
+      if(loginError) loginError.textContent = "";
+    }
+
+    function lock(){
+      document.body.classList.add("auth-locked");
+      if(loginPassword) setTimeout(()=>loginPassword.focus(), 80);
+    }
+
+    if(storedUntil > now() || hasSession){
+      unlock();
+    }else{
+      lock();
+    }
+
+    if(loginForm){
+      loginForm.addEventListener("submit", e => {
+        e.preventDefault();
+        const value = (loginPassword?.value || "").trim();
+        if(value === PASSCODE){
+          if(rememberLogin?.checked){
+            localStorage.setItem(AUTH_KEY, String(now() + REMEMBER_MS));
+            sessionStorage.removeItem(SESSION_KEY);
+          }else{
+            sessionStorage.setItem(SESSION_KEY, "1");
+            localStorage.removeItem(AUTH_KEY);
+          }
+          if(loginPassword) loginPassword.value = "";
+          unlock();
+          TANJAI.toast?.("เข้าสู่ระบบแล้ว");
+        }else{
+          if(loginError) loginError.textContent = "รหัสไม่ถูกต้อง กรุณาลองอีกครั้ง";
+          if(loginPassword){
+            loginPassword.select();
+            loginPassword.focus();
+          }
+        }
+      });
+    }
+
+    if(logoutBtn){
+      logoutBtn.addEventListener("click", () => {
+        localStorage.removeItem(AUTH_KEY);
+        sessionStorage.removeItem(SESSION_KEY);
+        lock();
+        TANJAI.toast?.("ออกจากระบบแล้ว");
+      });
+    }
+  })();
+
+
   // v6.1.4 mobile drawer menu
   const mobileMenuBtn = document.getElementById("mobileMenuBtn");
   const sidebarOverlay = document.getElementById("sidebarOverlay");
