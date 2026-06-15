@@ -127,3 +127,73 @@ button,input,select,textarea{font-family:inherit}button{cursor:pointer}
     border-radius:40px !important;
   }
 }
+
+
+/* v6.1.4 Responsive All Devices */
+.mobile-menu-btn{display:none;border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.08);color:#fff;width:46px;height:46px;border-radius:16px;font-size:22px;font-weight:1000;line-height:1;box-shadow:0 12px 34px rgba(0,0,0,.18)}
+.sidebar-overlay{display:none;position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.48);backdrop-filter:blur(3px)}
+
+@media(max-width:1180px){
+  .app-shell{display:block!important}
+  .sidebar{position:fixed!important;left:0;top:0;bottom:0;width:min(320px,86vw);height:100dvh!important;max-height:100dvh!important;z-index:100;transform:translateX(-110%);transition:transform .24s ease;border-right:1px solid rgba(255,255,255,.12);box-shadow:30px 0 90px rgba(0,0,0,.46);overflow-y:auto!important;overflow-x:hidden!important}
+  body.sidebar-open .sidebar{transform:translateX(0)}
+  body.sidebar-open .sidebar-overlay{display:block}
+  body.sidebar-open{overflow:hidden}
+  .mobile-menu-btn{display:grid;place-items:center;flex:0 0 auto}
+  .topbar{position:sticky;top:0;z-index:60;backdrop-filter:blur(18px);background:rgba(7,10,25,.74);border:1px solid rgba(255,255,255,.10);border-radius:22px;margin-bottom:14px;padding:12px}
+  .workspace{min-width:0;width:100%}
+  .hero-card{grid-template-columns:1fr!important}
+  .hero-visual{min-height:280px}
+  .media-orb{width:min(390px,86vw)!important}
+}
+
+@media(min-width:721px) and (max-width:1180px){
+  .workspace{padding:24px}
+  .tool-grid,.sample-grid,.library-grid,.projects-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .dashboard-grid,.studio-layout{grid-template-columns:1fr!important}
+  .form-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .hero-card h3{font-size:46px}
+}
+
+@media(max-width:720px){
+  html,body{width:100%;overflow-x:hidden}
+  .workspace{padding:14px!important}
+  .topbar{align-items:flex-start;gap:10px}
+  .topbar-left{width:100%;min-width:0}
+  .topbar h1{font-size:20px;line-height:1.25;word-break:break-word}
+  .topbar p{font-size:12px;line-height:1.45}
+  .top-actions{width:100%;display:grid;grid-template-columns:1fr;gap:8px}
+  .top-actions .btn,.top-actions .logout-btn{width:100%;justify-content:center}
+  .hero-card{padding:22px!important;border-radius:24px!important;min-height:auto!important;gap:18px!important}
+  .hero-card h3{font-size:31px!important;line-height:1.12!important;letter-spacing:-.04em!important}
+  .hero-card p{font-size:14px}
+  .hero-actions,.button-row{display:grid!important;grid-template-columns:1fr!important;gap:9px!important}
+  .hero-actions .btn,.button-row .btn,.result-action .btn{width:100%;min-height:46px}
+  .hero-stats{grid-template-columns:1fr!important}
+  .hero-visual{min-height:235px!important}
+  .media-orb{width:min(300px,86vw)!important}
+  .media-orb img{width:150px!important;height:150px!important;border-radius:36px!important}
+  .floating-chip{transform:scale(.82)}
+  .chip-a{left:0!important;top:14px!important}
+  .chip-b{right:0!important;top:28px!important}
+  .chip-c{left:4px!important;bottom:18px!important}
+  .chip-d{right:4px!important;bottom:6px!important}
+  .tool-grid,.sample-grid,.guide-grid,.library-grid,.projects-grid,.form-grid,.dashboard-grid,.studio-layout,.result-action{grid-template-columns:1fr!important}
+  .section-card,.form-section,.result-panel{border-radius:22px}
+  .form-section{padding:16px}
+  input,select,textarea{font-size:16px!important;min-height:48px}
+  textarea{min-height:130px}
+  .result-panel{position:relative!important;top:auto!important}
+  .result-box{max-height:55dvh;overflow:auto}
+  .sidebar{width:min(310px,88vw);padding-bottom:calc(24px + env(safe-area-inset-bottom))!important}
+  .nav-link{min-height:48px}
+  .brand img{width:58px;height:58px}
+  .quick-panel{margin-bottom:12px}
+}
+@media(max-width:380px){
+  .workspace{padding:10px!important}
+  .hero-card h3{font-size:27px!important}
+  .media-orb{width:min(260px,84vw)!important}
+  .media-orb img{width:130px!important;height:130px!important}
+  .tool-card,.sample-grid article,.section-card{padding:14px!important}
+}

@@ -98,6 +98,25 @@ document.addEventListener("DOMContentLoaded", () => {
   TANJAI.renderDestinations();
   TANJAI.renderProjects();
 
+
+  // v6.1.4 mobile drawer menu
+  const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+  const sidebarOverlay = document.getElementById("sidebarOverlay");
+  const closeSidebar = () => document.body.classList.remove("sidebar-open");
+  if(mobileMenuBtn){
+    mobileMenuBtn.addEventListener("click", e => {
+      e.preventDefault();
+      document.body.classList.toggle("sidebar-open");
+    });
+  }
+  if(sidebarOverlay){ sidebarOverlay.addEventListener("click", closeSidebar); }
+  window.addEventListener("keydown", e => { if(e.key === "Escape") closeSidebar(); });
+  document.addEventListener("click", e => {
+    const item = e.target.closest(".nav-link,[data-view]");
+    if(item && window.matchMedia("(max-width:1180px)").matches) closeSidebar();
+  });
+
+
   // Navigation
 
   // v6.1.2 fallback: กันเมนูซ้าย/การ์ดหน้าแรกคลิกไม่ได้
