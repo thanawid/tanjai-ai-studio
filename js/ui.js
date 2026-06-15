@@ -53,6 +53,9 @@ TANJAI.field = function(prefix, data){
 TANJAI.resultShell = function(tool, recommended, desc, bodyId, buttons=""){
   const destinationButtons = (()=>{
     const btn = (label,url)=>`<button class="btn secondary" data-open="${url}">${label}</button>`;
+    if(tool === "router"){
+      return btn("เปิด ChatGPT","https://chatgpt.com/") + btn("เปิด Canva","https://www.canva.com/") + btn("เปิด CapCut","https://www.capcut.com/");
+    }
     if(tool === "image"){
       return btn("เปิด ChatGPT","https://chatgpt.com/") + btn("เปิด Canva","https://www.canva.com/");
     }

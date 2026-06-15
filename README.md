@@ -75,15 +75,14 @@
 - อย่างอื่นคงเดิมจากฐานล่าสุด
 
 
-## v6.2.2 Logo Safe Final
-- เอาโลโก้เดิมของเว็บกลับมา ไม่เปลี่ยน assets/logo.jpg
-- ใช้ไฟล์ IconLogoTJ.png เฉพาะ favicon และไอคอนเว็บแอป
-- Title Tag: ทันใจ AI Studio | สร้างสื่อไว ด้วยพลัง AI
-- หน้าแรก:
-  - AI Media Hub
-  - สร้างสื่อไว ด้วยพลัง AI
+## v6.2.3 Logo Router Safe
+- Main logo / Hero / Sidebar ใช้โลโก้เดิม “ทันใจ AI Studio” จาก Logo001(3).jpg
+- Favicon / Web app icon / Mobile icon ใช้ TJ จาก IconLogoTJ(2).png
+- แก้ AI Router result box ไม่ให้เพี้ยน
 - คง Random Preview Cards
 - คง Destination Hub ครบ 6 เครื่องมือ
 - คงผลลัพธ์แนะนำเฉพาะเมนู
+- Title Tag: ทันใจ AI Studio | สร้างสื่อไว ด้วยพลัง AI
+- Hero: AI Media Hub / สร้างสื่อไว ด้วยพลัง AI
 - อย่างอื่นคงเดิม
 - เช็ก JavaScript syntax ก่อนส่ง

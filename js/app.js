@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Render forms
   $("#routerForm").innerHTML = `<div class="form-section"><div class="section-title"><b>?</b><h4>อยากทำอะไรครับ?</h4></div><label class="full">พิมพ์โจทย์ของพี่<textarea id="router-query" placeholder="เช่น อยากทำโพสต์ประชาสัมพันธ์โครงการปลูกต้นไม้ / อยากทำเสียงพากย์คลิปแจ้งข่าว / อยากทำสไลด์นำเสนอ"></textarea></label></div><div class="button-row"><button class="btn primary" id="askRouter">ให้ Router แนะนำ</button><button class="btn secondary" id="goRecommended">ไปที่เมนูที่แนะนำ</button></div>`;
-  $("#routerResult").innerHTML = TANJAI.resultShell("คำแนะนำจาก AI Router","ระบบจะแนะนำเมนูและปลายทางที่เหมาะกับโจทย์", "routerOut", `<button class="btn primary" data-copybox="routerOut">คัดลอกคำแนะนำ</button>`);
+  $("#routerResult").innerHTML = TANJAI.resultShell("router", "คำแนะนำจาก AI Router", "ระบบจะแนะนำเมนูและปลายทางที่เหมาะกับโจทย์", "routerOut", `<button class="btn primary" data-copybox="routerOut">คัดลอกคำแนะนำ</button>`);
 
   $("#imageForm").innerHTML = TANJAI.field("image") + `
     <div class="form-note">หน้านี้ใช้สำหรับสร้างภาพโดยเฉพาะ คืน dropdown รายละเอียดแบบเต็ม เพื่อให้ Prompt ภาพแม่นขึ้น</div>
