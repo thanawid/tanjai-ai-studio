@@ -31,7 +31,6 @@ document.addEventListener("DOMContentLoaded", () => {
   $("#routerResult").innerHTML = TANJAI.resultShell("router", "คำแนะนำจาก AI Router", "ระบบจะแนะนำเมนูและปลายทางที่เหมาะกับโจทย์", "routerOut", `<button class="btn primary" data-copybox="routerOut">คัดลอกคำแนะนำ</button>`);
 
   $("#imageForm").innerHTML = TANJAI.field("image") + `
-    <div class="form-note">หน้านี้ใช้สำหรับสร้างภาพโดยเฉพาะ คืน dropdown รายละเอียดแบบเต็ม เพื่อให้ Prompt ภาพแม่นขึ้น และเพิ่มโหมดภาพจริงเพื่อกันหน้าเพี้ยน</div>
     <div class="form-section"><div class="section-title"><b>2</b><h4>ภาพอ้างอิง / ภาพจริง</h4></div>
       <div class="form-grid">
         <label class="full">แนบภาพจริง / ภาพอ้างอิง
