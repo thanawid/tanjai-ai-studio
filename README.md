@@ -218,3 +218,12 @@
 - เมื่อกดสร้าง Prompt ภาพ ระบบจะตรวจความพร้อมให้อัตโนมัติ
 - บันทึกโปรเจกต์พร้อมผลตรวจ Prompt Critic
 - คง Smart Brief Auto Mode, Section Numbering Fix, Clean Image Note, Real Photo Safe Mode, Output Delivery Guard, Custom GPT URL Fix, Login Gate, Navigation UX, Destination Hub, Preview Cards, favicon, logo และ layout เดิม
+
+
+## v6.5.1 — Auto Prompt Critic Behind the Scenes
+- เอาปุ่ม “ตรวจความพร้อม” ออกจากหน้าเว็บ
+- เอากล่อง Prompt Critic ออกจากหน้าเว็บ
+- ให้ระบบ Prompt Critic ตรวจอัตโนมัติหลังบ้านเมื่อกด “สร้าง Prompt ภาพ”
+- ผลตรวจถูกใช้เสริม Prompt ภายใน ไม่โชว์เป็นแผงให้ผู้ใช้ต้องอ่าน
+- แก้ระบบเรียงเลขในหน้าสร้างภาพให้ครบและเรียงตาม section ที่มองเห็นจริง
+- คง Smart Brief Auto Mode, Clean Image Note, Real Photo Safe Mode, Output Delivery Guard, Custom GPT URL Fix, Login Gate, Navigation UX, Destination Hub, Preview Cards, favicon, logo และ layout เดิม

@@ -779,3 +779,7 @@ body:not(.auth-locked) .login-gate{
 @media(max-width:768px){
   .critic-head{align-items:flex-start;flex-direction:column}
 }
+
+
+/* v6.5.1 Auto Prompt Critic Behind the Scenes */
+/* The readiness critic runs automatically in the prompt engine; no separate visible critic panel is shown on the image form. */

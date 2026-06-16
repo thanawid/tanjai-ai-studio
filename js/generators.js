@@ -270,6 +270,12 @@ Layout: ${d.layout}
 คำสั่งแก้เฉพาะจุด:
 หากต้องแก้ ให้แก้เฉพาะข้อความ สี ขนาดตัวอักษร หรือการจัดวาง โดยห้ามเปลี่ยนภาพหลัก ห้ามเปลี่ยนบุคคล และห้ามออกแบบใหม่ทั้งหมด` : "";
 
+  const autoCriticNote = d.criticSummary ? `
+
+Auto Prompt Critic:
+ระบบตรวจความพร้อมหลังบ้านแล้ว ให้นำข้อควรระวังต่อไปนี้ไปปรับงานโดยอัตโนมัติ ไม่ต้องตอบเป็นรายงานแยก:
+${d.criticSummary}` : "";
+
   const confirmLine = d.smartConfirm ? `
 
 ถ้าข้อมูลถูกต้องแล้ว พิมพ์ว่า “สร้างภาพได้เลย”` : "";
@@ -316,7 +322,7 @@ ${textOnImage}
 
 Creative Direction:
 ${creativeDirection}
-${backupCommand}${TANJAI.outputDeliveryGuard("ภาพ")}${confirmLine}`;
+${backupCommand}${autoCriticNote}${TANJAI.outputDeliveryGuard("ภาพ")}${confirmLine}`;
   }
 
   return `โหมดการใช้ภาพ
@@ -356,7 +362,7 @@ ${modePrompt}
 - โทนภาษา: ${d.tone}
 
 ข้อความบนภาพถ้ามี
-- ${[title, ...secondaryLines].join("\n- ") || "ให้ AI จัดหัวข้อและข้อความบนภาพตามความเหมาะสม"}${backupCommand}${TANJAI.outputDeliveryGuard("ภาพ")}`;
+- ${[title, ...secondaryLines].join("\n- ") || "ให้ AI จัดหัวข้อและข้อความบนภาพตามความเหมาะสม"}${backupCommand}${autoCriticNote}${TANJAI.outputDeliveryGuard("ภาพ")}`;
 };
 
 
