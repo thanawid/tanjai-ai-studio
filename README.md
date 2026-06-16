@@ -174,3 +174,10 @@
 - เพิ่ม preset ใช้งานเร็วสำหรับภาพจริง
 - เพิ่มคำเตือนเมื่อแนบภาพจริงแต่ยังเลือกโหมดสร้างใหม่
 - ปรับ Prompt Engine ให้แยกโหมดภาพจริง / ใส่กราฟิก / รีทัช / สร้างใหม่อย่างชัดเจน
+
+
+## v6.3.1 — Output Delivery Guard
+- เพิ่มคำสั่งท้าย Prompt เพื่อบังคับให้ AI แนบไฟล์จริง ไม่ตอบเป็น path `/mnt/data/...` เฉย ๆ
+- ใช้กับ Prompt ภาพ, สไลด์, วิดีโอ/ไฟล์ประกอบ และชุดสื่อ
+- เพิ่ม Prompt Hub: Output Delivery Guard
+- คง Real Photo Safe Mode, Custom GPT URL Fix, Login Gate, Navigation UX, Destination Hub, Preview Cards, favicon, logo และ layout เดิม

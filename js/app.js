@@ -161,7 +161,7 @@ document.addEventListener("DOMContentLoaded", () => {
   $("#kitForm").innerHTML = TANJAI.field("kit") + `<div class="button-row"><button class="btn primary" id="makeKit">สร้างชุดสื่อ</button><button class="btn secondary" id="saveKit">บันทึก</button></div>`;
 
   // Results
-  $("#imageResult").innerHTML = TANJAI.resultShell("image", "Prompt ภาพ", "คัดลอกไปใช้กับ ChatGPT / Canva / AI สร้างภาพ", "imageOut", `<button class="btn primary" data-copybox="imageOut">คัดลอก Prompt ภาพ</button>`);
+  $("#imageResult").innerHTML = TANJAI.resultShell("image", "Prompt ภาพ", "คัดลอกไปใช้กับทันใจ GPT / Canva / AI สร้างภาพ พร้อมคำสั่งแนบไฟล์จริง", "imageOut", `<button class="btn primary" data-copybox="imageOut">คัดลอก Prompt ภาพ</button>`);
   $("#postResult").innerHTML = TANJAI.resultShell("post", "สคริปต์สรุปงาน", "ใช้ต่อได้ทั้งนำเสนอ ทำคลิป และโพสต์โซเชียล", "postOut", `<button class="btn primary" data-copybox="postOut">คัดลอกโพสต์</button>`);
   $("#videoResult").innerHTML = TANJAI.resultShell("video", "Storyboard", "คัดลอกไปใช้กับ CapCut / ทีมถ่าย / คลิปสั้น", "videoOut", `<button class="btn primary" data-copybox="videoOut">คัดลอก Storyboard</button>`);
   $("#voiceResult").innerHTML = TANJAI.resultShell("voice", "สคริปต์เสียงพากย์", "คัดลอกไปใช้กับ CapCut หรือ Voice Tool", "voiceOut", `<button class="btn primary" data-copybox="voiceOut">คัดลอกสคริปต์เสียง</button>`);
@@ -441,7 +441,7 @@ ${TANJAI.videoStoryboard(d, "60 วินาที")}
 ${TANJAI.voiceScript(d, "60 วินาที", "ทางการ สุภาพ")}
 
 === 5) Outline สไลด์ ===
-${TANJAI.deckOutline(d, 8)}`;
+${TANJAI.deckOutline(d, 8)}${TANJAI.outputDeliveryGuard("ชุดไฟล์สื่อ")}`;
     $("#kitOut").textContent=out; TANJAI.state.lastKit=out; TANJAI.toast("สร้างชุดสื่อแล้ว");
   };
 
