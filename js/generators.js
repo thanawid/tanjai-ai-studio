@@ -4,6 +4,7 @@ TANJAI.$$ = s => Array.from(document.querySelectorAll(s));
 
 TANJAI.commonData = function(prefix){
   const v = id => (TANJAI.$(`#${prefix}-${id}`)?.value || "").trim();
+  const c = id => !!TANJAI.$(`#${prefix}-${id}`)?.checked;
   return {
     title: v("title") || "หัวข้องาน",
     orgName: v("orgName") || "ทันใจ AI Studio",
@@ -24,22 +25,115 @@ TANJAI.commonData = function(prefix){
     focus: v("focus") || "เน้นหัวข้อหลัก",
     colorTone: v("colorTone") || "ให้ AI เลือกให้เหมาะสม",
     size: v("size") || "4:5 Facebook / Line 1080x1350",
-    avoid: v("avoid") || "ห้ามสร้าง QR Code ปลอม ห้ามวาดโลโก้ใหม่ ข้อความภาษาไทยต้องสะกดถูก"
+    avoid: v("avoid") || "ห้ามสร้าง QR Code ปลอม ห้ามวาดโลโก้ใหม่ ข้อความภาษาไทยต้องสะกดถูก",
+    useMode: v("useMode") || "สร้างภาพใหม่ด้วย AI",
+    originalityLevel: v("originalityLevel") || "",
+    safeUseMain: c("safeUseMain"),
+    safeFace: c("safeFace"),
+    safeNewPerson: c("safeNewPerson"),
+    safeLook: c("safeLook"),
+    safeScene: c("safeScene"),
+    safeAdjustOnly: c("safeAdjustOnly"),
+    safeOverlay: c("safeOverlay"),
+    safeNoCover: c("safeNoCover")
   };
 };
 
 TANJAI.imagePrompt = function(d){
-  return `สร้างภาพประชาสัมพันธ์ภาษาไทย หัวข้อ “${d.title}” สำหรับ ${d.orgName}
-กลุ่มเป้าหมาย: ${d.audience}
-ขนาดภาพ: ${d.size}
-รายละเอียดสำคัญ: ${d.detail}
-วันเวลา: ${d.dateTime || "ไม่ระบุ"}
-สถานที่: ${d.place || "ไม่ระบุ"}
-บุคคล/หน่วยงานที่เกี่ยวข้อง: ${d.people || "ไม่ระบุ"}
+  const mode = d.useMode || "สร้างภาพใหม่ด้วย AI";
+  const level = d.originalityLevel || (mode === "ปรับภาพจริง + ใส่กราฟิก" ? "สมดุล" : mode === "สร้างภาพใหม่ด้วย AI" ? "ไม่บังคับ" : "สูงสุด");
+  const photoCount = Number(d.photoCount || 0);
+  const hasPhotos = photoCount > 0;
+  const photoNames = d.photoNames || "ภาพแนบ";
 
-แนวภาพ: ${d.style}, โทน ${d.tone}, อ่านง่าย ทันสมัย มี visual hierarchy ชัดเจน หัวข้อหลักต้องเด่น รายละเอียดรองอ่านง่าย ไม่รก ใช้พื้นที่ว่างเหมาะสม เหมือนงานกราฟิกดีไซเนอร์มืออาชีพ
+  const guardItems = [];
+  if(mode !== "สร้างภาพใหม่ด้วย AI"){
+    if(d.safeUseMain) guardItems.push("- ใช้ภาพที่แนบเป็นภาพหลักจริง");
+    if(d.safeFace) guardItems.push("- ห้ามเปลี่ยนใบหน้า");
+    if(d.safeNewPerson) guardItems.push("- ห้ามสร้างบุคคลใหม่");
+    if(d.safeLook) guardItems.push("- ห้ามเปลี่ยนทรงผม / ชุด / รูปร่าง");
+    if(d.safeScene) guardItems.push("- ห้ามเปลี่ยนฉากหลัก");
+    if(d.safeAdjustOnly) guardItems.push("- อนุญาตเฉพาะการปรับแสง สี ความคมชัด และการครอป");
+    if(d.safeOverlay) guardItems.push("- อนุญาตให้ใส่ข้อความ / กรอบ / กล่องข้อความ / กราฟิกเสริม");
+    if(d.safeNoCover) guardItems.push("- ห้ามบังใบหน้าหรือรายละเอียดสำคัญ");
+  }
+  const guardText = guardItems.length ? guardItems.join("\n") : (mode === "สร้างภาพใหม่ด้วย AI" ? "- ไม่มีข้อบังคับคงต้นฉบับ เน้นสร้างภาพใหม่ตามโจทย์" : "- คงภาพจริงเป็นหลักและหลีกเลี่ยงการวาดใหม่");
 
-ข้อห้าม: ${d.avoid}`;
+  let modePrompt = "";
+  if(mode === "ใช้ภาพจริงเป็นต้นฉบับ"){
+    modePrompt = `ใช้ภาพที่แนบเป็นภาพจริงต้นฉบับ
+
+ข้อสำคัญ:
+- ห้ามสร้างบุคคลใหม่
+- ห้ามเปลี่ยนใบหน้า อัตลักษณ์ ทรงผม รูปร่าง หรือชุด
+- ห้ามเปลี่ยนสถานที่จริงในภาพ
+- ให้ปรับได้เฉพาะแสง สี ความคมชัด การครอป และความเรียบร้อยของภาพ
+- หากมีการเพิ่มองค์ประกอบกราฟิก ให้เป็นองค์ประกอบเสริมเท่านั้น
+- ห้ามทำให้ภาพดูเป็นภาพวาดใหม่
+- ผลลัพธ์ต้องยังคงเป็นภาพถ่ายจริงของบุคคลและสถานที่เดิม`;
+  }else if(mode === "ปรับภาพจริง + ใส่กราฟิก"){
+    modePrompt = `ใช้ภาพที่แนบเป็นภาพจริงต้นฉบับสำหรับงานประชาสัมพันธ์
+
+ข้อสำคัญ:
+- ห้ามสร้างบุคคลใหม่
+- ห้ามเปลี่ยนใบหน้า อัตลักษณ์ ทรงผม รูปร่าง หรือชุด
+- ห้ามเปลี่ยนฉากหลักของภาพ
+- ปรับได้เฉพาะแสง สี ความคมชัด และองค์ประกอบภาพ
+- สามารถเพิ่มหัวข้อ ข้อความ กล่องข้อความ กราฟิกประกอบ ไอคอน และกรอบได้
+- กราฟิกต้องไม่บังใบหน้า หรือรายละเอียดสำคัญของภาพ
+- ผลลัพธ์ต้องดูเป็นงานกราฟิกประชาสัมพันธ์จากภาพจริง ไม่ใช่การวาดภาพใหม่`;
+  }else if(mode === "รีทัชภาพจริง"){
+    modePrompt = `ใช้ภาพที่แนบเป็นภาพจริงต้นฉบับ
+
+ให้รีทัชภาพเท่านั้น โดย:
+- ห้ามเปลี่ยนใบหน้า บุคคล ชุด ทรงผม รูปร่าง และฉาก
+- ปรับเฉพาะแสง สี โทนผิว ความคมชัด white balance contrast และการครอป
+- ลบรอยรบกวนเล็กน้อยได้ หากไม่กระทบตัวบุคคล
+- ห้ามทำให้ภาพกลายเป็นภาพสร้างใหม่`;
+  }else{
+    modePrompt = `สร้างภาพใหม่ด้วย AI ตามโจทย์ที่กำหนด${hasPhotos ? " โดยใช้ภาพแนบเป็น reference หรือแรงบันดาลใจเท่านั้น ไม่จำเป็นต้องคงบุคคลหรือฉากเดิม" : ""}`;
+  }
+
+  const textOnImage = [d.title, d.dateTime ? `วันเวลา: ${d.dateTime}` : "", d.place ? `สถานที่: ${d.place}` : ""].filter(Boolean).join("\n- ");
+
+  return `โหมดการใช้ภาพ
+- ${mode}
+- ระดับการคงต้นฉบับ: ${level}
+- ภาพแนบ: ${hasPhotos ? `${photoCount} รูป (${photoNames})` : "ไม่มี"}
+
+ข้อห้ามสำหรับภาพจริง
+${guardText}
+- ข้อห้ามเพิ่มเติม: ${d.avoid}
+
+คำสั่งออกแบบ
+${modePrompt}
+
+สร้างภาพประชาสัมพันธ์ภาษาไทย หัวข้อ “${d.title}” สำหรับ ${d.orgName} โดยเน้นงานออกแบบที่สวย ทันสมัย อ่านง่าย มี visual hierarchy ชัดเจน หัวข้อหลักเด่น รายละเอียดรองอ่านง่าย ไม่รก ใช้พื้นที่ว่างเหมาะสม และดูเหมือนงานกราฟิกดีไซเนอร์มืออาชีพ
+
+รายละเอียดงาน
+- ชื่อองค์กร / แบรนด์: ${d.orgName}
+- ประเภทองค์กร: ${d.orgType || "ไม่ระบุ"}
+- หมวดงานหลัก: ${d.mainCategory || "ไม่ระบุ"}
+- หัวข้องานย่อย: ${d.subCategory || "ไม่ระบุ"}
+- กลุ่มเป้าหมาย: ${d.audience}
+- รายละเอียดสำคัญ: ${d.detail}
+- วันเวลา: ${d.dateTime || "ไม่ระบุ"}
+- สถานที่: ${d.place || "ไม่ระบุ"}
+- บุคคล/หน่วยงานที่เกี่ยวข้อง: ${d.people || "ไม่ระบุ"}
+
+ขนาด / ช่องทาง
+- ขนาดภาพ: ${d.size}
+
+โทนภาพ
+- สไตล์ภาพ: ${d.style}
+- Layout: ${d.layout}
+- โทนสี: ${d.colorTone}
+- ความหนาแน่น: ${d.density}
+- จุดเด่นของภาพ: ${d.focus}
+- โทนภาษา: ${d.tone}
+
+ข้อความบนภาพถ้ามี
+- ${textOnImage || "ให้ AI จัดหัวข้อและข้อความบนภาพตามความเหมาะสม"}`;
 };
 
 TANJAI.postText = function(d){

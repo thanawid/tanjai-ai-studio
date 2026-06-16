@@ -31,8 +31,62 @@ document.addEventListener("DOMContentLoaded", () => {
   $("#routerResult").innerHTML = TANJAI.resultShell("router", "คำแนะนำจาก AI Router", "ระบบจะแนะนำเมนูและปลายทางที่เหมาะกับโจทย์", "routerOut", `<button class="btn primary" data-copybox="routerOut">คัดลอกคำแนะนำ</button>`);
 
   $("#imageForm").innerHTML = TANJAI.field("image") + `
-    <div class="form-note">หน้านี้ใช้สำหรับสร้างภาพโดยเฉพาะ คืน dropdown รายละเอียดแบบเต็ม เพื่อให้ Prompt ภาพแม่นขึ้น</div>
-    <div class="form-section"><div class="section-title"><b>2</b><h4>ประเภทงานและช่องทาง</h4></div>
+    <div class="form-note">หน้านี้ใช้สำหรับสร้างภาพโดยเฉพาะ คืน dropdown รายละเอียดแบบเต็ม เพื่อให้ Prompt ภาพแม่นขึ้น และเพิ่มโหมดภาพจริงเพื่อกันหน้าเพี้ยน</div>
+    <div class="form-section"><div class="section-title"><b>2</b><h4>ภาพอ้างอิง / ภาพจริง</h4></div>
+      <div class="form-grid">
+        <label class="full">แนบภาพจริง / ภาพอ้างอิง
+          <input id="image-photos" type="file" accept="image/*" multiple>
+          <small>ถ้าเป็นภาพบุคคลจริง ภาพกิจกรรม หรือภาพผู้บริหาร แนะนำใช้โหมดภาพจริงเพื่อคงหน้าคนและฉากเดิม</small>
+          <div id="image-photoPreview" class="upload-preview-grid"></div>
+        </label>
+      </div>
+    </div>
+    <div class="form-section"><div class="section-title"><b>3</b><h4>โหมดการใช้ภาพ</h4></div>
+      <div class="form-grid">
+        <label class="full">โหมดการใช้ภาพ<select id="image-useMode">
+          <option>สร้างภาพใหม่ด้วย AI</option>
+          <option>ใช้ภาพจริงเป็นต้นฉบับ</option>
+          <option>ปรับภาพจริง + ใส่กราฟิก</option>
+          <option>รีทัชภาพจริง</option>
+        </select><small>เลือกให้ตรงกับลักษณะงาน เพื่อลดโอกาสหน้าเพี้ยนและช่วยให้ Prompt แม่นขึ้น</small></label>
+        <label id="image-originalityWrap">ระดับการคงต้นฉบับ<select id="image-originalityLevel">
+          <option>สูงสุด — คงคน คงฉาก คงองค์ประกอบเดิมมากที่สุด</option>
+          <option>สมดุล — ปรับภาพได้มากขึ้น แต่ยังไม่เปลี่ยนบุคคล</option>
+          <option>ยืดหยุ่น — ใช้เมื่อยอมให้มีการตกแต่งภาพมากขึ้น</option>
+        </select></label>
+        <div class="full preset-wrap">
+          <small class="preset-label">Preset ใช้งานเร็ว</small>
+          <div class="preset-row">
+            <button type="button" class="chip-btn" data-image-preset="real-post">โพสต์จากภาพจริง</button>
+            <button type="button" class="chip-btn" data-image-preset="real-poster">โปสเตอร์จากภาพจริง</button>
+            <button type="button" class="chip-btn" data-image-preset="beautify">ปรับภาพให้สวย</button>
+            <button type="button" class="chip-btn" data-image-preset="retouch">รีทัชแบบไม่เปลี่ยนคน</button>
+          </div>
+        </div>
+        <div id="image-photoHint" class="full soft-alert" hidden>พบภาพแนบจริง แนะนำใช้โหมด “ใช้ภาพจริงเป็นต้นฉบับ” เพื่อป้องกันหน้าเพี้ยน</div>
+        <div id="image-generateWarn" class="full warning-alert" hidden>
+          <div>คำเตือน: การเลือกโหมดสร้างภาพใหม่ อาจทำให้บุคคลในภาพเปลี่ยนไปจากต้นฉบับ</div>
+          <div class="inline-actions">
+            <button type="button" class="btn secondary" id="image-useSafeMode">ใช้โหมดภาพจริงแทน</button>
+            <button type="button" class="btn ghost" id="image-continueGenerate">สร้างใหม่ต่อ</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="form-section" id="image-safetyWrap"><div class="section-title"><b>4</b><h4>การปกป้องภาพจริง</h4></div>
+      <p class="mini-note">เหมาะสำหรับภาพกิจกรรม ภาพผู้บริหาร ภาพประชาสัมพันธ์ และภาพถ่ายจริงที่ต้องการคงบุคคลเดิม</p>
+      <div class="safe-check-grid">
+        <label class="checkline"><input id="image-safeUseMain" type="checkbox" checked> ใช้ภาพจริงเป็นภาพหลัก</label>
+        <label class="checkline"><input id="image-safeFace" type="checkbox" checked> ห้ามเปลี่ยนใบหน้า</label>
+        <label class="checkline"><input id="image-safeNewPerson" type="checkbox" checked> ห้ามสร้างบุคคลใหม่</label>
+        <label class="checkline"><input id="image-safeLook" type="checkbox" checked> ห้ามเปลี่ยนทรงผม / ชุด / รูปร่าง</label>
+        <label class="checkline"><input id="image-safeScene" type="checkbox" checked> ห้ามเปลี่ยนฉากหลัก</label>
+        <label class="checkline"><input id="image-safeAdjustOnly" type="checkbox" checked> อนุญาตเฉพาะการปรับแสง สี ความคมชัด</label>
+        <label class="checkline"><input id="image-safeOverlay" type="checkbox" checked> อนุญาตให้ใส่ข้อความ / กรอบ / กล่องข้อความ / กราฟิกเสริม</label>
+        <label class="checkline"><input id="image-safeNoCover" type="checkbox" checked> ห้ามบังใบหน้าหรือรายละเอียดสำคัญ</label>
+      </div>
+    </div>
+    <div class="form-section"><div class="section-title"><b>5</b><h4>ประเภทงานและช่องทาง</h4></div>
       <div class="form-grid">
         <label>ประเภทองค์กร<select id="image-orgType">${opts(toolOptions.orgTypes)}</select></label>
         <label>หมวดงานหลัก<select id="image-mainCategory">${opts(toolOptions.mainCategories)}</select></label>
@@ -40,7 +94,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <label>ช่องทาง / ขนาดภาพ<select id="image-size">${opts(TANJAI.categories.sizes)}</select></label>
       </div>
     </div>
-    <div class="form-section"><div class="section-title"><b>3</b><h4>แนวภาพและความสวย</h4></div>
+    <div class="form-section"><div class="section-title"><b>6</b><h4>แนวภาพและความสวย</h4></div>
       <div class="form-grid">
         <label>สไตล์ภาพ<select id="image-style">${opts(TANJAI.categories.imageStyles)}</select></label>
         <label>Layout<select id="image-layout">${opts(toolOptions.layouts)}</select></label>
@@ -220,6 +274,108 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   })();
+  const renderUploadPreview = (inputId, previewId) => {
+    const input = $(inputId), preview = $(previewId);
+    if(!input || !preview) return;
+    const files = Array.from(input.files || []);
+    preview.innerHTML = files.map(file => {
+      const src = URL.createObjectURL(file);
+      return `<figure><img src="${src}" alt="${file.name}"><figcaption>${file.name}</figcaption></figure>`;
+    }).join("");
+  };
+
+  const setImageSafeChecks = (checked=true) => {
+    ["safeUseMain","safeFace","safeNewPerson","safeLook","safeScene","safeAdjustOnly","safeOverlay","safeNoCover"].forEach(key=>{
+      const el = $(`#image-${key}`); if(el) el.checked = checked;
+    });
+  };
+
+  const setImageOriginalityByMode = mode => {
+    const level = $("#image-originalityLevel");
+    if(!level) return;
+    if(mode === "ใช้ภาพจริงเป็นต้นฉบับ" || mode === "รีทัชภาพจริง") level.value = "สูงสุด — คงคน คงฉาก คงองค์ประกอบเดิมมากที่สุด";
+    else if(mode === "ปรับภาพจริง + ใส่กราฟิก") level.value = "สมดุล — ปรับภาพได้มากขึ้น แต่ยังไม่เปลี่ยนบุคคล";
+  };
+
+  const refreshImageModeUI = () => {
+    const mode = $("#image-useMode")?.value || "สร้างภาพใหม่ด้วย AI";
+    const photoCount = $("#image-photos")?.files?.length || 0;
+    const safetyWrap = $("#image-safetyWrap");
+    const originalityWrap = $("#image-originalityWrap");
+    const hint = $("#image-photoHint");
+    const warn = $("#image-generateWarn");
+    if(safetyWrap) safetyWrap.style.display = mode === "สร้างภาพใหม่ด้วย AI" ? "none" : "block";
+    if(originalityWrap) originalityWrap.style.display = mode === "สร้างภาพใหม่ด้วย AI" ? "none" : "block";
+    if(hint) hint.hidden = !(photoCount > 0);
+    if(warn) warn.hidden = !(photoCount > 0 && mode === "สร้างภาพใหม่ด้วย AI");
+  };
+
+  const recommendRealPhotoMode = (force=false) => {
+    const input = $("#image-photos"), mode = $("#image-useMode");
+    if(!input || !mode) return;
+    const hasFiles = (input.files?.length || 0) > 0;
+    if(hasFiles && (force || !mode.dataset.userChanged)){
+      mode.value = "ใช้ภาพจริงเป็นต้นฉบับ";
+      setImageSafeChecks(true);
+      setImageOriginalityByMode(mode.value);
+    }
+    if(!hasFiles && !mode.dataset.userChanged){
+      mode.value = "สร้างภาพใหม่ด้วย AI";
+    }
+    refreshImageModeUI();
+  };
+
+  const applyImagePreset = preset => {
+    const mode = $("#image-useMode");
+    if(!mode) return;
+    if(preset === "real-post" || preset === "real-poster"){
+      mode.value = "ปรับภาพจริง + ใส่กราฟิก";
+      setImageSafeChecks(true);
+      $("#image-originalityLevel").value = "สมดุล — ปรับภาพได้มากขึ้น แต่ยังไม่เปลี่ยนบุคคล";
+    }else if(preset === "beautify" || preset === "retouch"){
+      mode.value = "รีทัชภาพจริง";
+      setImageSafeChecks(true);
+      $("#image-originalityLevel").value = "สูงสุด — คงคน คงฉาก คงองค์ประกอบเดิมมากที่สุด";
+    }
+    mode.dataset.userChanged = "1";
+    refreshImageModeUI();
+    TANJAI.toast("ตั้งค่าโหมดภาพจริงให้แล้ว");
+  };
+
+  const setupImageSafeMode = () => {
+    const imageInput = $("#image-photos");
+    const mode = $("#image-useMode");
+    imageInput?.addEventListener("change", ()=>{
+      renderUploadPreview("#image-photos", "#image-photoPreview");
+      recommendRealPhotoMode(true);
+    });
+    mode?.addEventListener("change", ()=>{
+      mode.dataset.userChanged = "1";
+      if(mode.value !== "สร้างภาพใหม่ด้วย AI"){
+        setImageOriginalityByMode(mode.value);
+        setImageSafeChecks(true);
+      }
+      refreshImageModeUI();
+    });
+    $("#image-useSafeMode")?.addEventListener("click", ()=>{
+      if(mode){
+        mode.value = "ใช้ภาพจริงเป็นต้นฉบับ";
+        mode.dataset.userChanged = "1";
+        setImageSafeChecks(true);
+        setImageOriginalityByMode(mode.value);
+        refreshImageModeUI();
+      }
+    });
+    $("#image-continueGenerate")?.addEventListener("click", ()=>{
+      $("#image-generateWarn").hidden = true;
+    });
+    $$("[data-image-preset]").forEach(btn => btn.addEventListener("click", ()=>applyImagePreset(btn.dataset.imagePreset)));
+    recommendRealPhotoMode(false);
+    refreshImageModeUI();
+  };
+
+  setupImageSafeMode();
+
 
   // Navigation
 
@@ -254,7 +410,16 @@ document.addEventListener("DOMContentLoaded", () => {
   TANJAI.setupNavigationHistory?.();
 
   // Generators
-  $("#makeImage").onclick = () => { const d=TANJAI.commonData("image"); const out=TANJAI.imagePrompt(d); $("#imageOut").textContent=out; TANJAI.state.lastImage=out; TANJAI.toast("สร้าง Prompt ภาพแล้ว"); };
+  $("#makeImage").onclick = () => {
+    const d=TANJAI.commonData("image");
+    const imageFiles = Array.from($("#image-photos")?.files || []);
+    d.photoCount = imageFiles.length;
+    d.photoNames = imageFiles.map(f=>f.name).join(", ");
+    const out=TANJAI.imagePrompt(d);
+    $("#imageOut").textContent=out;
+    TANJAI.state.lastImage=out;
+    TANJAI.toast("สร้าง Prompt ภาพแล้ว");
+  };
   $("#makePost").onclick = () => { const d=TANJAI.commonData("post"); const out=TANJAI.postText(d); $("#postOut").textContent=out; TANJAI.state.lastPost=out; TANJAI.toast("สร้างโพสต์แล้ว"); };
   $("#makeVideo").onclick = () => { const d=TANJAI.commonData("video"); const out=TANJAI.videoStoryboard(d, $("#video-length").value); $("#videoOut").textContent=out; TANJAI.state.lastVideo=out; TANJAI.toast("สร้าง Storyboard แล้ว"); };
   $("#makeVoice").onclick = () => { const d=TANJAI.commonData("voice"); const out=TANJAI.voiceScript(d, $("#voice-length").value, $("#voice-style").value); $("#voiceOut").textContent=out; TANJAI.state.lastVoice=out; TANJAI.toast("สร้างสคริปต์เสียงแล้ว"); };
