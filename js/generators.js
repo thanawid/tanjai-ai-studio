@@ -16,7 +16,7 @@ TANJAI.outputDeliveryGuard = function(type="ไฟล์"){
 
 TANJAI.commonData = function(prefix){
   const v = id => (TANJAI.$(`#${prefix}-${id}`)?.value || "").trim();
-  const c = id => !!TANJAI.$(`#${prefix}-${id}`)?.checked;
+  const c = id => { const el = TANJAI.$(`#${prefix}-${id}`); return !!(el && (el.checked || el.value === "on" || el.value === "true")); };
   return {
     title: v("title") || "หัวข้องาน",
     orgName: v("orgName") || "ทันใจ AI Studio",
@@ -52,7 +52,7 @@ TANJAI.commonData = function(prefix){
     smartThinking: v("smartThinking") || "ให้ AI ช่วยคิดต่ออัตโนมัติ",
     smartOutput: v("smartOutput") || "สรุปบรีฟ + Prompt พร้อมส่งเข้า GPT",
     smartBackup: c("smartBackup"),
-    smartConfirm: c("smartConfirm"),
+    smartConfirm: false,
     smartMunicipal: c("smartMunicipal")
   };
 };
@@ -179,9 +179,9 @@ Layout: ${d.layout}
 ถ้าข้อมูลถูกต้องแล้ว พิมพ์ว่า “สร้างภาพได้เลย”` : "";
 
   if(smartOn){
-    return `ได้เลยครับ ช่วยคิดต่อให้ครบ โดยทำเป็นภาพแนวมืออาชีพ อ่านง่าย และเหมาะกับงานประชาสัมพันธ์
+    return `Smart Brief Coach จัดบรีฟให้พร้อมใช้งาน โดยสรุปข้อมูล คิดต่อส่วนที่ขาด และจัดคำสั่งสำหรับส่งเข้า GPT
 
-ข้อมูลที่ยังต้องขอเพิ่ม / ระบบตัดสินใจแทนให้:
+ข้อมูลที่ระบบตรวจและตัดสินใจแทนให้:
 ${missing.length ? missing.join("\n") : "- ไม่มีข้อมูลจำเป็นที่ต้องรอเพิ่มเติมแล้ว"}
 ${systemDecisions.join("\n")}
 

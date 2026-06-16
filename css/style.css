@@ -739,3 +739,7 @@ body:not(.auth-locked) .login-gate{
 @media(max-width:768px){
   .smart-brief-coach .form-grid{grid-template-columns:1fr!important}
 }
+
+
+/* v6.4.1 Smart Brief Auto Mode */
+/* Smart Brief Coach works automatically in the prompt engine; no visible setup panel is shown. */

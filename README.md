@@ -189,3 +189,10 @@
 - เพิ่มคำสั่งสำรองหลังได้ภาพ เช่น ทำเวอร์ชันไม่มีข้อความ / แก้เฉพาะจุดโดยไม่ออกแบบใหม่
 - เพิ่มตัวเลือกควบคุมระดับการช่วยคิด, รูปแบบผลลัพธ์, ภาษางานเทศบาล
 - คง Real Photo Safe Mode, Output Delivery Guard, Custom GPT URL Fix, Login Gate, Navigation UX, Destination Hub, Preview Cards, favicon, logo และ layout เดิม
+
+
+## v6.4.1 — Smart Brief Auto Mode
+- ซ่อนแผง Smart Brief Coach ออกจากหน้าเว็บ ไม่ให้ผู้ใช้เห็นตัวเลือกเทคนิคที่ไม่จำเป็น
+- ใช้ Smart Brief Coach ทำงานอัตโนมัติหลังบ้านในเมนูสร้างภาพ
+- ผลลัพธ์ยังจัดบรีฟแบบ Creative Director: ตรวจข้อมูลที่ขาด สรุปบรีฟเป็นหมวด แยกข้อความบนภาพ และสร้างคำสั่งพร้อมส่งเข้า GPT
+- คง Real Photo Safe Mode, Output Delivery Guard, Custom GPT URL Fix, Login Gate, Navigation UX, Destination Hub, Preview Cards, favicon, logo และ layout เดิม
