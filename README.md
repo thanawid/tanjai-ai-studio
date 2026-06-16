@@ -265,7 +265,7 @@
 - คงปุ่ม คัดลอก + เปิดทันใจ GPT, Smart Brief Auto Mode, Auto Prompt Critic หลังบ้าน, Real Photo Safe Mode, Output Delivery Guard, Custom GPT, Login, Navigation, Destination Hub, Preview Cards, logo/favicon/layout หลัก
 
 
-## v6.5.5 — Restore Logo + Visuals
+## v6.5.6 — Restore Logo + Visuals
 - คงเมนูและระบบล่าสุดทั้งหมด
 - เอาหน้าแรกที่มีโลโก้วงกลมและภาพ Preview กลับมา
 - เพิ่มคำว่า “ดีไซน์” บนหน้าแรก
