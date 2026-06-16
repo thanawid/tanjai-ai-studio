@@ -14,7 +14,7 @@ TANJAI.renderProjects = function(){
   const el = TANJAI.$("#projectsList");
   if(!el) return;
   const items = TANJAI.getProjects();
-  if(!items.length){ el.innerHTML = `<div class="rights-box">ยังไม่มีโปรเจกต์ที่บันทึก</div>`; return; }
+  if(!items.length){ el.innerHTML = `<div class="empty-state"><b>ยังไม่มีโปรเจกต์ที่บันทึกไว้</b><span>เมื่อสร้างงานแล้วกดบันทึก งานจะมาอยู่ตรงนี้</span></div>`; return; }
   el.innerHTML = items.map((p,i)=>`
     <article class="project-card">
       <b>${p.title}</b>

@@ -416,6 +416,19 @@ $("#postResult").innerHTML = TANJAI.resultShell("post", "สคริปต์�
   document.body.addEventListener("click", e => {
     const t = e.target.closest("[data-template]"); if(t){TANJAI.applyTemplate(t.dataset.template); return;}
     const o = e.target.closest("[data-open]"); if(o){window.open(TANJAI.normalizeGPTUrl(o.dataset.open), "_blank", "noopener,noreferrer"); return;}
+    const miniDest = e.target.closest("[data-destination-open]");
+    if(miniDest){
+      const key = miniDest.dataset.destinationOpen;
+      const item = (TANJAI.destinations || []).find(d => {
+        const name = (d.name || "").toLowerCase();
+        return (key === "gpt" && name.includes("gpt")) ||
+               (key === "canva" && name.includes("canva")) ||
+               (key === "capcut" && name.includes("capcut")) ||
+               (key === "voice" && name.includes("voice"));
+      });
+      if(item?.url) window.open(TANJAI.normalizeGPTUrl(item.url), "_blank", "noopener,noreferrer");
+      return;
+    }
     const co = e.target.closest("[data-copyopen]");
     if(co){
       const text = $("#"+co.dataset.copyopen)?.textContent || "";

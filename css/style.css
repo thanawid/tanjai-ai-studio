@@ -838,3 +838,109 @@ body:not(.auth-locked) .login-gate{
     padding:7px 10px;
   }
 }
+
+
+/* v6.5.3 Dashboard Pro Layout */
+.pro-hero-card{
+  margin-bottom:18px;
+}
+.pro-tool-grid{
+  grid-template-columns:repeat(7,minmax(0,1fr));
+}
+@media(max-width:1280px){
+  .pro-tool-grid{grid-template-columns:repeat(4,minmax(0,1fr));}
+}
+@media(max-width:820px){
+  .pro-tool-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+}
+@media(max-width:520px){
+  .pro-tool-grid{grid-template-columns:1fr;}
+}
+.tool-card{
+  position:relative;
+}
+.card-badge{
+  position:absolute;
+  right:12px;
+  top:12px;
+  z-index:2;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:5px 9px;
+  border-radius:999px;
+  border:1px solid rgba(96,165,250,.30);
+  background:rgba(59,130,246,.14);
+  color:#dbeafe;
+  font-size:11px;
+  font-weight:1000;
+  letter-spacing:.01em;
+  box-shadow:0 10px 30px rgba(0,0,0,.16);
+}
+.card-badge.green{
+  border-color:rgba(34,197,94,.32);
+  background:rgba(34,197,94,.13);
+  color:#dcfce7;
+}
+.pro-dashboard-grid{
+  grid-template-columns:1.05fr .95fr;
+  align-items:stretch;
+  margin-top:18px;
+}
+.compact-steps{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+}
+.compact-steps .step-card-v61{
+  min-height:108px;
+}
+.mini-dest-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+.mini-dest{
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.055);
+  color:var(--text);
+  border-radius:18px;
+  min-height:62px;
+  font-weight:1000;
+  cursor:pointer;
+  transition:.18s ease;
+}
+.mini-dest:hover{
+  transform:translateY(-2px);
+  border-color:rgba(96,165,250,.35);
+  background:rgba(59,130,246,.12);
+}
+.danger-lite{
+  color:#fecaca!important;
+  border-color:rgba(248,113,113,.24)!important;
+}
+.empty-state{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  min-height:170px;
+  border:1px dashed rgba(255,255,255,.16);
+  border-radius:22px;
+  color:var(--muted);
+  background:rgba(255,255,255,.035);
+}
+.empty-state b{
+  color:var(--text);
+  font-size:16px;
+}
+@media(max-width:900px){
+  .pro-dashboard-grid{
+    grid-template-columns:1fr;
+  }
+  .compact-steps{
+    grid-template-columns:1fr;
+  }
+}

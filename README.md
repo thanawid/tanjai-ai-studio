@@ -241,3 +241,16 @@
 - จัดลำดับเมนูใหม่ให้สอดคล้อง: เริ่มต้น / สร้างงาน / ต่อยอด / จัดการ
 - ซ่อน Prompt Hub ที่เป็นระบบหลังบ้าน เช่น Prompt Critic, Smart Brief Coach, Output Delivery Guard ไม่ให้ดูเป็นห้องเครื่อง
 - คง Smart Brief Auto Mode, Auto Prompt Critic หลังบ้าน, Real Photo Safe Mode, Output Delivery Guard, Custom GPT, Login, Navigation, Destination Hub, Preview Cards, logo/favicon/layout เดิม
+
+
+## v6.5.3 — Dashboard Pro Layout
+- ปรับหน้า Dashboard ให้เหลือแกนหลักที่ชัดขึ้น: Hero + เครื่องมือหลัก + วิธีใช้งาน 3 ขั้น + เครื่องมือปลายทาง
+- เอา “เริ่มงานด่วน” ออกจาก Sidebar เพื่อลดความรกและให้ AI Router เป็นจุดเริ่มหลัก
+- ลดการ์ดหน้าแรกให้เหลือเครื่องมือหลัก ไม่โชว์ Prompt Hub / เครื่องมือปลายทางซ้ำในกลุ่มเครื่องมือหลัก
+- ปรับ Hero Stats เป็น “เริ่มไว / ครบงาน / ต่อยอดลื่น”
+- เพิ่ม Badge “แนะนำให้เริ่มตรงนี้” ให้ AI Router
+- เพิ่ม Badge “เร็วที่สุด” ให้สร้างชุดสื่อ
+- เพิ่มปุ่ม mini destination บน Dashboard: ทันใจ GPT, Canva, CapCut, Voice Tool
+- ปรับปุ่มล้างโปรเจกต์ให้ดูอ่อนลง และเพิ่ม Empty State หน้าโปรเจกต์
+- ปรับข้อความ “คลังคำสั่งสำเร็จรูป” เป็น “คลังคำสั่งพร้อมใช้”
+- คงทุกระบบหลังบ้านและโครงหลักเดิมจาก v6.5.2
