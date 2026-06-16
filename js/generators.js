@@ -55,6 +55,102 @@ TANJAI.commonData = function(prefix){
     smartConfirm: false,
     smartMunicipal: c("smartMunicipal")
   };
+
+};
+
+TANJAI.promptCritic = function(d){
+  const mode = d.useMode || "สร้างภาพใหม่ด้วย AI";
+  const photoCount = Number(d.photoCount || 0);
+  const isRealMode = mode !== "สร้างภาพใหม่ด้วย AI";
+  const hasPhotos = photoCount > 0;
+  const titleOk = !!(d.title && d.title !== "หัวข้องาน");
+  const orgOk = !!(d.orgName && d.orgName !== "ทันใจ AI Studio");
+  const detailOk = !!(d.detail && d.detail !== "ยังไม่ได้ระบุรายละเอียดเพิ่มเติม" && d.detail.length >= 20);
+  const hasDate = !!d.dateTime;
+  const hasPlace = !!d.place;
+  const hasPeople = !!d.people;
+  const hasAvoid = !!d.avoid;
+  const hasSize = !!d.size;
+  const safeFace = !!d.safeFace;
+  const safeNoNew = !!d.safeNewPerson;
+  const safeNoCover = !!d.safeNoCover;
+  const outputGuard = typeof TANJAI.outputDeliveryGuard === "function";
+
+  let score = 35;
+  const good = [];
+  const missing = [];
+  const risks = [];
+  const suggestions = [];
+  const attach = [];
+
+  if(titleOk){ score += 10; good.push("มีหัวข้องานชัดเจน"); } else { missing.push("หัวข้องานยังไม่ชัด ควรระบุชื่อเรื่องหลักของภาพ"); }
+  if(orgOk){ score += 8; good.push("มีชื่อองค์กร/แบรนด์"); } else { missing.push("ชื่อองค์กรยังไม่ชัด ควรระบุหน่วยงานเจ้าของงาน"); }
+  if(detailOk){ score += 14; good.push("มีรายละเอียดงานเพียงพอ"); } else { missing.push("รายละเอียดงานยังน้อย ควรเพิ่มว่า ใคร / ทำอะไร / ที่ไหน / เมื่อไหร่ / ต้องการให้ประชาชนทำอะไร"); }
+  if(hasSize){ score += 5; good.push("กำหนดขนาดหรือช่องทางใช้งานแล้ว"); }
+  if(hasDate){ score += 6; good.push("มีวัน/เวลา"); } else { suggestions.push("ถ้างานมีเส้นตายหรือกิจกรรม ควรเพิ่มวัน/เวลาเพื่อให้ภาพครบถ้วน"); }
+  if(hasPlace){ score += 5; good.push("มีสถานที่"); } else { suggestions.push("ถ้างานมีสถานที่จริง ควรเพิ่มสถานที่เพื่อให้ประชาชนเข้าใจทันที"); }
+  if(hasPeople){ score += 4; good.push("มีบุคคลหรือหน่วยงานที่เกี่ยวข้อง"); } else { suggestions.push("ถ้ามีผู้บริหาร/หน่วยงานรับผิดชอบ ควรใส่ชื่อให้สะกดถูก"); }
+  if(hasAvoid){ score += 4; good.push("มีข้อห้าม/หมายเหตุ"); }
+  if(outputGuard){ score += 4; good.push("มี Output Delivery Guard กันปัญหาไฟล์โหลดไม่ได้"); }
+
+  if(isRealMode){
+    if(hasPhotos){ score += 8; good.push("เลือกโหมดภาพจริงและมีภาพแนบ"); }
+    else { risks.push("เลือกโหมดภาพจริง แต่ยังไม่มีภาพแนบ อาจทำให้ GPT ไม่สามารถคงบุคคล/ฉากเดิมได้"); score -= 5; }
+    if(safeFace && safeNoNew && safeNoCover){ score += 8; good.push("เปิดระบบกันหน้าเพี้ยนครบถ้วน"); }
+    else { risks.push("ระบบกันหน้าเพี้ยนยังไม่ครบ ควรเปิดห้ามเปลี่ยนใบหน้า / ห้ามสร้างบุคคลใหม่ / ห้ามบังใบหน้า"); }
+  }else{
+    if(hasPhotos){ risks.push("มีภาพแนบแต่เลือกสร้างภาพใหม่ บุคคลหรือฉากอาจเปลี่ยนจากต้นฉบับ"); score -= 7; }
+    else { score += 3; good.push("โหมดสร้างใหม่เหมาะกับงานที่ไม่มีภาพจริงต้องคงต้นฉบับ"); }
+  }
+
+  if((d.avoid || "").includes("QR") || (d.detail || "").includes("QR") || (d.detail || "").includes("LINE")){
+    attach.push("QR Code จริง / LINE QR จริง");
+  }
+  if((d.detail || "").includes("โลโก้") || (d.avoid || "").includes("โลโก้") || (d.orgName || "").includes("เทศบาล")){
+    attach.push("โลโก้องค์กรจริง");
+  }
+  if(isRealMode || hasPhotos){
+    attach.push("ภาพถ่ายจริงความละเอียดสูง");
+  }
+  if((d.detail || "").includes("ภาษี") || (d.title || "").includes("ภาษี")){
+    suggestions.push("งานภาษีควรเน้นวันครบกำหนด ช่องทางชำระ และหน่วยงานรับผิดชอบให้เด่นที่สุด");
+  }
+  if((d.title || "").includes("แจ้ง") || (d.mainCategory || "").includes("แจ้งข่าว")){
+    suggestions.push("งานแจ้งข่าวควรจัดลำดับ: หัวข้อด่วน / พื้นที่ได้รับผลกระทบ / ระยะเวลา / ช่องทางสอบถาม");
+  }
+
+  score = Math.max(0, Math.min(100, score));
+  const level = score >= 90 ? "พร้อมมาก" : score >= 75 ? "พร้อมใช้งาน" : score >= 60 ? "พอใช้ แต่ควรเติมข้อมูล" : "ยังควรปรับก่อนส่ง";
+  const verdict = score >= 85 ? "ใช้ส่งเข้า GPT ได้เลย" : score >= 70 ? "ใช้ได้ แต่เติมข้อมูลอีกนิดจะดีขึ้น" : "ควรเติมข้อมูลก่อนส่งเข้า GPT";
+  const scoreIcon = score >= 90 ? "🟢" : score >= 75 ? "🟡" : score >= 60 ? "🟠" : "🔴";
+
+  const list = (arr, fallback) => arr.length ? arr.map(x => `- ${x.replace(/^- /,"")}`).join("\n") : `- ${fallback}`;
+
+  return `${scoreIcon} คะแนนความพร้อม: ${score}/100
+สถานะ: ${level}
+คำแนะนำสั้น: ${verdict}
+
+ข้อมูลที่ครบแล้ว:
+${list(good, "ยังไม่มีข้อมูลเด่นชัดมากพอ")}
+
+ข้อมูลที่ยังควรเพิ่ม:
+${list(missing, "ไม่มีข้อมูลจำเป็นที่ขาดชัดเจน")}
+
+ความเสี่ยงที่ควรระวัง:
+${list(risks, "ไม่พบความเสี่ยงสำคัญ")}
+
+ข้อเสนอแนะเพื่อให้งานดูมืออาชีพขึ้น:
+${list(suggestions, "โครง Prompt พร้อมใช้งานแล้ว")}
+
+ไฟล์ที่ควรแนบก่อนส่งเข้า GPT:
+${list([...new Set(attach)], "ไม่มีไฟล์แนบจำเป็นเพิ่มเติม")}
+
+Checklist ก่อนกดเปิด ทันใจ GPT:
+- ตรวจสะกดชื่อหน่วยงาน / ชื่อบุคคล / วันที่
+- แนบโลโก้จริงหากต้องใช้โลโก้
+- แนบ QR Code จริง ห้ามให้ AI สร้าง QR ปลอม
+- ถ้ามีภาพบุคคลจริง ให้ใช้โหมดภาพจริงและเปิดระบบกันหน้าเพี้ยน
+- หลัง GPT สร้างไฟล์ ต้องให้แนบลิงก์ดาวน์โหลด ไม่ตอบเป็น /mnt/data/... เฉย ๆ`;
 };
 
 TANJAI.imagePrompt = function(d){

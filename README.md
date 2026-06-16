@@ -208,3 +208,13 @@
 ## v6.4.3 — Clean Image Note
 - เอาข้อความอธิบายยาวใต้หัวข้อเมนูสร้างภาพออก
 - คง Smart Brief Auto Mode, Section Numbering Fix, Real Photo Safe Mode, Output Delivery Guard และฟังก์ชันอื่นทั้งหมด
+
+
+## v6.5 — Prompt Critic & Readiness Score
+- เพิ่มระบบตรวจความพร้อมก่อนส่งเข้า GPT ในเมนูสร้างภาพ
+- เพิ่มปุ่ม “ตรวจความพร้อม”
+- ให้คะแนนความพร้อม 0-100 พร้อมสถานะและคำแนะนำ
+- ตรวจข้อมูลที่ครบแล้ว / ข้อมูลที่ยังขาด / ความเสี่ยงหน้าเพี้ยน / ไฟล์ที่ควรแนบ / Checklist ก่อนส่งเข้า GPT
+- เมื่อกดสร้าง Prompt ภาพ ระบบจะตรวจความพร้อมให้อัตโนมัติ
+- บันทึกโปรเจกต์พร้อมผลตรวจ Prompt Critic
+- คง Smart Brief Auto Mode, Section Numbering Fix, Clean Image Note, Real Photo Safe Mode, Output Delivery Guard, Custom GPT URL Fix, Login Gate, Navigation UX, Destination Hub, Preview Cards, favicon, logo และ layout เดิม
