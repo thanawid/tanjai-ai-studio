@@ -89,7 +89,7 @@
         <div class="top-actions">
           <button class="btn secondary nav-back-btn" id="topBackBtn" type="button">← ย้อนกลับ</button>
           <button class="btn secondary nav-home-btn" data-view="dashboard" type="button">หน้าหลัก</button>
-          <span class="status-pill">พร้อมใช้งาน</span><span class="version-badge">v6.5.4</span>
+          <span class="status-pill">พร้อมใช้งาน</span><span class="version-badge">v6.5.5</span>
           <button class="btn secondary logout-btn" id="logoutBtn" type="button">ออกจากระบบ</button>
           <button class="btn secondary" data-view="router">AI Router</button>
           <button class="btn primary" data-view="kit">+ สร้างชุดสื่อ</button>
@@ -97,48 +97,79 @@
       </header>
 
       <section id="dashboard" class="view active">
-        <div class="sales-hero">
-          <div class="sales-hero-copy">
+        <div class="hero-card restored-hero">
+          <div class="hero-copy">
             <p class="eyebrow">ทันใจ AI Studio</p>
-            <h3 class="sales-title">สร้างสื่อไว<br><span>ด้วยพลัง AI</span></h3>
-            <p class="sales-subtitle">ผู้ช่วยสร้างสื่อประชาสัมพันธ์ครบวงจร กรอกข้อมูลครั้งเดียว แล้วต่อยอดเป็นภาพ โพสต์ คลิป เสียง และสไลด์ได้ทันที</p>
-            <div class="sales-actions">
+            <h3 class="hero-title"><span>ทันใจ AI Studio</span><span>สร้างสื่อไว ด้วยพลัง AI</span></h3>
+            <p>ผู้ช่วยสร้างสื่อประชาสัมพันธ์ครบวงจร กรอกข้อมูลครั้งเดียว แล้วต่อยอดเป็นภาพ โพสต์ คลิป เสียง และสไลด์ได้ทันที</p>
+            <div class="hero-actions">
               <button class="btn primary" data-view="router">เริ่มด้วย AI Router</button>
               <button class="btn secondary" data-view="kit">สร้างชุดสื่อ</button>
               <button class="btn secondary" data-view="image">สร้างภาพ</button>
+              <button class="btn secondary" data-view="library">ดูตัวอย่างงาน</button>
             </div>
-            <div class="sales-trust-row">
-              <span>Smart Brief</span>
-              <span>Real Photo Safe</span>
-              <span>Copy + Open GPT</span>
+            <div class="hero-stats restored-stats">
+              <article><b>ออกแบบ</b><span>Prompt พร้อมใช้</span></article>
+              <article><b>ดีไซน์</b><span>ภาพ โพสต์ คลิป สไลด์</span></article>
+              <article><b>ต่อยอด</b><span>คัดลอก + เปิดทันใจ GPT</span></article>
             </div>
           </div>
 
-          <div class="sales-visual" aria-label="ตัวอย่างงานที่สร้างได้">
-            <article class="mock-card mock-main">
-              <img src="assets/previews/deck-1.png" alt="ตัวอย่างภาพประชาสัมพันธ์">
-              <div class="mock-caption">
-                <small>Poster Preview</small>
-                <b>ภาพประชาสัมพันธ์</b>
-              </div>
-            </article>
-            <article class="mock-card mock-side top">
-              <img src="assets/previews/deck-2.png" alt="ตัวอย่างโพสต์และแคปชั่น">
-              <div class="mock-caption compact"><b>โพสต์พร้อมแคปชั่น</b></div>
-            </article>
-            <article class="mock-card mock-side bottom">
-              <img src="assets/previews/deck-3.png" alt="ตัวอย่างวิดีโอและเสียงพากย์">
-              <div class="mock-caption compact"><b>Storyboard + Voice</b></div>
-            </article>
-            <div class="mock-prompt-card">
-              <small>Prompt Ready</small>
-              <b>คัดลอก + เปิดทันใจ GPT</b>
-              <span>พร้อมแนบไฟล์และสร้างงานต่อ</span>
+          <div class="restored-visual">
+            <div class="brand-orb">
+              <img src="assets/logo.jpg" alt="ทันใจ AI Studio">
             </div>
+            <div class="design-ring ring-one"></div>
+            <div class="design-ring ring-two"></div>
+
+            <article class="visual-card card-poster">
+              <img src="assets/previews/deck-1.png" alt="ตัวอย่างภาพประชาสัมพันธ์">
+              <div><small>DESIGN PREVIEW</small><b>ภาพประชาสัมพันธ์</b></div>
+            </article>
+            <article class="visual-card card-social">
+              <img src="assets/previews/deck-1.svg" alt="ตัวอย่างโพสต์">
+              <div><small>SOCIAL POST</small><b>โพสต์ / แคปชั่น</b></div>
+            </article>
+            <article class="visual-card card-video">
+              <img src="assets/previews/deck-2.png" alt="ตัวอย่างคลิป">
+              <div><small>VIDEO</small><b>คลิป / เสียงพากย์</b></div>
+            </article>
           </div>
         </div>
 
-        <div class="tool-grid sales-tool-grid">
+        <section class="showcase-section restored-showcase">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">SHOWCASE</p>
+              <h3>ตัวอย่างงานที่ทำได้</h3>
+            </div>
+            <button class="btn secondary" data-view="library">ดูตัวอย่างงานทั้งหมด</button>
+          </div>
+          <div class="showcase-grid">
+            <button class="showcase-card" data-view="image">
+              <img src="assets/previews/deck-1.png" alt="ตัวอย่างภาพประชาสัมพันธ์">
+              <span>ภาพประชาสัมพันธ์</span>
+              <b>Poster / Infographic</b>
+            </button>
+            <button class="showcase-card" data-view="post">
+              <img src="assets/previews/deck-1.svg" alt="ตัวอย่างโพสต์และแคปชั่น">
+              <span>โพสต์และแคปชั่น</span>
+              <b>Facebook / Line</b>
+            </button>
+            <button class="showcase-card" data-view="video">
+              <img src="assets/previews/deck-2.png" alt="ตัวอย่างคลิปและเสียงพากย์">
+              <span>คลิปและเสียงพากย์</span>
+              <b>Storyboard / Voice</b>
+            </button>
+            <button class="showcase-card" data-view="deck">
+              <img src="assets/previews/deck-2.svg" alt="ตัวอย่างสไลด์นำเสนอ">
+              <span>สไลด์นำเสนอ</span>
+              <b>Presentation</b>
+            </button>
+          </div>
+        </section>
+
+        <div class="tool-grid sales-tool-grid restored-tools">
           <button class="tool-card highlight" data-view="router">
             <span class="card-badge">แนะนำให้เริ่มตรงนี้</span>
             <img src="assets/icons/router.svg" alt=""><b>AI Router</b><span>บอกสิ่งที่อยากทำ แล้วระบบพาไปเมนูที่เหมาะที่สุด</span>
@@ -154,39 +185,7 @@
           <button class="tool-card" data-view="deck"><img src="assets/icons/deck.svg" alt=""><b>ทำสไลด์</b><span>จัด Outline, ลำดับสไลด์ และ Speaker Notes</span></button>
         </div>
 
-        <section class="showcase-section">
-          <div class="section-heading">
-            <div>
-              <p class="eyebrow">SHOWCASE</p>
-              <h3>ตัวอย่างงานที่ทำได้</h3>
-            </div>
-            <button class="btn secondary" data-view="library">ดูตัวอย่างงาน</button>
-          </div>
-          <div class="showcase-grid">
-            <button class="showcase-card" data-view="image">
-              <img src="assets/previews/deck-1.png" alt="ตัวอย่างภาพประชาสัมพันธ์">
-              <span>ภาพประชาสัมพันธ์</span>
-              <b>Poster / Infographic</b>
-            </button>
-            <button class="showcase-card" data-view="post">
-              <img src="assets/previews/deck-2.png" alt="ตัวอย่างโพสต์และแคปชั่น">
-              <span>โพสต์และแคปชั่น</span>
-              <b>Facebook / Line</b>
-            </button>
-            <button class="showcase-card" data-view="video">
-              <img src="assets/previews/deck-3.png" alt="ตัวอย่างคลิปและเสียงพากย์">
-              <span>คลิปและเสียงพากย์</span>
-              <b>Video Script</b>
-            </button>
-            <button class="showcase-card" data-view="deck">
-              <img src="assets/previews/image-1.png" alt="ตัวอย่างสไลด์นำเสนอ">
-              <span>สไลด์นำเสนอ</span>
-              <b>Presentation</b>
-            </button>
-          </div>
-        </section>
-
-        <div class="dashboard-grid sales-bottom-grid">
+        <div class="dashboard-grid sales-bottom-grid restored-bottom">
           <section class="panel">
             <div class="panel-head">
               <div><h3>ใช้งานง่ายใน 3 ขั้นตอน</h3><p>ทำงานต่อกับทันใจ GPT ได้ทันที ไม่ต้องคัดลอกหลายรอบ</p></div>

@@ -263,3 +263,11 @@
 - คงเครื่องมือหลัก 7 ตัวบนหน้าแรก และยังเริ่มงานได้ชัดเจน
 - ซ่อนความรกจาก Dashboard: ไม่โชว์เริ่มงานด่วน ไม่โชว์รายละเอียดเมนูซ้ำยาว ๆ บนหน้าแรก
 - คงปุ่ม คัดลอก + เปิดทันใจ GPT, Smart Brief Auto Mode, Auto Prompt Critic หลังบ้าน, Real Photo Safe Mode, Output Delivery Guard, Custom GPT, Login, Navigation, Destination Hub, Preview Cards, logo/favicon/layout หลัก
+
+
+## v6.5.5 — Restore Logo + Visuals
+- คงเมนูและระบบล่าสุดทั้งหมด
+- เอาหน้าแรกที่มีโลโก้วงกลมและภาพ Preview กลับมา
+- เพิ่มคำว่า “ดีไซน์” บนหน้าแรก
+- ใช้โลโก้วงกลมกลาง Hero Visual พร้อมการ์ดภาพตัวอย่างงาน
+- คง Showcase ภาพ 4 ใบ และระบบหลังบ้านเดิมทั้งหมด
