@@ -151,3 +151,11 @@
 - ปุ่ม Back / Forward ของ Browser กลับหน้าก่อนหน้าในเว็บได้จริง
 - เวลาเปลี่ยนหน้า ระบบเลื่อนกลับขึ้นด้านบนอัตโนมัติ
 - คง Login Gate, Preview Cards, Destination Hub, favicon, main logo, layout และฟังก์ชันสร้างงานเดิมทั้งหมด
+
+
+## v6.2.9 — Custom GPT Integration
+- เปลี่ยนปลายทาง ChatGPT เป็น Custom GPT ของแบรนด์ “ทันใจ AI Studio”
+- Destination Hub แสดงเป็น “ทันใจ AI Studio GPT”
+- ปุ่มผลลัพธ์แนะนำเปลี่ยนเป็น “เปิด ทันใจ GPT”
+- เปิดลิงก์ Custom GPT: https://chatgpt.com/g/g-6a30a740e7f88191b30aa43923fbb072-thanaicch-ai-studio
+- คง Login Gate, Navigation & Mobile UX Fix, Real Preview Cards Pro, Destination Hub 6 รายการ, favicon, logo, layout และฟังก์ชันอื่นทั้งหมด

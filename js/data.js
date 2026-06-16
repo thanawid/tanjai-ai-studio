@@ -157,9 +157,9 @@ TANJAI.promptHub = [
 ];
 TANJAI.destinations = [
   {
-    "name": "ChatGPT",
-    "desc": "ใช้ต่อยอด Prompt, สคริปต์สรุปงาน, Storyboard, Outline และไอเดียคอนเทนต์",
-    "url": "https://chatgpt.com/",
+    "name": "ทันใจ AI Studio GPT",
+    "desc": "เปิด GPT เฉพาะของทันใจ AI Studio เพื่อทำงานต่อจาก Prompt ที่คัดลอกไว้",
+    "url": "https://chatgpt.com/g/g-6a30a740e7f88191b30aa43923fbb072-thanaicch-ai-studiog/g-6a30a740e7f88191b30aa43923fbb072-thanaicch-ai-studio",
     "group": "ข้อความ / คิดงาน"
   },
   {

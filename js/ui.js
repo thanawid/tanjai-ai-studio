@@ -1,4 +1,5 @@
 window.TANJAI = window.TANJAI || {};
+const TANJAI_CUSTOM_GPT_URL = "https://chatgpt.com/g/g-6a30a740e7f88191b30aa43923fbb072-thanaicch-ai-studiog/g-6a30a740e7f88191b30aa43923fbb072-thanaicch-ai-studio";
 TANJAI.$ = s => document.querySelector(s);
 TANJAI.$$ = s => Array.from(document.querySelectorAll(s));
 
@@ -115,27 +116,27 @@ TANJAI.resultShell = function(tool, recommended, desc, bodyId, buttons=""){
   const destinationButtons = (()=>{
     const btn = (label,url)=>`<button class="btn secondary" data-open="${url}">${label}</button>`;
     if(tool === "router"){
-      return btn("เปิด ChatGPT","https://chatgpt.com/") + btn("เปิด Canva","https://www.canva.com/") + btn("เปิด CapCut","https://www.capcut.com/");
+      return btn("เปิด ทันใจ GPT", TANJAI_CUSTOM_GPT_URL) + btn("เปิด Canva","https://www.canva.com/") + btn("เปิด CapCut","https://www.capcut.com/");
     }
     if(tool === "image"){
-      return btn("เปิด ChatGPT","https://chatgpt.com/") + btn("เปิด Canva","https://www.canva.com/");
+      return btn("เปิด ทันใจ GPT", TANJAI_CUSTOM_GPT_URL) + btn("เปิด Canva","https://www.canva.com/");
     }
     if(tool === "post"){
-      return btn("เปิด ChatGPT","https://chatgpt.com/") + btn("เปิด Notebook Tool","https://notebooklm.google.com/") + btn("เปิด Canva","https://www.canva.com/") + btn("เปิด CapCut","https://www.capcut.com/");
+      return btn("เปิด ทันใจ GPT", TANJAI_CUSTOM_GPT_URL) + btn("เปิด Notebook Tool","https://notebooklm.google.com/") + btn("เปิด Canva","https://www.canva.com/") + btn("เปิด CapCut","https://www.capcut.com/");
     }
     if(tool === "video"){
-      return btn("เปิด ChatGPT","https://chatgpt.com/") + btn("เปิด CapCut","https://www.capcut.com/");
+      return btn("เปิด ทันใจ GPT", TANJAI_CUSTOM_GPT_URL) + btn("เปิด CapCut","https://www.capcut.com/");
     }
     if(tool === "voice"){
-      return btn("เปิด ChatGPT","https://chatgpt.com/") + btn("เปิด CapCut","https://www.capcut.com/") + btn("เปิด Voice Tool","https://aistudio.google.com/");
+      return btn("เปิด ทันใจ GPT", TANJAI_CUSTOM_GPT_URL) + btn("เปิด CapCut","https://www.capcut.com/") + btn("เปิด Voice Tool","https://aistudio.google.com/");
     }
     if(tool === "deck"){
-      return btn("เปิด ChatGPT","https://chatgpt.com/") + btn("เปิด Canva","https://www.canva.com/") + btn("เปิด Slide Tool","https://gamma.app/") + btn("เปิด Notebook Tool","https://notebooklm.google.com/");
+      return btn("เปิด ทันใจ GPT", TANJAI_CUSTOM_GPT_URL) + btn("เปิด Canva","https://www.canva.com/") + btn("เปิด Slide Tool","https://gamma.app/") + btn("เปิด Notebook Tool","https://notebooklm.google.com/");
     }
     if(tool === "kit"){
-      return btn("เปิด ChatGPT","https://chatgpt.com/") + btn("เปิด Canva","https://www.canva.com/") + btn("เปิด CapCut","https://www.capcut.com/") + btn("เปิด Voice Tool","https://aistudio.google.com/") + btn("เปิด Slide Tool","https://gamma.app/");
+      return btn("เปิด ทันใจ GPT", TANJAI_CUSTOM_GPT_URL) + btn("เปิด Canva","https://www.canva.com/") + btn("เปิด CapCut","https://www.capcut.com/") + btn("เปิด Voice Tool","https://aistudio.google.com/") + btn("เปิด Slide Tool","https://gamma.app/");
     }
-    return btn("เปิด ChatGPT","https://chatgpt.com/") + btn("เปิด Canva","https://www.canva.com/") + btn("เปิด CapCut","https://www.capcut.com/");
+    return btn("เปิด ทันใจ GPT", TANJAI_CUSTOM_GPT_URL) + btn("เปิด Canva","https://www.canva.com/") + btn("เปิด CapCut","https://www.capcut.com/");
   })();
 
   return `
