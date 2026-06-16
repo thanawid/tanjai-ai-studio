@@ -142,3 +142,12 @@
 ## v6.2.7 Shortcut Text Polish
 - จัดระเบียบข้อความในกล่อง “ทางลัดการใช้งาน” ให้สั้น กระชับ และตัดบรรทัดสวยขึ้น
 - คง Login Gate, Real Preview Cards Pro, Destination Hub 6 รายการ, favicon TJ และฟังก์ชันอื่นทั้งหมด
+
+
+## v6.2.8 — Navigation & Mobile UX Fix
+- เพิ่มปุ่ม “ย้อนกลับ” และ “หน้าหลัก” ที่แถบบน ใช้ได้ทั้งคอมและมือถือ
+- เพิ่มปุ่มนำทางด่วนด้านล่างเฉพาะมือถือ: ย้อนกลับ / หน้าหลัก
+- เพิ่มระบบ URL hash เช่น `#dashboard`, `#image`, `#voice`
+- ปุ่ม Back / Forward ของ Browser กลับหน้าก่อนหน้าในเว็บได้จริง
+- เวลาเปลี่ยนหน้า ระบบเลื่อนกลับขึ้นด้านบนอัตโนมัติ
+- คง Login Gate, Preview Cards, Destination Hub, favicon, main logo, layout และฟังก์ชันสร้างงานเดิมทั้งหมด

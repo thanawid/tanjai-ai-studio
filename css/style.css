@@ -603,3 +603,62 @@ body:not(.auth-locked) .login-gate{
 .steps .step-card-v61:after{
   display:none !important;
 }
+
+
+/* v6.2.8 Navigation & Mobile UX Fix */
+.nav-back-btn,
+.nav-home-btn{
+  white-space:nowrap;
+}
+.mobile-quick-nav{
+  display:none;
+}
+@media(max-width:1180px){
+  .topbar{
+    gap:16px;
+  }
+  .top-actions{
+    width:100%;
+    justify-content:flex-start;
+    flex-wrap:wrap;
+  }
+}
+@media(max-width:720px){
+  .top-actions .status-pill{
+    order:5;
+  }
+  .top-actions .btn{
+    flex:1 1 auto;
+    min-width:128px;
+  }
+  .mobile-quick-nav{
+    position:fixed;
+    left:14px;
+    right:14px;
+    bottom:14px;
+    z-index:999;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    padding:10px;
+    border:1px solid rgba(255,255,255,.14);
+    border-radius:22px;
+    background:rgba(6,8,22,.72);
+    backdrop-filter:blur(18px);
+    box-shadow:0 20px 70px rgba(0,0,0,.34);
+  }
+  .mobile-quick-nav button{
+    border:1px solid rgba(255,255,255,.14);
+    background:rgba(255,255,255,.08);
+    color:#fff;
+    border-radius:16px;
+    min-height:46px;
+    font-weight:900;
+  }
+  .workspace{
+    padding-bottom:96px !important;
+  }
+  body.auth-locked .mobile-quick-nav{
+    display:none;
+  }
+}

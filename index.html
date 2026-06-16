@@ -90,6 +90,8 @@
           <h2 id="pageTitle">สวัสดีครับ! 👋</h2>
         </div>
         <div class="top-actions">
+          <button class="btn secondary nav-back-btn" id="topBackBtn" type="button">← ย้อนกลับ</button>
+          <button class="btn secondary nav-home-btn" data-view="dashboard" type="button">หน้าหลัก</button>
           <span class="status-pill">พร้อมใช้งาน</span>
           <button class="btn secondary logout-btn" id="logoutBtn" type="button">ออกจากระบบ</button>
           <button class="btn secondary" data-view="router">ถาม Router</button>
@@ -220,6 +222,11 @@
         </div>
       </section>
     </main>
+  </div>
+
+  <div id="mobileQuickNav" class="mobile-quick-nav" aria-label="ปุ่มนำทางด่วน">
+    <button type="button" data-nav-back>← ย้อนกลับ</button>
+    <button type="button" data-view="dashboard">🏠 หน้าหลัก</button>
   </div>
 
   <div id="toast" class="toast"></div>

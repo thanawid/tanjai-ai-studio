@@ -22,13 +22,74 @@ TANJAI.downloadText = function(text, filename){
   URL.revokeObjectURL(a.href);
 };
 
-TANJAI.switchView = function(id){
+TANJAI.validViews = ["dashboard","router","image","post","video","voice","deck","kit","promptHub","destinationHub","projects","library","guide"];
+
+TANJAI.switchView = function(id, options = {}){
+  if(!TANJAI.validViews.includes(id)) id = "dashboard";
+
   TANJAI.$$(".view").forEach(v => v.classList.remove("active"));
   TANJAI.$("#"+id)?.classList.add("active");
   TANJAI.$$(".nav-link").forEach(b => b.classList.toggle("active", b.dataset.view === id));
-  const names = {dashboard:"สวัสดีครับ! 👋",image:"สร้างภาพ",post:"เขียนโพสต์",video:"ทำวิดีโอ",voice:"เสียงพากย์",deck:"ทำสไลด์",kit:"สร้างชุดสื่อ",projects:"โปรเจกต์",library:"ตัวอย่างงาน",guide:"คู่มือระบบ"};
-  TANJAI.$("#pageTitle").textContent = names[id] || "ทันใจ AI Studio";
-  if(id === "projects") TANJAI.renderProjects();
+
+  const names = {
+    dashboard:"สวัสดีครับ! 👋",
+    router:"AI Router",
+    image:"สร้างภาพ",
+    post:"สคริปต์สรุปงาน",
+    video:"ทำวิดีโอ",
+    voice:"เสียงพากย์",
+    deck:"ทำสไลด์",
+    kit:"สร้างชุดสื่อ",
+    promptHub:"Prompt Hub",
+    destinationHub:"Destination Hub",
+    projects:"โปรเจกต์",
+    library:"ตัวอย่างงาน",
+    guide:"คู่มือระบบ"
+  };
+  const title = TANJAI.$("#pageTitle");
+  if(title) title.textContent = names[id] || "ทันใจ AI Studio";
+
+  if(id === "projects") TANJAI.renderProjects?.();
+
+  if(options.push !== false){
+    const nextHash = "#" + id;
+    if(location.hash !== nextHash){
+      history.pushState({view:id}, "", nextHash);
+    }
+  }
+
+  if(options.scroll !== false){
+    window.scrollTo({top:0, behavior: options.smooth === false ? "auto" : "smooth"});
+  }
+};
+
+TANJAI.currentViewFromHash = function(){
+  const id = (location.hash || "#dashboard").replace("#","");
+  return TANJAI.validViews.includes(id) ? id : "dashboard";
+};
+
+TANJAI.goBackView = function(){
+  if(location.hash && location.hash !== "#dashboard" && history.length > 1){
+    history.back();
+  }else{
+    TANJAI.switchView("dashboard");
+  }
+};
+
+TANJAI.setupNavigationHistory = function(){
+  window.addEventListener("hashchange", () => {
+    TANJAI.switchView(TANJAI.currentViewFromHash(), {push:false, smooth:false});
+  });
+
+  document.addEventListener("click", e => {
+    const backBtn = e.target.closest("[data-nav-back], #topBackBtn");
+    if(backBtn){
+      e.preventDefault();
+      TANJAI.goBackView();
+    }
+  }, true);
+
+  TANJAI.switchView(TANJAI.currentViewFromHash(), {push:false, smooth:false});
 };
 
 TANJAI.field = function(prefix, data){
@@ -126,3 +187,9 @@ TANJAI.renderDestinations = function(){
     return `<article class="library-card"><span class="tag">${group}</span><b>${name}</b><p>${desc}</p><div class="button-row"><button class="btn secondary" data-open="${url}">เปิดใช้งาน</button></div></article>`;
   }).join("");
 };
+
+
+/* v6.2.8 fallback setupNavigationHistory */
+if(!TANJAI.setupNavigationHistory){
+  TANJAI.setupNavigationHistory = function(){};
+}

@@ -243,6 +243,10 @@ document.addEventListener("DOMContentLoaded", () => {
   };
   $("#goRecommended").onclick = () => TANJAI.switchView(recommendedView);
 
+
+  // v6.2.8 setup navigation history
+  TANJAI.setupNavigationHistory?.();
+
   // Generators
   $("#makeImage").onclick = () => { const d=TANJAI.commonData("image"); const out=TANJAI.imagePrompt(d); $("#imageOut").textContent=out; TANJAI.state.lastImage=out; TANJAI.toast("สร้าง Prompt ภาพแล้ว"); };
   $("#makePost").onclick = () => { const d=TANJAI.commonData("post"); const out=TANJAI.postText(d); $("#postOut").textContent=out; TANJAI.state.lastPost=out; TANJAI.toast("สร้างโพสต์แล้ว"); };
