@@ -196,3 +196,10 @@
 - ใช้ Smart Brief Coach ทำงานอัตโนมัติหลังบ้านในเมนูสร้างภาพ
 - ผลลัพธ์ยังจัดบรีฟแบบ Creative Director: ตรวจข้อมูลที่ขาด สรุปบรีฟเป็นหมวด แยกข้อความบนภาพ และสร้างคำสั่งพร้อมส่งเข้า GPT
 - คง Real Photo Safe Mode, Output Delivery Guard, Custom GPT URL Fix, Login Gate, Navigation UX, Destination Hub, Preview Cards, favicon, logo และ layout เดิม
+
+
+## v6.4.2 — Section Numbering Fix
+- แก้เลขลำดับในเมนูสร้างภาพให้เรียงต่อเนื่องตาม section ที่มองเห็นจริง
+- เมื่อโหมดสร้างภาพใหม่ซ่อนส่วน “การปกป้องภาพจริง” ระบบจะเรียงเป็น 1 2 3 4 5
+- เมื่อเปิดโหมดภาพจริงและแสดงส่วนนั้น ระบบจะเรียงเป็น 1 2 3 4 5 6
+- อย่างอื่นคงเดิม

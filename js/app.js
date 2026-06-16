@@ -304,6 +304,22 @@ document.addEventListener("DOMContentLoaded", () => {
     else if(mode === "ปรับภาพจริง + ใส่กราฟิก") level.value = "สมดุล — ปรับภาพได้มากขึ้น แต่ยังไม่เปลี่ยนบุคคล";
   };
 
+  const renumberImageSections = () => {
+    const form = $("#imageForm");
+    if(!form) return;
+    const sections = Array.from(form.querySelectorAll(':scope > .form-section'));
+    let n = 1;
+    sections.forEach(section => {
+      const hiddenByStyle = section.style.display === "none";
+      const hiddenByAttr = section.hidden;
+      const invisible = hiddenByStyle || hiddenByAttr || section.offsetParent === null;
+      const badge = section.querySelector('.section-title b');
+      if(!badge) return;
+      if(invisible) return;
+      badge.textContent = String(n++);
+    });
+  };
+
   const refreshImageModeUI = () => {
     const mode = $("#image-useMode")?.value || "สร้างภาพใหม่ด้วย AI";
     const photoCount = $("#image-photos")?.files?.length || 0;
@@ -315,6 +331,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if(originalityWrap) originalityWrap.style.display = mode === "สร้างภาพใหม่ด้วย AI" ? "none" : "block";
     if(hint) hint.hidden = !(photoCount > 0);
     if(warn) warn.hidden = !(photoCount > 0 && mode === "สร้างภาพใหม่ด้วย AI");
+    renumberImageSections();
   };
 
   const recommendRealPhotoMode = (force=false) => {
