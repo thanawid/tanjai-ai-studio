@@ -2,6 +2,12 @@ window.TANJAI = window.TANJAI || {};
 
 document.addEventListener("DOMContentLoaded", () => {
   const $ = TANJAI.$, $$ = TANJAI.$$;
+  const TANJAI_CUSTOM_GPT_URL = "https://chatgpt.com/g/g-6a30a740e7f88191b30aa43923fbb072-thanaicch-ai-studio";
+  TANJAI.normalizeGPTUrl = function(url){
+    if(!url) return url;
+    if(String(url).includes("g-6a30a740e7f88191b30aa43923fbb072-thanaicch-ai-studio")) return TANJAI_CUSTOM_GPT_URL;
+    return url;
+  };
 
   
   const opts = arr => arr.map(x => `<option>${x}</option>`).join("");
@@ -229,7 +235,7 @@ document.addEventListener("DOMContentLoaded", () => {
   $$("[data-view]").forEach(btn => btn.addEventListener("click", () => TANJAI.switchView(btn.dataset.view)));
   document.body.addEventListener("click", e => {
     const t = e.target.closest("[data-template]"); if(t){TANJAI.applyTemplate(t.dataset.template); return;}
-    const o = e.target.closest("[data-open]"); if(o){window.open(o.dataset.open, "_blank", "noopener"); return;}
+    const o = e.target.closest("[data-open]"); if(o){window.open(TANJAI.normalizeGPTUrl(o.dataset.open), "_blank", "noopener,noreferrer"); return;}
     const c = e.target.closest("[data-copybox]"); if(c){TANJAI.copyText($("#"+c.dataset.copybox)?.textContent || ""); return;}
   });
 

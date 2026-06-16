@@ -159,3 +159,10 @@
 - ปุ่มผลลัพธ์แนะนำเปลี่ยนเป็น “เปิด ทันใจ GPT”
 - เปิดลิงก์ Custom GPT: https://chatgpt.com/g/g-6a30a740e7f88191b30aa43923fbb072-thanaicch-ai-studio
 - คง Login Gate, Navigation & Mobile UX Fix, Real Preview Cards Pro, Destination Hub 6 รายการ, favicon, logo, layout และฟังก์ชันอื่นทั้งหมด
+
+
+## v6.2.9.1 — Custom GPT URL Fix
+- แก้ปัญหาลิงก์ Custom GPT ซ้อน `/g/.../g/...` จนขึ้น 404
+- ล็อกลิงก์ Custom GPT ให้เป็น absolute URL ตัวเดียวเท่านั้น
+- เพิ่มตัวกรอง URL ก่อน `window.open()` เพื่อกันลิงก์ซ้ำอีกชั้น
+- คง Custom GPT Integration, Login Gate, Navigation UX, Real Preview Cards Pro, Destination Hub 6 รายการ, favicon, logo, layout และฟังก์ชันอื่นทั้งหมด

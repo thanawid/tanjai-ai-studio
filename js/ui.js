@@ -1,5 +1,6 @@
 window.TANJAI = window.TANJAI || {};
-const TANJAI_CUSTOM_GPT_URL = "https://chatgpt.com/g/g-6a30a740e7f88191b30aa43923fbb072-thanaicch-ai-studiog/g-6a30a740e7f88191b30aa43923fbb072-thanaicch-ai-studio";
+const TANJAI_CUSTOM_GPT_URL = "https://chatgpt.com/g/g-6a30a740e7f88191b30aa43923fbb072-thanaicch-ai-studio";
+TANJAI.openCustomGPT = function(){ window.open(TANJAI_CUSTOM_GPT_URL, "_blank", "noopener,noreferrer"); };
 TANJAI.$ = s => document.querySelector(s);
 TANJAI.$$ = s => Array.from(document.querySelectorAll(s));
 
