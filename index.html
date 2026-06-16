@@ -89,7 +89,7 @@
         <div class="top-actions">
           <button class="btn secondary nav-back-btn" id="topBackBtn" type="button">← ย้อนกลับ</button>
           <button class="btn secondary nav-home-btn" data-view="dashboard" type="button">หน้าหลัก</button>
-          <span class="status-pill">พร้อมใช้งาน</span><span class="version-badge">v6.5.3</span>
+          <span class="status-pill">พร้อมใช้งาน</span><span class="version-badge">v6.5.4</span>
           <button class="btn secondary logout-btn" id="logoutBtn" type="button">ออกจากระบบ</button>
           <button class="btn secondary" data-view="router">AI Router</button>
           <button class="btn primary" data-view="kit">+ สร้างชุดสื่อ</button>
@@ -97,33 +97,48 @@
       </header>
 
       <section id="dashboard" class="view active">
-        <div class="hero-card pro-hero-card">
-          <div class="hero-copy">
+        <div class="sales-hero">
+          <div class="sales-hero-copy">
             <p class="eyebrow">ทันใจ AI Studio</p>
-            <h3 class="hero-title"><span>ทันใจ AI Studio</span><span>สร้างสื่อไว ด้วยพลัง AI</span></h3>
-            <p>ผู้ช่วยสร้างสื่อประชาสัมพันธ์ครบวงจร กรอกข้อมูลครั้งเดียว แล้วต่อยอดเป็นภาพ โพสต์ คลิป เสียง และสไลด์ได้ทันที</p>
-            <div class="hero-actions">
+            <h3 class="sales-title">สร้างสื่อไว<br><span>ด้วยพลัง AI</span></h3>
+            <p class="sales-subtitle">ผู้ช่วยสร้างสื่อประชาสัมพันธ์ครบวงจร กรอกข้อมูลครั้งเดียว แล้วต่อยอดเป็นภาพ โพสต์ คลิป เสียง และสไลด์ได้ทันที</p>
+            <div class="sales-actions">
               <button class="btn primary" data-view="router">เริ่มด้วย AI Router</button>
               <button class="btn secondary" data-view="kit">สร้างชุดสื่อ</button>
               <button class="btn secondary" data-view="image">สร้างภาพ</button>
-              <button class="btn secondary" data-view="voice">เสียงพากย์</button>
             </div>
-            <div class="hero-stats">
-              <article><b>เริ่มไว</b><span>AI Router ช่วยเลือกทาง</span></article>
-              <article><b>ครบงาน</b><span>ภาพ โพสต์ คลิป เสียง สไลด์</span></article>
-              <article><b>ต่อยอดลื่น</b><span>คัดลอกแล้วเปิดทันใจ GPT</span></article>
+            <div class="sales-trust-row">
+              <span>Smart Brief</span>
+              <span>Real Photo Safe</span>
+              <span>Copy + Open GPT</span>
             </div>
           </div>
-          <div class="hero-visual">
-            <div class="media-orb"><img src="assets/logo.jpg" alt=""></div>
-            <div class="floating-chip chip-a"><small>Start</small><b>AI Router</b></div>
-            <div class="floating-chip chip-b"><small>All-in-one</small><b>ชุดสื่อ</b></div>
-            <div class="floating-chip chip-c"><small>Image</small><b>สร้างภาพ</b></div>
-            <div class="floating-chip chip-d"><small>Voice</small><b>เสียงพากย์</b></div>
+
+          <div class="sales-visual" aria-label="ตัวอย่างงานที่สร้างได้">
+            <article class="mock-card mock-main">
+              <img src="assets/previews/deck-1.png" alt="ตัวอย่างภาพประชาสัมพันธ์">
+              <div class="mock-caption">
+                <small>Poster Preview</small>
+                <b>ภาพประชาสัมพันธ์</b>
+              </div>
+            </article>
+            <article class="mock-card mock-side top">
+              <img src="assets/previews/deck-2.png" alt="ตัวอย่างโพสต์และแคปชั่น">
+              <div class="mock-caption compact"><b>โพสต์พร้อมแคปชั่น</b></div>
+            </article>
+            <article class="mock-card mock-side bottom">
+              <img src="assets/previews/deck-3.png" alt="ตัวอย่างวิดีโอและเสียงพากย์">
+              <div class="mock-caption compact"><b>Storyboard + Voice</b></div>
+            </article>
+            <div class="mock-prompt-card">
+              <small>Prompt Ready</small>
+              <b>คัดลอก + เปิดทันใจ GPT</b>
+              <span>พร้อมแนบไฟล์และสร้างงานต่อ</span>
+            </div>
           </div>
         </div>
 
-        <div class="tool-grid pro-tool-grid">
+        <div class="tool-grid sales-tool-grid">
           <button class="tool-card highlight" data-view="router">
             <span class="card-badge">แนะนำให้เริ่มตรงนี้</span>
             <img src="assets/icons/router.svg" alt=""><b>AI Router</b><span>บอกสิ่งที่อยากทำ แล้วระบบพาไปเมนูที่เหมาะที่สุด</span>
@@ -139,21 +154,53 @@
           <button class="tool-card" data-view="deck"><img src="assets/icons/deck.svg" alt=""><b>ทำสไลด์</b><span>จัด Outline, ลำดับสไลด์ และ Speaker Notes</span></button>
         </div>
 
-        <div class="dashboard-grid pro-dashboard-grid">
+        <section class="showcase-section">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">SHOWCASE</p>
+              <h3>ตัวอย่างงานที่ทำได้</h3>
+            </div>
+            <button class="btn secondary" data-view="library">ดูตัวอย่างงาน</button>
+          </div>
+          <div class="showcase-grid">
+            <button class="showcase-card" data-view="image">
+              <img src="assets/previews/deck-1.png" alt="ตัวอย่างภาพประชาสัมพันธ์">
+              <span>ภาพประชาสัมพันธ์</span>
+              <b>Poster / Infographic</b>
+            </button>
+            <button class="showcase-card" data-view="post">
+              <img src="assets/previews/deck-2.png" alt="ตัวอย่างโพสต์และแคปชั่น">
+              <span>โพสต์และแคปชั่น</span>
+              <b>Facebook / Line</b>
+            </button>
+            <button class="showcase-card" data-view="video">
+              <img src="assets/previews/deck-3.png" alt="ตัวอย่างคลิปและเสียงพากย์">
+              <span>คลิปและเสียงพากย์</span>
+              <b>Video Script</b>
+            </button>
+            <button class="showcase-card" data-view="deck">
+              <img src="assets/previews/image-1.png" alt="ตัวอย่างสไลด์นำเสนอ">
+              <span>สไลด์นำเสนอ</span>
+              <b>Presentation</b>
+            </button>
+          </div>
+        </section>
+
+        <div class="dashboard-grid sales-bottom-grid">
           <section class="panel">
             <div class="panel-head">
-              <div><h3>ใช้งานง่ายใน 3 ขั้นตอน</h3><p>กรอกข้อมูล สร้าง Prompt แล้วเปิดทันใจ GPT เพื่อทำงานต่อ</p></div>
+              <div><h3>ใช้งานง่ายใน 3 ขั้นตอน</h3><p>ทำงานต่อกับทันใจ GPT ได้ทันที ไม่ต้องคัดลอกหลายรอบ</p></div>
             </div>
             <div class="steps compact-steps">
               <div class="step-card-v61"><b>1</b><strong>กรอกข้อมูล</strong><span>ใส่หัวข้อ หน่วยงาน กลุ่มเป้าหมาย และรายละเอียดสำคัญ</span></div>
-              <div class="step-card-v61"><b>2</b><strong>สร้าง Prompt</strong><span>ระบบจัดเนื้อหาให้พร้อมใช้งานและต่อยอดอัตโนมัติ</span></div>
+              <div class="step-card-v61"><b>2</b><strong>สร้าง Prompt</strong><span>ระบบจัดบรีฟและตรวจความพร้อมให้อัตโนมัติหลังบ้าน</span></div>
               <div class="step-card-v61"><b>3</b><strong>เปิดทันใจ GPT</strong><span>กดคัดลอก + เปิดทันใจ GPT แล้ววางคำสั่งได้ทันที</span></div>
             </div>
           </section>
 
           <aside class="panel">
             <div class="panel-head">
-              <div><h3>เครื่องมือปลายทาง</h3><p>เปิดเครื่องมือที่ใช้ต่อหลังได้ Prompt</p></div>
+              <div><h3>เครื่องมือปลายทาง</h3><p>ต่อยอดงานไปยังเครื่องมือที่ใช้ประจำ</p></div>
               <button class="btn secondary" data-view="destinationHub">ดูทั้งหมด</button>
             </div>
             <div class="mini-dest-grid">

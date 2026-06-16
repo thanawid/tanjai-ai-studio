@@ -254,3 +254,12 @@
 - ปรับปุ่มล้างโปรเจกต์ให้ดูอ่อนลง และเพิ่ม Empty State หน้าโปรเจกต์
 - ปรับข้อความ “คลังคำสั่งสำเร็จรูป” เป็น “คลังคำสั่งพร้อมใช้”
 - คงทุกระบบหลังบ้านและโครงหลักเดิมจาก v6.5.2
+
+
+## v6.5.4 — Sales Ready Visual Dashboard
+- แก้หน้าแรกใหม่แบบจริงจังให้ใช้ขายได้: ไม่ใช่มีแต่ปุ่ม แต่มี Hero Visual และ Showcase ภาพตัวอย่างงาน
+- เพิ่ม Hero Visual แบบการ์ดซ้อน: Poster Preview, Post/Caption, Storyboard/Voice และ Prompt Ready
+- เพิ่มโซน “ตัวอย่างงานที่ทำได้” 4 ใบพร้อมภาพ: ภาพประชาสัมพันธ์, โพสต์และแคปชั่น, คลิปและเสียงพากย์, สไลด์นำเสนอ
+- คงเครื่องมือหลัก 7 ตัวบนหน้าแรก และยังเริ่มงานได้ชัดเจน
+- ซ่อนความรกจาก Dashboard: ไม่โชว์เริ่มงานด่วน ไม่โชว์รายละเอียดเมนูซ้ำยาว ๆ บนหน้าแรก
+- คงปุ่ม คัดลอก + เปิดทันใจ GPT, Smart Brief Auto Mode, Auto Prompt Critic หลังบ้าน, Real Photo Safe Mode, Output Delivery Guard, Custom GPT, Login, Navigation, Destination Hub, Preview Cards, logo/favicon/layout หลัก
