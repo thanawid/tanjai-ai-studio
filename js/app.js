@@ -73,7 +73,27 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
       </div>
     </div>
-    <div class="form-section" id="image-safetyWrap"><div class="section-title"><b>4</b><h4>การปกป้องภาพจริง</h4></div>
+    <div class="form-section smart-brief-coach" id="image-smartBriefWrap"><div class="section-title"><b>4</b><h4>Smart Brief Coach</h4></div>
+      <p class="mini-note">โหมดนี้ช่วยคิดต่อแบบ Creative Director: สรุปบรีฟเป็นหมวด เติมสิ่งที่ขาดอย่างมีเหตุผล แยกข้อความบนภาพ และสร้างคำสั่งพร้อมส่งเข้า GPT</p>
+      <div class="form-grid">
+        <label class="checkline full smart-toggle"><input id="image-smartCoach" type="checkbox" checked> เปิด Smart Brief Coach — ให้ระบบช่วยคิดต่อและจัดบรีฟแบบมืออาชีพ</label>
+        <label>ระดับการช่วยคิด<select id="image-smartThinking">
+          <option>ให้ AI ช่วยคิดต่ออัตโนมัติ</option>
+          <option>ยึดข้อมูลผู้ใช้มากที่สุด</option>
+          <option>ช่วยเติมสไตล์และไอเดียแบบจัดเต็ม</option>
+        </select></label>
+        <label>รูปแบบผลลัพธ์<select id="image-smartOutput">
+          <option>สรุปบรีฟ + Prompt พร้อมส่งเข้า GPT</option>
+          <option>สรุปแบบพร้อมสร้างภาพ</option>
+          <option>สรุปแบบพร้อมส่งหัวหน้า</option>
+          <option>Prompt ล้วนแบบกระชับ</option>
+        </select></label>
+        <label class="checkline"><input id="image-smartBackup" type="checkbox" checked> เพิ่มคำสั่งสำรองหลังได้ภาพ</label>
+        <label class="checkline"><input id="image-smartConfirm" type="checkbox" checked> ปิดท้ายให้ผู้ใช้ยืนยัน “สร้างภาพได้เลย”</label>
+        <label class="checkline"><input id="image-smartMunicipal" type="checkbox" checked> ปรับภาษาให้เหมาะกับงานเทศบาล/อบต.</label>
+      </div>
+    </div>
+    <div class="form-section" id="image-safetyWrap"><div class="section-title"><b>5</b><h4>การปกป้องภาพจริง</h4></div>
       <p class="mini-note">เหมาะสำหรับภาพกิจกรรม ภาพผู้บริหาร ภาพประชาสัมพันธ์ และภาพถ่ายจริงที่ต้องการคงบุคคลเดิม</p>
       <div class="safe-check-grid">
         <label class="checkline"><input id="image-safeUseMain" type="checkbox" checked> ใช้ภาพจริงเป็นภาพหลัก</label>
@@ -86,7 +106,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <label class="checkline"><input id="image-safeNoCover" type="checkbox" checked> ห้ามบังใบหน้าหรือรายละเอียดสำคัญ</label>
       </div>
     </div>
-    <div class="form-section"><div class="section-title"><b>5</b><h4>ประเภทงานและช่องทาง</h4></div>
+    <div class="form-section"><div class="section-title"><b>6</b><h4>ประเภทงานและช่องทาง</h4></div>
       <div class="form-grid">
         <label>ประเภทองค์กร<select id="image-orgType">${opts(toolOptions.orgTypes)}</select></label>
         <label>หมวดงานหลัก<select id="image-mainCategory">${opts(toolOptions.mainCategories)}</select></label>
@@ -94,7 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <label>ช่องทาง / ขนาดภาพ<select id="image-size">${opts(TANJAI.categories.sizes)}</select></label>
       </div>
     </div>
-    <div class="form-section"><div class="section-title"><b>6</b><h4>แนวภาพและความสวย</h4></div>
+    <div class="form-section"><div class="section-title"><b>7</b><h4>แนวภาพและความสวย</h4></div>
       <div class="form-grid">
         <label>สไตล์ภาพ<select id="image-style">${opts(TANJAI.categories.imageStyles)}</select></label>
         <label>Layout<select id="image-layout">${opts(toolOptions.layouts)}</select></label>

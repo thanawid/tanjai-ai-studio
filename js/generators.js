@@ -47,7 +47,13 @@ TANJAI.commonData = function(prefix){
     safeScene: c("safeScene"),
     safeAdjustOnly: c("safeAdjustOnly"),
     safeOverlay: c("safeOverlay"),
-    safeNoCover: c("safeNoCover")
+    safeNoCover: c("safeNoCover"),
+    smartCoach: c("smartCoach"),
+    smartThinking: v("smartThinking") || "ให้ AI ช่วยคิดต่ออัตโนมัติ",
+    smartOutput: v("smartOutput") || "สรุปบรีฟ + Prompt พร้อมส่งเข้า GPT",
+    smartBackup: c("smartBackup"),
+    smartConfirm: c("smartConfirm"),
+    smartMunicipal: c("smartMunicipal")
   };
 };
 
@@ -57,6 +63,7 @@ TANJAI.imagePrompt = function(d){
   const photoCount = Number(d.photoCount || 0);
   const hasPhotos = photoCount > 0;
   const photoNames = d.photoNames || "ภาพแนบ";
+  const smartOn = !!d.smartCoach;
 
   const guardItems = [];
   if(mode !== "สร้างภาพใหม่ด้วย AI"){
@@ -106,7 +113,115 @@ TANJAI.imagePrompt = function(d){
     modePrompt = `สร้างภาพใหม่ด้วย AI ตามโจทย์ที่กำหนด${hasPhotos ? " โดยใช้ภาพแนบเป็น reference หรือแรงบันดาลใจเท่านั้น ไม่จำเป็นต้องคงบุคคลหรือฉากเดิม" : ""}`;
   }
 
-  const textOnImage = [d.title, d.dateTime ? `วันเวลา: ${d.dateTime}` : "", d.place ? `สถานที่: ${d.place}` : ""].filter(Boolean).join("\n- ");
+  const title = d.title || "หัวข้องาน";
+  const orgName = d.orgName || "ทันใจ AI Studio";
+  const detail = d.detail || "ยังไม่ได้ระบุรายละเอียดเพิ่มเติม";
+  const secondaryLines = [
+    d.dateTime ? `วันเวลา: ${d.dateTime}` : "",
+    d.place ? `สถานที่: ${d.place}` : "",
+    d.people ? `ผู้เกี่ยวข้อง: ${d.people}` : ""
+  ].filter(Boolean);
+
+  const missing = [];
+  if(!d.dateTime) missing.push("- วัน / เวลา: ไม่ระบุ ให้ใช้เฉพาะเมื่อจำเป็น หรือเว้นช่องให้เติมภายหลัง");
+  if(!d.place) missing.push("- สถานที่: ไม่ระบุ ให้หลีกเลี่ยงการแต่งสถานที่ขึ้นเอง");
+  if(!d.people) missing.push("- บุคคล / หน่วยงานที่เกี่ยวข้อง: ไม่ระบุ ให้ใช้ชื่อองค์กรหลักแทน");
+  if(!hasPhotos && mode !== "สร้างภาพใหม่ด้วย AI") missing.push("- ภาพแนบ: ยังไม่มีภาพจริง หากต้องการคงคน/ฉากเดิม ต้องแนบภาพก่อนใช้ Prompt นี้");
+
+  const systemDecisions = [
+    `- ขนาดภาพที่จะทำก่อน: ${d.size || "4:5 Facebook / Line 1080x1350"}`,
+    `- เน้นเด่นที่สุด: ${title}`,
+    `- แนวภาพ: ${d.style}, ${d.colorTone}, ${d.density}`,
+    `- อารมณ์ที่ภาพควรสื่อ: ${d.tone}, อ่านง่าย เหมาะกับ${d.orgType || "กลุ่มเป้าหมาย"}`,
+    `- ภาพแนบ: ${hasPhotos ? `ใช้ ${photoCount} รูป (${photoNames})` : "ไม่มีภาพแนบ"}`
+  ];
+
+  const briefSummary = `ประเภทองค์กร: ${d.orgType || "ไม่ระบุ"}
+ชื่อองค์กร / รายละเอียด: ${orgName}
+ประเภทภาพ: ${d.mainCategory || "ภาพประชาสัมพันธ์"}
+หัวข้องานย่อย: ${d.subCategory || "ไม่ระบุ"}
+กลุ่มเป้าหมาย: ${d.audience}
+ช่องทางใช้งาน: ${d.size}
+โหมดการใช้ภาพ: ${mode}
+ระดับการคงต้นฉบับ: ${level}
+โทนภาพ: ${d.style}
+โทนสีที่ใช้: ${d.colorTone}
+สิ่งที่คนดูควรรู้: ${detail}
+อารมณ์ที่ภาพควรสื่อ: ${d.tone} อ่านง่าย น่าเชื่อถือ และเหมาะกับงานประชาสัมพันธ์`;
+
+  const textOnImage = `ข้อความหลัก:
+${title}
+
+ข้อความรอง / รายละเอียด:
+${detail}
+
+${secondaryLines.length ? secondaryLines.join("\n") : "รายละเอียดวันเวลา / สถานที่ / ผู้เกี่ยวข้อง: ไม่ระบุ หรือให้เว้นพื้นที่เติมภายหลัง"}`;
+
+  const creativeDirection = `แนวภาพโดยรวม:
+ออกแบบภาพประชาสัมพันธ์ภาษาไทยให้ดูเป็นงานมืออาชีพ ใช้ visual hierarchy ชัดเจน หัวข้อหลักเด่นมาก รายละเอียดรองอ่านง่าย ไม่รก ใช้พื้นที่ว่างเหมาะสม จัดวางองค์ประกอบให้เหมาะกับ ${d.size}
+สไตล์: ${d.style}
+Layout: ${d.layout}
+โทนสี: ${d.colorTone}
+ความหนาแน่น: ${d.density}
+จุดเด่นของภาพ: ${d.focus}
+ข้อห้าม / หมายเหตุ: ${d.avoid}`;
+
+  const backupCommand = d.smartBackup ? `
+
+คำสั่งสำรองหลังได้ภาพ:
+ช่วยสร้างภาพเดิมแบบไม่มีข้อความ โดยคงพื้นหลัง กราฟิก กล่องข้อความ ไอคอน สี แสง บรรยากาศ และองค์ประกอบทั้งหมดให้เหมือนภาพล่าสุดมากที่สุด ลบเฉพาะตัวอักษรออกเท่านั้น ห้ามลบกล่องข้อความ ห้ามลบไอคอน ห้ามเปลี่ยนพื้นหลัง ห้ามเปลี่ยนองค์ประกอบหลัก และห้ามออกแบบใหม่
+
+คำสั่งแก้เฉพาะจุด:
+หากต้องแก้ ให้แก้เฉพาะข้อความ สี ขนาดตัวอักษร หรือการจัดวาง โดยห้ามเปลี่ยนภาพหลัก ห้ามเปลี่ยนบุคคล และห้ามออกแบบใหม่ทั้งหมด` : "";
+
+  const confirmLine = d.smartConfirm ? `
+
+ถ้าข้อมูลถูกต้องแล้ว พิมพ์ว่า “สร้างภาพได้เลย”` : "";
+
+  if(smartOn){
+    return `ได้เลยครับ ช่วยคิดต่อให้ครบ โดยทำเป็นภาพแนวมืออาชีพ อ่านง่าย และเหมาะกับงานประชาสัมพันธ์
+
+ข้อมูลที่ยังต้องขอเพิ่ม / ระบบตัดสินใจแทนให้:
+${missing.length ? missing.join("\n") : "- ไม่มีข้อมูลจำเป็นที่ต้องรอเพิ่มเติมแล้ว"}
+${systemDecisions.join("\n")}
+
+สรุปบรีฟก่อนสร้างภาพ:
+${briefSummary}
+
+ข้อความบนภาพที่จะใช้:
+${textOnImage}
+
+ไฟล์ที่ควรแนบ ถ้ามี:
+${hasPhotos ? `ใช้ภาพแนบจริงจำนวน ${photoCount} รูป: ${photoNames}` : "- หากมีโลโก้จริง / QR Code จริง / ภาพถ่ายกิจกรรมจริง ให้แนบไปพร้อม Prompt นี้"}
+
+ข้อห้ามสำหรับภาพจริง:
+${guardText}
+
+คำสั่งออกแบบพร้อมส่งเข้า GPT:
+บทบาทของ AI:
+คุณคือ Creative Director และ Graphic Designer สำหรับงานประชาสัมพันธ์ภาษาไทย ช่วยออกแบบภาพให้สวย ทันสมัย อ่านง่าย และพร้อมใช้ในงานจริง
+
+เป้าหมายงาน:
+สร้างภาพประชาสัมพันธ์ภาษาไทย หัวข้อ “${title}” สำหรับ ${orgName}
+
+โหมดการใช้ภาพ:
+- ${mode}
+- ระดับการคงต้นฉบับ: ${level}
+- ภาพแนบ: ${hasPhotos ? `${photoCount} รูป (${photoNames})` : "ไม่มี"}
+
+Prompt Guard:
+${modePrompt}
+
+ข้อมูลจริง:
+${briefSummary}
+
+ข้อความบนภาพ:
+${textOnImage}
+
+Creative Direction:
+${creativeDirection}
+${backupCommand}${TANJAI.outputDeliveryGuard("ภาพ")}${confirmLine}`;
+  }
 
   return `โหมดการใช้ภาพ
 - ${mode}
@@ -120,15 +235,15 @@ ${guardText}
 คำสั่งออกแบบ
 ${modePrompt}
 
-สร้างภาพประชาสัมพันธ์ภาษาไทย หัวข้อ “${d.title}” สำหรับ ${d.orgName} โดยเน้นงานออกแบบที่สวย ทันสมัย อ่านง่าย มี visual hierarchy ชัดเจน หัวข้อหลักเด่น รายละเอียดรองอ่านง่าย ไม่รก ใช้พื้นที่ว่างเหมาะสม และดูเหมือนงานกราฟิกดีไซเนอร์มืออาชีพ
+สร้างภาพประชาสัมพันธ์ภาษาไทย หัวข้อ “${title}” สำหรับ ${orgName} โดยเน้นงานออกแบบที่สวย ทันสมัย อ่านง่าย มี visual hierarchy ชัดเจน หัวข้อหลักเด่น รายละเอียดรองอ่านง่าย ไม่รก ใช้พื้นที่ว่างเหมาะสม และดูเหมือนงานกราฟิกดีไซเนอร์มืออาชีพ
 
 รายละเอียดงาน
-- ชื่อองค์กร / แบรนด์: ${d.orgName}
+- ชื่อองค์กร / แบรนด์: ${orgName}
 - ประเภทองค์กร: ${d.orgType || "ไม่ระบุ"}
 - หมวดงานหลัก: ${d.mainCategory || "ไม่ระบุ"}
 - หัวข้องานย่อย: ${d.subCategory || "ไม่ระบุ"}
 - กลุ่มเป้าหมาย: ${d.audience}
-- รายละเอียดสำคัญ: ${d.detail}
+- รายละเอียดสำคัญ: ${detail}
 - วันเวลา: ${d.dateTime || "ไม่ระบุ"}
 - สถานที่: ${d.place || "ไม่ระบุ"}
 - บุคคล/หน่วยงานที่เกี่ยวข้อง: ${d.people || "ไม่ระบุ"}
@@ -145,8 +260,10 @@ ${modePrompt}
 - โทนภาษา: ${d.tone}
 
 ข้อความบนภาพถ้ามี
-- ${textOnImage || "ให้ AI จัดหัวข้อและข้อความบนภาพตามความเหมาะสม"}${TANJAI.outputDeliveryGuard("ภาพ")}`;
+- ${[title, ...secondaryLines].join("\n- ") || "ให้ AI จัดหัวข้อและข้อความบนภาพตามความเหมาะสม"}${backupCommand}${TANJAI.outputDeliveryGuard("ภาพ")}`;
 };
+
+
 
 TANJAI.postText = function(d){
   return `📌 ${d.title}

@@ -181,3 +181,11 @@
 - ใช้กับ Prompt ภาพ, สไลด์, วิดีโอ/ไฟล์ประกอบ และชุดสื่อ
 - เพิ่ม Prompt Hub: Output Delivery Guard
 - คง Real Photo Safe Mode, Custom GPT URL Fix, Login Gate, Navigation UX, Destination Hub, Preview Cards, favicon, logo และ layout เดิม
+
+
+## v6.4 — Smart Brief Coach
+- เพิ่ม Smart Brief Coach ในเมนูสร้างภาพ
+- ผลลัพธ์แบบ Creative Director: ช่วยคิดต่อ, ตัดสินใจแทนอย่างมีเหตุผล, สรุปบรีฟเป็นหมวด, แยกข้อความบนภาพ, สร้างคำสั่งพร้อมส่งเข้า GPT
+- เพิ่มคำสั่งสำรองหลังได้ภาพ เช่น ทำเวอร์ชันไม่มีข้อความ / แก้เฉพาะจุดโดยไม่ออกแบบใหม่
+- เพิ่มตัวเลือกควบคุมระดับการช่วยคิด, รูปแบบผลลัพธ์, ภาษางานเทศบาล
+- คง Real Photo Safe Mode, Output Delivery Guard, Custom GPT URL Fix, Login Gate, Navigation UX, Destination Hub, Preview Cards, favicon, logo และ layout เดิม

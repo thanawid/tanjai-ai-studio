@@ -716,3 +716,26 @@ body:not(.auth-locked) .login-gate{
 @media(max-width:768px){
   .preset-row,.inline-actions{flex-direction:column;align-items:stretch}
 }
+
+
+/* v6.4 Smart Brief Coach */
+.smart-brief-coach{
+  border-color:rgba(250,204,21,.22)!important;
+  background:
+    radial-gradient(circle at top right, rgba(250,204,21,.10), transparent 34%),
+    rgba(255,255,255,.045);
+}
+.smart-brief-coach .section-title b{
+  background:linear-gradient(135deg,#fde68a,#f59e0b);
+  color:#1f2937;
+}
+.smart-toggle{
+  border-color:rgba(250,204,21,.26)!important;
+  background:rgba(250,204,21,.08)!important;
+}
+.smart-brief-coach select{
+  border-color:rgba(250,204,21,.18);
+}
+@media(max-width:768px){
+  .smart-brief-coach .form-grid{grid-template-columns:1fr!important}
+}
