@@ -227,3 +227,17 @@
 - ผลตรวจถูกใช้เสริม Prompt ภายใน ไม่โชว์เป็นแผงให้ผู้ใช้ต้องอ่าน
 - แก้ระบบเรียงเลขในหน้าสร้างภาพให้ครบและเรียงตาม section ที่มองเห็นจริง
 - คง Smart Brief Auto Mode, Clean Image Note, Real Photo Safe Mode, Output Delivery Guard, Custom GPT URL Fix, Login Gate, Navigation UX, Destination Hub, Preview Cards, favicon, logo และ layout เดิม
+
+
+## v6.5.2 — UX Clean & Pro Polish
+- ปรับหน้าแรกให้เห็นทันทีว่าต้องเริ่มที่ AI Router / สร้างชุดสื่อ / สร้างภาพ
+- ใช้แบรนด์หลัก “ทันใจ AI Studio — สร้างสื่อไว ด้วยพลัง AI”
+- ไม่เพิ่มบล็อก “งานเทศบาลที่ใช้บ่อย” บนหน้าแรก
+- ไม่เพิ่มหน้า “สถานะระบบ”
+- เพิ่ม Version Badge เล็ก ๆ เป็น v6.5.2
+- ลบปุ่มข้อความ placeholder “ใส่ตัวอย่าง” ออกจากหน้าฟอร์มหลัก
+- ปรับคำอธิบายให้เป็นภาษาผู้ใช้ ไม่โชว์ภาษาระบบมากเกินไป
+- เพิ่มปุ่ม “คัดลอก + เปิดทันใจ GPT” เพื่อให้ทำงานต่อกับ GPT ได้ลื่นขึ้น
+- จัดลำดับเมนูใหม่ให้สอดคล้อง: เริ่มต้น / สร้างงาน / ต่อยอด / จัดการ
+- ซ่อน Prompt Hub ที่เป็นระบบหลังบ้าน เช่น Prompt Critic, Smart Brief Coach, Output Delivery Guard ไม่ให้ดูเป็นห้องเครื่อง
+- คง Smart Brief Auto Mode, Auto Prompt Critic หลังบ้าน, Real Photo Safe Mode, Output Delivery Guard, Custom GPT, Login, Navigation, Destination Hub, Preview Cards, logo/favicon/layout เดิม
