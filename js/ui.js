@@ -114,32 +114,6 @@ TANJAI.field = function(prefix, data){
 };
 
 TANJAI.resultShell = function(tool, recommended, desc, bodyId, buttons=""){
-  const destinationButtons = (()=>{
-    const btn = (label,url)=>`<button class="btn secondary" data-open="${url}">${label}</button>`;
-    if(tool === "router"){
-      return btn("เปิด ทันใจ GPT", TANJAI_CUSTOM_GPT_URL) + btn("เปิด Canva","https://www.canva.com/") + btn("เปิด CapCut","https://www.capcut.com/");
-    }
-    if(tool === "image"){
-      return btn("เปิด ทันใจ GPT", TANJAI_CUSTOM_GPT_URL) + btn("เปิด Canva","https://www.canva.com/");
-    }
-    if(tool === "post"){
-      return btn("เปิด ทันใจ GPT", TANJAI_CUSTOM_GPT_URL) + btn("เปิด Notebook Tool","https://notebooklm.google.com/") + btn("เปิด Canva","https://www.canva.com/") + btn("เปิด CapCut","https://www.capcut.com/");
-    }
-    if(tool === "video"){
-      return btn("เปิด ทันใจ GPT", TANJAI_CUSTOM_GPT_URL) + btn("เปิด CapCut","https://www.capcut.com/");
-    }
-    if(tool === "voice"){
-      return btn("เปิด ทันใจ GPT", TANJAI_CUSTOM_GPT_URL) + btn("เปิด CapCut","https://www.capcut.com/") + btn("เปิด Voice Tool","https://aistudio.google.com/");
-    }
-    if(tool === "deck"){
-      return btn("เปิด ทันใจ GPT", TANJAI_CUSTOM_GPT_URL) + btn("เปิด Canva","https://www.canva.com/") + btn("เปิด Slide Tool","https://gamma.app/") + btn("เปิด Notebook Tool","https://notebooklm.google.com/");
-    }
-    if(tool === "kit"){
-      return btn("เปิด ทันใจ GPT", TANJAI_CUSTOM_GPT_URL) + btn("เปิด Canva","https://www.canva.com/") + btn("เปิด CapCut","https://www.capcut.com/") + btn("เปิด Voice Tool","https://aistudio.google.com/") + btn("เปิด Slide Tool","https://gamma.app/");
-    }
-    return btn("เปิด ทันใจ GPT", TANJAI_CUSTOM_GPT_URL) + btn("เปิด Canva","https://www.canva.com/") + btn("เปิด CapCut","https://www.capcut.com/");
-  })();
-
   return `
     <div class="result-action stable-output-head">
       <div class="result-title-block">
@@ -152,8 +126,98 @@ TANJAI.resultShell = function(tool, recommended, desc, bodyId, buttons=""){
         <button class="btn primary compact-action" data-copyopen="${bodyId}">ส่งเข้า GPT</button>
       </div>
     </div>
-    <div id="${bodyId}" class="result-box stable-empty">กดปุ่มสร้าง แล้ว Prompt / คำสั่งส่ง GPT จะแสดงตรงนี้</div>
+    <div id="${bodyId}" class="result-box stable-empty">กดปุ่มสร้าง แล้วผลลัพธ์จะแสดงตรงนี้</div>
   `;
+};
+
+TANJAI.getToolDestinations = function(tool){
+  const GPT = TANJAI.customGptUrl || TANJAI_CUSTOM_GPT_URL;
+  const map = {
+    image:[{label:"เปิด ทันใจ GPT", url:GPT},{label:"เปิด Canva", url:"https://www.canva.com/"}],
+    post:[{label:"เปิด ทันใจ GPT", url:GPT},{label:"เปิด Notebook Tool", url:"https://notebooklm.google.com/"},{label:"เปิด Canva", url:"https://www.canva.com/"},{label:"เปิด CapCut", url:"https://www.capcut.com/"}],
+    video:[{label:"เปิด ทันใจ GPT", url:GPT},{label:"เปิด CapCut", url:"https://www.capcut.com/"}],
+    voice:[{label:"เปิด ทันใจ GPT", url:GPT},{label:"เปิด Voice Tool", url:"https://aistudio.google.com/"},{label:"เปิด CapCut", url:"https://www.capcut.com/"}],
+    deck:[{label:"เปิด ทันใจ GPT", url:GPT},{label:"เปิด Slide Tool", url:"https://gamma.app/"},{label:"เปิด Canva", url:"https://www.canva.com/"},{label:"เปิด Notebook Tool", url:"https://notebooklm.google.com/"}],
+    kit:[{label:"เปิด ทันใจ GPT", url:GPT},{label:"เปิด Canva", url:"https://www.canva.com/"},{label:"เปิด CapCut", url:"https://www.capcut.com/"},{label:"เปิด Voice Tool", url:"https://aistudio.google.com/"},{label:"เปิด Slide Tool", url:"https://gamma.app/"}]
+  };
+  return map[tool] || [{label:"เปิด ทันใจ GPT", url:GPT}];
+};
+
+TANJAI.primaryActionButtons = function(tool, bodyId){
+  const GPT = TANJAI.customGptUrl || TANJAI_CUSTOM_GPT_URL;
+  const btn = (label, attrs, cls="secondary")=>`<button class="btn ${cls}" ${attrs}>${label}</button>`;
+  if(tool === "image") return btn("คัดลอก Prompt", `data-copybox="${bodyId}"`, "primary") + btn("เปิด ทันใจ GPT", `data-open="${GPT}"`);
+  if(tool === "post") return btn("คัดลอกข้อความ", `data-copybox="${bodyId}"`, "primary") + btn("เปิด ทันใจ GPT", `data-open="${GPT}"`);
+  if(tool === "video") return btn("คัดลอก Storyboard", `data-copybox="${bodyId}"`, "primary") + btn("เปิด CapCut", `data-open="https://www.capcut.com/"`);
+  if(tool === "voice") return btn("คัดลอกสคริปต์", `data-copybox="${bodyId}"`, "primary") + btn("เปิด Voice Tool", `data-open="https://aistudio.google.com/"`);
+  if(tool === "deck") return btn("คัดลอก Outline", `data-copybox="${bodyId}"`, "primary") + btn("เปิด Slide Tool", `data-open="https://gamma.app/"`);
+  if(tool === "kit") return btn("คัดลอกชุดสื่อ", `data-copybox="${bodyId}"`, "primary") + btn("เปิด ทันใจ GPT", `data-open="${GPT}"`);
+  return btn("คัดลอกผลลัพธ์", `data-copybox="${bodyId}"`, "primary");
+};
+
+TANJAI.readyOutputShell = function(tool, recommended, desc, bodyId){
+  const destinations = TANJAI.getToolDestinations(tool).map(item => `<button class="btn ghost" data-open="${item.url}">${item.label}</button>`).join("");
+  return `
+    <div class="result-action stable-output-head ready-output-head">
+      <div class="result-title-block">
+        <small>ผลลัพธ์พร้อมใช้</small>
+        <h4 id="${tool}ResultTitle">${recommended}</h4>
+        <p id="${tool}ResultDesc">${desc}</p>
+      </div>
+      <div class="result-buttons stable-result-buttons primary-first-actions">
+        ${TANJAI.primaryActionButtons(tool, bodyId)}
+      </div>
+    </div>
+    <div id="${bodyId}" class="result-box stable-empty">กดปุ่มสร้าง แล้วผลลัพธ์พร้อมใช้จะแสดงตรงนี้</div>
+    <details class="advanced-output-wrap" id="${tool}AdvancedWrap">
+      <summary>ดูรายละเอียดเพิ่มเติม</summary>
+      <div class="advanced-output-grid">
+        <section class="advanced-output-card" id="${tool}AdvancedSection1" hidden>
+          <h5 id="${tool}AdvancedTitle1">รายละเอียดเพิ่มเติม</h5>
+          <div id="${tool}Advanced1" class="result-box advanced-result-box">ยังไม่มีข้อมูลเพิ่มเติม</div>
+        </section>
+        <section class="advanced-output-card" id="${tool}AdvancedSection2" hidden>
+          <h5 id="${tool}AdvancedTitle2">ตัวช่วยเพิ่มเติม</h5>
+          <div id="${tool}Advanced2" class="result-box advanced-result-box">ยังไม่มีข้อมูลเพิ่มเติม</div>
+        </section>
+        <section class="advanced-output-card">
+          <h5>เครื่องมือที่แนะนำ</h5>
+          <div class="advanced-tools-list">${destinations}</div>
+        </section>
+      </div>
+    </details>
+  `;
+};
+
+TANJAI.setReadyOutput = function(tool, options={}){
+  const mainEl = TANJAI.$(`#${tool}Out`);
+  const titleEl = TANJAI.$(`#${tool}ResultTitle`);
+  const descEl = TANJAI.$(`#${tool}ResultDesc`);
+  const a1Wrap = TANJAI.$(`#${tool}AdvancedSection1`);
+  const a2Wrap = TANJAI.$(`#${tool}AdvancedSection2`);
+  const a1Title = TANJAI.$(`#${tool}AdvancedTitle1`);
+  const a2Title = TANJAI.$(`#${tool}AdvancedTitle2`);
+  const a1El = TANJAI.$(`#${tool}Advanced1`);
+  const a2El = TANJAI.$(`#${tool}Advanced2`);
+  if(mainEl){
+    mainEl.textContent = options.main || "";
+    mainEl.classList.toggle("stable-empty", !(options.main || "").trim());
+  }
+  if(titleEl && options.title) titleEl.textContent = options.title;
+  if(descEl && options.desc) descEl.textContent = options.desc;
+  const sectionSets = [
+    [a1Wrap, a1Title, a1El, options.advancedTitle1, options.advanced1],
+    [a2Wrap, a2Title, a2El, options.advancedTitle2, options.advanced2]
+  ];
+  sectionSets.forEach(([wrap,title,el,newTitle,newText])=>{
+    const has = !!(newText && String(newText).trim());
+    if(wrap) wrap.hidden = !has;
+    if(title && newTitle) title.textContent = newTitle;
+    if(el){
+      el.textContent = newText || "";
+      el.classList.toggle("stable-empty", !has);
+    }
+  });
 };
 
 TANJAI.applyTemplate = function(key){
