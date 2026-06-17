@@ -60,6 +60,7 @@
         <span>สร้างงาน</span>
         <button class="nav-link" data-view="kit"><i>🧩</i><b>สร้างชุดสื่อ</b></button>
         <button class="nav-link" data-view="image"><i>🖼️</i><b>สร้างภาพ</b></button>
+        <button class="nav-link" data-view="album"><i>🧷</i><b>ชุดภาพโพสต์ Facebook</b></button>
         <button class="nav-link" data-view="post"><i>✍️</i><b>สรุปงาน / โพสต์</b></button>
         <button class="nav-link" data-view="video"><i>🎬</i><b>ทำวิดีโอ</b></button>
         <button class="nav-link" data-view="voice"><i>🎙️</i><b>เสียงพากย์</b></button>
@@ -89,7 +90,7 @@
         <div class="top-actions">
           <button class="btn secondary nav-back-btn" id="topBackBtn" type="button">← ย้อนกลับ</button>
           <button class="btn secondary nav-home-btn" data-view="dashboard" type="button">หน้าหลัก</button>
-          <span class="status-pill">พร้อมใช้งาน</span><span class="version-badge">v8.3.1</span>
+          <span class="status-pill">พร้อมใช้งาน</span><span class="version-badge">v8.4</span>
           <button class="btn secondary logout-btn" id="logoutBtn" type="button">ออกจากระบบ</button>
           <button class="btn secondary" id="openCommandTop" onclick="window.TANJAI&&TANJAI.openCommandPalette&&TANJAI.openCommandPalette()">⌘ ค้นหาคำสั่ง</button><button class="btn secondary" data-view="router">AI Router</button>
           <button class="btn primary" data-view="kit">+ สร้างชุดสื่อ</button>
@@ -127,6 +128,7 @@
           <button class="tool-card highlight" data-view="router"><img src="assets/icons/router.svg" alt=""><b>AI Router</b><span>บอกสิ่งที่อยากทำ แล้วระบบพาไปเมนูที่เหมาะที่สุด</span></button>
           <button class="tool-card highlight" data-view="kit"><img src="assets/icons/kit.svg" alt=""><b>สร้างชุดสื่อ</b><span>กรอกครั้งเดียว ได้ภาพ โพสต์ คลิป เสียง และสไลด์</span></button>
           <button class="tool-card" data-view="image"><img src="assets/icons/image.svg" alt=""><b>สร้างภาพ</b><span>เตรียม Prompt ภาพพร้อมใช้กับ AI และงานออกแบบ</span></button>
+          <button class="tool-card" data-view="album"><img src="assets/icons/image.svg" alt=""><b>ชุดภาพโพสต์ Facebook</b><span>ปรับภาพจริง ใส่กรอบ และทำอัลบั้มพร้อมโพสต์</span></button>
           <button class="tool-card" data-view="post"><img src="assets/icons/post.svg" alt=""><b>สรุปงาน / โพสต์</b><span>สรุปงานให้พร้อมลง Facebook, Line และทำคลิป</span></button>
           <button class="tool-card" data-view="video"><img src="assets/icons/video.svg" alt=""><b>ทำวิดีโอ</b><span>วาง Hook, Storyboard, เสียงพากย์ และข้อความบนจอ</span></button>
           <button class="tool-card" data-view="voice"><img src="assets/icons/voice.svg" alt=""><b>เสียงพากย์</b><span>เขียนสคริปต์เสียงให้อ่านลื่น พร้อมใช้ต่อ</span></button>
@@ -142,6 +144,7 @@
             </div>
             <div class="sample-grid">
               <article class="home-choice-card" data-view="image"><img src="assets/previews/image-1.png" data-random-previews="assets/previews/image-1.png|assets/previews/image-2.png|assets/previews/image-3.png" alt=""><b>สร้างภาพ</b><span>Prompt ภาพพร้อมใช้</span></article>
+              <article class="home-choice-card" data-view="album"><img src="assets/previews/post-1.png" data-random-previews="assets/previews/post-1.png|assets/previews/image-1.png|assets/previews/kit-1.png" alt=""><b>ชุดภาพโพสต์ Facebook</b><span>Auto Enhance + Frame</span></article>
               <article class="home-choice-card" data-view="post"><img src="assets/previews/post-1.png" data-random-previews="assets/previews/post-1.png|assets/previews/post-2.png|assets/previews/post-3.png" alt=""><b>สคริปต์สรุปงาน</b><span>ใช้ต่อได้ทั้งนำเสนอ ทำคลิป และโพสต์โซเชียล</span></article>
               <article class="home-choice-card" data-view="video"><img src="assets/previews/video-1.png" data-random-previews="assets/previews/video-1.png|assets/previews/video-2.png|assets/previews/video-3.png" alt=""><b>ทำวิดีโอ / ทำคลิป</b><span>Storyboard + Voice Over</span></article>
               <article class="home-choice-card" data-view="voice"><img src="assets/previews/voice-1.png" data-random-previews="assets/previews/voice-1.png|assets/previews/voice-2.png|assets/previews/voice-3.png" alt=""><b>เสียงพากย์</b><span>สคริปต์เสียงพร้อมใช้ต่อ Voice Tool</span></article>
@@ -172,6 +175,8 @@
       </section>
 
       <section id="image" class="view"><div class="studio-layout"><section class="panel form-panel"><div class="panel-head"><div><h3>🖼️ สร้างภาพ</h3><p>เตรียมคำสั่งสร้างภาพให้พร้อมใช้ต่อกับทันใจ GPT, AI สร้างภาพ หรือ Canva</p></div></div><div id="imageForm"></div></section><aside class="panel result-panel"><div id="imageResult"></div></aside></div></section>
+
+      <section id="album" class="view"><div class="studio-layout"><section class="panel form-panel"><div class="panel-head"><div><h3>🧷 ชุดภาพโพสต์ Facebook</h3><p>อัปโหลดหลายภาพ ปรับแสงสี ครอป ใส่กรอบข้อความ และดาวน์โหลดภาพพร้อมโพสต์ โดยไม่สร้างภาพใหม่</p></div></div><div id="albumForm"></div></section><aside class="panel result-panel"><div id="albumResult"></div></aside></div></section>
 
       <section id="post" class="view"><div class="studio-layout"><section class="panel form-panel"><div class="panel-head"><div><h3>✍️ สคริปต์สรุปงาน</h3><p>สรุปงานให้พร้อมใช้เป็นโพสต์ แคปชั่น ข้อความ Line และสคริปต์คลิป</p></div></div><div id="postForm"></div></section><aside class="panel result-panel"><div id="postResult"></div></aside></div></section>
 
@@ -234,5 +239,6 @@
   <script src="js/projects.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/album.js"></script>
 </body>
 </html>

@@ -2025,3 +2025,16 @@ body:not(.auth-locked) .login-gate{
     padding:12px;
   }
 }
+
+
+/* V8.4 — Facebook Album Auto Frame & Smart Enhance */
+.album-upload-preview{display:grid;gap:10px;margin-top:12px}
+.album-file-chip{display:grid;grid-template-columns:36px 1fr auto;align-items:center;gap:10px;border:1px solid rgba(255,255,255,.10);border-radius:14px;padding:10px 12px;background:rgba(255,255,255,.045)}
+.album-file-chip span{width:30px;height:30px;display:grid;place-items:center;border-radius:10px;background:linear-gradient(135deg,#6d5dfc,#e6b85b);color:#fff;font-weight:900}
+.album-file-chip b{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.album-file-chip small{color:rgba(255,255,255,.62)}
+.album-output-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}
+.album-output-card{border:1px solid rgba(255,255,255,.10);border-radius:16px;background:rgba(255,255,255,.04);padding:10px;display:grid;gap:8px}
+.album-output-card img{width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:12px;background:#08111f}
+.album-output-card b{font-size:12px;color:rgba(255,255,255,.82);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.album-output-card .btn{width:100%;min-height:36px;font-size:12px}

@@ -24,7 +24,7 @@ TANJAI.downloadText = function(text, filename){
   URL.revokeObjectURL(a.href);
 };
 
-TANJAI.validViews = ["dashboard","router","image","post","video","voice","deck","kit","promptHub","destinationHub","projects","library","guide"];
+TANJAI.validViews = ["dashboard","router","image","album","post","video","voice","deck","kit","promptHub","destinationHub","projects","library","guide"];
 
 TANJAI.switchView = function(id, options = {}){
   if(!TANJAI.validViews.includes(id)) id = "dashboard";
@@ -37,6 +37,7 @@ TANJAI.switchView = function(id, options = {}){
     dashboard:"สวัสดีครับ! 👋",
     router:"AI Router",
     image:"สร้างภาพ",
+    album:"ชุดภาพโพสต์ Facebook",
     post:"สคริปต์สรุปงาน",
     video:"ทำวิดีโอ",
     voice:"เสียงพากย์",
@@ -134,6 +135,7 @@ TANJAI.getToolDestinations = function(tool){
   const GPT = TANJAI.customGptUrl || TANJAI_CUSTOM_GPT_URL;
   const map = {
     image:[{label:"เปิด ทันใจ GPT", url:GPT},{label:"เปิด Canva", url:"https://www.canva.com/"}],
+    album:[{label:"เปิด Canva", url:"https://www.canva.com/"},{label:"เปิด ทันใจ GPT", url:GPT}],
     post:[{label:"เปิด ทันใจ GPT", url:GPT},{label:"เปิด Notebook Tool", url:"https://notebooklm.google.com/"},{label:"เปิด Canva", url:"https://www.canva.com/"},{label:"เปิด CapCut", url:"https://www.capcut.com/"}],
     video:[{label:"เปิด ทันใจ GPT", url:GPT},{label:"เปิด CapCut", url:"https://www.capcut.com/"}],
     voice:[{label:"เปิด ทันใจ GPT", url:GPT},{label:"เปิด Voice Tool", url:"https://aistudio.google.com/"},{label:"เปิด CapCut", url:"https://www.capcut.com/"}],
@@ -147,6 +149,7 @@ TANJAI.primaryActionButtons = function(tool, bodyId){
   const GPT = TANJAI.customGptUrl || TANJAI_CUSTOM_GPT_URL;
   const btn = (label, attrs, cls="secondary")=>`<button class="btn ${cls}" ${attrs}>${label}</button>`;
   if(tool === "image") return btn("คัดลอก Prompt", `data-copybox="${bodyId}"`, "primary") + btn("เปิด ทันใจ GPT", `data-open="${GPT}"`);
+  if(tool === "album") return btn("ดาวน์โหลดทั้งหมด", `id="albumDownloadAllTop"`, "primary") + btn("ล้างรูป", `id="albumClearTop"`);
   if(tool === "post") return btn("คัดลอกข้อความ", `data-copybox="${bodyId}"`, "primary") + btn("เปิด ทันใจ GPT", `data-open="${GPT}"`);
   if(tool === "video") return btn("คัดลอก Storyboard", `data-copybox="${bodyId}"`, "primary") + btn("เปิด CapCut", `data-open="https://www.capcut.com/"`);
   if(tool === "voice") return btn("คัดลอกสคริปต์", `data-copybox="${bodyId}"`, "primary") + btn("เปิด Voice Tool", `data-open="https://aistudio.google.com/"`);

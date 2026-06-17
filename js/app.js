@@ -114,6 +114,35 @@ document.addEventListener("DOMContentLoaded", () => {
     </div>
     <div class="button-row"><button class="btn primary" id="makeImage">สร้างคำสั่งภาพ</button><button class="btn secondary" id="saveImage">บันทึก</button></div>
   `;
+
+  $("#albumForm").innerHTML = `
+    <div class="form-section"><div class="section-title"><b>1</b><h4>อัปโหลดภาพจริง</h4></div>
+      <label class="full">เลือกภาพหลายภาพ<input id="album-files" type="file" accept="image/*" multiple><small>โหมดนี้ปรับภาพจริงเท่านั้น ไม่สร้างภาพใหม่ ไม่เปลี่ยนหน้า ไม่แก้องค์ประกอบหลัก</small></label>
+      <div id="album-preview" class="album-upload-preview"></div>
+    </div>
+    <div class="form-section"><div class="section-title"><b>2</b><h4>ข้อมูลบนกรอบภาพ</h4></div>
+      <div class="form-grid">
+        <label>หัวข้องาน<input id="album-title" placeholder="เช่น ประชุมเตรียมความพร้อมงานคัดสรรกิจกรรมพัฒนาชุมชนดีเด่น"></label>
+        <label>หน่วยงาน<input id="album-orgName" placeholder="เทศบาลเมืองบางรักน้อย"></label>
+        <label>วันที่<input id="album-dateTime" placeholder="เช่น 16 มิถุนายน 2569"></label>
+        <label>สถานที่<input id="album-place" placeholder="เช่น ศูนย์ท่องเที่ยวกลุ่มไม้ดอกไม้ประดับซอยช้าง หมู่ที่ 3"></label>
+        <label class="full">ใคร / ทำอะไร<textarea id="album-detail" placeholder="เช่น นายสุชาติ แก้วประดิษฐ์ นายกเทศมนตรีเมืองบางรักน้อย พร้อมคณะผู้บริหาร ร่วมประชุม..."></textarea></label>
+        <label class="full">ข้อความปิดท้าย<input id="album-footer" placeholder="สร้างสรรค์งานบริการ เพื่อประชาชนอย่างต่อเนื่อง"></label>
+      </div>
+    </div>
+    <div class="form-section"><div class="section-title"><b>3</b><h4>ตั้งค่าชุดภาพ</h4></div>
+      <div class="form-grid">
+        <label>ขนาดภาพ<select id="album-ratio"><option value="4:5" selected>4:5 Facebook / Line 1080x1350</option><option value="1:1">1:1 Square 1080x1080</option><option value="16:9">16:9 1920x1080</option><option value="9:16">9:16 Story / Reels 1080x1920</option></select></label>
+        <label>สไตล์กรอบ<select id="album-frameStyle"><option>ข่าวประชาสัมพันธ์เทศบาล</option><option>ลงพื้นที่ / นายกติดตามงาน</option><option>ประชุม / อบรม / กิจกรรมชุมชน</option><option>มินิมอล ขอบบาง</option></select></label>
+        <label>โทนสี<select id="album-colorTone"><option>ม่วง–ทอง พรีเมียม</option><option>เขียว–เหลือง–ขาว</option><option>น้ำเงิน–ขาว ทางการ</option><option>ดำ–ทอง หรูหรา</option></select></label>
+        <label>โหมดอัตโนมัติ<select id="album-autoMode"><option>ปรับภาพ + ครอป + ใส่กรอบ</option><option>ครอป + ใส่กรอบเท่านั้น</option><option>ปรับภาพเท่านั้น</option></select></label>
+        <label class="checkline full"><input id="album-safeMode" type="checkbox" checked> Safe Photo Mode — ไม่สร้างภาพใหม่ ไม่เปลี่ยนใบหน้า ไม่แก้องค์ประกอบหลัก</label>
+        <label class="checkline full"><input id="album-makeCover" type="checkbox" checked> ทำ 2 รูปแรกให้เด่นเป็นปกหลัก / ปกรอง</label>
+      </div>
+    </div>
+    <div class="button-row"><button class="btn primary" id="makeAlbum">สร้างชุดภาพโพสต์</button><button class="btn secondary" id="albumDownloadAll">ดาวน์โหลดทั้งหมด</button><button class="btn secondary" id="albumClear">ล้างรูป</button></div>
+  `;
+
   $("#postForm").innerHTML = TANJAI.field("post") + `
     <div class="form-note">เมนูนี้ใช้สรุปงานจากข้อมูลและรูปภาพ เช่น นายกลงพื้นที่ ตรวจงาน ช่วยเหลือประชาชน แล้วนำไปต่อได้ทั้งนำเสนอ ทำคลิป และโพสต์โซเชียล</div>
     <div class="form-section"><div class="section-title"><b>2</b><h4>ตั้งค่าสคริปต์สรุปงาน</h4></div>
@@ -169,6 +198,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Results
   $("#imageResult").innerHTML = TANJAI.readyOutputShell("image", "Prompt พร้อมใช้", "คัดลอกแล้วส่งต่อ AI สร้างภาพหรือทันใจ GPT ได้ทันที", "imageOut");
+$("#albumResult").innerHTML = TANJAI.readyOutputShell("album", "ชุดภาพพร้อมโพสต์", "ปรับภาพจริง ใส่กรอบ และดาวน์โหลดเป็นภาพพร้อมลง Facebook", "albumOut");
 $("#postResult").innerHTML = TANJAI.readyOutputShell("post", "ข้อความพร้อมใช้", "คัดลอกไปใช้ต่อเป็นโพสต์ แคปชั่น หรือข้อความประชาสัมพันธ์ได้ทันที", "postOut");
   $("#videoResult").innerHTML = TANJAI.readyOutputShell("video", "Storyboard พร้อมใช้", "คัดลอกแล้วนำไปทำคลิปต่อได้ทันที", "videoOut");
   $("#voiceResult").innerHTML = TANJAI.readyOutputShell("voice", "สคริปต์เสียงพร้อมใช้", "คัดลอกแล้วนำไปใช้ต่อกับ Voice Tool หรือ CapCut ได้ทันที", "voiceOut");
@@ -210,7 +240,7 @@ $("#postResult").innerHTML = TANJAI.readyOutputShell("post", "ข้อควา
   };
 
 
-  // V8.3.1 Command Palette + FAB Quick Menu
+  // V8.4 Command Palette + FAB Quick Menu
   TANJAI.quickActions = [
     {label:"หน้าหลัก", icon:"🏠", view:"dashboard", hint:"กลับหน้าแรก"},
     {label:"สร้างภาพ", icon:"🖼️", view:"image", hint:"สร้าง Prompt / คำสั่งพร้อมใช้"},
