@@ -2282,3 +2282,78 @@ body:not(.auth-locked) .login-gate{
   .sales-dashboard-hero .hero-copy > p:not(.eyebrow),
   .hero-card .hero-copy > p:not(.eyebrow){max-width:none;font-size:16px;}
 }
+
+
+/* v8.6.6 Owner Watermark + Footer */
+.owner-footer{
+  margin-top:22px;
+  padding:18px 22px;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:22px;
+  background:linear-gradient(135deg,rgba(255,255,255,.05),rgba(255,255,255,.03));
+  box-shadow:0 20px 60px rgba(0,0,0,.18);
+}
+.owner-footer-copy{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+}
+.owner-footer-copy strong{
+  display:block;
+  color:#fff;
+  font-size:14px;
+  letter-spacing:.01em;
+}
+.owner-footer-copy span{
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.5;
+}
+.owner-watermark{
+  position:fixed;
+  right:18px;
+  bottom:18px;
+  z-index:18;
+  pointer-events:none;
+  user-select:none;
+  display:grid;
+  gap:2px;
+  padding:10px 12px;
+  border-radius:18px;
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(7,10,25,.28);
+  backdrop-filter:blur(10px);
+  box-shadow:0 14px 44px rgba(0,0,0,.16);
+  opacity:.42;
+}
+.owner-watermark span{
+  font-size:12px;
+  font-weight:1000;
+  letter-spacing:.02em;
+  color:rgba(255,255,255,.88);
+}
+.owner-watermark small{
+  font-size:10px;
+  color:rgba(219,234,254,.82);
+}
+body.auth-locked .owner-watermark{
+  opacity:.20;
+}
+@media(max-width:720px){
+  .owner-footer{
+    padding:16px 18px;
+    border-radius:20px;
+  }
+  .owner-footer-copy{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+  .owner-watermark{
+    right:14px;
+    bottom:86px;
+    max-width:calc(100vw - 28px);
+    opacity:.34;
+  }
+}
