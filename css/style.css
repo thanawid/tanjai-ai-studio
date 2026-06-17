@@ -1570,7 +1570,7 @@ body:not(.auth-locked) .login-gate{
 }
 
 
-/* v8.6.2 — Output Panel Stabilize + Command Palette + FAB */
+/* v8.6.3 — Output Panel Stabilize + Command Palette + FAB */
 .result-action.stable-output-head{
   display:grid;
   grid-template-columns:minmax(220px, 1fr) auto;
@@ -1880,7 +1880,7 @@ body:not(.auth-locked) .login-gate{
 }
 
 
-/* v8.6.2 — Clean Actions Patch */
+/* v8.6.3 — Clean Actions Patch */
 .result-buttons.stable-result-buttons{
   max-width:360px;
 }
@@ -1930,7 +1930,7 @@ body:not(.auth-locked) .login-gate{
 }
 
 
-/* v8.6.2 — Output Meaning Fix */
+/* v8.6.3 — Output Meaning Fix */
 .result-title-block h4{
   word-break: keep-all;
   overflow-wrap: normal;
@@ -1955,7 +1955,7 @@ body:not(.auth-locked) .login-gate{
 }
 
 
-/* v8.6.2 — Clean Ready Output */
+/* v8.6.3 — Clean Ready Output */
 .ready-output-head .result-title-block small{
   color:#f1d087;
 }
@@ -2027,7 +2027,7 @@ body:not(.auth-locked) .login-gate{
 }
 
 
-/* v8.6.2 — Facebook Album Auto Frame & Smart Enhance */
+/* v8.6.3 — Facebook Album Auto Frame & Smart Enhance */
 .album-upload-preview{display:grid;gap:10px;margin-top:12px}
 .album-file-chip{display:grid;grid-template-columns:36px 1fr auto;align-items:center;gap:10px;border:1px solid rgba(255,255,255,.10);border-radius:14px;padding:10px 12px;background:rgba(255,255,255,.045)}
 .album-file-chip span{width:30px;height:30px;display:grid;place-items:center;border-radius:10px;background:linear-gradient(135deg,#6d5dfc,#e6b85b);color:#fff;font-weight:900}
@@ -2040,12 +2040,12 @@ body:not(.auth-locked) .login-gate{
 .album-output-card .btn{width:100%;min-height:36px;font-size:12px}
 
 
-/* v8.6.2 — Smart Album Frame Templates */
+/* v8.6.3 — Smart Album Frame Templates */
 .album-frame-note{color:rgba(255,255,255,.70);font-size:12px}
 .album-output-card img{box-shadow:0 14px 36px rgba(0,0,0,.26)}
 
 
-/* v8.6.2 — Facebook Album Pro & Sales Ready UX */
+/* v8.6.3 — Facebook Album Pro & Sales Ready UX */
 .home-tool-grid.compact-v85,
 .quick-tools-grid.compact-v85{
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -2145,7 +2145,7 @@ body:not(.auth-locked) .login-gate{
 }
 
 
-/* v8.6.2 — Real Dashboard Fix (no overlay) */
+/* v8.6.3 — Real Dashboard Fix (no overlay) */
 .dashboard-main-tools-v861{
   grid-template-columns:repeat(5,minmax(0,1fr));
   align-items:stretch;
