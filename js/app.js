@@ -210,7 +210,7 @@ $("#postResult").innerHTML = TANJAI.readyOutputShell("post", "ข้อควา
   };
 
 
-  // V8.3 Command Palette + FAB Quick Menu
+  // V8.3.1 Command Palette + FAB Quick Menu
   TANJAI.quickActions = [
     {label:"หน้าหลัก", icon:"🏠", view:"dashboard", hint:"กลับหน้าแรก"},
     {label:"สร้างภาพ", icon:"🖼️", view:"image", hint:"สร้าง Prompt / คำสั่งพร้อมใช้"},

@@ -337,40 +337,110 @@ Scene 4: ปิดคลิป
 };
 
 TANJAI.voiceScript = function(d, length="60 วินาที", style="ทางการ สุภาพ"){
-  const opener = style.includes("เร่งด่วน") ? "ขอแจ้งข่าวสำคัญให้ประชาชนได้รับทราบ" : "ขอประชาสัมพันธ์ข้อมูลสำคัญให้ทุกท่านได้รับทราบ";
-  const middle = d.detail;
-  const close = `ติดตามข่าวสารเพิ่มเติมได้ทางช่องทางประชาสัมพันธ์ของ ${d.orgName}`;
-  if(length === "15 วินาที"){
-    return `${opener}
+  const fixThaiTypos = (text="") => String(text)
+    .replaceAll("ประชม", "ประชุม")
+    .replaceAll("พ.ศ.2571-2575", "พ.ศ. 2571–2575")
+    .replaceAll("พ.ศ. 2571-2575", "พ.ศ. 2571–2575")
+    .replaceAll("\\n", "\n");
 
-${d.title}
+  const clean = (text, fallback="") => {
+    const value = fixThaiTypos(text || "").trim();
+    return value || fallback;
+  };
 
-${middle}
+  const org = clean(d.orgName, "เทศบาลเมืองบางรักน้อย");
+  const title = clean(d.title, "ข้อมูลประชาสัมพันธ์");
+  const detail = clean(d.detail, "");
+  const dateTime = clean(d.dateTime, "");
+  const place = clean(d.place, "");
+  const people = clean(d.people, "");
+  const audience = clean(d.audience, "ประชาชนทั่วไป");
+  const isShort = String(length).includes("15");
+  const isThirty = String(length).includes("30");
 
-${close}`;
+  // แยกข้อมูลจากรายละเอียดให้เป็นย่อหน้าอ่านออกเสียงได้จริง
+  const detailLines = detail
+    .split(/\n+/)
+    .map(x => clean(x))
+    .filter(Boolean);
+
+  const hasPeopleInDetail = people || /นาย|นาง|คณะผู้บริหาร|ผู้บริหาร|เจ้าหน้าที่|กำนัน|ผู้ใหญ่บ้าน/.test(detail);
+  const hasPlaceInDetail = place || /ณ |บริเวณ|พื้นที่|หมู่ที่|ตำบล|อำเภอ|ศูนย์|ห้องประชุม/.test(detail);
+  const hasDateInDetail = dateTime || /วันที่|วันจันทร์|วันอังคาร|วันพุธ|วันพฤหัสบดี|วันศุกร์|วันเสาร์|วันอาทิตย์/.test(detail);
+
+  const opening = `${org} ขอประชาสัมพันธ์ข่าวสารให้ประชาชนได้รับทราบ`;
+
+  const dateBlock = dateTime ? `${dateTime}` : "";
+  const peopleBlock = people ? `${people}` : "";
+  const titleBlock = title && title !== "ข้อมูลประชาสัมพันธ์" ? title : "";
+
+  let missionBlock = "";
+  if(detailLines.length){
+    missionBlock = detailLines.join("\n");
+  }else{
+    const parts = [];
+    if(dateBlock) parts.push(`วันที่ ${dateBlock}`);
+    if(peopleBlock) parts.push(peopleBlock);
+    if(titleBlock) parts.push(titleBlock);
+    missionBlock = parts.join("\n");
   }
-  if(length === "30 วินาที"){
-    return `${opener}
 
-${d.title}
-
-${middle}
-
-${d.dateTime ? "กำหนดการ: " + d.dateTime + "\\n" : ""}${d.place ? "สถานที่: " + d.place + "\\n" : ""}
-
-${close}`;
+  let locationBlock = "";
+  if(place){
+    locationBlock = `การดำเนินงานดังกล่าวจัดขึ้น ณ ${place}`;
   }
-  return `${opener}
 
-วันนี้ ${d.orgName} มีข้อมูลประชาสัมพันธ์ เรื่อง “${d.title}”
+  let benefitBlock = "";
+  if(/เตรียมความพร้อม|ประชุม|ร่วมประชุม|ประชาคม|กิจกรรม|โครงการ|พัฒนา|ชุมชน|ช่วยเหลือ|ตรวจสอบ/.test(detail + title)){
+    benefitBlock = "เพื่อเตรียมความพร้อมในการดำเนินงาน ส่งเสริมการพัฒนาชุมชน และสนับสนุนการให้บริการประชาชนอย่างต่อเนื่อง";
+  }else{
+    benefitBlock = "เพื่อให้ประชาชนได้รับทราบข้อมูลข่าวสาร และสามารถติดตามการดำเนินงานของหน่วยงานได้อย่างต่อเนื่อง";
+  }
 
-${middle}
+  const closing = `${org} ขอประชาสัมพันธ์ข้อมูลดังกล่าวให้${audience}ได้รับทราบ`;
+  const signature = `${org}\nสร้างสรรค์งานบริการ เพื่อประชาชนอย่างต่อเนื่อง`;
 
-${d.dateTime ? "วันและเวลา: " + d.dateTime + "\\n" : ""}${d.place ? "สถานที่: " + d.place + "\\n" : ""}${d.people ? "ผู้เกี่ยวข้อง: " + d.people + "\\n" : ""}
+  if(isShort){
+    return `${opening}
 
-ขอให้ประชาชนและผู้เกี่ยวข้องติดตามข้อมูลดังกล่าว และดำเนินการตามรายละเอียดที่แจ้งไว้
+${titleBlock || missionBlock}
 
-${close}`;
+${dateTime ? `วันที่ ${dateTime}` : ""}${place ? `\nณ ${place}` : ""}
+
+${closing}`.replace(/\n{3,}/g, "\n\n").trim();
+  }
+
+  if(isThirty){
+    return `${opening}
+
+${dateTime ? `วันที่ ${dateTime}` : ""}
+${peopleBlock ? peopleBlock : ""}
+${titleBlock ? titleBlock : detailLines.slice(0, 2).join("\n")}
+
+${place ? `การดำเนินงานดังกล่าวจัดขึ้น ณ ${place}` : ""}
+${benefitBlock}
+
+${closing}`.replace(/\n{3,}/g, "\n\n").trim();
+  }
+
+  // 60 วินาทีขึ้นไป: จัดเป็นสคริปต์ประกาศข่าวท้องถิ่น มีจังหวะหายใจ
+  const mainParagraph = [
+    dateTime ? `วันที่ ${dateTime}` : "",
+    peopleBlock,
+    detailLines.length ? detailLines.join("\n") : titleBlock
+  ].filter(Boolean).join("\n");
+
+  return `${opening}
+
+${mainParagraph}
+
+${locationBlock}
+
+${benefitBlock}
+
+${closing}
+
+${signature}`.replace(/\n{3,}/g, "\n\n").trim();
 };
 
 TANJAI.deckOutline = function(d, count=8){
