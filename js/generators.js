@@ -50,7 +50,7 @@ TANJAI.commonData = function(prefix){
     safeNoCover: c("safeNoCover"),
     smartCoach: c("smartCoach"),
     smartThinking: v("smartThinking") || "ให้ AI ช่วยคิดต่ออัตโนมัติ",
-    smartOutput: v("smartOutput") || "สรุปบรีฟ + Prompt พร้อมส่งเข้า GPT",
+    smartOutput: v("smartOutput") || "สรุปคำสั่ง + Prompt พร้อมส่งเข้า GPT",
     smartBackup: c("smartBackup"),
     smartConfirm: false,
     smartMunicipal: c("smartMunicipal")
@@ -281,13 +281,13 @@ ${d.criticSummary}` : "";
 ถ้าข้อมูลถูกต้องแล้ว พิมพ์ว่า “สร้างภาพได้เลย”` : "";
 
   if(smartOn){
-    return `Smart Brief Coach จัดบรีฟให้พร้อมใช้งาน โดยสรุปข้อมูล คิดต่อส่วนที่ขาด และจัดคำสั่งสำหรับส่งเข้า GPT
+    return `คำสั่งพร้อมใช้งานสำหรับทันใจ GPT โดยใช้ข้อมูลที่ระบบคัดเลือกแล้ว เพื่อสร้างสื่อประชาสัมพันธ์ให้พร้อมใช้งาน
 
-ข้อมูลที่ระบบตรวจและตัดสินใจแทนให้:
+ข้อมูลที่ระบบคัดเลือกและจัดให้เหมาะที่สุด:
 ${missing.length ? missing.join("\n") : "- ไม่มีข้อมูลจำเป็นที่ต้องรอเพิ่มเติมแล้ว"}
 ${systemDecisions.join("\n")}
 
-สรุปบรีฟก่อนสร้างภาพ:
+สรุปคำสั่งก่อนสร้างภาพ:
 ${briefSummary}
 
 ข้อความบนภาพที่จะใช้:

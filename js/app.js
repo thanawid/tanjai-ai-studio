@@ -74,7 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
     </div>
     <input id="image-smartCoach" type="hidden" value="on">
     <input id="image-smartThinking" type="hidden" value="ให้ AI ช่วยคิดต่ออัตโนมัติ">
-    <input id="image-smartOutput" type="hidden" value="สรุปบรีฟ + Prompt พร้อมส่งเข้า GPT">
+    <input id="image-smartOutput" type="hidden" value="สรุปคำสั่ง + Prompt พร้อมส่งเข้า GPT">
     <input id="image-smartBackup" type="hidden" value="on">
     <input id="image-smartConfirm" type="hidden" value="on">
     <input id="image-smartMunicipal" type="hidden" value="on">

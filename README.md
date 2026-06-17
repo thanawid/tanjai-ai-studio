@@ -183,18 +183,18 @@
 - คง Real Photo Safe Mode, Custom GPT URL Fix, Login Gate, Navigation UX, Destination Hub, Preview Cards, favicon, logo และ layout เดิม
 
 
-## v6.4 — Smart Brief Coach
-- เพิ่ม Smart Brief Coach ในเมนูสร้างภาพ
-- ผลลัพธ์แบบ Creative Director: ช่วยคิดต่อ, ตัดสินใจแทนอย่างมีเหตุผล, สรุปบรีฟเป็นหมวด, แยกข้อความบนภาพ, สร้างคำสั่งพร้อมส่งเข้า GPT
+## v6.4 — คำสั่งพร้อมใช้งาน
+- เพิ่ม คำสั่งพร้อมใช้งาน ในเมนูสร้างภาพ
+- ผลลัพธ์แบบ Creative Director: ช่วยคิดต่อ, ตัดสินใจแทนอย่างมีเหตุผล, สรุปคำสั่งเป็นหมวด, แยกข้อความบนภาพ, สร้างคำสั่งพร้อมส่งเข้า GPT
 - เพิ่มคำสั่งสำรองหลังได้ภาพ เช่น ทำเวอร์ชันไม่มีข้อความ / แก้เฉพาะจุดโดยไม่ออกแบบใหม่
 - เพิ่มตัวเลือกควบคุมระดับการช่วยคิด, รูปแบบผลลัพธ์, ภาษางานเทศบาล
 - คง Real Photo Safe Mode, Output Delivery Guard, Custom GPT URL Fix, Login Gate, Navigation UX, Destination Hub, Preview Cards, favicon, logo และ layout เดิม
 
 
-## v6.4.1 — Smart Brief Auto Mode
-- ซ่อนแผง Smart Brief Coach ออกจากหน้าเว็บ ไม่ให้ผู้ใช้เห็นตัวเลือกเทคนิคที่ไม่จำเป็น
-- ใช้ Smart Brief Coach ทำงานอัตโนมัติหลังบ้านในเมนูสร้างภาพ
-- ผลลัพธ์ยังจัดบรีฟแบบ Creative Director: ตรวจข้อมูลที่ขาด สรุปบรีฟเป็นหมวด แยกข้อความบนภาพ และสร้างคำสั่งพร้อมส่งเข้า GPT
+## v6.4.1 — คำสั่งพร้อมใช้ Auto Mode
+- ซ่อนแผง คำสั่งพร้อมใช้งาน ออกจากหน้าเว็บ ไม่ให้ผู้ใช้เห็นตัวเลือกเทคนิคที่ไม่จำเป็น
+- ใช้ คำสั่งพร้อมใช้งาน ทำงานอัตโนมัติหลังบ้านในเมนูสร้างภาพ
+- ผลลัพธ์ยังจัดคำสั่งแบบ Creative Director: ตรวจข้อมูลที่ขาด สรุปคำสั่งเป็นหมวด แยกข้อความบนภาพ และสร้างคำสั่งพร้อมส่งเข้า GPT
 - คง Real Photo Safe Mode, Output Delivery Guard, Custom GPT URL Fix, Login Gate, Navigation UX, Destination Hub, Preview Cards, favicon, logo และ layout เดิม
 
 
@@ -207,7 +207,7 @@
 
 ## v6.4.3 — Clean Image Note
 - เอาข้อความอธิบายยาวใต้หัวข้อเมนูสร้างภาพออก
-- คง Smart Brief Auto Mode, Section Numbering Fix, Real Photo Safe Mode, Output Delivery Guard และฟังก์ชันอื่นทั้งหมด
+- คง คำสั่งพร้อมใช้ Auto Mode, Section Numbering Fix, Real Photo Safe Mode, Output Delivery Guard และฟังก์ชันอื่นทั้งหมด
 
 
 ## v6.5 — Prompt Critic & Readiness Score
@@ -217,7 +217,7 @@
 - ตรวจข้อมูลที่ครบแล้ว / ข้อมูลที่ยังขาด / ความเสี่ยงหน้าเพี้ยน / ไฟล์ที่ควรแนบ / Checklist ก่อนส่งเข้า GPT
 - เมื่อกดสร้าง Prompt ภาพ ระบบจะตรวจความพร้อมให้อัตโนมัติ
 - บันทึกโปรเจกต์พร้อมผลตรวจ Prompt Critic
-- คง Smart Brief Auto Mode, Section Numbering Fix, Clean Image Note, Real Photo Safe Mode, Output Delivery Guard, Custom GPT URL Fix, Login Gate, Navigation UX, Destination Hub, Preview Cards, favicon, logo และ layout เดิม
+- คง คำสั่งพร้อมใช้ Auto Mode, Section Numbering Fix, Clean Image Note, Real Photo Safe Mode, Output Delivery Guard, Custom GPT URL Fix, Login Gate, Navigation UX, Destination Hub, Preview Cards, favicon, logo และ layout เดิม
 
 
 ## v6.5.1 — Auto Prompt Critic Behind the Scenes
@@ -226,7 +226,7 @@
 - ให้ระบบ Prompt Critic ตรวจอัตโนมัติหลังบ้านเมื่อกด “สร้าง Prompt ภาพ”
 - ผลตรวจถูกใช้เสริม Prompt ภายใน ไม่โชว์เป็นแผงให้ผู้ใช้ต้องอ่าน
 - แก้ระบบเรียงเลขในหน้าสร้างภาพให้ครบและเรียงตาม section ที่มองเห็นจริง
-- คง Smart Brief Auto Mode, Clean Image Note, Real Photo Safe Mode, Output Delivery Guard, Custom GPT URL Fix, Login Gate, Navigation UX, Destination Hub, Preview Cards, favicon, logo และ layout เดิม
+- คง คำสั่งพร้อมใช้ Auto Mode, Clean Image Note, Real Photo Safe Mode, Output Delivery Guard, Custom GPT URL Fix, Login Gate, Navigation UX, Destination Hub, Preview Cards, favicon, logo และ layout เดิม
 
 
 ## v6.5.2 — UX Clean & Pro Polish
@@ -239,8 +239,8 @@
 - ปรับคำอธิบายให้เป็นภาษาผู้ใช้ ไม่โชว์ภาษาระบบมากเกินไป
 - เพิ่มปุ่ม “คัดลอก + เปิดทันใจ GPT” เพื่อให้ทำงานต่อกับ GPT ได้ลื่นขึ้น
 - จัดลำดับเมนูใหม่ให้สอดคล้อง: เริ่มต้น / สร้างงาน / ต่อยอด / จัดการ
-- ซ่อน Prompt Hub ที่เป็นระบบหลังบ้าน เช่น Prompt Critic, Smart Brief Coach, Output Delivery Guard ไม่ให้ดูเป็นห้องเครื่อง
-- คง Smart Brief Auto Mode, Auto Prompt Critic หลังบ้าน, Real Photo Safe Mode, Output Delivery Guard, Custom GPT, Login, Navigation, Destination Hub, Preview Cards, logo/favicon/layout เดิม
+- ซ่อน Prompt Hub ที่เป็นระบบหลังบ้าน เช่น Prompt Critic, คำสั่งพร้อมใช้งาน, Output Delivery Guard ไม่ให้ดูเป็นห้องเครื่อง
+- คง คำสั่งพร้อมใช้ Auto Mode, Auto Prompt Critic หลังบ้าน, Real Photo Safe Mode, Output Delivery Guard, Custom GPT, Login, Navigation, Destination Hub, Preview Cards, logo/favicon/layout เดิม
 
 
 ## v6.5.3 — Dashboard Pro Layout
@@ -262,19 +262,19 @@
 - เพิ่มโซน “ตัวอย่างงานที่ทำได้” 4 ใบพร้อมภาพ: ภาพประชาสัมพันธ์, โพสต์และแคปชั่น, คลิปและเสียงพากย์, สไลด์นำเสนอ
 - คงเครื่องมือหลัก 7 ตัวบนหน้าแรก และยังเริ่มงานได้ชัดเจน
 - ซ่อนความรกจาก Dashboard: ไม่โชว์เริ่มงานด่วน ไม่โชว์รายละเอียดเมนูซ้ำยาว ๆ บนหน้าแรก
-- คงปุ่ม คัดลอก + เปิดทันใจ GPT, Smart Brief Auto Mode, Auto Prompt Critic หลังบ้าน, Real Photo Safe Mode, Output Delivery Guard, Custom GPT, Login, Navigation, Destination Hub, Preview Cards, logo/favicon/layout หลัก
+- คงปุ่ม คัดลอก + เปิดทันใจ GPT, คำสั่งพร้อมใช้ Auto Mode, Auto Prompt Critic หลังบ้าน, Real Photo Safe Mode, Output Delivery Guard, Custom GPT, Login, Navigation, Destination Hub, Preview Cards, logo/favicon/layout หลัก
 
 
-## v7.0 — Restore Logo + Visuals
+## v7.1 — Restore Logo + Visuals
 - คงเมนูและระบบล่าสุดทั้งหมด
 - เอาหน้าแรกที่มีโลโก้วงกลมและภาพ Preview กลับมา
 - เพิ่มคำว่า “ดีไซน์” บนหน้าแรก
 - ใช้โลโก้วงกลมกลาง Hero Visual พร้อมการ์ดภาพตัวอย่างงาน
 - คง Showcase ภาพ 4 ใบ และระบบหลังบ้านเดิมทั้งหมด
 
-## v7.0 Color Dropdown Only
+## v7.1 Color Dropdown Only
 
-- คงธีมเว็บ สีเว็บ เมนู โครงสร้าง ฟังก์ชัน และหน้าแรกเหมือน v7.0
+- คงธีมเว็บ สีเว็บ เมนู โครงสร้าง ฟังก์ชัน และหน้าแรกเหมือน v7.1
 - แก้เฉพาะตัวเลือก “โทนสี” ในฟอร์มสร้างภาพ
 - ค่าแนะนำแรก: ม่วง–ทองเป็นหลัก / เขียว–เหลืองเป็นโทนรอง
 - ไม่แตะ CSS theme ของเว็บ
@@ -285,4 +285,12 @@
 - เปลี่ยนเฉพาะตัวเลือกโทนสีให้เหมาะกับผู้ใช้ทั่วไป
 - ค่าแรกในช่องโทนสี: “ม่วง–ทอง พรีเมียม”
 - ไม่ใช้คำว่า “เทศบาล” ในตัวเลือก เพื่อไม่ให้ดูจำกัดกลุ่มผู้ใช้
+- ไม่แตะธีมเว็บ ไม่แตะ layout ไม่แตะเมนู ไม่แตะระบบหลัก
+
+## V7.1 Ready Output Clean
+
+- คงทุกอย่างจาก V7
+- แก้เฉพาะข้อความ Output ฝั่งขวา/คำสั่งที่คัดลอก
+- เอาคำว่า คำสั่งพร้อมใช้งาน และคำว่า คำสั่ง ออกจากผลลัพธ์ผู้ใช้
+- ใช้คำว่า “คำสั่งพร้อมใช้งานสำหรับทันใจ GPT” แทน
 - ไม่แตะธีมเว็บ ไม่แตะ layout ไม่แตะเมนู ไม่แตะระบบหลัก
