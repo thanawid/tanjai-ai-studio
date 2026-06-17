@@ -24,9 +24,9 @@
 
   const template = () => {
     const raw = $("#album-frameStyle")?.value || "หน่วยงานท้องถิ่น / ราชการ";
-    const common = {label:"ประชาสัมพันธ์", icon:"●", chips:["ใกล้ชิด","โปร่งใส","บริการด้วยใจ"], mood:"official"};
-    if(raw.includes("ประชุม") || raw.includes("ประชาคม")) return {label:"ประชุม / ประชาคม", icon:"◉", chips:["รับฟัง","มีส่วนร่วม","พัฒนา"], mood:"meeting"};
-    if(raw.includes("ลงพื้นที่") || raw.includes("ผู้บริหาร")) return {label:"ลงพื้นที่ติดตามงาน", icon:"◆", chips:["ติดตาม","รับฟัง","แก้ปัญหา"], mood:"field"};
+    const common = {label:"ประชาสัมพันธ์", icon:"●", chips:["ชัดเจน","น่าเชื่อถือ","พร้อมใช้งาน"], mood:"official"};
+    if(raw.includes("ประชุม") || raw.includes("ประชาคม")) return {label:"ประชุม / เวทีรับฟัง", icon:"◉", chips:["รับฟัง","มีส่วนร่วม","พัฒนา"], mood:"meeting"};
+    if(raw.includes("ลงพื้นที่") || raw.includes("ผู้บริหาร")) return {label:"ภารกิจ / ติดตามงาน", icon:"◆", chips:["ติดตาม","รับฟัง","แก้ปัญหา"], mood:"field"};
     if(raw.includes("ข่าวด่วน") || raw.includes("ประกาศ")) return {label:"แจ้งข่าวสำคัญ", icon:"!", chips:["เร่งด่วน","ชัดเจน","ตรวจสอบได้"], mood:"urgent"};
     if(raw.includes("กิจกรรม") || raw.includes("อบรม") || raw.includes("อีเวนต์")) return {label:"กิจกรรม / อีเวนต์", icon:"✦", chips:["สร้างสรรค์","มีส่วนร่วม","บรรยากาศดี"], mood:"event"};
     if(raw.includes("โรงเรียน") || raw.includes("ศึกษา")) return {label:"การศึกษา", icon:"✎", chips:["เรียนรู้","สร้างสรรค์","พัฒนาเด็ก"], mood:"education"};
