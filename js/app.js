@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
     layouts: ["Hero Center Layout","Split Layout ซ้ายข้อความ ขวาภาพ","Infographic Layout","Poster Layout","Clean Social Card","ภาพเต็ม + กล่องข้อความ"],
     densities: ["สมดุล อ่านง่าย","โล่งมาก ดูแพง","ข้อมูลเยอะ แต่อ่านง่าย","แน่นแบบ Infographic"],
     focuses: ["เน้นหัวข้อหลัก","เน้นภาพบุคคล","เน้นภาพกิจกรรม","เน้นสินค้า / โปรโมชัน","เน้นบรรยากาศ","เน้นโลโก้หน่วยงาน"],
-    colorTones: ["ม่วง ทอง เป็นหลัก / เขียว เหลือง เป็นโทนรอง แบบหน่วยงานท้องถิ่น","ม่วง ทอง เทคโนโลยี","น้ำเงิน ขาว ทางการ","ชมพู ม่วง สดใส","ดำ ทอง พรีเมียม","ให้ AI เลือกให้เหมาะสม"],
+    colorTones: ["ม่วง–ทอง พรีเมียม","ม่วง–ทอง เทคโนโลยี","น้ำเงิน–ขาว ทางการ","ชมพู–ม่วง สดใส","ดำ–ทอง หรูหรา","ให้ AI เลือกให้เหมาะสม"],
     videoFormats: ["คลิปประชาสัมพันธ์","คลิปข่าวด่วน","คลิปกิจกรรม / โครงการ","คลิปรีวิว","คลิปโซเชียลไวรัล","คลิปแนวสารคดีสั้น"],
     slideStyles: ["ทางการสำหรับผู้บริหาร","สรุปประชุม","นำเสนอโครงการ","รายงานผล","Pitch Deck","สไลด์อบรม"],
     workTypes: ["นายกลงพื้นที่","ติดตามปัญหาประชาชน","ตรวจงานโครงการ","กิจกรรมเทศบาล","อบรม / ประชุม","ลงพื้นที่ช่วยเหลือ","รณรงค์ / ประชาสัมพันธ์","อื่น ๆ"]
@@ -74,7 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
     </div>
     <input id="image-smartCoach" type="hidden" value="on">
     <input id="image-smartThinking" type="hidden" value="ให้ AI ช่วยคิดต่ออัตโนมัติ">
-    <input id="image-smartOutput" type="hidden" value="สรุปคำสั่ง + Prompt พร้อมส่งเข้า GPT">
+    <input id="image-smartOutput" type="hidden" value="สรุปบรีฟ + Prompt พร้อมส่งเข้า GPT">
     <input id="image-smartBackup" type="hidden" value="on">
     <input id="image-smartConfirm" type="hidden" value="on">
     <input id="image-smartMunicipal" type="hidden" value="on">
