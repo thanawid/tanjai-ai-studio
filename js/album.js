@@ -73,7 +73,96 @@
     el.innerHTML=files.map((f,i)=>`<div class="album-file-chip"><span>${i+1}</span><b>${f.name}</b><small>${Math.round(f.size/1024)} KB</small></div>`).join("") || `<div class="mini-note">ยังไม่มีภาพแนบ</div>`;
   };
   TANJAI.albumDownload = function(i){ const item=TANJAI.albumState.outputs?.[i]; if(!item) return; const a=document.createElement("a"); a.href=item.url; a.download=item.name; a.click(); };
-  TANJAI.albumDownloadAll = function(){ const outputs=TANJAI.albumState.outputs||[]; if(!outputs.length){TANJAI.toast("ยังไม่มีภาพที่สร้างแล้ว"); return;} outputs.forEach((_,i)=>setTimeout(()=>TANJAI.albumDownload(i),i*180)); };
+  TANJAI.albumZipCrcTable = TANJAI.albumZipCrcTable || (() => {
+    const table = new Uint32Array(256);
+    for(let n=0; n<256; n++){
+      let c = n;
+      for(let k=0; k<8; k++) c = (c & 1) ? (0xedb88320 ^ (c >>> 1)) : (c >>> 1);
+      table[n] = c >>> 0;
+    }
+    return table;
+  })();
+
+  TANJAI.albumCrc32 = function(bytes){
+    let crc = 0xffffffff;
+    const table = TANJAI.albumZipCrcTable;
+    for(let i=0; i<bytes.length; i++) crc = table[(crc ^ bytes[i]) & 0xff] ^ (crc >>> 8);
+    return (crc ^ 0xffffffff) >>> 0;
+  };
+
+  TANJAI.albumU16 = function(n){ return [n & 255, (n >>> 8) & 255]; };
+  TANJAI.albumU32 = function(n){ return [n & 255, (n >>> 8) & 255, (n >>> 16) & 255, (n >>> 24) & 255]; };
+
+  TANJAI.albumDosTimeDate = function(date = new Date()){
+    const time = ((date.getHours() & 31) << 11) | ((date.getMinutes() & 63) << 5) | ((Math.floor(date.getSeconds()/2)) & 31);
+    const dosDate = (((date.getFullYear() - 1980) & 127) << 9) | (((date.getMonth()+1) & 15) << 5) | (date.getDate() & 31);
+    return {time, date: dosDate};
+  };
+
+  TANJAI.albumBlobToBytes = async function(blob){
+    return new Uint8Array(await blob.arrayBuffer());
+  };
+
+  TANJAI.albumMakeZip = async function(files){
+    const enc = new TextEncoder();
+    const chunks = [];
+    const central = [];
+    let offset = 0;
+    const dt = TANJAI.albumDosTimeDate();
+
+    for(const file of files){
+      const nameBytes = enc.encode(file.name);
+      const data = await TANJAI.albumBlobToBytes(file.blob);
+      const crc = TANJAI.albumCrc32(data);
+      const size = data.length;
+
+      const local = new Uint8Array([
+        0x50,0x4b,0x03,0x04,
+        ...TANJAI.albumU16(20), ...TANJAI.albumU16(0), ...TANJAI.albumU16(0),
+        ...TANJAI.albumU16(dt.time), ...TANJAI.albumU16(dt.date),
+        ...TANJAI.albumU32(crc), ...TANJAI.albumU32(size), ...TANJAI.albumU32(size),
+        ...TANJAI.albumU16(nameBytes.length), ...TANJAI.albumU16(0)
+      ]);
+      chunks.push(local, nameBytes, data);
+
+      const centralHeader = new Uint8Array([
+        0x50,0x4b,0x01,0x02,
+        ...TANJAI.albumU16(20), ...TANJAI.albumU16(20), ...TANJAI.albumU16(0), ...TANJAI.albumU16(0),
+        ...TANJAI.albumU16(dt.time), ...TANJAI.albumU16(dt.date),
+        ...TANJAI.albumU32(crc), ...TANJAI.albumU32(size), ...TANJAI.albumU32(size),
+        ...TANJAI.albumU16(nameBytes.length), ...TANJAI.albumU16(0), ...TANJAI.albumU16(0),
+        ...TANJAI.albumU16(0), ...TANJAI.albumU16(0),
+        ...TANJAI.albumU32(0), ...TANJAI.albumU32(offset)
+      ]);
+      central.push(centralHeader, nameBytes);
+      offset += local.length + nameBytes.length + data.length;
+    }
+
+    const centralSize = central.reduce((sum, part)=>sum + part.length, 0);
+    const centralOffset = offset;
+    const end = new Uint8Array([
+      0x50,0x4b,0x05,0x06,
+      ...TANJAI.albumU16(0), ...TANJAI.albumU16(0),
+      ...TANJAI.albumU16(files.length), ...TANJAI.albumU16(files.length),
+      ...TANJAI.albumU32(centralSize), ...TANJAI.albumU32(centralOffset),
+      ...TANJAI.albumU16(0)
+    ]);
+
+    return new Blob([...chunks, ...central, end], {type:"application/zip"});
+  };
+
+  TANJAI.albumDownloadAll = async function(){
+    const outputs = TANJAI.albumState.outputs || [];
+    if(!outputs.length){ TANJAI.toast("ยังไม่มีภาพที่สร้างแล้ว"); return; }
+    TANJAI.toast("กำลังรวมภาพเป็น ZIP...");
+    const zipBlob = await TANJAI.albumMakeZip(outputs);
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(zipBlob);
+    a.download = `facebook_album_pack_${new Date().toISOString().slice(0,10)}.zip`;
+    a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 2500);
+    TANJAI.toast("ดาวน์โหลด ZIP แล้ว");
+  };
   document.addEventListener("DOMContentLoaded",()=>{
     $("#album-files")?.addEventListener("change",()=>{ TANJAI.albumState.files=Array.from($("#album-files").files||[]); TANJAI.renderAlbumPreview(); });
     $("#makeAlbum")?.addEventListener("click",async()=>{
@@ -83,7 +172,7 @@
       TANJAI.albumState.outputs.forEach(o=>{try{URL.revokeObjectURL(o.url)}catch(e){}});
       const outputs=[]; for(let i=0;i<files.length;i++) outputs.push(await processImage(files[i],i,files.length)); TANJAI.albumState.outputs=outputs;
       const grid=outputs.map((o,i)=>`<article class="album-output-card"><img src="${o.url}" alt=""><b>${o.name}</b><button class="btn secondary" data-album-download="${i}">ดาวน์โหลด</button></article>`).join("");
-      TANJAI.setReadyOutput("album",{title:"ชุดภาพพร้อมโพสต์",desc:`สร้างแล้ว ${outputs.length} ภาพ พร้อมดาวน์โหลดใช้งานจริง`,main:`สร้างชุดภาพโพสต์ Facebook เรียบร้อยแล้ว\n\n- จำนวนภาพ: ${outputs.length} ภาพ\n- ขนาด: ${$("#album-ratio")?.selectedOptions?.[0]?.textContent || "4:5"}\n- โหมด: ${$("#album-autoMode")?.value || "ปรับภาพ + ครอป + ใส่กรอบ"}\n- Safe Photo Mode: ไม่สร้างภาพใหม่ ไม่เปลี่ยนใบหน้า ไม่แก้องค์ประกอบหลัก\n\nกดปุ่ม “ดาวน์โหลดทั้งหมด” หรือดาวน์โหลดแยกจากรายการด้านล่าง`,advancedTitle1:"พรีวิวชุดภาพ",advanced1:" "});
+      TANJAI.setReadyOutput("album",{title:"ชุดภาพพร้อมโพสต์",desc:`สร้างแล้ว ${outputs.length} ภาพ พร้อมดาวน์โหลดใช้งานจริง`,main:`สร้างชุดภาพโพสต์ Facebook เรียบร้อยแล้ว\n\n- จำนวนภาพ: ${outputs.length} ภาพ\n- ขนาด: ${$("#album-ratio")?.selectedOptions?.[0]?.textContent || "4:5"}\n- โหมด: ${$("#album-autoMode")?.value || "ปรับภาพ + ครอป + ใส่กรอบ"}\n- Safe Photo Mode: ไม่สร้างภาพใหม่ ไม่เปลี่ยนใบหน้า ไม่แก้องค์ประกอบหลัก\n\nกดปุ่ม “ดาวน์โหลดทั้งหมด” เพื่อโหลดเป็น ZIP หรือดาวน์โหลดแยกจากรายการด้านล่าง`,advancedTitle1:"พรีวิวชุดภาพ",advanced1:" "});
       const adv=$("#albumAdvanced1"); if(adv){adv.classList.remove("result-box","advanced-result-box","stable-empty"); adv.innerHTML=`<div class="album-output-grid">${grid}</div>`;}
       TANJAI.toast("สร้างชุดภาพโพสต์เรียบร้อย");
     });
