@@ -131,7 +131,6 @@ document.addEventListener("DOMContentLoaded", () => {
             <option>ปก + สรุป + ภาพกิจกรรม</option>
           </select>
         </div>
-        <small>เลือกได้หลายภาพพร้อมกัน เช่น 5–20 ภาพ</small>
         <input id="album-files" type="file" accept="image/*" multiple><small>โหมดนี้ปรับภาพจริงเท่านั้น ไม่สร้างภาพใหม่ ไม่เปลี่ยนหน้า ไม่แก้องค์ประกอบหลัก</small></label>
       <div id="album-preview" class="album-upload-preview"></div>
     </div>
@@ -255,7 +254,7 @@ $("#postResult").innerHTML = TANJAI.readyOutputShell("post", "ข้อควา
   };
 
 
-  // v8.6 Command Palette + FAB Quick Menu
+  // v8.5 Command Palette + FAB Quick Menu
   TANJAI.quickActions = [
     {label:"หน้าหลัก", icon:"🏠", view:"dashboard", hint:"กลับหน้าแรก"},
     {label:"สร้างภาพ", icon:"🖼️", view:"image", hint:"สร้าง Prompt / คำสั่งพร้อมใช้"},
