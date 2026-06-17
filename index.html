@@ -90,7 +90,7 @@
         <div class="top-actions">
           <button class="btn secondary nav-back-btn" id="topBackBtn" type="button">← ย้อนกลับ</button>
           <button class="btn secondary nav-home-btn" data-view="dashboard" type="button">หน้าหลัก</button>
-          <span class="status-pill">พร้อมใช้งาน</span><span class="version-badge">v8.5</span>
+          <span class="status-pill">พร้อมใช้งาน</span><span class="version-badge">v8.6.1</span>
           <button class="btn secondary logout-btn" id="logoutBtn" type="button">ออกจากระบบ</button>
           <button class="btn secondary" id="openCommandTop" onclick="window.TANJAI&&TANJAI.openCommandPalette&&TANJAI.openCommandPalette()">⌘ ค้นหาคำสั่ง</button><button class="btn secondary" data-view="router">AI Router</button>
           <button class="btn primary" data-view="kit">+ สร้างชุดสื่อ</button>
@@ -98,21 +98,20 @@
       </header>
 
       <section id="dashboard" class="view active">
-        <div class="hero-card">
+        <div class="hero-card sales-dashboard-hero">
           <div class="hero-copy">
             <p class="eyebrow">ทันใจ AI Studio</p>
-            <h3 class="hero-title"><span>ทันใจ AI Studio</span><span>สร้างสื่อไว ด้วยพลัง AI</span></h3>
-            <p>ผู้ช่วยสร้างสื่อประชาสัมพันธ์ครบวงจร กรอกข้อมูลครั้งเดียว แล้วต่อยอดเป็นภาพ โพสต์ คลิป เสียง และสไลด์ได้ทันที</p>
+            <h3 class="hero-title"><span>สร้างสื่อไว</span><span>พร้อมโพสต์ พร้อมต่อยอด</span></h3>
+            <p>Dashboard สำหรับงานสื่อสารองค์กร โซเชียล แบรนด์ กิจกรรม และงานขาย จัดเครื่องมือหลักเป็นกลุ่มให้เลือกง่ายขึ้น โดยเมนูด้านข้างยังอยู่ครบเหมือนเดิม</p>
             <div class="hero-actions">
               <button class="btn primary" data-view="router">เริ่มด้วย AI Router</button>
               <button class="btn secondary" data-view="kit">สร้างชุดสื่อ</button>
-              <button class="btn secondary" data-view="image">สร้างภาพ</button>
-              <button class="btn secondary" data-view="voice">เสียงพากย์</button>
+              <button class="btn secondary" data-view="album">Facebook Album Pro</button>
             </div>
             <div class="hero-stats">
-              <article><b>เริ่ม</b><span>ด้วย Router</span></article>
+              <article><b>5</b><span>กลุ่มหลักบนหน้าแรก</span></article>
               <article><b>ครบ</b><span>ภาพ โพสต์ คลิป เสียง สไลด์</span></article>
-              <article><b>ลื่น</b><span>ต่อกับทันใจ GPT</span></article>
+              <article><b>Pro</b><span>Album + Caption + Preview</span></article>
             </div>
           </div>
           <div class="hero-visual">
@@ -124,44 +123,46 @@
           </div>
         </div>
 
-        <div class="tool-grid">
-          <button class="tool-card highlight" data-view="router"><img src="assets/icons/router.svg" alt=""><b>AI Router</b><span>บอกสิ่งที่อยากทำ แล้วระบบพาไปเมนูที่เหมาะที่สุด</span></button>
-          <button class="tool-card highlight" data-view="kit"><img src="assets/icons/kit.svg" alt=""><b>สร้างชุดสื่อ</b><span>กรอกครั้งเดียว ได้ภาพ โพสต์ คลิป เสียง และสไลด์</span></button>
-          <button class="tool-card" data-view="image"><img src="assets/icons/image.svg" alt=""><b>สร้างภาพ</b><span>เตรียม Prompt ภาพพร้อมใช้กับ AI และงานออกแบบ</span></button>
-          <button class="tool-card" data-view="album"><img src="assets/icons/image.svg" alt=""><b>ชุดภาพโพสต์ Facebook</b><span>ปรับภาพจริง ใส่กรอบ และทำอัลบั้มพร้อมโพสต์</span></button>
-          <button class="tool-card" data-view="post"><img src="assets/icons/post.svg" alt=""><b>สรุปงาน / โพสต์</b><span>สรุปงานให้พร้อมลง Facebook, Line และทำคลิป</span></button>
-          <button class="tool-card" data-view="video"><img src="assets/icons/video.svg" alt=""><b>ทำวิดีโอ</b><span>วาง Hook, Storyboard, เสียงพากย์ และข้อความบนจอ</span></button>
-          <button class="tool-card" data-view="voice"><img src="assets/icons/voice.svg" alt=""><b>เสียงพากย์</b><span>เขียนสคริปต์เสียงให้อ่านลื่น พร้อมใช้ต่อ</span></button>
-          <button class="tool-card" data-view="deck"><img src="assets/icons/deck.svg" alt=""><b>ทำสไลด์</b><span>จัด Outline, ลำดับสไลด์ และ Speaker Notes</span></button>
-          <button class="tool-card" data-view="destinationHub"><img src="assets/icons/dest.svg" alt=""><b>เครื่องมือปลายทาง</b><span>เปิดทันใจ GPT, Canva, CapCut และเครื่องมือที่ใช้ต่อ</span></button>
-          <button class="tool-card" data-view="promptHub"><img src="assets/icons/prompt.svg" alt=""><b>Prompt Hub</b><span>คลังคำสั่งพร้อมใช้สำหรับงานประจำ</span></button>
+        <div class="tool-grid dashboard-main-tools-v861">
+          <button class="tool-card highlight" data-view="router"><img src="assets/icons/router.svg" alt=""><b>เริ่มต้นด้วย AI Router</b><span>บอกสิ่งที่อยากทำ แล้วระบบพาไปเมนูที่เหมาะที่สุด</span></button>
+          <button class="tool-card highlight" data-view="kit"><img src="assets/icons/kit.svg" alt=""><b>สร้างสื่อครบชุด</b><span>รวมภาพ โพสต์ วิดีโอ เสียงพากย์ และสไลด์จากข้อมูลเดียว</span></button>
+          <button class="tool-card highlight album-pro-card-v861" data-view="album"><img src="assets/icons/image.svg" alt=""><b>ชุดภาพโพสต์ Facebook Pro</b><span>อัปโหลดหลายภาพ ใส่กรอบ คิดแคปชั่น พรีวิวก่อนโพสต์ และโหลด ZIP</span></button>
+          <button class="tool-card" data-view="projects"><img src="assets/icons/project.svg" alt=""><b>โปรเจกต์ / งานที่บันทึกไว้</b><span>กลับมาดูงานเดิม บันทึกไอเดีย และต่อยอดงานที่ทำไว้</span></button>
+          <button class="tool-card" data-view="destinationHub"><img src="assets/icons/dest.svg" alt=""><b>เครื่องมือเสริม</b><span>Prompt Hub เครื่องมือปลายทาง ตัวอย่างงาน และคู่มือระบบ</span></button>
         </div>
 
-        <div class="dashboard-grid">
+        <div class="dashboard-grid dashboard-sales-grid-v861">
           <section class="panel wide">
             <div class="panel-head">
-              <div><h3>เลือกงานที่ต้องการทำ</h3><p>เริ่มจากงานเดียว หรือสร้างเป็นชุดสื่อครบงานได้ในขั้นตอนเดียว</p></div>
+              <div><h3>สร้างสื่อครบชุด</h3><p>เมนูย่อยยังอยู่ครบ เลือกใช้งานได้ทันทีจากกลุ่มนี้</p></div>
             </div>
-            <div class="sample-grid">
+            <div class="sample-grid compact-sample-grid-v861">
               <article class="home-choice-card" data-view="image"><img src="assets/previews/image-1.png" data-random-previews="assets/previews/image-1.png|assets/previews/image-2.png|assets/previews/image-3.png" alt=""><b>สร้างภาพ</b><span>Prompt ภาพพร้อมใช้</span></article>
-              <article class="home-choice-card" data-view="album"><img src="assets/previews/post-1.png" data-random-previews="assets/previews/post-1.png|assets/previews/image-1.png|assets/previews/kit-1.png" alt=""><b>ชุดภาพโพสต์ Facebook</b><span>Auto Enhance + Frame</span></article>
-              <article class="home-choice-card" data-view="post"><img src="assets/previews/post-1.png" data-random-previews="assets/previews/post-1.png|assets/previews/post-2.png|assets/previews/post-3.png" alt=""><b>สคริปต์สรุปงาน</b><span>ใช้ต่อได้ทั้งนำเสนอ ทำคลิป และโพสต์โซเชียล</span></article>
-              <article class="home-choice-card" data-view="video"><img src="assets/previews/video-1.png" data-random-previews="assets/previews/video-1.png|assets/previews/video-2.png|assets/previews/video-3.png" alt=""><b>ทำวิดีโอ / ทำคลิป</b><span>Storyboard + Voice Over</span></article>
-              <article class="home-choice-card" data-view="voice"><img src="assets/previews/voice-1.png" data-random-previews="assets/previews/voice-1.png|assets/previews/voice-2.png|assets/previews/voice-3.png" alt=""><b>เสียงพากย์</b><span>สคริปต์เสียงพร้อมใช้ต่อ Voice Tool</span></article>
+              <article class="home-choice-card" data-view="post"><img src="assets/previews/post-1.png" data-random-previews="assets/previews/post-1.png|assets/previews/post-2.png|assets/previews/post-3.png" alt=""><b>โพสต์ / สรุปงาน</b><span>โพสต์ แคปชั่น และข้อความเผยแพร่</span></article>
+              <article class="home-choice-card" data-view="video"><img src="assets/previews/video-1.png" data-random-previews="assets/previews/video-1.png|assets/previews/video-2.png|assets/previews/video-3.png" alt=""><b>ทำวิดีโอ</b><span>Hook + Storyboard + Voice Over</span></article>
+              <article class="home-choice-card" data-view="voice"><img src="assets/previews/voice-1.png" data-random-previews="assets/previews/voice-1.png|assets/previews/voice-2.png|assets/previews/voice-3.png" alt=""><b>เสียงพากย์</b><span>สคริปต์เสียงอ่านธรรมชาติ</span></article>
               <article class="home-choice-card" data-view="deck"><img src="assets/previews/deck-1.png" data-random-previews="assets/previews/deck-1.png|assets/previews/deck-2.png|assets/previews/deck-3.png" alt=""><b>ทำสไลด์</b><span>Outline + Speaker Notes</span></article>
-              <article class="home-choice-card" data-view="kit"><img src="assets/previews/kit-1.png" data-random-previews="assets/previews/kit-1.png|assets/previews/kit-2.png|assets/previews/kit-3.png" alt=""><b>สร้างชุดสื่อ</b><span>ครบชุดจากข้อมูลเดียว</span></article>
             </div>
           </section>
+
           <aside class="panel">
-            <h3>ทางลัดการใช้งาน</h3>
-            <div class="steps">
-              <div class="step-card-v61"><b>1</b><strong>เลือกเมนูงาน</strong><span>เลือกสิ่งที่ต้องทำ เช่น ภาพ โพสต์ คลิป เสียง สไลด์ หรือชุดสื่อ</span></div>
-              <div class="step-card-v61"><b>2</b><strong>กรอกข้อมูล</strong><span>ใส่หัวข้อ หน่วยงาน กลุ่มเป้าหมาย และรายละเอียดสำคัญของงาน</span></div>
-              <div class="step-card-v61"><b>3</b><strong>กดสร้าง</strong><span>ระบบจัดเนื้อหาให้พร้อมนำไปใช้ต่อทันที</span></div>
-              <div class="step-card-v61"><b>4</b><strong>คัดลอกไปใช้</strong><span>คัดลอกผลลัพธ์ แล้วเปิดทันใจ GPT หรือเครื่องมือที่ต้องใช้ต่อ</span></div>
+            <h3>เครื่องมือเสริม</h3>
+            <p class="muted">ย้ายจากการ์ดหลักมาไว้เป็นทางลัดรอง เพื่อให้หน้าแรกไม่แน่นเกินไป</p>
+            <div class="steps compact-extra-links-v861">
+              <button class="step-card-v61" data-view="promptHub"><b>⭐</b><strong>Prompt Hub</strong><span>คลังคำสั่งพร้อมใช้</span></button>
+              <button class="step-card-v61" data-view="destinationHub"><b>🚀</b><strong>เครื่องมือปลายทาง</strong><span>เปิด GPT, Canva, CapCut และเครื่องมือต่อเนื่อง</span></button>
+              <button class="step-card-v61" data-view="library"><b>🗂️</b><strong>ตัวอย่างงาน</strong><span>ดูตัวอย่างเพื่อเลือกแนวทาง</span></button>
+              <button class="step-card-v61" data-view="guide"><b>⚙️</b><strong>คู่มือระบบ</strong><span>วิธีใช้งานและแนวทางอัปเดต</span></button>
             </div>
           </aside>
         </div>
+
+        <section class="panel album-pro-summary-v861">
+          <div class="panel-head">
+            <div><h3>Facebook Album Pro</h3><p>ทำชุดภาพโพสต์หลายรูป พร้อมแคปชั่น พรีวิวจำลองหน้าโพสต์ และดาวน์โหลดเป็น ZIP</p></div>
+            <button class="btn primary" data-view="album">เปิดชุดภาพโพสต์ Facebook Pro</button>
+          </div>
+        </section>
       </section>
 
       <section id="router" class="view">
@@ -190,7 +191,7 @@
 
       <section id="promptHub" class="view">
         <div class="panel">
-          <div class="panel-head"><div><h3>⭐ Prompt Hub</h3><p>คลังคำสั่งพร้อมใช้สำหรับงานประชาสัมพันธ์ไทย</p></div></div>
+          <div class="panel-head"><div><h3>⭐ Prompt Hub</h3><p>คลังคำสั่งพร้อมใช้สำหรับงานสื่อสารองค์กร / โซเชียล / แบรนด์</p></div></div>
           <div id="promptGrid" class="library-grid"></div>
         </div>
       </section>

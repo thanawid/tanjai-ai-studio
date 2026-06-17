@@ -1,7 +1,17 @@
-/* V8.5 — Facebook Album Pro & Sales Ready UX
+/* v8.6.1 — Facebook Album Pro & Sales Ready UX
    Safe photo processing: crop/enhance/frame real photos only. No generative image alteration.
 */
 (function(){
+
+  // v8.6.1 safety guard: keep album upload as multi-image input
+  function ensureAlbumMultiInput(){
+    const inp = document.getElementById("album-files");
+    if(inp){
+      inp.setAttribute("multiple","multiple");
+      inp.setAttribute("accept","image/*");
+    }
+  }
+
   const $ = (q,root=document)=>root.querySelector(q);
   const $$ = (q,root=document)=>Array.from(root.querySelectorAll(q));
   const state = { files: [], outputs: [], logo: null, caption: "" };
@@ -375,6 +385,7 @@
   }
 
   document.addEventListener("DOMContentLoaded",()=>{
+    ensureAlbumMultiInput();
     document.addEventListener("click",(e)=>{
       const id=e.target && e.target.id;
       if(id==="makeAlbum"){ e.preventDefault(); generate(); }
