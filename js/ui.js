@@ -142,7 +142,7 @@ TANJAI.resultShell = function(tool, recommended, desc, bodyId, buttons=""){
 
   return `
     <div class="result-action">
-      <div><small>ผลลัพธ์ที่แนะนำ</small><h4>${recommended}</h4><p>${desc}</p></div>
+      <div><small>ผลลัพธ์ที่แนะนำ</small><h4 id="${tool}ResultTitle">${recommended}</h4><p id="${tool}ResultDesc">${desc}</p></div>
       <div class="result-buttons">${buttons}<button class="btn primary" data-copyopen="${bodyId}">คัดลอก + เปิดทันใจ GPT</button></div>
     </div>
     <div class="destination-actions">

@@ -153,7 +153,7 @@ Checklist ก่อนกดเปิด ทันใจ GPT:
 - หลัง GPT สร้างไฟล์ ต้องให้แนบลิงก์ดาวน์โหลด ไม่ตอบเป็น /mnt/data/... เฉย ๆ`;
 };
 
-TANJAI.imagePrompt = function(d){
+TANJAI.imagePrompt = function(d, outputMode="gpt"){
   const mode = d.useMode || "สร้างภาพใหม่ด้วย AI";
   const level = d.originalityLevel || (mode === "ปรับภาพจริง + ใส่กราฟิก" ? "สมดุล" : mode === "สร้างภาพใหม่ด้วย AI" ? "ไม่บังคับ" : "สูงสุด");
   const photoCount = Number(d.photoCount || 0);
@@ -280,8 +280,18 @@ ${d.criticSummary}` : "";
 
 ถ้าข้อมูลถูกต้องแล้ว พิมพ์ว่า “สร้างภาพได้เลย”` : "";
 
-  if(smartOn){
-    return `คำสั่งพร้อมใช้งานสำหรับทันใจ GPT โดยใช้ข้อมูลที่ระบบคัดเลือกแล้ว เพื่อสร้างสื่อประชาสัมพันธ์ให้พร้อมใช้งาน
+  const promptDestination = `
+
+คำสั่งปลายทาง:
+กรุณาจัด Prompt สำหรับสร้างภาพจากข้อมูลนี้ให้พร้อมใช้งาน โดยยังไม่ต้องสร้างภาพจริง`;
+
+  const gptDestination = `
+
+คำสั่งปลายทาง:
+กรุณาสร้างภาพประชาสัมพันธ์จริงทันทีจากข้อมูลนี้ หากมีโลโก้ QR Code หรือภาพแนบในแชทนี้ ให้ใช้อ้างอิงจากไฟล์แนบดังกล่าว`;
+
+  if(outputMode === "gpt"){
+    return `คำสั่งพร้อมใช้สำหรับทันใจ GPT
 
 ข้อมูลที่ระบบคัดเลือกและจัดให้เหมาะที่สุด:
 ${missing.length ? missing.join("\n") : "- ไม่มีข้อมูลจำเป็นที่ต้องรอเพิ่มเติมแล้ว"}
@@ -322,10 +332,12 @@ ${textOnImage}
 
 Creative Direction:
 ${creativeDirection}
-${backupCommand}${autoCriticNote}${TANJAI.outputDeliveryGuard("ภาพ")}${confirmLine}`;
+${backupCommand}${autoCriticNote}${TANJAI.outputDeliveryGuard("ภาพ")}${confirmLine}${gptDestination}`;
   }
 
-  return `โหมดการใช้ภาพ
+  return `Prompt สำหรับสร้างภาพ
+
+โหมดการใช้ภาพ
 - ${mode}
 - ระดับการคงต้นฉบับ: ${level}
 - ภาพแนบ: ${hasPhotos ? `${photoCount} รูป (${photoNames})` : "ไม่มี"}
@@ -362,7 +374,7 @@ ${modePrompt}
 - โทนภาษา: ${d.tone}
 
 ข้อความบนภาพถ้ามี
-- ${[title, ...secondaryLines].join("\n- ") || "ให้ AI จัดหัวข้อและข้อความบนภาพตามความเหมาะสม"}${backupCommand}${autoCriticNote}${TANJAI.outputDeliveryGuard("ภาพ")}`;
+- ${[title, ...secondaryLines].join("\n- ") || "ให้ AI จัดหัวข้อและข้อความบนภาพตามความเหมาะสม"}${backupCommand}${autoCriticNote}${TANJAI.outputDeliveryGuard("ภาพ")}${promptDestination}`;
 };
 
 

@@ -191,7 +191,7 @@
 - คง Real Photo Safe Mode, Output Delivery Guard, Custom GPT URL Fix, Login Gate, Navigation UX, Destination Hub, Preview Cards, favicon, logo และ layout เดิม
 
 
-## v6.4.1 — คำสั่งพร้อมใช้ Auto Mode
+## v6.4.1 — Smart Brief Auto Mode
 - ซ่อนแผง คำสั่งพร้อมใช้งาน ออกจากหน้าเว็บ ไม่ให้ผู้ใช้เห็นตัวเลือกเทคนิคที่ไม่จำเป็น
 - ใช้ คำสั่งพร้อมใช้งาน ทำงานอัตโนมัติหลังบ้านในเมนูสร้างภาพ
 - ผลลัพธ์ยังจัดคำสั่งแบบ Creative Director: ตรวจข้อมูลที่ขาด สรุปคำสั่งเป็นหมวด แยกข้อความบนภาพ และสร้างคำสั่งพร้อมส่งเข้า GPT
@@ -207,7 +207,7 @@
 
 ## v6.4.3 — Clean Image Note
 - เอาข้อความอธิบายยาวใต้หัวข้อเมนูสร้างภาพออก
-- คง คำสั่งพร้อมใช้ Auto Mode, Section Numbering Fix, Real Photo Safe Mode, Output Delivery Guard และฟังก์ชันอื่นทั้งหมด
+- คง Smart Brief Auto Mode, Section Numbering Fix, Real Photo Safe Mode, Output Delivery Guard และฟังก์ชันอื่นทั้งหมด
 
 
 ## v6.5 — Prompt Critic & Readiness Score
@@ -217,7 +217,7 @@
 - ตรวจข้อมูลที่ครบแล้ว / ข้อมูลที่ยังขาด / ความเสี่ยงหน้าเพี้ยน / ไฟล์ที่ควรแนบ / Checklist ก่อนส่งเข้า GPT
 - เมื่อกดสร้าง Prompt ภาพ ระบบจะตรวจความพร้อมให้อัตโนมัติ
 - บันทึกโปรเจกต์พร้อมผลตรวจ Prompt Critic
-- คง คำสั่งพร้อมใช้ Auto Mode, Section Numbering Fix, Clean Image Note, Real Photo Safe Mode, Output Delivery Guard, Custom GPT URL Fix, Login Gate, Navigation UX, Destination Hub, Preview Cards, favicon, logo และ layout เดิม
+- คง Smart Brief Auto Mode, Section Numbering Fix, Clean Image Note, Real Photo Safe Mode, Output Delivery Guard, Custom GPT URL Fix, Login Gate, Navigation UX, Destination Hub, Preview Cards, favicon, logo และ layout เดิม
 
 
 ## v6.5.1 — Auto Prompt Critic Behind the Scenes
@@ -226,7 +226,7 @@
 - ให้ระบบ Prompt Critic ตรวจอัตโนมัติหลังบ้านเมื่อกด “สร้าง Prompt ภาพ”
 - ผลตรวจถูกใช้เสริม Prompt ภายใน ไม่โชว์เป็นแผงให้ผู้ใช้ต้องอ่าน
 - แก้ระบบเรียงเลขในหน้าสร้างภาพให้ครบและเรียงตาม section ที่มองเห็นจริง
-- คง คำสั่งพร้อมใช้ Auto Mode, Clean Image Note, Real Photo Safe Mode, Output Delivery Guard, Custom GPT URL Fix, Login Gate, Navigation UX, Destination Hub, Preview Cards, favicon, logo และ layout เดิม
+- คง Smart Brief Auto Mode, Clean Image Note, Real Photo Safe Mode, Output Delivery Guard, Custom GPT URL Fix, Login Gate, Navigation UX, Destination Hub, Preview Cards, favicon, logo และ layout เดิม
 
 
 ## v6.5.2 — UX Clean & Pro Polish
@@ -240,7 +240,7 @@
 - เพิ่มปุ่ม “คัดลอก + เปิดทันใจ GPT” เพื่อให้ทำงานต่อกับ GPT ได้ลื่นขึ้น
 - จัดลำดับเมนูใหม่ให้สอดคล้อง: เริ่มต้น / สร้างงาน / ต่อยอด / จัดการ
 - ซ่อน Prompt Hub ที่เป็นระบบหลังบ้าน เช่น Prompt Critic, คำสั่งพร้อมใช้งาน, Output Delivery Guard ไม่ให้ดูเป็นห้องเครื่อง
-- คง คำสั่งพร้อมใช้ Auto Mode, Auto Prompt Critic หลังบ้าน, Real Photo Safe Mode, Output Delivery Guard, Custom GPT, Login, Navigation, Destination Hub, Preview Cards, logo/favicon/layout เดิม
+- คง Smart Brief Auto Mode, Auto Prompt Critic หลังบ้าน, Real Photo Safe Mode, Output Delivery Guard, Custom GPT, Login, Navigation, Destination Hub, Preview Cards, logo/favicon/layout เดิม
 
 
 ## v6.5.3 — Dashboard Pro Layout
@@ -262,7 +262,7 @@
 - เพิ่มโซน “ตัวอย่างงานที่ทำได้” 4 ใบพร้อมภาพ: ภาพประชาสัมพันธ์, โพสต์และแคปชั่น, คลิปและเสียงพากย์, สไลด์นำเสนอ
 - คงเครื่องมือหลัก 7 ตัวบนหน้าแรก และยังเริ่มงานได้ชัดเจน
 - ซ่อนความรกจาก Dashboard: ไม่โชว์เริ่มงานด่วน ไม่โชว์รายละเอียดเมนูซ้ำยาว ๆ บนหน้าแรก
-- คงปุ่ม คัดลอก + เปิดทันใจ GPT, คำสั่งพร้อมใช้ Auto Mode, Auto Prompt Critic หลังบ้าน, Real Photo Safe Mode, Output Delivery Guard, Custom GPT, Login, Navigation, Destination Hub, Preview Cards, logo/favicon/layout หลัก
+- คงปุ่ม คัดลอก + เปิดทันใจ GPT, Smart Brief Auto Mode, Auto Prompt Critic หลังบ้าน, Real Photo Safe Mode, Output Delivery Guard, Custom GPT, Login, Navigation, Destination Hub, Preview Cards, logo/favicon/layout หลัก
 
 
 ## v7.1 — Restore Logo + Visuals
@@ -291,6 +291,13 @@
 
 - คงทุกอย่างจาก V7
 - แก้เฉพาะข้อความ Output ฝั่งขวา/คำสั่งที่คัดลอก
-- เอาคำว่า คำสั่งพร้อมใช้งาน และคำว่า คำสั่ง ออกจากผลลัพธ์ผู้ใช้
+- เอาคำว่า Smart Brief Coach และคำว่า บรีฟ ออกจากผลลัพธ์ผู้ใช้
 - ใช้คำว่า “คำสั่งพร้อมใช้งานสำหรับทันใจ GPT” แทน
 - ไม่แตะธีมเว็บ ไม่แตะ layout ไม่แตะเมนู ไม่แตะระบบหลัก
+
+
+## V8 — Image Output Modes
+- แยกผลลัพธ์ “Prompt สำหรับสร้างภาพ” และ “คำสั่งพร้อมใช้สำหรับทันใจ GPT” ชัดเจน
+- ปุ่ม “คัดลอก + เปิดทันใจ GPT” จะคัดลอกเวอร์ชันสั่งสร้างภาพจริงโดยอัตโนมัติ
+- มีปุ่มดู/คัดลอก Prompt และดู/คัดลอกคำสั่งพร้อมใช้แยกกัน
+- ผลลัพธ์ภาพเริ่มต้นจะแสดงเวอร์ชันพร้อมใช้สำหรับทันใจ GPT
