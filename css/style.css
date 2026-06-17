@@ -2222,3 +2222,63 @@ body:not(.auth-locked) .login-gate{
   line-height:1.72;
   font-family:"Prompt","Noto Sans Thai",system-ui,sans-serif;
 }
+
+
+/* V8.6.6 — Hero context text fix only */
+.sales-dashboard-hero .hero-copy > .eyebrow,
+.hero-card .hero-copy > .eyebrow:first-child{
+  color:#bfe7ff !important;
+  letter-spacing:.08em;
+  text-transform:none;
+  font-weight:800;
+  font-family:"Prompt","Noto Sans Thai",system-ui,sans-serif;
+}
+.sales-dashboard-hero .hero-title,
+.hero-card .hero-title{
+  font-family:"Prompt","Noto Sans Thai",system-ui,sans-serif;
+  letter-spacing:-.03em;
+  line-height:1.05;
+  gap:10px;
+  margin:10px 0 18px;
+}
+.sales-dashboard-hero .hero-title span:first-child,
+.sales-dashboard-hero .hero-title span:last-child,
+.hero-card .hero-title span:first-child,
+.hero-card .hero-title span:last-child{
+  background:linear-gradient(90deg,#40e0ff 0%,#8b5cf6 28%,#f472b6 58%,#fb923c 82%,#facc15 100%) !important;
+  -webkit-background-clip:text !important;
+  background-clip:text !important;
+  color:transparent !important;
+  -webkit-text-fill-color:transparent !important;
+  text-shadow:none !important;
+}
+.sales-dashboard-hero .hero-title span:first-child,
+.hero-card .hero-title span:first-child{
+  font-size:clamp(40px,4.15vw,64px) !important;
+  line-height:1.02;
+  white-space:nowrap;
+  font-weight:900;
+}
+.sales-dashboard-hero .hero-title span:last-child,
+.hero-card .hero-title span:last-child{
+  font-size:clamp(28px,2.9vw,46px) !important;
+  line-height:1.08;
+  font-weight:800;
+  letter-spacing:-.03em;
+}
+.sales-dashboard-hero .hero-copy > p:not(.eyebrow),
+.hero-card .hero-copy > p:not(.eyebrow){
+  max-width:520px;
+  line-height:1.65;
+  font-size:clamp(17px,1.28vw,19px);
+  color:#e6efff;
+  font-family:"Prompt","Noto Sans Thai",system-ui,sans-serif;
+}
+@media (max-width:720px){
+  .sales-dashboard-hero .hero-title span:first-child,
+  .hero-card .hero-title span:first-child{font-size:38px !important; white-space:normal;}
+  .sales-dashboard-hero .hero-title span:last-child,
+  .hero-card .hero-title span:last-child{font-size:26px !important;}
+  .sales-dashboard-hero .hero-copy > p:not(.eyebrow),
+  .hero-card .hero-copy > p:not(.eyebrow){max-width:none;font-size:16px;}
+}
