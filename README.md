@@ -265,9 +265,16 @@
 - คงปุ่ม คัดลอก + เปิดทันใจ GPT, Smart Brief Auto Mode, Auto Prompt Critic หลังบ้าน, Real Photo Safe Mode, Output Delivery Guard, Custom GPT, Login, Navigation, Destination Hub, Preview Cards, logo/favicon/layout หลัก
 
 
-## v6.5.6 — Restore Logo + Visuals
+## v6.5.7 — Restore Logo + Visuals
 - คงเมนูและระบบล่าสุดทั้งหมด
 - เอาหน้าแรกที่มีโลโก้วงกลมและภาพ Preview กลับมา
 - เพิ่มคำว่า “ดีไซน์” บนหน้าแรก
 - ใช้โลโก้วงกลมกลาง Hero Visual พร้อมการ์ดภาพตัวอย่างงาน
 - คง Showcase ภาพ 4 ใบ และระบบหลังบ้านเดิมทั้งหมด
+
+## v6.5.7 Purple Gold + Ready Prompt Patch
+
+- คงเมนู โครงสร้าง ฟังก์ชัน และหน้าแรกจาก v6.5.6 ไว้เหมือนเดิม
+- ปรับโทนหลักเป็นม่วง–ทองก่อน เขียว–เหลืองเป็นโทนรอง
+- ปรับถ้อยคำฝั่งเว็บให้ใช้ “คำสั่งพร้อมใช้ / พร้อมใช้งาน” แทนการโชว์คำว่า “บรีฟ”
+- Output ที่คัดลอกไปทันใจ GPT เน้นคำสั่งพร้อมใช้งาน ไม่อธิบายกระบวนการหลังบ้าน
