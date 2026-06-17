@@ -143,19 +143,16 @@ TANJAI.resultShell = function(tool, recommended, desc, bodyId, buttons=""){
   return `
     <div class="result-action stable-output-head">
       <div class="result-title-block">
-        <small>ผลลัพธ์ที่แนะนำ</small>
+        <small>ผลลัพธ์</small>
         <h4 id="${tool}ResultTitle">${recommended}</h4>
         <p id="${tool}ResultDesc">${desc}</p>
       </div>
       <div class="result-buttons stable-result-buttons">
         ${buttons}
-        <button class="btn primary compact-action" data-copyopen="${bodyId}">คัดลอก + เปิด GPT</button>
+        <button class="btn primary compact-action" data-copyopen="${bodyId}">ส่งเข้า GPT</button>
       </div>
     </div>
-    <div class="destination-actions">
-      ${destinationButtons}
-    </div>
-    <div id="${bodyId}" class="result-box stable-empty">กดปุ่มสร้าง แล้วคำสั่งพร้อมใช้จะแสดงตรงนี้</div>
+    <div id="${bodyId}" class="result-box stable-empty">กดปุ่มสร้าง แล้ว Prompt / คำสั่งส่ง GPT จะแสดงตรงนี้</div>
   `;
 };
 
