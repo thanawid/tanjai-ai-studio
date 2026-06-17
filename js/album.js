@@ -1,275 +1,403 @@
-
+/* V8.5 — Facebook Album Pro & Sales Ready UX
+   Safe photo processing: crop/enhance/frame real photos only. No generative image alteration.
+*/
 (function(){
-  window.TANJAI = window.TANJAI || {};
-  const $ = s => document.querySelector(s);
-  TANJAI.albumState = { files: [], outputs: [] };
+  const $ = (q,root=document)=>root.querySelector(q);
+  const $$ = (q,root=document)=>Array.from(root.querySelectorAll(q));
+  const state = { files: [], outputs: [], logo: null, caption: "" };
 
-  const size = () => {
-    const r = $("#album-ratio")?.value || "4:5";
-    if(r === "1:1") return {w:1080,h:1080};
-    if(r === "16:9") return {w:1920,h:1080};
-    if(r === "9:16") return {w:1080,h:1920};
+  function val(id, fallback=""){
+    const el = document.getElementById(id);
+    return (el && typeof el.value === "string" && el.value.trim()) ? el.value.trim() : fallback;
+  }
+  function clean(s){ return String(s||"").replace(/\s+/g," ").trim(); }
+  function short(s,n=44){
+    s = clean(s);
+    if(!s) return "";
+    return s.length>n ? s.slice(0, Math.max(0,n-1)).trim()+"…" : s;
+  }
+  function hasRealOrg(org){
+    const s = clean(org);
+    return !!s && !/ชื่อหน่วยงาน|แบรนด์|องค์กร|ร้านค้า|เพจ/.test(s);
+  }
+  function data(){
+    return {
+      title: val("album-title","ชุดภาพพร้อมโพสต์"),
+      org: val("album-orgName",""),
+      dateTime: val("album-dateTime",""),
+      place: val("album-place",""),
+      detail: val("album-detail",""),
+      footer: val("album-footer",""),
+      frameStyle: val("album-frameStyle","ทั่วไป / หน่วยงาน / แบรนด์"),
+      ratio: val("album-ratio","4:5 Facebook / Line"),
+      colorTone: val("album-colorTone","ให้ AI เลือกให้เหมาะสม"),
+      mode: val("album-mode","ปรับภาพ + ครอป + ใส่กรอบ"),
+      layoutMode: val("album-layoutMode","สมดุลภาพและข้อความ")
+    };
+  }
+  function size(d=data()){
+    const r = d.ratio || "";
+    if(r.includes("1:1")) return {w:1080,h:1080};
+    if(r.includes("16:9")) return {w:1600,h:900};
+    if(r.includes("9:16")) return {w:1080,h:1920};
     return {w:1080,h:1350};
-  };
-
-  const theme = () => {
-    const t = $("#album-colorTone")?.value || "";
-    if(t.includes("เขียว")) return {a:"#0f5a34", b:"#f1d15a", c:"#ffffff", dark:"rgba(8,54,33,.88)", glow:"rgba(241,209,90,.28)"};
-    if(t.includes("น้ำเงิน")) return {a:"#102f66", b:"#8ecbff", c:"#ffffff", dark:"rgba(8,28,58,.88)", glow:"rgba(142,203,255,.26)"};
-    if(t.includes("ดำ")) return {a:"#111111", b:"#d7b35b", c:"#ffffff", dark:"rgba(0,0,0,.82)", glow:"rgba(215,179,91,.26)"};
-    return {a:"#4b1979", b:"#f0c45c", c:"#ffffff", dark:"rgba(48,20,78,.88)", glow:"rgba(240,196,92,.28)"};
-  };
-
-  const val = (id,f="") => ($("#album-"+id)?.value || f || "").trim();
-
-  const template = () => {
-    const raw = $("#album-frameStyle")?.value || "หน่วยงานท้องถิ่น / ราชการ";
-    const common = {label:"ประชาสัมพันธ์", icon:"●", chips:["ชัดเจน","น่าเชื่อถือ","พร้อมใช้งาน"], mood:"official"};
-    if(raw.includes("ประชุม") || raw.includes("ประชาคม")) return {label:"ประชุม / เวทีรับฟัง", icon:"◉", chips:["รับฟัง","มีส่วนร่วม","พัฒนา"], mood:"meeting"};
-    if(raw.includes("ลงพื้นที่") || raw.includes("ผู้บริหาร")) return {label:"ภารกิจ / ติดตามงาน", icon:"◆", chips:["ติดตาม","รับฟัง","แก้ปัญหา"], mood:"field"};
-    if(raw.includes("ข่าวด่วน") || raw.includes("ประกาศ")) return {label:"แจ้งข่าวสำคัญ", icon:"!", chips:["เร่งด่วน","ชัดเจน","ตรวจสอบได้"], mood:"urgent"};
-    if(raw.includes("กิจกรรม") || raw.includes("อบรม") || raw.includes("อีเวนต์")) return {label:"กิจกรรม / อีเวนต์", icon:"✦", chips:["สร้างสรรค์","มีส่วนร่วม","บรรยากาศดี"], mood:"event"};
-    if(raw.includes("โรงเรียน") || raw.includes("ศึกษา")) return {label:"การศึกษา", icon:"✎", chips:["เรียนรู้","สร้างสรรค์","พัฒนาเด็ก"], mood:"education"};
-    if(raw.includes("สุขภาพ") || raw.includes("รณรงค์")) return {label:"รณรงค์ / สุขภาพ", icon:"♥", chips:["ห่วงใย","ปลอดภัย","ชุมชนเข้มแข็ง"], mood:"health"};
-    if(raw.includes("ธุรกิจ") || raw.includes("สินค้า")) return {label:"โปรโมชัน / ธุรกิจ", icon:"★", chips:["โดดเด่น","น่าเชื่อถือ","พร้อมขาย"], mood:"business"};
-    if(raw.includes("เพจ") || raw.includes("ครีเอเตอร์")) return {label:"คอนเทนต์ / แบรนด์", icon:"✦", chips:["จำง่าย","ทันสมัย","มีสไตล์"], mood:"creator"};
-    if(raw.includes("มินิมอล")) return {label:"ภาพเล่าเรื่อง", icon:"—", chips:["เรียบง่าย","สะอาด","อ่านง่าย"], mood:"minimal"};
-    return common;
-  };
-
-  const loadImage = file => new Promise((resolve,reject)=>{ const img=new Image(); img.onload=()=>resolve(img); img.onerror=reject; img.src=URL.createObjectURL(file); });
-
-  const wrap = (ctx,text,x,y,maxWidth,lineHeight,maxLines=4) => {
-    const input = String(text||"").replace(/\s+/g," ").trim();
-    if(!input) return y;
-    // Thai-friendly greedy wrapping by character group
-    const tokens = input.includes(" ") ? input.split(" ") : input.match(/.{1,6}/g) || [];
-    let line="", lines=[];
-    tokens.forEach(w=>{
-      const test=line ? line+" "+w : w;
-      if(ctx.measureText(test).width > maxWidth && line){ lines.push(line); line=w; }
-      else line=test;
+  }
+  function theme(d=data()){
+    const raw=(d.colorTone||"").toLowerCase();
+    if(raw.includes("ม่วง") || raw.includes("ทอง")) return {a:"#6D28D9",b:"#FBBF24",c:"#FFFFFF",dark:"#25104D",soft:"rgba(109,40,217,.72)"};
+    if(raw.includes("เขียว") || raw.includes("เหลือง")) return {a:"#15803D",b:"#FACC15",c:"#FFFFFF",dark:"#063B22",soft:"rgba(21,128,61,.72)"};
+    if(raw.includes("น้ำเงิน")) return {a:"#1D4ED8",b:"#FACC15",c:"#FFFFFF",dark:"#0B1B4D",soft:"rgba(29,78,216,.72)"};
+    if(raw.includes("ชมพู")) return {a:"#BE185D",b:"#F9A8D4",c:"#FFFFFF",dark:"#4A102B",soft:"rgba(190,24,93,.72)"};
+    return {a:"#2563EB",b:"#F59E0B",c:"#FFFFFF",dark:"#0F172A",soft:"rgba(15,23,42,.68)"};
+  }
+  function tpl(d=data()){
+    const raw=d.frameStyle||"";
+    if(raw.includes("ประชุม") || raw.includes("รับฟัง") || raw.includes("ประชาคม")) return {label:"ประชุม / รับฟัง", icon:"◉", chips:["รับฟัง","มีส่วนร่วม","สรุปชัด"]};
+    if(raw.includes("ลงพื้นที่") || raw.includes("ภารกิจ") || raw.includes("ติดตาม")) return {label:"ภารกิจ / ติดตามงาน", icon:"◆", chips:["ติดตาม","ลงมือทำ","ผลลัพธ์"]};
+    if(raw.includes("ข่าวด่วน") || raw.includes("ประกาศ")) return {label:"ประกาศสำคัญ", icon:"!", chips:["แจ้งข่าว","ตรวจสอบ","อัปเดต"]};
+    if(raw.includes("โรงเรียน") || raw.includes("ศึกษา")) return {label:"การศึกษา", icon:"✦", chips:["เรียนรู้","กิจกรรม","พัฒนา"]};
+    if(raw.includes("สุขภาพ") || raw.includes("รณรงค์")) return {label:"สุขภาพ / รณรงค์", icon:"＋", chips:["ดูแล","ปลอดภัย","ร่วมมือ"]};
+    if(raw.includes("ธุรกิจ") || raw.includes("โปรโม")) return {label:"โปรโมชัน", icon:"★", chips:["สินค้า","บริการ","ข้อเสนอ"]};
+    if(raw.includes("ครีเอเตอร์") || raw.includes("แบรนด์ส่วนตัว")) return {label:"คอนเทนต์", icon:"●", chips:["อัปเดต","น่าสนใจ","แชร์ได้"]};
+    if(raw.includes("มินิมอล")) return {label:"อัปเดต", icon:"—", chips:["เรียบง่าย","อ่านง่าย","สะอาด"]};
+    return {label:"ประชาสัมพันธ์", icon:"●", chips:["ชัดเจน","น่าเชื่อถือ","พร้อมใช้"]};
+  }
+  function coverDraw(img, ctx, w, h, enhance=true){
+    const sw=img.naturalWidth||img.width, sh=img.naturalHeight||img.height;
+    const scale=Math.max(w/sw,h/sh), nw=sw*scale, nh=sh*scale;
+    const x=(w-nw)/2, y=(h-nh)/2;
+    ctx.save();
+    if(enhance) ctx.filter="brightness(1.05) contrast(1.04) saturate(1.08)";
+    ctx.drawImage(img,x,y,nw,nh);
+    ctx.restore();
+    const grad=ctx.createLinearGradient(0,0,0,h);
+    grad.addColorStop(0,"rgba(0,0,0,.10)");
+    grad.addColorStop(.56,"rgba(0,0,0,.05)");
+    grad.addColorStop(1,"rgba(0,0,0,.42)");
+    ctx.fillStyle=grad; ctx.fillRect(0,0,w,h);
+  }
+  function roundRect(ctx,x,y,w,h,r){
+    r=Math.min(r,w/2,h/2); ctx.beginPath();
+    ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath();
+  }
+  function wrap(ctx,text,x,y,maxW,lineH,maxLines){
+    const words=String(text||"").split(/\s+/).filter(Boolean);
+    const lines=[]; let line="";
+    words.forEach(word=>{
+      const t=line?line+" "+word:word;
+      if(ctx.measureText(t).width>maxW && line){ lines.push(line); line=word; }
+      else line=t;
     });
     if(line) lines.push(line);
-    lines = lines.slice(0,maxLines);
-    lines.forEach((ln,i)=>ctx.fillText(ln,x,y+i*lineHeight));
-    return y + lines.length*lineHeight;
-  };
-
-  const shortText = (txt, max=72) => {
-    const s = String(txt||"").replace(/\s+/g," ").trim();
-    return s.length > max ? s.slice(0,max-1)+"…" : s;
-  };
-
-  const autoCaption = (d, idx) => {
-    if(idx === 0) return d.title || "ชุดภาพประชาสัมพันธ์";
-    if(idx === 1) return [d.dateTime, d.place].filter(Boolean).join(" | ") || shortText(d.detail, 60) || d.title;
-    return shortText(d.detail || d.title, 62);
-  };
-
-  const data = () => ({
-    title: val("title","ชุดภาพประชาสัมพันธ์"),
-    org: val("orgName","ชื่อหน่วยงาน / แบรนด์"),
-    dateTime: val("dateTime"),
-    place: val("place"),
-    detail: val("detail"),
-    footer: val("footer","พร้อมสื่อสารอย่างมืออาชีพ")
-  });
-
-  const initials = (name) => {
-    const s = String(name||"").trim();
-    if(!s) return "AI";
-    const en = s.match(/[A-Za-z]/g);
-    if(en && en.length) return en.slice(0,2).join("").toUpperCase();
-    return s.replace(/\s+/g,"").slice(0,2);
-  };
-
-  const drawBrandBadge = (ctx,w,h,d,th,tpl) => {
-    const pad = Math.round(w*.045);
+    const out=lines.slice(0,maxLines);
+    if(lines.length>maxLines && out.length){
+      let last=out[out.length-1];
+      while(ctx.measureText(last+"…").width>maxW && last.length>1) last=last.slice(0,-1);
+      out[out.length-1]=last.trim()+"…";
+    }
+    out.forEach((l,i)=>ctx.fillText(l,x,y+i*lineH));
+    return out.length;
+  }
+  function drawLogo(ctx,w,h,d,th){
+    if(!state.logo) return;
+    const pad=Math.round(w*.042), s=Math.round(w*.075);
     ctx.save();
-    ctx.shadowColor = th.glow; ctx.shadowBlur = 18;
-    ctx.fillStyle = th.b;
-    ctx.beginPath(); ctx.arc(w-pad*1.35,pad*1.35,Math.round(w*.046),0,Math.PI*2); ctx.fill();
-    ctx.shadowBlur = 0;
-    ctx.fillStyle = th.a;
-    ctx.font = `900 ${Math.round(w*.027)}px sans-serif`;
-    ctx.textAlign="center";
-    ctx.fillText(initials(d.org), w-pad*1.35, pad*1.45);
-    ctx.textAlign="left";
+    ctx.shadowColor="rgba(0,0,0,.22)"; ctx.shadowBlur=12;
+    ctx.fillStyle="rgba(255,255,255,.9)";
+    ctx.beginPath(); ctx.arc(w-pad-s/2,pad+s/2,s/2,0,Math.PI*2); ctx.fill();
+    ctx.clip();
+    ctx.drawImage(state.logo,w-pad-s,pad,s,s);
     ctx.restore();
-  };
-
-  const drawTopRibbon = (ctx,w,h,d,th,tpl) => {
-    const pad = Math.round(w*.045);
-    const rh = Math.round(h*.072);
-    ctx.fillStyle = th.dark;
-    ctx.roundRect(pad, pad*.75, w-pad*3.4, rh, Math.round(rh*.34));
-    ctx.fill();
-    ctx.fillStyle = th.b;
-    ctx.font = `900 ${Math.round(w*.028)}px sans-serif`;
-    ctx.fillText(tpl.icon+"  "+tpl.label, pad*1.35, pad*.75 + Math.round(rh*.60));
-    ctx.fillStyle = "#fff";
-    ctx.font = `700 ${Math.round(w*.023)}px sans-serif`;
-    wrap(ctx,d.org,pad*1.35+Math.round(w*.25), pad*.75 + Math.round(rh*.60), w-pad*5.2, Math.round(w*.031), 1);
-    drawBrandBadge(ctx,w,h,d,th,tpl);
-  };
-
-  const cover = (ctx,w,h,d,th,tpl) => {
-    const pad=Math.round(w*.055);
-    const grad=ctx.createLinearGradient(0,0,w,h);
-    grad.addColorStop(0,"rgba(0,0,0,.02)");
-    grad.addColorStop(.48,"rgba(0,0,0,.08)");
-    grad.addColorStop(1,"rgba(0,0,0,.72)");
-    ctx.fillStyle=grad; ctx.fillRect(0,0,w,h);
-    drawTopRibbon(ctx,w,h,d,th,tpl);
-
-    // Accent side stripes for more "frame" feel
-    ctx.fillStyle = th.b; ctx.globalAlpha=.92;
-    ctx.fillRect(0,0,Math.max(10,Math.round(w*.012)),h);
-    ctx.globalAlpha=1;
-
-    const boxY = Math.round(h*.56), boxH = Math.round(h*.34);
-    ctx.fillStyle=th.dark; ctx.roundRect(pad,boxY,w-pad*2,boxH,34); ctx.fill();
-    ctx.strokeStyle=th.b; ctx.lineWidth=Math.max(3,Math.round(w*.004)); ctx.stroke();
-
-    ctx.fillStyle=th.b; ctx.font=`900 ${Math.round(w*.036)}px sans-serif`;
-    ctx.fillText(d.org || "ชื่อหน่วยงาน / แบรนด์", pad*1.35, boxY + Math.round(boxH*.18));
-
-    ctx.fillStyle="#fff"; ctx.font=`900 ${Math.round(w*.058)}px sans-serif`;
-    wrap(ctx,d.title || "ชุดภาพประชาสัมพันธ์", pad*1.35, boxY + Math.round(boxH*.38), w-pad*2.7, Math.round(w*.068), 3);
-
-    ctx.font=`700 ${Math.round(w*.028)}px sans-serif`;
-    ctx.fillStyle="rgba(255,255,255,.90)";
-    wrap(ctx,[d.dateTime,d.place].filter(Boolean).join("  |  ") || autoCaption(d,0), pad*1.35, boxY + Math.round(boxH*.82), w-pad*2.7, Math.round(w*.038), 2);
-  };
-
-  const summary = (ctx,w,h,d,th,tpl) => {
-    const pad=Math.round(w*.055);
-    ctx.fillStyle="rgba(0,0,0,.35)"; ctx.fillRect(0,0,w,h);
-    drawTopRibbon(ctx,w,h,d,th,tpl);
-
-    const boxY = Math.round(h*.50), boxH = Math.round(h*.405);
-    ctx.fillStyle=th.dark; ctx.roundRect(pad,boxY,w-pad*2,boxH,30); ctx.fill();
-    ctx.strokeStyle=th.b; ctx.lineWidth=Math.max(3,Math.round(w*.004)); ctx.stroke();
-
-    ctx.fillStyle=th.b; ctx.font=`900 ${Math.round(w*.045)}px sans-serif`;
-    ctx.fillText("สรุปข้อมูลสำคัญ",pad*1.35,boxY+Math.round(boxH*.15));
-    ctx.fillStyle="#fff"; ctx.font=`800 ${Math.round(w*.031)}px sans-serif`;
-    let y=boxY+Math.round(boxH*.31);
-    [
-      d.dateTime ? "วันที่: "+d.dateTime : "",
-      d.place ? "สถานที่: "+d.place : "",
-      d.detail ? "เรื่อง: "+shortText(d.detail,120) : ""
-    ].filter(Boolean).forEach(line=>{
-      y = wrap(ctx,line,pad*1.35,y,w-pad*2.7,Math.round(w*.043),2) + Math.round(w*.012);
+  }
+  function drawRibbon(ctx,w,h,d,th,t){
+    const pad=Math.round(w*.04);
+    ctx.save();
+    ctx.fillStyle="rgba(255,255,255,.92)";
+    roundRect(ctx,pad,pad,Math.min(w*.58, ctx.measureText(t.label).width+pad*2.8),Math.round(h*.046),Math.round(h*.023)); ctx.fill();
+    ctx.fillStyle=th.dark;
+    ctx.font=`800 ${Math.round(w*.018)}px sans-serif`;
+    ctx.textBaseline="middle";
+    ctx.fillText(`${t.icon} ${t.label}`,pad*1.55,pad+Math.round(h*.023));
+    ctx.restore();
+  }
+  function chipsLine(ctx,w,h,d,th,t,x,y){
+    const chips = t.chips.slice(0,3);
+    let cx=x;
+    ctx.font=`700 ${Math.round(w*.016)}px sans-serif`;
+    chips.forEach(ch=>{
+      const cw=ctx.measureText(ch).width+Math.round(w*.035);
+      ctx.fillStyle="rgba(255,255,255,.18)";
+      roundRect(ctx,cx,y,cw,Math.round(h*.035),Math.round(h*.018)); ctx.fill();
+      ctx.fillStyle="#fff"; ctx.fillText(ch,cx+Math.round(w*.016),y+Math.round(h*.024));
+      cx += cw + Math.round(w*.012);
     });
-
-    ctx.fillStyle=th.b; ctx.font=`800 ${Math.round(w*.026)}px sans-serif`;
-    wrap(ctx,d.footer || tpl.chips.join(" • "), pad*1.35, boxY+Math.round(boxH*.90), w-pad*2.7, Math.round(w*.033), 1);
-  };
-
-  const lower = (ctx,w,h,d,idx,total,th,tpl) => {
-    drawTopRibbon(ctx,w,h,d,th,tpl);
-    const pad=Math.round(w*.045), barH=Math.round(h*.145), y=h-barH-pad;
-    ctx.fillStyle=th.dark; ctx.roundRect(pad,y,w-pad*2,barH,24); ctx.fill();
-    ctx.strokeStyle=th.b; ctx.lineWidth=Math.max(2,Math.round(w*.003)); ctx.stroke();
-
-    ctx.fillStyle=th.b; ctx.font=`900 ${Math.round(w*.026)}px sans-serif`;
-    ctx.fillText(tpl.label, pad*1.35, y+Math.round(barH*.28));
-    ctx.fillStyle="#fff"; ctx.font=`850 ${Math.round(w*.032)}px sans-serif`;
-    wrap(ctx,autoCaption(d,idx), pad*1.35, y+Math.round(barH*.58), w-pad*4.2, Math.round(w*.04), 1);
-    ctx.fillStyle="rgba(255,255,255,.78)"; ctx.font=`650 ${Math.round(w*.021)}px sans-serif`;
-    ctx.fillText([d.dateTime,d.place].filter(Boolean).join(" | "), pad*1.35, y+Math.round(barH*.86));
-
-    ctx.fillStyle=th.b; ctx.roundRect(w-pad*3,y+Math.round(barH*.25),pad*1.85,Math.round(barH*.48),16); ctx.fill();
-    ctx.fillStyle=th.a; ctx.font=`900 ${Math.round(w*.026)}px sans-serif`; ctx.textAlign="center";
-    ctx.fillText(`${idx+1}/${total}`,w-pad*2.08,y+Math.round(barH*.56)); ctx.textAlign="left";
-  };
-
-  const processImage = async (file,idx,total) => {
-    const img=await loadImage(file), {w,h}=size(), th=theme(), tpl=template(), d=data();
-    const canvas=document.createElement("canvas"); canvas.width=w; canvas.height=h;
+  }
+  function autoCaption(d,idx){
+    const date = d.dateTime ? short(d.dateTime,18) : "";
+    const title = short(d.title,34);
+    const place = d.place ? short(d.place,28) : "";
+    if(idx===0) return title;
+    if(idx===1) return "สรุปภาพรวมกิจกรรม";
+    if(date && place) return `${title} | ${date}`;
+    if(date) return `${title} | ${date}`;
+    return title;
+  }
+  function captionText(d){
+    const org = hasRealOrg(d.org) ? d.org : "ชื่อหน่วยงาน / แบรนด์ของคุณ";
+    const title = d.title || "กิจกรรม / ข่าวประชาสัมพันธ์";
+    const parts = [];
+    parts.push(`📌 ${title}`);
+    let line = `${org} ขอประชาสัมพันธ์ข้อมูลกิจกรรมให้ทุกท่านได้รับทราบ`;
+    parts.push(line);
+    const meta = [d.dateTime && `📅 ${d.dateTime}`, d.place && `📍 ${d.place}`].filter(Boolean);
+    if(meta.length) parts.push(meta.join("\n"));
+    if(d.detail) parts.push(short(d.detail,170));
+    parts.push(d.footer ? d.footer : "ติดตามข่าวสารและกิจกรรมเพิ่มเติมได้ที่ช่องทางของเรา");
+    const hashBase = hasRealOrg(d.org) ? d.org.replace(/\s+/g,"") : "ประชาสัมพันธ์";
+    parts.push(`#${hashBase} #กิจกรรม #ประชาสัมพันธ์`);
+    return parts.filter(Boolean).join("\n\n");
+  }
+  function drawCover(ctx,w,h,d,th,t){
+    const minimal = (d.layoutMode||"").includes("เน้นภาพ");
+    drawRibbon(ctx,w,h,d,th,t); drawLogo(ctx,w,h,d,th);
+    const pad=Math.round(w*.045);
+    const boxH = minimal ? Math.round(h*.14) : Math.round(h*.22);
+    const boxY = h - boxH - pad;
+    ctx.save();
+    ctx.fillStyle=minimal ? "rgba(15,23,42,.62)" : "rgba(15,23,42,.72)";
+    roundRect(ctx,pad,boxY,w-pad*2,boxH,Math.round(w*.03)); ctx.fill();
+    ctx.fillStyle="#fff";
+    ctx.font=`900 ${Math.round(w*(minimal?.034:.044))}px sans-serif`;
+    ctx.textBaseline="top";
+    wrap(ctx,short(d.title,60),pad*1.55,boxY+Math.round(boxH*.22),w-pad*3.1,Math.round(w*.05),minimal?1:2);
+    if(!minimal){
+      ctx.font=`700 ${Math.round(w*.021)}px sans-serif`;
+      ctx.fillStyle="rgba(255,255,255,.9)";
+      const meta=[d.dateTime,d.place].filter(Boolean).join("  •  ");
+      wrap(ctx,short(meta,82),pad*1.55,boxY+Math.round(boxH*.70),w-pad*3.1,Math.round(w*.03),1);
+    }
+    ctx.restore();
+  }
+  function drawSummary(ctx,w,h,d,th,t){
+    drawRibbon(ctx,w,h,d,th,t); drawLogo(ctx,w,h,d,th);
+    const pad=Math.round(w*.045), boxH=Math.round(h*.28), boxY=h-boxH-pad;
+    ctx.save();
+    ctx.fillStyle="rgba(255,255,255,.90)";
+    roundRect(ctx,pad,boxY,w-pad*2,boxH,Math.round(w*.03)); ctx.fill();
+    ctx.fillStyle=th.dark;
+    ctx.font=`900 ${Math.round(w*.035)}px sans-serif`;
+    ctx.fillText("สรุปข้อมูลสำคัญ",pad*1.55,boxY+Math.round(boxH*.18));
+    ctx.font=`700 ${Math.round(w*.024)}px sans-serif`;
+    const bullets=[
+      d.dateTime ? `วันที่: ${short(d.dateTime,38)}` : "",
+      d.place ? `สถานที่: ${short(d.place,42)}` : "",
+      d.detail ? `ประเด็น: ${short(d.detail,58)}` : short(d.title,58)
+    ].filter(Boolean).slice(0,3);
+    bullets.forEach((b,i)=>ctx.fillText("• "+b,pad*1.65,boxY+Math.round(boxH*(.42+i*.18))));
+    ctx.restore();
+  }
+  function drawLower(ctx,w,h,d,idx,th,t){
+    drawRibbon(ctx,w,h,d,th,t); drawLogo(ctx,w,h,d,th);
+    const cap=autoCaption(d,idx);
+    if(!cap && !d.dateTime) return;
+    const pad=Math.round(w*.045), barH=Math.round(h*.075), y=h-barH-pad;
+    ctx.save();
+    ctx.fillStyle="rgba(15,23,42,.66)";
+    roundRect(ctx,pad,y,w-pad*2,barH,Math.round(w*.025)); ctx.fill();
+    ctx.fillStyle="#fff";
+    ctx.font=`800 ${Math.round(w*.022)}px sans-serif`;
+    ctx.textBaseline="middle";
+    wrap(ctx,cap,pad*1.45,y+barH*.53,w-pad*2.9,Math.round(w*.03),1);
+    ctx.restore();
+  }
+  function makeImage(file){
+    return new Promise((res,rej)=>{
+      const img=new Image();
+      img.onload=()=>res(img);
+      img.onerror=rej;
+      img.src=URL.createObjectURL(file);
+    });
+  }
+  function canvasToBlob(canvas){
+    return new Promise(res=>canvas.toBlob(b=>res(b),"image/jpeg",.92));
+  }
+  async function processImage(file,idx,total){
+    const d=data(), th=theme(d), t=tpl(d), sz=size(d);
+    const canvas=document.createElement("canvas"); canvas.width=sz.w; canvas.height=sz.h;
     const ctx=canvas.getContext("2d");
-    if(!ctx.roundRect){
-      ctx.roundRect = function(x,y,w,h,r){ this.beginPath(); this.moveTo(x+r,y); this.lineTo(x+w-r,y); this.quadraticCurveTo(x+w,y,x+w,y+r); this.lineTo(x+w,y+h-r); this.quadraticCurveTo(x+w,y+h,x+w-r,y+h); this.lineTo(x+r,y+h); this.quadraticCurveTo(x,y+h,x,y+h-r); this.lineTo(x,y+r); this.quadraticCurveTo(x,y,x+r,y); this.closePath(); return this; };
+    const img=await makeImage(file);
+    const enhance=!d.mode.includes("ครอป + ใส่กรอบเท่านั้น");
+    coverDraw(img,ctx,sz.w,sz.h,enhance);
+    if(!d.mode.includes("ปรับภาพเท่านั้น")){
+      if(idx===0) drawCover(ctx,sz.w,sz.h,d,th,t);
+      else if(idx===1 && !(d.layoutMode||"").includes("เน้นภาพ")) drawSummary(ctx,sz.w,sz.h,d,th,t);
+      else drawLower(ctx,sz.w,sz.h,d,idx,th,t);
     }
-    const mode=$("#album-autoMode")?.value||"ปรับภาพ + ครอป + ใส่กรอบ";
-    if(mode.includes("ปรับภาพ")) ctx.filter="brightness(1.08) contrast(1.08) saturate(1.07)";
-    const scale=Math.max(w/img.naturalWidth,h/img.naturalHeight), sw=w/scale, sh=h/scale, sx=(img.naturalWidth-sw)/2, sy=(img.naturalHeight-sh)/2;
-    ctx.drawImage(img,sx,sy,sw,sh,0,0,w,h);
-    ctx.filter="none";
+    const blob=await canvasToBlob(canvas);
+    const url=URL.createObjectURL(blob);
+    return {blob,url,filename:`facebook_album_${String(idx+1).padStart(2,"0")}.jpg`};
+  }
+  function renderOutputs(){
+    const host=$("#albumResult .ready-main") || $("#albumResult") || $("#albumOutput") || $("#albumPreview");
+    if(!host) return;
+    const caption = state.caption || captionText(data());
+    const cards=state.outputs.map((o,i)=>`
+      <div class="album-output-card">
+        <img src="${o.url}" alt="ภาพที่ ${i+1}">
+        <div class="album-caption-actions">
+          <button class="btn secondary album-one-download" data-i="${i}">ดาวน์โหลดภาพนี้</button>
+        </div>
+      </div>`).join("");
+    host.innerHTML = `
+      <div class="album-pro-panel">
+        <div class="album-caption-box">
+          <h3>แคปชั่นพร้อมโพสต์</h3>
+          <textarea id="albumCaptionText" rows="7">${caption.replace(/</g,"&lt;")}</textarea>
+          <div class="album-caption-actions">
+            <button class="btn primary" id="albumCopyCaption">คัดลอกแคปชั่น</button>
+            <button class="btn secondary" id="albumRefreshPreview">อัปเดตพรีวิว</button>
+          </div>
+          <p class="album-pro-note">พรีวิวด้านล่างเป็น mockup เพื่อเช็กภาพรวมก่อนโพสต์ ไม่ได้เชื่อมต่อ Facebook จริง</p>
+        </div>
+        <div id="albumFacebookPreview"></div>
+        <div class="album-output-grid">${cards}</div>
+      </div>`;
+    renderFacebookPreview();
+  }
+  function renderFacebookPreview(){
+    const host=$("#albumFacebookPreview"); if(!host) return;
+    const imgs=state.outputs.slice(0,4);
+    const total=state.outputs.length;
+    const cls=imgs.length<=1?"one":imgs.length===2?"two":imgs.length===3?"three":"four";
+    const captionEl=$("#albumCaptionText");
+    const caption=captionEl?captionEl.value:state.caption;
+    const cells=imgs.map((o,i)=>`<div class="fb-preview-cell"><img src="${o.url}" alt=""><span>${(total>4 && i===3)?`<span class="fb-preview-more">+${total-4}</span>`:""}</span></div>`).join("");
+    host.innerHTML=`
+      <div class="fb-preview-card">
+        <div class="fb-preview-head">
+          <div class="fb-preview-avatar">${state.logo?'<img style="width:100%;height:100%;object-fit:cover;border-radius:50%" src="'+state.logo.src+'">':'เพจ'}</div>
+          <div><div class="fb-preview-name">ชื่อเพจของคุณ</div><div class="fb-preview-time">เมื่อสักครู่ · 🌐</div></div>
+        </div>
+        <div class="fb-preview-caption">${String(caption||"").replace(/</g,"&lt;").replace(/\n/g,"<br>")}</div>
+        <div class="fb-preview-grid ${cls}">${cells}</div>
+        <div class="fb-preview-foot">พรีวิวจำลองหน้าโพสต์ Facebook สำหรับตรวจความอ่านง่ายก่อนดาวน์โหลด</div>
+      </div>`;
+  }
 
-    if(mode!=="ปรับภาพเท่านั้น"){
-      if($("#album-makeCover")?.checked!==false && idx===0) cover(ctx,w,h,d,th,tpl);
-      else if($("#album-makeCover")?.checked!==false && idx===1) summary(ctx,w,h,d,th,tpl);
-      else lower(ctx,w,h,d,idx,total,th,tpl);
+  // ZIP helpers
+  const te=new TextEncoder();
+  let crcTable=null;
+  function crc32(buf){
+    if(!crcTable){
+      crcTable=Array.from({length:256},(_,n)=>{
+        let c=n; for(let k=0;k<8;k++) c=(c&1)?(0xEDB88320^(c>>>1)):(c>>>1);
+        return c>>>0;
+      });
     }
-    const blob=await new Promise(res=>canvas.toBlob(res,"image/jpeg",.92));
-    return {blob,url:URL.createObjectURL(blob),name:`facebook_album_${String(idx+1).padStart(2,"0")}.jpg`};
-  };
-
-  TANJAI.renderAlbumPreview = function(){
-    const el=$("#album-preview"); if(!el) return;
-    const files=TANJAI.albumState.files||[];
-    el.innerHTML=files.map((f,i)=>`<div class="album-file-chip"><span>${i+1}</span><b>${f.name}</b><small>${Math.round(f.size/1024)} KB</small></div>`).join("") || `<div class="mini-note">ยังไม่มีภาพแนบ</div>`;
-  };
-
-  TANJAI.albumDownload = function(i){
-    const item=TANJAI.albumState.outputs?.[i]; if(!item) return;
-    const a=document.createElement("a"); a.href=item.url; a.download=item.name; a.click();
-  };
-
-  // ZIP writer in browser, no external library required.
-  TANJAI.albumZipCrcTable = TANJAI.albumZipCrcTable || (() => {
-    const table = new Uint32Array(256);
-    for(let n=0; n<256; n++){ let c=n; for(let k=0;k<8;k++) c=(c&1)?(0xedb88320^(c>>>1)):(c>>>1); table[n]=c>>>0; }
-    return table;
-  })();
-  TANJAI.albumCrc32 = function(bytes){ let crc=0xffffffff, table=TANJAI.albumZipCrcTable; for(let i=0;i<bytes.length;i++) crc=table[(crc^bytes[i])&255]^(crc>>>8); return (crc^0xffffffff)>>>0; };
-  TANJAI.albumU16 = n => [n&255,(n>>>8)&255];
-  TANJAI.albumU32 = n => [n&255,(n>>>8)&255,(n>>>16)&255,(n>>>24)&255];
-  TANJAI.albumDosTimeDate = function(date=new Date()){
-    return {time:((date.getHours()&31)<<11)|((date.getMinutes()&63)<<5)|((Math.floor(date.getSeconds()/2))&31), date:(((date.getFullYear()-1980)&127)<<9)|(((date.getMonth()+1)&15)<<5)|(date.getDate()&31)};
-  };
-  TANJAI.albumMakeZip = async function(files){
-    const enc=new TextEncoder(), chunks=[], central=[], dt=TANJAI.albumDosTimeDate(); let offset=0;
-    for(const file of files){
-      const nameBytes=enc.encode(file.name), data=new Uint8Array(await file.blob.arrayBuffer()), crc=TANJAI.albumCrc32(data), size=data.length;
-      const local=new Uint8Array([0x50,0x4b,0x03,0x04,...TANJAI.albumU16(20),...TANJAI.albumU16(0),...TANJAI.albumU16(0),...TANJAI.albumU16(dt.time),...TANJAI.albumU16(dt.date),...TANJAI.albumU32(crc),...TANJAI.albumU32(size),...TANJAI.albumU32(size),...TANJAI.albumU16(nameBytes.length),...TANJAI.albumU16(0)]);
-      chunks.push(local,nameBytes,data);
-      const cent=new Uint8Array([0x50,0x4b,0x01,0x02,...TANJAI.albumU16(20),...TANJAI.albumU16(20),...TANJAI.albumU16(0),...TANJAI.albumU16(0),...TANJAI.albumU16(dt.time),...TANJAI.albumU16(dt.date),...TANJAI.albumU32(crc),...TANJAI.albumU32(size),...TANJAI.albumU32(size),...TANJAI.albumU16(nameBytes.length),...TANJAI.albumU16(0),...TANJAI.albumU16(0),...TANJAI.albumU16(0),...TANJAI.albumU16(0),...TANJAI.albumU32(0),...TANJAI.albumU32(offset)]);
-      central.push(cent,nameBytes); offset+=local.length+nameBytes.length+data.length;
+    let c=0xffffffff;
+    for(const b of buf) c=crcTable[(c^b)&255]^(c>>>8);
+    return (c^0xffffffff)>>>0;
+  }
+  function u16(n){ return [n&255,(n>>>8)&255]; }
+  function u32(n){ return [n&255,(n>>>8)&255,(n>>>16)&255,(n>>>24)&255]; }
+  function dosDateTime(date=new Date()){
+    const time=(date.getHours()<<11)|(date.getMinutes()<<5)|Math.floor(date.getSeconds()/2);
+    const day=((date.getFullYear()-1980)<<9)|((date.getMonth()+1)<<5)|date.getDate();
+    return {time,day};
+  }
+  async function makeZip(files){
+    const chunks=[], central=[]; let offset=0; const dt=dosDateTime();
+    for(const f of files){
+      const data=new Uint8Array(await f.blob.arrayBuffer());
+      const name=te.encode(f.filename);
+      const crc=crc32(data), size=data.length;
+      const local=new Uint8Array([
+        ...u32(0x04034b50),...u16(20),...u16(0),...u16(0),...u16(dt.time),...u16(dt.day),
+        ...u32(crc),...u32(size),...u32(size),...u16(name.length),...u16(0),...name
+      ]);
+      chunks.push(local,data);
+      central.push({name,crc,size,offset});
+      offset += local.length + data.length;
     }
-    const centralSize=central.reduce((s,p)=>s+p.length,0), centralOffset=offset;
-    const end=new Uint8Array([0x50,0x4b,0x05,0x06,...TANJAI.albumU16(0),...TANJAI.albumU16(0),...TANJAI.albumU16(files.length),...TANJAI.albumU16(files.length),...TANJAI.albumU32(centralSize),...TANJAI.albumU32(centralOffset),...TANJAI.albumU16(0)]);
-    return new Blob([...chunks,...central,end],{type:"application/zip"});
-  };
-  TANJAI.albumDownloadAll = async function(){
-    const outputs=TANJAI.albumState.outputs||[];
-    if(!outputs.length){TANJAI.toast("ยังไม่มีภาพที่สร้างแล้ว"); return;}
-    TANJAI.toast("กำลังรวมภาพเป็น ZIP...");
-    const zipBlob=await TANJAI.albumMakeZip(outputs), a=document.createElement("a");
-    a.href=URL.createObjectURL(zipBlob); a.download=`facebook_album_pack_${new Date().toISOString().slice(0,10)}.zip`; a.click();
-    setTimeout(()=>URL.revokeObjectURL(a.href),2500); TANJAI.toast("ดาวน์โหลด ZIP แล้ว");
-  };
+    const cdStart=offset; const cdChunks=[];
+    for(const f of central){
+      const c=new Uint8Array([
+        ...u32(0x02014b50),...u16(20),...u16(20),...u16(0),...u16(0),...u16(dt.time),...u16(dt.day),
+        ...u32(f.crc),...u32(f.size),...u32(f.size),...u16(f.name.length),...u16(0),...u16(0),...u16(0),...u16(0),
+        ...u32(0),...u32(f.offset),...f.name
+      ]);
+      cdChunks.push(c); offset += c.length;
+    }
+    const cdSize=offset-cdStart;
+    const end=new Uint8Array([...u32(0x06054b50),...u16(0),...u16(0),...u16(central.length),...u16(central.length),...u32(cdSize),...u32(cdStart),...u16(0)]);
+    return new Blob([...chunks,...cdChunks,end],{type:"application/zip"});
+  }
+  async function downloadAll(){
+    if(!state.outputs.length) return alert("กรุณาสร้างชุดภาพก่อน");
+    const blob=await makeZip(state.outputs);
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);
+    a.download=`facebook_album_pack_${Date.now()}.zip`;
+    a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  }
+  function downloadOne(i){
+    const o=state.outputs[i]; if(!o) return;
+    const a=document.createElement("a"); a.href=o.url; a.download=o.filename; a.click();
+  }
+
+  async function loadLogo(file){
+    if(!file){ state.logo=null; return; }
+    const img=new Image();
+    await new Promise((res,rej)=>{ img.onload=res; img.onerror=rej; img.src=URL.createObjectURL(file); });
+    state.logo=img;
+  }
+
+  async function generate(){
+    const input=$("#album-files");
+    const files=input && input.files ? Array.from(input.files).filter(f=>f.type.startsWith("image/")) : state.files;
+    if(!files.length){ alert("กรุณาเลือกรูปภาพก่อน"); return; }
+    state.files=files;
+    state.outputs.forEach(o=>URL.revokeObjectURL(o.url));
+    state.outputs=[];
+    const btn=$("#makeAlbum"); const old=btn?btn.textContent:"";
+    if(btn){ btn.disabled=true; btn.textContent="กำลังสร้างชุดภาพ..."; }
+    try{
+      const logoInput=$("#album-logoFile");
+      if(logoInput && logoInput.files && logoInput.files[0]) await loadLogo(logoInput.files[0]);
+      for(let i=0;i<files.length;i++) state.outputs.push(await processImage(files[i],i,files.length));
+      state.caption=captionText(data());
+      renderOutputs();
+    }finally{
+      if(btn){ btn.disabled=false; btn.textContent=old || "สร้างชุดภาพ"; }
+    }
+  }
 
   document.addEventListener("DOMContentLoaded",()=>{
-    $("#album-files")?.addEventListener("change",()=>{ TANJAI.albumState.files=Array.from($("#album-files").files||[]); TANJAI.renderAlbumPreview(); });
-    $("#makeAlbum")?.addEventListener("click",async()=>{
-      const files=TANJAI.albumState.files||[];
-      if(!files.length){ TANJAI.setReadyOutput("album",{title:"ยังไม่มีภาพ",desc:"กรุณาอัปโหลดภาพก่อนสร้างชุดภาพโพสต์",main:"ยังไม่มีภาพแนบ\n\nกรุณาเลือกภาพจริงหลายภาพ แล้วกด “สร้างชุดภาพโพสต์” อีกครั้ง"}); return; }
-      TANJAI.toast("กำลังปรับภาพและใส่กรอบ...");
-      TANJAI.albumState.outputs.forEach(o=>{try{URL.revokeObjectURL(o.url)}catch(e){}});
-      const outputs=[]; for(let i=0;i<files.length;i++) outputs.push(await processImage(files[i],i,files.length)); TANJAI.albumState.outputs=outputs;
-      const grid=outputs.map((o,i)=>`<article class="album-output-card"><img src="${o.url}" alt=""><b>${o.name}</b><button class="btn secondary" data-album-download="${i}">ดาวน์โหลด</button></article>`).join("");
-      TANJAI.setReadyOutput("album",{title:"ชุดภาพพร้อมโพสต์",desc:`สร้างแล้ว ${outputs.length} ภาพ พร้อมดาวน์โหลดใช้งานจริง`,main:`สร้างชุดภาพโพสต์ Facebook เรียบร้อยแล้ว\n\n- จำนวนภาพ: ${outputs.length} ภาพ\n- ขนาด: ${$("#album-ratio")?.selectedOptions?.[0]?.textContent || "4:5"}\n- สไตล์กรอบ: ${$("#album-frameStyle")?.value || "Smart Frame"}\n- โหมด: ${$("#album-autoMode")?.value || "ปรับภาพ + ครอป + ใส่กรอบ"}\n- Safe Photo Mode: ไม่สร้างภาพใหม่ ไม่เปลี่ยนใบหน้า ไม่แก้องค์ประกอบหลัก\n\nกดปุ่ม “ดาวน์โหลดทั้งหมด” เพื่อโหลด ZIP หรือดาวน์โหลดแยกจากรายการด้านล่าง`,advancedTitle1:"พรีวิวชุดภาพ",advanced1:" "});
-      const adv=$("#albumAdvanced1"); if(adv){adv.classList.remove("result-box","advanced-result-box","stable-empty"); adv.innerHTML=`<div class="album-output-grid">${grid}</div>`;}
-      TANJAI.toast("สร้างชุดภาพโพสต์เรียบร้อย");
+    document.addEventListener("click",(e)=>{
+      const id=e.target && e.target.id;
+      if(id==="makeAlbum"){ e.preventDefault(); generate(); }
+      if(id==="albumDownloadAll" || id==="albumDownloadAllTop"){ e.preventDefault(); downloadAll(); }
+      if(id==="albumClear" || id==="albumClearTop"){
+        e.preventDefault();
+        state.outputs.forEach(o=>URL.revokeObjectURL(o.url)); state.outputs=[]; state.files=[];
+        const inp=$("#album-files"); if(inp) inp.value="";
+        const host=$("#albumResult .ready-main") || $("#albumResult"); if(host) host.innerHTML="";
+      }
+      if(id==="albumCopyCaption"){
+        e.preventDefault();
+        const t=$("#albumCaptionText");
+        if(t){ navigator.clipboard?.writeText(t.value); e.target.textContent="คัดลอกแล้ว"; setTimeout(()=>e.target.textContent="คัดลอกแคปชั่น",1200); }
+      }
+      if(id==="albumRefreshPreview"){ e.preventDefault(); renderFacebookPreview(); }
+      if(e.target && e.target.classList.contains("album-one-download")) downloadOne(Number(e.target.dataset.i||0));
     });
-    document.body.addEventListener("click",e=>{
-      const dl=e.target.closest("[data-album-download]"); if(dl){TANJAI.albumDownload(Number(dl.dataset.albumDownload)); return;}
-      if(e.target.closest("#albumDownloadAll,#albumDownloadAllTop")){TANJAI.albumDownloadAll(); return;}
-      if(e.target.closest("#albumClear,#albumClearTop")){ TANJAI.albumState.files=[]; TANJAI.albumState.outputs.forEach(o=>{try{URL.revokeObjectURL(o.url)}catch(err){}}); TANJAI.albumState.outputs=[]; const input=$("#album-files"); if(input) input.value=""; TANJAI.renderAlbumPreview(); TANJAI.setReadyOutput("album",{title:"ชุดภาพพร้อมโพสต์",desc:"ปรับภาพจริง ใส่กรอบ และดาวน์โหลดเป็นภาพพร้อมลง Facebook",main:"กดปุ่มสร้าง แล้วผลลัพธ์พร้อมใช้จะแสดงตรงนี้"}); TANJAI.toast("ล้างรูปแล้ว"); }
+    document.addEventListener("change",(e)=>{
+      if(e.target && e.target.id==="album-files"){
+        state.files=Array.from(e.target.files||[]).filter(f=>f.type.startsWith("image/"));
+      }
     });
   });
+  window.TANJAI_ALBUM_PRO={generate,downloadAll,renderFacebookPreview};
 })();

@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
     colorTones: ["ม่วง–ทอง พรีเมียม","ม่วง–ทอง เทคโนโลยี","น้ำเงิน–ขาว ทางการ","ชมพู–ม่วง สดใส","ดำ–ทอง หรูหรา","ให้ AI เลือกให้เหมาะสม"],
     videoFormats: ["คลิปประชาสัมพันธ์","คลิปข่าวด่วน","คลิปกิจกรรม / โครงการ","คลิปรีวิว","คลิปโซเชียลไวรัล","คลิปแนวสารคดีสั้น"],
     slideStyles: ["ทางการสำหรับผู้บริหาร","สรุปประชุม","นำเสนอโครงการ","รายงานผล","Pitch Deck","สไลด์อบรม"],
-    workTypes: ["นายกลงพื้นที่","ติดตามปัญหาประชาชน","ตรวจงานโครงการ","กิจกรรมเทศบาล","อบรม / ประชุม","ลงพื้นที่ช่วยเหลือ","รณรงค์ / ประชาสัมพันธ์","อื่น ๆ"]
+    workTypes: ["นายกลงพื้นที่","ติดตามปัญหากลุ่มเป้าหมาย","ตรวจงานโครงการ","กิจกรรมเทศบาล","อบรม / ประชุม","ลงพื้นที่ช่วยเหลือ","รณรงค์ / ประชาสัมพันธ์","อื่น ๆ"]
   };
 
 // Render forms
@@ -117,7 +117,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
   $("#albumForm").innerHTML = `
     <div class="form-section"><div class="section-title"><b>1</b><h4>อัปโหลดภาพจริง</h4></div>
-      <label class="full">เลือกภาพหลายภาพ<input id="album-files" type="file" accept="image/*" multiple><small>โหมดนี้ปรับภาพจริงเท่านั้น ไม่สร้างภาพใหม่ ไม่เปลี่ยนหน้า ไม่แก้องค์ประกอบหลัก</small></label>
+      <label class="full">เลือกภาพหลายภาพ
+        <div class="field">
+          <label>โลโก้จริง / โปรไฟล์เพจ (ไม่บังคับ)</label>
+          <input id="album-logoFile" type="file" accept="image/*">
+          <small>ถ้าไม่ใส่ ระบบจะไม่สร้าง badge หลอกบนภาพ</small>
+        </div>
+        <div class="field">
+          <label>โหมดการจัดวางภาพ</label>
+          <select id="album-layoutMode">
+            <option>สมดุลภาพและข้อความ</option>
+            <option>ภาพกิจกรรมเน้นภาพ / แถบเล็ก</option>
+            <option>ปก + สรุป + ภาพกิจกรรม</option>
+          </select>
+        </div>
+        <input id="album-files" type="file" accept="image/*" multiple><small>โหมดนี้ปรับภาพจริงเท่านั้น ไม่สร้างภาพใหม่ ไม่เปลี่ยนหน้า ไม่แก้องค์ประกอบหลัก</small></label>
       <div id="album-preview" class="album-upload-preview"></div>
     </div>
     <div class="form-section"><div class="section-title"><b>2</b><h4>ข้อมูลบนกรอบภาพ</h4></div>
@@ -135,7 +149,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <label>ขนาดภาพ<select id="album-ratio"><option value="4:5" selected>4:5 Facebook / Line 1080x1350</option><option value="1:1">1:1 Square 1080x1080</option><option value="16:9">16:9 1920x1080</option><option value="9:16">9:16 Story / Reels 1080x1920</option></select></label>
         <label>สไตล์กรอบ<select id="album-frameStyle"><option>ทั่วไป / หน่วยงาน / แบรนด์</option><option>ประชุม / เวทีรับฟัง / ประชาคม</option><option>ลงพื้นที่ / ภารกิจ / ติดตามงาน</option><option>ข่าวด่วน / ประกาศสำคัญ</option><option>กิจกรรม / อบรม / อีเวนต์</option><option>โรงเรียน / การศึกษา</option><option>สุขภาพ / รณรงค์ / ชุมชน</option><option>ธุรกิจ / สินค้า / โปรโมชัน</option><option>เพจ / ครีเอเตอร์ / แบรนด์ส่วนตัว</option><option>มินิมอล ขอบบาง</option></select></label>
         <label>โทนสี<select id="album-colorTone"><option>ม่วง–ทอง พรีเมียม</option><option>เขียว–เหลือง–ขาว</option><option>น้ำเงิน–ขาว ทางการ</option><option>ดำ–ทอง หรูหรา</option></select></label>
-        <label>โหมดอัตโนมัติ<select id="album-autoMode"><option>ปรับภาพ + ครอป + ใส่กรอบ</option><option>ครอป + ใส่กรอบเท่านั้น</option><option>ปรับภาพเท่านั้น</option></select></label>
+        <label>โหมดอัตโนมัติ<select id="album-autoMode"><option>ปรับภาพ + ครอป + ใส่กรอบ</option><option>ภาพกิจกรรมเน้นภาพ / แถบเล็ก</option><option>ครอป + ใส่กรอบเท่านั้น</option><option>ปรับภาพเท่านั้น</option></select></label>
         <label class="checkline full"><input id="album-safeMode" type="checkbox" checked> Safe Photo Mode — ไม่สร้างภาพใหม่ ไม่เปลี่ยนใบหน้า ไม่แก้องค์ประกอบหลัก</label>
         <label class="checkline full"><input id="album-makeCover" type="checkbox" checked> ทำ 2 รูปแรกให้เด่นเป็นปกหลัก / ปกรอง</label>
       </div>
@@ -144,7 +158,7 @@ document.addEventListener("DOMContentLoaded", () => {
   `;
 
   $("#postForm").innerHTML = TANJAI.field("post") + `
-    <div class="form-note">เมนูนี้ใช้สรุปงานจากข้อมูลและรูปภาพ เช่น นายกลงพื้นที่ ตรวจงาน ช่วยเหลือประชาชน แล้วนำไปต่อได้ทั้งนำเสนอ ทำคลิป และโพสต์โซเชียล</div>
+    <div class="form-note">เมนูนี้ใช้สรุปงานจากข้อมูลและรูปภาพ เช่น นายกลงพื้นที่ ตรวจงาน ช่วยเหลือกลุ่มเป้าหมาย แล้วนำไปต่อได้ทั้งนำเสนอ ทำคลิป และโพสต์โซเชียล</div>
     <div class="form-section"><div class="section-title"><b>2</b><h4>ตั้งค่าสคริปต์สรุปงาน</h4></div>
       <div class="form-grid">
         <label>ประเภทงาน<select id="post-workType">${opts(toolOptions.workTypes || ["นายกลงพื้นที่","กิจกรรมเทศบาล","อื่น ๆ"])}</select></label>
@@ -156,7 +170,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <small>หมายเหตุ: เว็บนี้จะช่วยจัด Prompt และแสดงตัวอย่างรูป จากนั้นนำ Prompt พร้อมรูปไปใช้กับ AI ที่วิเคราะห์ภาพได้ เช่น ChatGPT</small>
           <div id="post-photoPreview" class="upload-preview-grid"></div>
         </label>
-        <label class="full">สิ่งที่อยากให้เน้นเพิ่มเติม<textarea id="post-extra" placeholder="เช่น เน้นการรับฟังปัญหา การตรวจสอบพื้นที่ การประสานหน่วยงาน หรือผลลัพธ์ที่ประชาชนได้รับ"></textarea></label>
+        <label class="full">สิ่งที่อยากให้เน้นเพิ่มเติม<textarea id="post-extra" placeholder="เช่น เน้นการรับฟังปัญหา การตรวจสอบพื้นที่ การประสานหน่วยงาน หรือผลลัพธ์ที่กลุ่มเป้าหมายได้รับ"></textarea></label>
       </div>
       <div class="summary-output-tabs">
         <span class="summary-chip">สรุปผู้บริหาร</span>
@@ -240,7 +254,7 @@ $("#postResult").innerHTML = TANJAI.readyOutputShell("post", "ข้อควา
   };
 
 
-  // V8.4.3 Command Palette + FAB Quick Menu
+  // v8.5 Command Palette + FAB Quick Menu
   TANJAI.quickActions = [
     {label:"หน้าหลัก", icon:"🏠", view:"dashboard", hint:"กลับหน้าแรก"},
     {label:"สร้างภาพ", icon:"🖼️", view:"image", hint:"สร้าง Prompt / คำสั่งพร้อมใช้"},

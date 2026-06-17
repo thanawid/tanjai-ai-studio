@@ -37,7 +37,7 @@ TANJAI.switchView = function(id, options = {}){
     dashboard:"สวัสดีครับ! 👋",
     router:"AI Router",
     image:"สร้างภาพ",
-    album:"ชุดภาพโพสต์ Facebook",
+    album:"ชุดภาพโพสต์ Facebook Pro",
     post:"สคริปต์สรุปงาน",
     video:"ทำวิดีโอ",
     voice:"เสียงพากย์",
@@ -102,11 +102,11 @@ TANJAI.field = function(prefix, data){
     <div class="form-section">
       <div class="section-title"><b>1</b><h4>ข้อมูลพื้นฐาน</h4></div>
       <div class="form-grid">
-        <label>หัวข้องาน<input id="${prefix}-title" placeholder="เช่น แจ้งข่าวสำคัญ / โปรโมชัน / โครงการ"></label>
-        <label>ชื่อองค์กร / แบรนด์<input id="${prefix}-orgName" placeholder="เช่น เทศบาลเมืองบางรักน้อย"></label>
+        <label>หัวข้องาน<input id="${prefix}-title" placeholder="เช่น ชื่องาน / ประกาศ / กิจกรรม / แคมเปญ / โปรโมชัน"></label>
+        <label>ชื่อองค์กร / แบรนด์<input id="${prefix}-orgName" placeholder="เช่น ชื่อหน่วยงาน / องค์กร / ร้านค้า / เพจ / แบรนด์"></label>
         <label>กลุ่มเป้าหมาย<select id="${prefix}-audience">${opts(c.audiences)}</select></label>
         <label>โทนภาษา<select id="${prefix}-tone">${opts(c.tones)}</select></label>
-        <label class="full">รายละเอียด<textarea id="${prefix}-detail" placeholder="ใส่เนื้อหาที่ต้องการให้ระบบช่วยคิด"></textarea></label>
+        <label class="full">รายละเอียด<textarea id="${prefix}-detail" placeholder="ใส่ข้อมูลจริงของงาน เช่น ใคร / ทำอะไร / ที่ไหน / เมื่อไหร่ / ต้องการสื่อสารอะไร"></textarea></label>
         <label>วัน / เวลา<input id="${prefix}-dateTime" placeholder="ถ้ามี"></label>
         <label>สถานที่<input id="${prefix}-place" placeholder="ถ้ามี"></label>
         <label class="full">บุคคล / หน่วยงานที่เกี่ยวข้อง<input id="${prefix}-people" placeholder="ถ้ามี"></label>
