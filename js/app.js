@@ -126,13 +126,13 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="field">
           <label>โหมดการจัดวางภาพ</label>
           <select id="album-layoutMode">
-            <option>สมดุลภาพและข้อความ</option>
-            <option>ภาพกิจกรรมเน้นภาพ / แถบเล็ก</option>
-            <option>ปก + สรุป + ภาพกิจกรรม</option>
+            <option>Cover หนัก + Lite Album 2–4</option>
+            <option>Cover เน้นภาพ + Lite บาง</option>
+            <option>Cover มินิมอล + Lite Caption</option>
           </select>
         </div>
-        <small>เลือกได้หลายภาพพร้อมกัน เช่น 4–20 ภาพ โดยระบบจะเน้น 4 รูปแรกเป็นชุดอัลบั้มหลักสำหรับ Facebook</small>
-        <input id="album-files" type="file" accept="image/*" multiple><small>โหมดนี้ปรับภาพจริงเท่านั้น ไม่สร้างภาพใหม่ ไม่เปลี่ยนหน้า ไม่แก้องค์ประกอบหลัก</small></label>
+        <small>อัปโหลดได้ 4–5 ภาพ โดยระบบจะเน้นภาพแรกเป็น Cover Frame และภาพ 2–4 เป็น Lite Album สำหรับ Facebook</small>
+        <input id="album-files" type="file" accept="image/*" multiple><small>ออกแบบรองรับภาพแนวนอนเป็นหลัก และยังเลือกขนาดสำหรับหน้าจออื่นได้</small></label>
       <div id="album-preview" class="album-upload-preview"></div>
     </div>
     <div class="form-section"><div class="section-title"><b>2</b><h4>ข้อมูลบนกรอบภาพ</h4></div>
@@ -148,12 +148,13 @@ document.addEventListener("DOMContentLoaded", () => {
     </div>
     <div class="form-section"><div class="section-title"><b>3</b><h4>ตั้งค่าชุดภาพ</h4></div>
       <div class="form-grid">
-        <label>ขนาดภาพ<select id="album-ratio"><option value="4:5" selected>4:5 Facebook / Line 1080x1350</option><option value="1:1">1:1 Square 1080x1080</option><option value="16:9">16:9 1920x1080</option><option value="9:16">9:16 Story / Reels 1080x1920</option></select></label>
+        <label>ขนาดภาพ<select id="album-ratio"><option value="16:9" selected>16:9 Facebook แนวนอน 1920x1080</option><option value="4:5">4:5 Facebook / Line 1080x1350</option><option value="1:1">1:1 Square 1080x1080</option><option value="9:16">9:16 Story / Reels 1080x1920</option></select></label>
         <label>สไตล์กรอบ<select id="album-frameStyle"><option>ทั่วไป / หน่วยงาน / แบรนด์</option><option>ประชุม / เวทีรับฟัง / ประชาคม</option><option>ลงพื้นที่ / ภารกิจ / ติดตามงาน</option><option>ข่าวด่วน / ประกาศสำคัญ</option><option>กิจกรรม / อบรม / อีเวนต์</option><option>โรงเรียน / การศึกษา</option><option>สุขภาพ / รณรงค์ / ชุมชน</option><option>ธุรกิจ / สินค้า / โปรโมชัน</option><option>เพจ / ครีเอเตอร์ / แบรนด์ส่วนตัว</option><option>มินิมอล ขอบบาง</option></select></label>
+        <label>Theme Cover Frame Preset<select id="album-themePreset"><option>Modern Civic Cover</option><option>Clean Banner Cover</option><option>Premium Glass Cover</option></select></label>
         <label>โทนสี<select id="album-colorTone"><option>ม่วง–ทอง พรีเมียม</option><option>เขียว–เหลือง–ขาว</option><option>น้ำเงิน–ขาว ทางการ</option><option>ดำ–ทอง หรูหรา</option></select></label>
         <label>โหมดอัตโนมัติ<select id="album-autoMode"><option>ปรับภาพ + ครอป + ใส่กรอบ</option><option>ภาพกิจกรรมเน้นภาพ / แถบเล็ก</option><option>ครอป + ใส่กรอบเท่านั้น</option><option>ปรับภาพเท่านั้น</option></select></label>
         <label class="checkline full"><input id="album-safeMode" type="checkbox" checked> Safe Photo Mode — ไม่สร้างภาพใหม่ ไม่เปลี่ยนใบหน้า ไม่แก้องค์ประกอบหลัก</label>
-        <label class="checkline full"><input id="album-makeCover" type="checkbox" checked> ทำ 2 รูปแรกให้เด่นเป็นปกหลัก / ปกรอง</label>
+        <label class="checkline full"><input id="album-makeCover" type="checkbox" checked> ใช้กรอบหนักเฉพาะภาพแรก และให้ภาพ 2–4 เป็น Lite Frame</label>
       </div>
     </div>
     <div class="button-row"><button class="btn primary" id="makeAlbum">สร้างชุดภาพโพสต์</button><button class="btn secondary" id="albumDownloadAll">ดาวน์โหลดทั้งหมด</button><button class="btn secondary" id="albumClear">ล้างรูป</button></div>
