@@ -153,10 +153,10 @@ document.addEventListener("DOMContentLoaded", () => {
         <label>Theme Cover Frame Preset<select id="album-themePreset"><option>Ribbon Civic Cover</option><option>Modern Glass Cover</option><option>Minimal Story Cover</option></select></label>
         <label>โทนสี<select id="album-colorTone"><option>ม่วง–ทอง พรีเมียม</option><option selected>เขียว–เหลือง–ขาว</option><option>น้ำเงิน–ขาว ทางการ</option><option>ส้ม–ทอง สดเด่น</option><option>ดำ–ทอง หรูหรา</option></select></label>
         <label>โหมดอัตโนมัติ<select id="album-autoMode"><option>ปรับภาพ + ครอป + ใส่กรอบ</option><option>ภาพกิจกรรมเน้นภาพ / แถบเล็ก</option><option>ครอป + ใส่กรอบเท่านั้น</option><option>ปรับภาพเท่านั้น</option></select></label>
-        <label class="checkline full"><input id="album-safeMode" type="checkbox" checked> Safe Photo Mode — ไม่สร้างภาพใหม่ ไม่เปลี่ยนใบหน้า ไม่แก้องค์ประกอบหลัก</label>
-        <label class="checkline full"><input id="album-makeCover" type="checkbox" checked> ใช้กรอบหนักเฉพาะภาพแรก ภาพ 2–4 เป็น Lite Frame และภาพที่ 5 เป็น Additional Frame</label>
+        <input id="album-safeMode" type="checkbox" checked hidden>
+        <input id="album-makeCover" type="checkbox" checked hidden>
       </div>
-      <div class="form-note">V8.7.0 — Template Frame System: แนวกรอบอ้างอิงจากตัวอย่างแบบ Cover Frame + Lite Album โดยพรีวิวและผลลัพธ์จริงจะใช้โครงสร้างเดียวกัน รองรับภาพแนวนอนเป็นหลัก และยังส่งออกได้ในสัดส่วนอื่น</div>
+      <div class="form-note">V8.7.0 — Template Frame System: ระบบจะใช้ภาพแรกเป็น Cover Frame, ภาพ 2–4 เป็น Lite Frame และภาพที่ 5 เป็น Additional Frame แบบบาง โดยยังคง Safe Photo Mode ไม่สร้างภาพใหม่ ไม่เปลี่ยนใบหน้า และไม่แก้องค์ประกอบหลัก</div>
     </div>
     <div class="button-row"><button class="btn primary" id="makeAlbum">สร้างชุดภาพโพสต์</button><button class="btn secondary" id="albumDownloadAll">ดาวน์โหลดทั้งหมด</button><button class="btn secondary" id="albumClear">ล้างรูป</button></div>
   `;
