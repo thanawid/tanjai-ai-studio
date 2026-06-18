@@ -1,20 +1,22 @@
-/* v8.7.1 — Preview Sync + Smart Template
+/* v8.7.2 — Clean Frame Output + Smart Text Fit
    Safe photo processing for real uploaded images only.
-   Facebook album storytelling: image 1 = heavy cover, images 2–4 = lite frame,
-   image 5 = additional light frame. Preview and output share the same logic.
+   Separate cover upload + support uploads, cleaner frame output,
+   smarter text fitting, and synced preview / download results.
 */
 (function(){
-  function ensureAlbumMultiInput(){
-    const inp = document.getElementById("album-files");
-    if(inp){
-      inp.setAttribute("multiple","multiple");
-      inp.setAttribute("accept","image/*");
+  function ensureAlbumInputs(){
+    const cover = document.getElementById("album-coverFile");
+    const supports = document.getElementById("album-supportFiles");
+    if(cover) cover.setAttribute("accept","image/*");
+    if(supports){
+      supports.setAttribute("multiple","multiple");
+      supports.setAttribute("accept","image/*");
     }
   }
 
   const $ = (q,root=document)=>root.querySelector(q);
   const $$ = (q,root=document)=>Array.from(root.querySelectorAll(q));
-  const state = { files: [], outputs: [], logo: null, caption: "" };
+  const state = { coverFile: null, supportFiles: [], files: [], outputs: [], logo: null, caption: "" };
 
   function val(id, fallback=""){
     const el = document.getElementById(id);
@@ -398,44 +400,41 @@
   function drawLiteFrame(ctx,w,h,d,idx,th){
     const pst=preset(d);
     const pad=Math.round(Math.min(w,h)*0.024);
-    const bottomH=Math.round(h*(w>=h?(pst.liteCompact?0.15:0.16):(pst.liteCompact?0.12:0.13)));
+    const bottomH=Math.round(h*(w>=h?(pst.liteCompact?0.155:0.17):(pst.liteCompact?0.13:0.145)));
     const y=h-pad-bottomH;
     const x=pad;
     const boxW=w-pad*2;
     drawGlassPanel(ctx,x,y,boxW,bottomH,Math.round(bottomH*.28),th,.68);
 
-    const badgeSize=Math.round(bottomH*.62);
-    const badgeX=x+Math.round(w*.018);
-    const badgeY=y+Math.round((bottomH-badgeSize)/2);
-    ctx.save();
-    const g=ctx.createLinearGradient(badgeX,badgeY,badgeX+badgeSize,badgeY+badgeSize);
-    g.addColorStop(0,th.accent2); g.addColorStop(1,th.accent);
-    fillRoundRect(ctx,badgeX,badgeY,badgeSize,badgeSize,Math.round(badgeSize*.28),g,'rgba(255,255,255,.14)',1);
-    ctx.fillStyle='#fff';
-    ctx.font=`900 ${Math.round(badgeSize*.44)}px "Prompt","Noto Sans Thai",sans-serif`;
-    ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText(String(idx+1), badgeX+badgeSize/2, badgeY+badgeSize/2+1);
-    ctx.restore();
-
     const hasLogo = !!state.logo;
+    const leftPad=x+Math.round(w*.026);
+    let rightReserve=Math.round(w*.03);
     if(hasLogo){
-      const ls=Math.round(bottomH*.58);
-      drawLogo(ctx,w-pad-ls,badgeY,ls);
+      const ls=Math.round(bottomH*.56);
+      const logoY=y+Math.round((bottomH-ls)/2);
+      drawLogo(ctx,w-pad-ls,logoY,ls);
+      rightReserve = Math.round(w*.03) + ls + Math.round(w*.018);
     }
 
-    const textX=badgeX+badgeSize+Math.round(w*.016);
-    const textW=boxW-(textX-x)-Math.round(w*(hasLogo?0.09:0.03));
-    drawText(ctx, liteText(d, idx), textX, y+Math.round(bottomH*.27), textW, w>=h?2:2, `900 ${Math.round(Math.min(w,h)*0.024)}px "Prompt","Noto Sans Thai",sans-serif`, '#fff', Math.round(Math.min(w,h)*0.03));
+    const textY=y+Math.round(bottomH*.24);
+    const textW=boxW-(leftPad-x)-rightReserve;
+    drawText(ctx, liteText(d, idx), leftPad, textY, textW, 2, `900 ${Math.round(Math.min(w,h)*0.025)}px "Prompt","Noto Sans Thai",sans-serif`, '#fff', Math.round(Math.min(w,h)*0.03));
   }
 
   function drawAdditionalFrame(ctx,w,h,d,idx,th){
     const pad=Math.round(Math.min(w,h)*0.025);
-    const boxW=Math.round(w*0.62);
-    const boxH=Math.round(h*(w>=h?0.105:0.085));
+    const boxW=Math.round(w*0.68);
+    const boxH=Math.round(h*(w>=h?0.12:0.1));
     const x=pad;
     const y=h-pad-boxH;
     drawGlassPanel(ctx,x,y,boxW,boxH,Math.round(boxH*.34),th,.60);
-    drawText(ctx, liteText(d, idx), x+Math.round(w*.02), y+Math.round(boxH*.25), boxW-Math.round(w*.04), 1, `800 ${Math.round(Math.min(w,h)*0.022)}px "Prompt","Noto Sans Thai",sans-serif`, '#fff', Math.round(Math.min(w,h)*0.027));
+    let textW=boxW-Math.round(w*.04);
+    if(state.logo){
+      const ls=Math.round(boxH*.58);
+      drawLogo(ctx,x+boxW-ls-Math.round(w*.015), y+Math.round((boxH-ls)/2), ls);
+      textW -= ls + Math.round(w*.03);
+    }
+    drawText(ctx, liteText(d, idx), x+Math.round(w*.02), y+Math.round(boxH*.21), textW, 2, `800 ${Math.round(Math.min(w,h)*0.022)}px "Prompt","Noto Sans Thai",sans-serif`, '#fff', Math.round(Math.min(w,h)*0.027));
   }
 
   function makeImage(file){
@@ -460,31 +459,56 @@
     return {blob,url,filename:`facebook_album_${String(idx+1).padStart(2,'0')}.jpg`};
   }
 
-  function normalizeFiles(fileList, warn=true){
+  function normalizeFiles(fileList, warn=true, max=4){
     let files=Array.from(fileList||[]).filter(f=>f.type.startsWith('image/'));
-    if(files.length>5){ files=files.slice(0,5); if(warn) alert('ระบบนี้รองรับ 4–5 ภาพเท่านั้น จึงเลือกใช้ 5 ภาพแรกให้โดยอัตโนมัติ'); }
+    if(files.length>max){ files=files.slice(0,max); if(warn) alert(`ระบบนี้รองรับภาพรองได้สูงสุด ${max} ภาพ จึงเลือกใช้ ${max} ภาพแรกให้โดยอัตโนมัติ`); }
     return files;
+  }
+  function syncStateFiles(){
+    state.files=[state.coverFile, ...state.supportFiles].filter(Boolean);
+    return state.files;
+  }
+  function collectFilesFromInputs(warn=true){
+    const coverInput=$('#album-coverFile');
+    const supportInput=$('#album-supportFiles');
+    state.coverFile = coverInput && coverInput.files && coverInput.files[0] ? coverInput.files[0] : null;
+    state.supportFiles = normalizeFiles(supportInput && supportInput.files ? supportInput.files : [], warn, 4);
+    return syncStateFiles();
   }
 
   function renderUploadPreview(){
     const host=$('#album-preview'); if(!host) return;
-    if(!state.files.length){
-      host.innerHTML = `<p class="album-frame-note">ยังไม่มีรูปที่เลือก — อัปโหลด 4–5 ภาพ แล้วเลือกภาพแรกให้เป็นปกหลักได้</p>`;
+    syncStateFiles();
+    const hasCover=!!state.coverFile;
+    const supports=state.supportFiles || [];
+    if(!hasCover && !supports.length){
+      host.innerHTML = `<p class="album-frame-note">เลือกภาพหน้าปก 1 ภาพ และภาพรอง 3–4 ภาพ แล้วระบบจะจัดทำ Cover + Lite Album ให้อัตโนมัติ</p>`;
       return;
     }
     host.innerHTML = `
-      <div class="album-order-note">V8.7.1 Preview Sync: รูปที่ 1 = Cover Preview ใหญ่, รูปที่ 2–4 = Lite Preview, รูปที่ 5 = Additional แบบบาง กด “ตั้งเป็นปก” เพื่อดันภาพนั้นขึ้นเป็นรูปแรก</div>
-      ${state.files.map((f,i)=>`
-        <div class="album-file-chip" data-i="${i}">
-          <span>${i+1}</span>
-          <b title="${f.name.replace(/"/g,'&quot;')}">${f.name}</b>
-          <small>${i===0?'Cover':i<4?'Lite':'Extra'}</small>
-          <div class="album-order-actions">
-            ${i!==0?`<button type="button" class="album-order-btn album-cover-btn" data-album-cover="${i}" title="ตั้งเป็นภาพปก">ปก</button>`:''}
-            <button type="button" class="album-order-btn" data-album-move="up" data-i="${i}" ${i===0?'disabled':''}>↑</button>
-            <button type="button" class="album-order-btn" data-album-move="down" data-i="${i}" ${i===state.files.length-1?'disabled':''}>↓</button>
-          </div>
-        </div>`).join('')}
+      <div class="album-order-note">โหมดใหม่: แยกภาพปกออกจากภาพรองชัดเจน เพื่อให้ภาพที่ใช้เป็นหน้าปก ตรงกับภาพปกใน Preview และไฟล์ดาวน์โหลด</div>
+      <div class="album-upload-group">
+        <div class="album-upload-group-title">ภาพหน้าปกหลัก</div>
+        ${hasCover ? `
+          <div class="album-file-chip album-cover-chip">
+            <span>ปก</span>
+            <b title="${state.coverFile.name.replace(/"/g,'&quot;')}">${state.coverFile.name}</b>
+            <small>Cover Frame</small>
+          </div>` : `<div class="album-empty-chip">ยังไม่ได้เลือกภาพปก</div>`}
+      </div>
+      <div class="album-upload-group">
+        <div class="album-upload-group-title">ภาพรอง</div>
+        ${supports.length ? supports.map((f,i)=>`
+          <div class="album-file-chip" data-support-i="${i}">
+            <span>${i+2}</span>
+            <b title="${f.name.replace(/"/g,'&quot;')}">${f.name}</b>
+            <small>${i<3?'Lite Frame':'Additional'}</small>
+            <div class="album-order-actions">
+              <button type="button" class="album-order-btn" data-album-support-move="up" data-i="${i}" ${i===0?'disabled':''}>↑</button>
+              <button type="button" class="album-order-btn" data-album-support-move="down" data-i="${i}" ${i===supports.length-1?'disabled':''}>↓</button>
+            </div>
+          </div>`).join('') : `<div class="album-empty-chip">ยังไม่ได้เลือกภาพรอง</div>`}
+      </div>
     `;
   }
 
@@ -514,7 +538,7 @@
       <section class="album-preview-section">
         <div class="album-preview-title">
           <b>Cover Preview</b>
-          <span>ภาพปกหลักแบบเต็ม เห็นจริงก่อนดาวน์โหลด</span>
+          <span>ภาพปกหลักแบบเต็ม</span>
         </div>
         <div class="album-cover-preview-card">
           <img src="${cover.url}" alt="Cover Preview" style="aspect-ratio:${aspect}">
@@ -526,7 +550,7 @@
       <section class="album-preview-section">
         <div class="album-preview-title">
           <b>Lite Preview</b>
-          <span>ภาพ 2–4 ใช้กรอบเบา เน้นบรรยากาศ</span>
+          <span>ภาพรอง 2–4 แบบ Lite Frame</span>
         </div>
         <div class="album-lite-preview-grid">
           ${lites.map((o,k)=>`
@@ -542,7 +566,7 @@
       <section class="album-preview-section">
         <div class="album-preview-title">
           <b>Additional</b>
-          <span>ภาพที่ 5 กรอบบางมากหรือใช้เป็นภาพเสริม</span>
+          <span>ภาพเสริมลำดับสุดท้าย</span>
         </div>
         <div class="album-lite-preview-grid album-additional-preview-grid">
           ${additional.map((o,k)=>`
@@ -570,7 +594,7 @@
             <button class="btn primary" id="albumCopyCaption">คัดลอกแคปชั่น</button>
             <button class="btn secondary" id="albumRefreshPreview">อัปเดตพรีวิว Facebook</button>
           </div>
-          <p class="album-pro-note">ภาพ Preview ด้านล่างคือภาพที่เรนเดอร์จริงชุดเดียวกับไฟล์ดาวน์โหลด</p>
+          <p class="album-pro-note">พรีวิวและไฟล์ดาวน์โหลดใช้ภาพชุดเดียวกัน</p>
         </div>
         ${coverPreview}
         ${litePreview}
@@ -578,7 +602,7 @@
         <section class="album-preview-section">
           <div class="album-preview-title">
             <b>Facebook Album Mockup</b>
-            <span>จำลองการแสดงผล 4 รูปแรกบน Facebook</span>
+            <span>จำลองโพสต์ตามภาพที่สร้างจริง</span>
           </div>
           <div id="albumFacebookPreview"></div>
         </section>
@@ -605,7 +629,7 @@
         </div>
         <div class="fb-preview-caption">${String(caption||'').replace(/</g,'&lt;').replace(/\n/g,'<br>')}</div>
         <div class="fb-preview-grid ${cls}">${cells}</div>
-        <div class="fb-preview-foot">พรีวิวจำลองหน้าโพสต์ Facebook สำหรับตรวจภาพรวมของ 4 รูปแรก</div>
+        <div class="fb-preview-foot">จำลองหน้าโพสต์ Facebook จากภาพที่สร้างจริง</div>
       </div>`;
   }
 
@@ -629,14 +653,14 @@
   async function downloadAll(){ if(!state.outputs.length) return alert('กรุณาสร้างชุดภาพก่อน'); const blob=await makeZip(state.outputs); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`facebook_album_pack_${Date.now()}.zip`; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1000); }
   function downloadOne(i){ const o=state.outputs[i]; if(!o) return; const a=document.createElement('a'); a.href=o.url; a.download=o.filename; a.click(); }
   async function loadLogo(file){ if(!file){ state.logo=null; return; } const img=new Image(); await new Promise((res,rej)=>{ img.onload=res; img.onerror=rej; img.src=URL.createObjectURL(file); }); state.logo=img; }
-  function moveFile(i,dir){ const j=dir==='up'?i-1:i+1; if(j<0 || j>=state.files.length) return; const copy=state.files.slice(); [copy[i],copy[j]]=[copy[j],copy[i]]; state.files=copy; renderUploadPreview(); }
-  function setCover(i){ if(i<=0 || i>=state.files.length) return; const copy=state.files.slice(); const picked=copy.splice(i,1)[0]; copy.unshift(picked); state.files=copy; renderUploadPreview(); }
+  function moveSupport(i,dir){ const j=dir==='up'?i-1:i+1; if(j<0 || j>=state.supportFiles.length) return; const copy=state.supportFiles.slice(); [copy[i],copy[j]]=[copy[j],copy[i]]; state.supportFiles=copy; syncStateFiles(); renderUploadPreview(); }
 
   async function generate(){
     if(window.TANJAI && TANJAI.proofread && typeof TANJAI.proofread.runActive === 'function') TANJAI.proofread.runActive(false);
-    let files=state.files; const input=$('#album-files');
-    if((!files || !files.length) && input && input.files) files=normalizeFiles(input.files,false);
-    if(files.length < 4) return alert('กรุณาอัปโหลดอย่างน้อย 4 ภาพ');
+    let files=syncStateFiles();
+    if(!files.length) files=collectFilesFromInputs(false);
+    if(!state.coverFile) return alert('กรุณาเลือกภาพหน้าปกหลัก 1 ภาพ');
+    if(files.length < 4) return alert('กรุณาอัปโหลดภาพหน้าปก 1 ภาพ และภาพรองอย่างน้อย 3 ภาพ');
     if(files.length > 5) files=files.slice(0,5);
     state.files=files;
     state.outputs.forEach(o=>URL.revokeObjectURL(o.url)); state.outputs=[];
@@ -651,7 +675,8 @@
   }
 
   document.addEventListener('DOMContentLoaded',()=>{
-    ensureAlbumMultiInput();
+    ensureAlbumInputs();
+    collectFilesFromInputs(false);
     renderUploadPreview();
     document.addEventListener('click',(e)=>{
       const id=e.target && e.target.id;
@@ -660,8 +685,9 @@
       if(id==='albumClear' || id==='albumClearTop'){
         e.preventDefault();
         state.outputs.forEach(o=>URL.revokeObjectURL(o.url));
-        state.outputs=[]; state.files=[]; state.logo=null;
-        const inp=$('#album-files'); if(inp) inp.value='';
+        state.outputs=[]; state.files=[]; state.coverFile=null; state.supportFiles=[]; state.logo=null;
+        const coverInp=$('#album-coverFile'); if(coverInp) coverInp.value='';
+        const supportInp=$('#album-supportFiles'); if(supportInp) supportInp.value='';
         const logoInp=$('#album-logoFile'); if(logoInp) logoInp.value='';
         renderUploadPreview();
         const host=$('#albumResult .ready-main') || $('#albumResult'); if(host) host.innerHTML='';
@@ -669,12 +695,11 @@
       if(id==='albumCopyCaption'){ e.preventDefault(); const t=$('#albumCaptionText'); if(t){ navigator.clipboard?.writeText(t.value); e.target.textContent='คัดลอกแล้ว'; setTimeout(()=>e.target.textContent='คัดลอกแคปชั่น',1200); } }
       if(id==='albumRefreshPreview'){ e.preventDefault(); renderFacebookPreview(); }
       if(e.target && e.target.classList.contains('album-one-download')) downloadOne(Number(e.target.dataset.i||0));
-      const coverIndex=e.target && e.target.dataset && e.target.dataset.albumCover; if(coverIndex!==undefined){ e.preventDefault(); setCover(Number(coverIndex)); }
-      const move=e.target && e.target.dataset && e.target.dataset.albumMove; if(move){ e.preventDefault(); moveFile(Number(e.target.dataset.i||0), move); }
+      const move=e.target && e.target.dataset && e.target.dataset.albumSupportMove; if(move){ e.preventDefault(); moveSupport(Number(e.target.dataset.i||0), move); }
     });
     document.addEventListener('change',(e)=>{
-      if(e.target && e.target.id==='album-files'){ state.files=normalizeFiles(e.target.files,true); renderUploadPreview(); }
+      if(e.target && (e.target.id==='album-coverFile' || e.target.id==='album-supportFiles')){ collectFilesFromInputs(true); renderUploadPreview(); }
     });
   });
-  window.TANJAI_ALBUM_PRO={generate,downloadAll,renderFacebookPreview,renderUploadPreview};
+  window.TANJAI_ALBUM_PRO={generate,downloadAll,renderFacebookPreview,renderUploadPreview,collectFilesFromInputs};
 })();

@@ -117,22 +117,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
   $("#albumForm").innerHTML = `
     <div class="form-section"><div class="section-title"><b>1</b><h4>อัปโหลดภาพจริง</h4></div>
-      <label class="full">เลือกภาพหลายภาพ
-        <div class="field">
-          <label>โลโก้จริง / โปรไฟล์เพจ (ไม่บังคับ)</label>
+      <div class="form-grid">
+        <label>โลโก้จริง / โปรไฟล์เพจ (ไม่บังคับ)
           <input id="album-logoFile" type="file" accept="image/*">
-          <small>ถ้าไม่ใส่ ระบบจะไม่สร้าง badge หลอกบนภาพ</small>
-        </div>
-        <div class="field">
-          <label>โหมดการจัดวางภาพ</label>
-          <select id="album-layoutMode">
-            <option>Preview Sync + Smart Template</option>
-            <option>Cover ขายเรื่อง + Lite ขายบรรยากาศ</option>
-            <option>Cover มินิมอล + Lite Caption</option>
-          </select>
-        </div>
-        <small>อัปโหลดได้ 4–5 ภาพ โดยระบบจะใช้ภาพแรกเป็น Cover Frame, ภาพ 2–4 เป็น Lite Frame และภาพที่ 5 เป็น Additional Frame แบบบาง</small>
-        <input id="album-files" type="file" accept="image/*" multiple><small>ออกแบบรองรับภาพแนวนอนเป็นหลัก และยังเลือกขนาดสำหรับหน้าจออื่นได้</small></label>
+          <small>ถ้าไม่ใส่ ระบบจะไม่ใส่โลโก้บนภาพ</small>
+        </label>
+        <input id="album-layoutMode" type="hidden" value="Clean Frame Output + Smart Text Fit">
+        <label>ภาพหน้าปกหลัก (จำเป็น)
+          <input id="album-coverFile" type="file" accept="image/*">
+          <small>ภาพนี้จะใช้เป็น Cover Frame แบบเต็ม</small>
+        </label>
+        <label class="full">ภาพรอง 3–4 ภาพ
+          <input id="album-supportFiles" type="file" accept="image/*" multiple>
+          <small>ภาพรองจะใช้กรอบแบบ Lite Frame และภาพที่ 5 จะเป็น Additional Frame</small>
+        </label>
+      </div>
       <div id="album-preview" class="album-upload-preview"></div>
     </div>
     <div class="form-section"><div class="section-title"><b>2</b><h4>ข้อมูลบนกรอบภาพ</h4></div>

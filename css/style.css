@@ -2360,12 +2360,33 @@ body.auth-locked .owner-watermark{
 
 
 /* v8.6.7 — Album Pro Design Refresh + Smart Thai Proofread */
+
+.album-upload-group{
+  display:grid;
+  gap:10px;
+}
+.album-upload-group-title{
+  font-size:13px;
+  font-weight:900;
+  color:#f8fafc;
+  letter-spacing:.01em;
+}
+.album-empty-chip{
+  border:1px dashed rgba(255,255,255,.16);
+  border-radius:14px;
+  padding:12px 14px;
+  color:var(--muted);
+  background:rgba(255,255,255,.025);
+}
+.album-cover-chip span{
+  background:linear-gradient(135deg,#16a34a,#facc15);
+}
 .album-order-note{
   border:1px solid rgba(34,211,238,.18);
   border-radius:14px;
   padding:10px 12px;
-  background:linear-gradient(135deg,rgba(34,211,238,.08),rgba(139,92,246,.08));
-  color:#dbeafe;
+  background:rgba(255,255,255,.04);
+  color:#cbd5e1;
   font-size:12px;
   line-height:1.55;
 }
@@ -2553,7 +2574,7 @@ body.auth-locked .owner-watermark{
 }
 
 
-/* v8.7.1 — Preview Sync + Smart Template */
+/* v8.7.2 — Clean Frame Output + Smart Text Fit */
 .album-preview-section{
   margin-top:16px;
   border:1px solid rgba(255,255,255,.10);
