@@ -246,7 +246,7 @@
     if(idx===1) return "สรุปข้อมูลสำคัญ";
     if(idx===2) return "บรรยากาศการดำเนินงาน";
     if(idx===3) return "ร่วมติดตามและขับเคลื่อนงาน";
-    if(idx===4) return d.footer ? smartShort(d.footer,42) : "ติดตามข้อมูลเพิ่มเติมได้ที่ช่องทางของหน่วยงาน";
+    if(idx===4) return d.footer ? smartShort(d.footer,42) : "ภาพเพิ่มเติม";
     if(date && place) return `${title} | ${date}`;
     if(date) return `${title} | ${date}`;
     return title;
@@ -340,7 +340,7 @@
     const fontSize=Math.round(w*.0225);
     const lineH=Math.round(fontSize*1.38);
     ctx.font=`800 ${fontSize}px "Prompt","Noto Sans Thai",sans-serif`;
-    const lines=balancedLines(ctx,cap,w-pad*3.05,idx<=4?2:1);
+    const lines=balancedLines(ctx,cap,w-pad*3.05,idx<=3?2:1);
     const barH=Math.round(pad*.85 + lines.length*lineH);
     const y=h-barH-pad;
     drawGlass(ctx,pad,y,w-pad*2,barH,Math.round(w*.028),th,false);
@@ -389,12 +389,12 @@
       return;
     }
     host.innerHTML = `
-      <div class="album-order-note">ระบบจะสร้างภาพตามลำดับนี้ รูปที่ 1 เป็นปก รูปที่ 2 เป็นสรุป รูปที่ 3–5 เป็นภาพประกอบหลัก</div>
+      <div class="album-order-note">ระบบจะสร้างภาพตามลำดับนี้ รูปที่ 1 เป็นปก รูปที่ 2 เป็นสรุป รูปที่ 3–4 เป็นภาพประกอบหลัก และรูปที่ 5 เป็นต้นไปเป็นภาพเพิ่มเติม</div>
       ${state.files.map((f,i)=>`
         <div class="album-file-chip" data-i="${i}">
           <span>${i+1}</span>
           <b title="${f.name.replace(/"/g,"&quot;")}">${f.name}</b>
-          <small>${i===0?"Cover":i===1?"Summary":i<5?"Main":"Extra"}</small>
+          <small>${i===0?"Cover":i===1?"Summary":i<4?"Main":"Extra"}</small>
           <div class="album-order-actions">
             <button type="button" class="album-order-btn" data-album-move="up" data-i="${i}" ${i===0?"disabled":""}>↑</button>
             <button type="button" class="album-order-btn" data-album-move="down" data-i="${i}" ${i===state.files.length-1?"disabled":""}>↓</button>
@@ -409,7 +409,7 @@
     const cards=state.outputs.map((o,i)=>`
       <div class="album-output-card">
         <img src="${o.url}" alt="ภาพที่ ${i+1}">
-        <b>${i===0?"รูปปก":i===1?"รูปสรุป":i<5?"รูปหลัก":"รูปเพิ่มเติม"} ${i+1}</b>
+        <b>${i===0?"รูปปก":i===1?"รูปสรุป":i<4?"รูปหลัก":"รูปเพิ่มเติม"} ${i+1}</b>
         <div class="album-caption-actions">
           <button class="btn secondary album-one-download" data-i="${i}">ดาวน์โหลดภาพนี้</button>
         </div>

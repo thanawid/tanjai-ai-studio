@@ -131,7 +131,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <option>ปก + สรุป + ภาพกิจกรรม</option>
           </select>
         </div>
-        <small>เลือกได้หลายภาพพร้อมกัน เช่น 5–20 ภาพ โดยระบบจะให้ความสำคัญกับ 4–5 รูปแรกเป็นชุดภาพหลัก</small>
+        <small>เลือกได้หลายภาพพร้อมกัน เช่น 4–20 ภาพ โดยระบบจะเน้น 4 รูปแรกเป็นชุดอัลบั้มหลักสำหรับ Facebook</small>
         <input id="album-files" type="file" accept="image/*" multiple><small>โหมดนี้ปรับภาพจริงเท่านั้น ไม่สร้างภาพใหม่ ไม่เปลี่ยนหน้า ไม่แก้องค์ประกอบหลัก</small></label>
       <div id="album-preview" class="album-upload-preview"></div>
     </div>
