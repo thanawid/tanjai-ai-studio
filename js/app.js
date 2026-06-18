@@ -126,12 +126,12 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="field">
           <label>โหมดการจัดวางภาพ</label>
           <select id="album-layoutMode">
-            <option>Cover หนัก + Lite Album 2–4</option>
-            <option>Cover เน้นภาพ + Lite บาง</option>
+            <option>Template Frame System — Cover + Lite</option>
+            <option>Cover ขายเรื่อง + Lite ขายบรรยากาศ</option>
             <option>Cover มินิมอล + Lite Caption</option>
           </select>
         </div>
-        <small>อัปโหลดได้ 4–5 ภาพ โดยระบบจะเน้นภาพแรกเป็น Cover Frame และภาพ 2–4 เป็น Lite Album สำหรับ Facebook</small>
+        <small>อัปโหลดได้ 4–5 ภาพ โดยระบบจะใช้ภาพแรกเป็น Cover Frame, ภาพ 2–4 เป็น Lite Frame และภาพที่ 5 เป็น Additional Frame แบบบาง</small>
         <input id="album-files" type="file" accept="image/*" multiple><small>ออกแบบรองรับภาพแนวนอนเป็นหลัก และยังเลือกขนาดสำหรับหน้าจออื่นได้</small></label>
       <div id="album-preview" class="album-upload-preview"></div>
     </div>
@@ -150,12 +150,13 @@ document.addEventListener("DOMContentLoaded", () => {
       <div class="form-grid">
         <label>ขนาดภาพ<select id="album-ratio"><option value="16:9" selected>16:9 Facebook แนวนอน 1920x1080</option><option value="4:5">4:5 Facebook / Line 1080x1350</option><option value="1:1">1:1 Square 1080x1080</option><option value="9:16">9:16 Story / Reels 1080x1920</option></select></label>
         <label>สไตล์กรอบ<select id="album-frameStyle"><option>ทั่วไป / หน่วยงาน / แบรนด์</option><option>ประชุม / เวทีรับฟัง / ประชาคม</option><option>ลงพื้นที่ / ภารกิจ / ติดตามงาน</option><option>ข่าวด่วน / ประกาศสำคัญ</option><option>กิจกรรม / อบรม / อีเวนต์</option><option>โรงเรียน / การศึกษา</option><option>สุขภาพ / รณรงค์ / ชุมชน</option><option>ธุรกิจ / สินค้า / โปรโมชัน</option><option>เพจ / ครีเอเตอร์ / แบรนด์ส่วนตัว</option><option>มินิมอล ขอบบาง</option></select></label>
-        <label>Theme Cover Frame Preset<select id="album-themePreset"><option>Modern Civic Cover</option><option>Clean Banner Cover</option><option>Premium Glass Cover</option></select></label>
-        <label>โทนสี<select id="album-colorTone"><option>ม่วง–ทอง พรีเมียม</option><option>เขียว–เหลือง–ขาว</option><option>น้ำเงิน–ขาว ทางการ</option><option>ดำ–ทอง หรูหรา</option></select></label>
+        <label>Theme Cover Frame Preset<select id="album-themePreset"><option>Ribbon Civic Cover</option><option>Modern Glass Cover</option><option>Minimal Story Cover</option></select></label>
+        <label>โทนสี<select id="album-colorTone"><option>ม่วง–ทอง พรีเมียม</option><option selected>เขียว–เหลือง–ขาว</option><option>น้ำเงิน–ขาว ทางการ</option><option>ส้ม–ทอง สดเด่น</option><option>ดำ–ทอง หรูหรา</option></select></label>
         <label>โหมดอัตโนมัติ<select id="album-autoMode"><option>ปรับภาพ + ครอป + ใส่กรอบ</option><option>ภาพกิจกรรมเน้นภาพ / แถบเล็ก</option><option>ครอป + ใส่กรอบเท่านั้น</option><option>ปรับภาพเท่านั้น</option></select></label>
         <label class="checkline full"><input id="album-safeMode" type="checkbox" checked> Safe Photo Mode — ไม่สร้างภาพใหม่ ไม่เปลี่ยนใบหน้า ไม่แก้องค์ประกอบหลัก</label>
-        <label class="checkline full"><input id="album-makeCover" type="checkbox" checked> ใช้กรอบหนักเฉพาะภาพแรก และให้ภาพ 2–4 เป็น Lite Frame</label>
+        <label class="checkline full"><input id="album-makeCover" type="checkbox" checked> ใช้กรอบหนักเฉพาะภาพแรก ภาพ 2–4 เป็น Lite Frame และภาพที่ 5 เป็น Additional Frame</label>
       </div>
+      <div class="form-note">V8.7.0 — Template Frame System: แนวกรอบอ้างอิงจากตัวอย่างแบบ Cover Frame + Lite Album โดยพรีวิวและผลลัพธ์จริงจะใช้โครงสร้างเดียวกัน รองรับภาพแนวนอนเป็นหลัก และยังส่งออกได้ในสัดส่วนอื่น</div>
     </div>
     <div class="button-row"><button class="btn primary" id="makeAlbum">สร้างชุดภาพโพสต์</button><button class="btn secondary" id="albumDownloadAll">ดาวน์โหลดทั้งหมด</button><button class="btn secondary" id="albumClear">ล้างรูป</button></div>
   `;
