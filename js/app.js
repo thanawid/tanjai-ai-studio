@@ -156,7 +156,6 @@ document.addEventListener("DOMContentLoaded", () => {
         <input id="album-safeMode" type="checkbox" checked hidden>
         <input id="album-makeCover" type="checkbox" checked hidden>
       </div>
-      <div class="form-note">V8.7.0 — Template Frame System: ระบบจะใช้ภาพแรกเป็น Cover Frame, ภาพ 2–4 เป็น Lite Frame และภาพที่ 5 เป็น Additional Frame แบบบาง โดยยังคง Safe Photo Mode ไม่สร้างภาพใหม่ ไม่เปลี่ยนใบหน้า และไม่แก้องค์ประกอบหลัก</div>
     </div>
     <div class="button-row"><button class="btn primary" id="makeAlbum">สร้างชุดภาพโพสต์</button><button class="btn secondary" id="albumDownloadAll">ดาวน์โหลดทั้งหมด</button><button class="btn secondary" id="albumClear">ล้างรูป</button></div>
   `;
