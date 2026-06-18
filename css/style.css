@@ -2357,3 +2357,197 @@ body.auth-locked .owner-watermark{
     opacity:.34;
   }
 }
+
+
+/* v8.6.7 — Album Pro Design Refresh + Smart Thai Proofread */
+.album-order-note{
+  border:1px solid rgba(34,211,238,.18);
+  border-radius:14px;
+  padding:10px 12px;
+  background:linear-gradient(135deg,rgba(34,211,238,.08),rgba(139,92,246,.08));
+  color:#dbeafe;
+  font-size:12px;
+  line-height:1.55;
+}
+.album-file-chip{
+  grid-template-columns:36px minmax(0,1fr) auto auto !important;
+}
+.album-file-chip small{
+  min-width:72px;
+  text-align:right;
+}
+.album-order-actions{
+  display:flex;
+  gap:6px;
+}
+.album-order-btn{
+  width:32px;
+  height:32px;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.07);
+  color:#fff;
+  font-weight:900;
+}
+.album-order-btn:disabled{
+  opacity:.35;
+  cursor:not-allowed;
+}
+.album-output-card{
+  background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.035)) !important;
+  border-color:rgba(255,255,255,.13) !important;
+}
+.album-output-card b{
+  display:block;
+  color:#dbeafe !important;
+  white-space:normal !important;
+}
+.album-caption-box{
+  background:
+    radial-gradient(circle at top right,rgba(34,211,238,.09),transparent 32%),
+    rgba(15,23,42,.56) !important;
+  border-color:rgba(148,163,184,.26) !important;
+}
+.album-pro-note{
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.55;
+}
+.proofread-top-btn{
+  border-color:rgba(34,211,238,.20) !important;
+}
+.proofread-modal{
+  position:fixed;
+  inset:0;
+  z-index:10050;
+  display:none;
+}
+.proofread-modal.open{
+  display:block;
+}
+.proofread-backdrop{
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,.54);
+  backdrop-filter:blur(5px);
+}
+.proofread-card{
+  position:absolute;
+  right:22px;
+  top:22px;
+  width:min(520px,calc(100vw - 44px));
+  max-height:calc(100dvh - 44px);
+  overflow:auto;
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:26px;
+  background:
+    radial-gradient(circle at 100% 0%,rgba(34,211,238,.13),transparent 34%),
+    linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.055)),
+    rgba(8,11,28,.94);
+  box-shadow:0 30px 110px rgba(0,0,0,.52);
+  padding:20px;
+}
+.proofread-head{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:flex-start;
+}
+.proofread-head small{
+  color:#a5f3fc;
+  font-size:11px;
+  font-weight:1000;
+  letter-spacing:.12em;
+}
+.proofread-head h3{
+  margin:5px 0 0;
+  font-size:22px;
+}
+.proofread-close{
+  width:38px;
+  height:38px;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(255,255,255,.07);
+  color:#fff;
+  font-size:24px;
+  line-height:1;
+}
+.proofread-help{
+  color:var(--muted);
+  line-height:1.65;
+  font-size:13px;
+  margin:12px 0 14px;
+}
+.proofread-label{
+  display:grid;
+  gap:8px;
+  font-weight:900;
+}
+.proofread-label span{
+  color:var(--muted);
+  font-weight:600;
+  font-size:12px;
+}
+.proofread-actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:12px;
+}
+.proofread-result-card{
+  margin-top:14px;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:18px;
+  background:rgba(255,255,255,.045);
+  padding:14px;
+}
+.proofread-result-card b{
+  font-size:16px;
+}
+.proofread-result-card p,
+.proofread-result-card small{
+  color:var(--muted);
+  line-height:1.55;
+}
+.proofread-list{
+  display:grid;
+  gap:7px;
+  margin-top:12px;
+}
+.proofread-list strong{
+  color:#dcfce7;
+  font-size:13px;
+}
+.proofread-list.warn strong{
+  color:#fde68a;
+}
+.proofread-list span{
+  display:block;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:12px;
+  background:rgba(255,255,255,.05);
+  padding:8px 10px;
+  color:#e5e7eb;
+  font-size:13px;
+}
+@media(max-width:720px){
+  .album-file-chip{
+    grid-template-columns:34px minmax(0,1fr) !important;
+  }
+  .album-file-chip small,
+  .album-order-actions{
+    grid-column:2;
+    text-align:left;
+  }
+  .proofread-card{
+    left:14px;
+    right:14px;
+    top:14px;
+    width:auto;
+    max-height:calc(100dvh - 28px);
+  }
+  .proofread-actions .btn{
+    width:100%;
+  }
+}

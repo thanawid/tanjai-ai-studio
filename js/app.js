@@ -131,7 +131,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <option>ปก + สรุป + ภาพกิจกรรม</option>
           </select>
         </div>
-        <small>เลือกได้หลายภาพพร้อมกัน เช่น 5–20 ภาพ</small>
+        <small>เลือกได้หลายภาพพร้อมกัน เช่น 5–20 ภาพ โดยระบบจะให้ความสำคัญกับ 4–5 รูปแรกเป็นชุดภาพหลัก</small>
         <input id="album-files" type="file" accept="image/*" multiple><small>โหมดนี้ปรับภาพจริงเท่านั้น ไม่สร้างภาพใหม่ ไม่เปลี่ยนหน้า ไม่แก้องค์ประกอบหลัก</small></label>
       <div id="album-preview" class="album-upload-preview"></div>
     </div>
@@ -139,6 +139,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <div class="form-grid">
         <label>หัวข้องาน<input id="album-title" placeholder="เช่น ชื่องาน / กิจกรรม / ประกาศ / แคมเปญ"></label>
         <label>หน่วยงาน<input id="album-orgName" placeholder="เช่น ชื่อหน่วยงาน / องค์กร / ร้านค้า / เพจ / แบรนด์"></label>
+        <label>ป้ายหมวดด้านบน<input id="album-categoryLabel" placeholder="เช่น ประชาสัมพันธ์ / แจ้งข่าว / กิจกรรม / ลงพื้นที่ — ไม่ใส่ก็ไม่แสดง"></label>
         <label>วันที่<input id="album-dateTime" placeholder="เช่น วันที่จัดกิจกรรม / วันที่เผยแพร่"></label>
         <label>สถานที่<input id="album-place" placeholder="เช่น สถานที่จัดงาน / พื้นที่ / ช่องทาง / สาขา"></label>
         <label class="full">ใคร / ทำอะไร<textarea id="album-detail" placeholder="เช่น ใคร / ทำอะไร / เพื่ออะไร / มีประเด็นสำคัญอะไร"></textarea></label>
