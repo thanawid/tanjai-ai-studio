@@ -1,0 +1,6 @@
+V8.7.2 — Clean Frame Output + Smart Text Fit
+Changes:
+- แยกอัปโหลดภาพปกหลักและภาพรอง 3–4 ภาพ
+- เอาเลขบนภาพ Lite/Additional ออก
+- ปรับ Smart Text Fit ให้ข้อความพอดีขึ้น
+- คงระบบ ZIP / caption / preview / sidebar / hero เดิม
