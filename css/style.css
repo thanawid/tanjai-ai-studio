@@ -2551,3 +2551,119 @@ body.auth-locked .owner-watermark{
     width:100%;
   }
 }
+
+
+/* v8.7.1 — Preview Sync + Smart Template */
+.album-preview-section{
+  margin-top:16px;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:22px;
+  background:rgba(255,255,255,.035);
+  padding:14px;
+}
+.album-preview-title{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:flex-end;
+  margin-bottom:12px;
+}
+.album-preview-title b{
+  font-size:16px;
+  color:#fff;
+}
+.album-preview-title span{
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.45;
+  text-align:right;
+}
+.album-cover-preview-card{
+  display:grid;
+  gap:12px;
+}
+.album-cover-preview-card img{
+  width:100%;
+  height:auto;
+  display:block;
+  object-fit:contain;
+  border-radius:18px;
+  border:1px solid rgba(255,255,255,.16);
+  background:#050814;
+  box-shadow:0 18px 50px rgba(0,0,0,.28);
+}
+.album-cover-preview-card .btn{
+  justify-self:end;
+}
+.album-lite-preview-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px;
+}
+.album-additional-preview-grid{
+  grid-template-columns:minmax(0,1fr);
+}
+.album-lite-preview-card{
+  display:grid;
+  gap:8px;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:18px;
+  background:rgba(15,23,42,.48);
+  padding:10px;
+}
+.album-lite-preview-card img{
+  width:100%;
+  display:block;
+  object-fit:contain;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.12);
+  background:#050814;
+}
+.album-lite-preview-card b{
+  color:#e5e7eb;
+  font-size:12px;
+}
+.album-lite-preview-card .btn{
+  width:100%;
+  min-height:34px;
+}
+.album-all-files{
+  margin-top:16px;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:18px;
+  padding:12px;
+  background:rgba(255,255,255,.03);
+}
+.album-all-files summary{
+  cursor:pointer;
+  font-weight:900;
+  color:#e0f2fe;
+}
+.album-cover-btn{
+  min-width:38px;
+  width:auto !important;
+  padding-inline:8px;
+  font-size:11px;
+}
+@media(max-width:1100px){
+  .album-lite-preview-grid{
+    grid-template-columns:1fr;
+  }
+  .album-preview-title{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+  .album-preview-title span{
+    text-align:left;
+  }
+}
+@media(max-width:720px){
+  .album-preview-section{
+    padding:10px;
+    border-radius:18px;
+  }
+  .album-cover-preview-card img,
+  .album-lite-preview-card img{
+    border-radius:12px;
+  }
+}

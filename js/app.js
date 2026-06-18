@@ -126,7 +126,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="field">
           <label>โหมดการจัดวางภาพ</label>
           <select id="album-layoutMode">
-            <option>Template Frame System — Cover + Lite</option>
+            <option>Preview Sync + Smart Template</option>
             <option>Cover ขายเรื่อง + Lite ขายบรรยากาศ</option>
             <option>Cover มินิมอล + Lite Caption</option>
           </select>
@@ -144,13 +144,16 @@ document.addEventListener("DOMContentLoaded", () => {
         <label>สถานที่<input id="album-place" placeholder="เช่น สถานที่จัดงาน / พื้นที่ / ช่องทาง / สาขา"></label>
         <label class="full">ใคร / ทำอะไร<textarea id="album-detail" placeholder="เช่น ใคร / ทำอะไร / เพื่ออะไร / มีประเด็นสำคัญอะไร"></textarea></label>
         <label class="full">ข้อความปิดท้าย<input id="album-footer" placeholder="เช่น สโลแกน / ข้อความปิดท้าย / แฮชแท็ก / คำเชิญชวน"></label>
+        <label class="full">ข้อความภาพ 2 (ไม่บังคับ)<input id="album-lite2" placeholder="ถ้าไม่กรอก ระบบจะสรุปจากข้อมูลหลักให้"></label>
+        <label class="full">ข้อความภาพ 3 (ไม่บังคับ)<input id="album-lite3" placeholder="เช่น บรรยากาศการประชุม / รับฟังความคิดเห็น / ผู้เข้าร่วม"></label>
+        <label class="full">ข้อความภาพ 4 (ไม่บังคับ)<input id="album-lite4" placeholder="เช่น ร่วมติดตามและขับเคลื่อนงาน / สรุปผล / เชิญติดตาม"></label>
       </div>
     </div>
     <div class="form-section"><div class="section-title"><b>3</b><h4>ตั้งค่าชุดภาพ</h4></div>
       <div class="form-grid">
         <label>ขนาดภาพ<select id="album-ratio"><option value="16:9" selected>16:9 Facebook แนวนอน 1920x1080</option><option value="4:5">4:5 Facebook / Line 1080x1350</option><option value="1:1">1:1 Square 1080x1080</option><option value="9:16">9:16 Story / Reels 1080x1920</option></select></label>
         <label>สไตล์กรอบ<select id="album-frameStyle"><option>ทั่วไป / หน่วยงาน / แบรนด์</option><option>ประชุม / เวทีรับฟัง / ประชาคม</option><option>ลงพื้นที่ / ภารกิจ / ติดตามงาน</option><option>ข่าวด่วน / ประกาศสำคัญ</option><option>กิจกรรม / อบรม / อีเวนต์</option><option>โรงเรียน / การศึกษา</option><option>สุขภาพ / รณรงค์ / ชุมชน</option><option>ธุรกิจ / สินค้า / โปรโมชัน</option><option>เพจ / ครีเอเตอร์ / แบรนด์ส่วนตัว</option><option>มินิมอล ขอบบาง</option></select></label>
-        <label>Theme Cover Frame Preset<select id="album-themePreset"><option>Ribbon Civic Cover</option><option>Modern Glass Cover</option><option>Minimal Story Cover</option></select></label>
+        <label>Theme Cover Frame Preset<select id="album-themePreset"><option>Ribbon Civic Cover</option><option>Modern Glass Cover</option><option>Clean Civic Cover</option><option>Minimal Story Cover</option></select></label>
         <label>โทนสี<select id="album-colorTone"><option>ม่วง–ทอง พรีเมียม</option><option selected>เขียว–เหลือง–ขาว</option><option>น้ำเงิน–ขาว ทางการ</option><option>ส้ม–ทอง สดเด่น</option><option>ดำ–ทอง หรูหรา</option></select></label>
         <label>โหมดอัตโนมัติ<select id="album-autoMode"><option>ปรับภาพ + ครอป + ใส่กรอบ</option><option>ภาพกิจกรรมเน้นภาพ / แถบเล็ก</option><option>ครอป + ใส่กรอบเท่านั้น</option><option>ปรับภาพเท่านั้น</option></select></label>
         <input id="album-safeMode" type="checkbox" checked hidden>
