@@ -1505,3 +1505,237 @@ TANJAI.deckOutline = function(d, count=8){
   return TANJAI.v9DeckPrompt(d, {count});
 };
 
+
+
+/* =========================================================
+   V9.1 Context & Creative Quality System
+   - Context field
+   - Image type field
+   - Creative Quality Lock
+   - คิดตามผู้ใช้สั่ง / ไม่มั่ว / ไม่เว่อร์
+========================================================= */
+
+TANJAI.__v91CommonData = TANJAI.__v91CommonData || TANJAI.commonData;
+TANJAI.commonData = function(prefix){
+  const d = TANJAI.__v91CommonData(prefix);
+  const v = id => (TANJAI.$(`#${prefix}-${id}`)?.value || "").trim();
+  d.workContext = v("workContext") || d.workContext || "";
+  d.imageType = v("imageType") || d.imageType || "";
+  d.qualityLevel = v("qualityLevel") || d.qualityLevel || "Creative Quality สมดุล — สวย ใช้งานจริง ไม่เว่อร์";
+  d.creativityLevel = v("creativityLevel") || d.creativityLevel || "คิดต่อพอดีตามข้อมูลผู้ใช้";
+  return d;
+};
+
+TANJAI.v91CreativePreset = function(context="", imageType="", d={}){
+  const text = `${context} ${imageType} ${d.title || ""} ${d.detail || ""} ${d.mainCategory || ""} ${d.subCategory || ""}`;
+  const has = pattern => pattern.test(text);
+
+  const base = {
+    context: context || "ให้ AI ช่วยเลือกจากรายละเอียด",
+    imageType: imageType || "ให้ AI ช่วยเลือกตามบริบท",
+    style:"Modern Premium Clean",
+    layout:"Poster Layout",
+    density:"สมดุล อ่านง่าย",
+    focus:"เน้นหัวข้อหลัก",
+    colorTone:"ให้ AI เลือกให้เหมาะสม",
+    visualTone:"สวยงาม อ่านง่าย เหมาะกับบริบทงาน",
+    creativeDirection:"ออกแบบให้ดูมืออาชีพ ใช้งานจริง ไม่เว่อร์ และไม่เติมข้อมูลเกินจริง",
+    textPolicy:"ใช้ข้อความเท่าที่จำเป็น หัวข้อหลักต้องอ่านง่าย",
+    overdoGuard:"ห้ามเพิ่มองค์ประกอบเกินบริบท ห้ามใส่ข้อมูลปลอม และห้ามทำภาพรกเกินจำเป็น",
+    cta:""
+  };
+
+  if(has(/โปรโมทเพลง|เพลง|ผลงานสร้างสรรค์|ปกเพลง|music|single|mv/i)){
+    return {
+      ...base,
+      context: context || "โปรโมทเพลง / ผลงานสร้างสรรค์",
+      imageType: imageType || "ปกเพลง / โปรโมทเพลง",
+      style:"Emotional Music Poster / Modern Social Premium",
+      layout:"Poster Focus / Hero Layout",
+      density:"ปานกลางหรือโปร่ง ไม่แน่นแบบอินโฟกราฟิก",
+      focus:"ชื่อเพลงเด่นที่สุด ภาพบุคคลหรือ mood เพลงเด่นรองลงมา",
+      colorTone:"ให้ AI เลือกให้เข้ากับอารมณ์เพลง",
+      visualTone:"มีอารมณ์เพลง ทันสมัย น่าฟัง ดูเป็นโปสเตอร์เพลงจริง",
+      creativeDirection:"เน้นอารมณ์เพลงและการดึงดูดบนโซเชียล ไม่ทำเป็นเอกสารราชการหรืออินโฟกราฟิกแน่น",
+      textPolicy:"ใช้ข้อความน้อย ใหญ่ อ่านชัด เช่น ชื่อเพลง ชื่อศิลปิน และ CTA สั้น ๆ",
+      overdoGuard:"ห้ามใส่วันเวลา/สถานที่ถ้าไม่ได้ระบุ ห้ามสร้าง QR หรือโลโก้ปลอม ห้ามยัดไอคอนแพลตฟอร์มเกินจำเป็น",
+      cta:"เพลงใหม่ / ฟังได้แล้ววันนี้"
+    };
+  }
+
+  if(has(/แจ้งข่าว|ประกาศ|ข่าวด่วน|เตือน|ระวัง/)){
+    return {
+      ...base,
+      context: context || "แจ้งข่าว / ประกาศ",
+      imageType: imageType || "ภาพแจ้งข่าว",
+      style:"Clean Announcement / Government Clean",
+      layout:"Title First / Info Card",
+      density:"ปานกลาง อ่านเร็ว",
+      focus:"หัวข้อใหญ่และข้อมูลสำคัญชัดเจน",
+      colorTone:"น้ำเงิน–ขาว ทางการ หรือสีที่เหมาะกับหน่วยงาน",
+      visualTone:"น่าเชื่อถือ ชัดเจน ไม่ตกแต่งเกิน",
+      creativeDirection:"เน้นให้ประชาชนอ่านเข้าใจเร็ว เห็นสารหลักทันที",
+      textPolicy:"แยกหัวข้อ รายละเอียด วันเวลา/สถานที่ถ้ามีจริง",
+      overdoGuard:"ห้ามใส่ข้อมูลเตือนภัยเกินจริง ห้ามเติมวันเวลา/สถานที่เอง"
+    };
+  }
+
+  if(has(/เชิญชวน|ประชาสัมพันธ์|เชิญร่วม|กิจกรรม|โครงการ/)){
+    return {
+      ...base,
+      context: context || "เชิญชวน / ประชาสัมพันธ์",
+      imageType: imageType || "ภาพเชิญชวนกิจกรรม",
+      style:"Event Poster / Social Bright",
+      layout:"Hero + Info Box",
+      density:"สมดุล อ่านง่าย",
+      focus:"ชื่องานเด่น พร้อมข้อมูลเข้าร่วมถ้ามี",
+      visualTone:"สุภาพ เชิญชวน สดใสพอดี",
+      creativeDirection:"สร้างบรรยากาศน่าเข้าร่วม แต่ไม่ใส่ข้อมูลที่ไม่มีจริง",
+      textPolicy:"หัวข้อเด่น ตามด้วยวัน เวลา สถานที่ และผู้จัด หากผู้ใช้ระบุ",
+      overdoGuard:"ห้ามเดาวันเวลา/สถานที่ ห้ามทำภาพรกจนข้อมูลสำคัญหาย"
+    };
+  }
+
+  if(has(/ให้ความรู้|infographic|อินโฟกราฟิก|ขั้นตอน|วิธีใช้งาน|ข้อมูลควรรู้|บริการ/)){
+    return {
+      ...base,
+      context: context || "ให้ความรู้ / Infographic",
+      imageType: imageType || "อินโฟกราฟิก",
+      style:"Informative Clean / Modern Infographic",
+      layout:"Infographic Grid / Step Layout",
+      density:"แน่นแบบพอดี อ่านง่าย",
+      focus:"ลำดับข้อมูลและข้อสำคัญ",
+      visualTone:"ชัดเจน เป็นขั้นตอน เข้าใจง่าย",
+      creativeDirection:"แปลงข้อมูลให้เป็นลำดับ ใช้กล่อง/ไอคอนช่วยโดยไม่ทำให้รก",
+      textPolicy:"แบ่งข้อสั้น ๆ อ่านง่าย ใช้เลขข้อเมื่อเหมาะสม",
+      overdoGuard:"ห้ามใส่ขั้นตอนที่ผู้ใช้ไม่ได้ระบุ ห้ามใช้ icon เยอะจนอ่านยาก"
+    };
+  }
+
+  if(has(/สรุปกิจกรรม|รายงานผล|ลงพื้นที่|ประชุม|ร่วมประชุม|บรรยากาศ/)){
+    return {
+      ...base,
+      context: context || "สรุปกิจกรรม / รายงานผล",
+      imageType: imageType || "ภาพสรุปกิจกรรม",
+      style:"Photo Report / Municipal News",
+      layout:"Photo + Caption Blocks",
+      density:"ปานกลาง อ่านง่าย",
+      focus:"ภาพจริงหรือบรรยากาศเด่น พร้อมสารสำคัญ",
+      visualTone:"น่าเชื่อถือ อบอุ่น เป็นงานประชาสัมพันธ์จริง",
+      creativeDirection:"เล่าให้เห็นว่าใคร ทำอะไร ที่ไหน และเกิดประโยชน์อะไร",
+      textPolicy:"ข้อความสั้นเป็นข่าว/สรุป ไม่ยัดรายละเอียดทั้งหมดบนภาพ",
+      overdoGuard:"ห้ามเติมผลลัพธ์เกินจริง ห้ามทำภาพเป็นพิธีการเกินบริบท"
+    };
+  }
+
+  if(has(/ไว้อาลัย|อาลัย|ลดสี|สุภาพ|รำลึก/)){
+    return {
+      ...base,
+      context: context || "ไว้อาลัย / สุภาพ / ลดสี",
+      imageType: imageType || "ภาพไว้อาลัย / สุภาพ",
+      style:"Memorial Minimal / Formal Clean",
+      layout:"Center Focus / Minimal Poster",
+      density:"โปร่ง ข้อความน้อย",
+      focus:"ข้อความหลักและความสำรวม",
+      colorTone:"ขาว ดำ เทา ทองหม่น หรือโทนลดสี",
+      visualTone:"สุภาพ สำรวม เรียบ ไม่ฉูดฉาด",
+      creativeDirection:"ลดสี ลดเอฟเฟกต์ ให้เกียรติและเหมาะสมกับบริบท",
+      textPolicy:"ใช้ข้อความน้อย อ่านง่าย ไม่ใช้คำหวือหวา",
+      overdoGuard:"ห้ามใช้สีสด เอฟเฟกต์ไฟ แสงจัด หรือองค์ประกอบเว่อร์"
+    };
+  }
+
+  return base;
+};
+
+TANJAI.__v91DetectImageType = TANJAI.__v91DetectImageType || TANJAI.v9DetectImageType;
+TANJAI.v9DetectImageType = function(d){
+  if(d.imageType && !/^ให้ AI ช่วยเลือก/.test(d.imageType)) return d.imageType;
+  return TANJAI.__v91DetectImageType(d);
+};
+
+TANJAI.__v91BuildSharedBrief = TANJAI.__v91BuildSharedBrief || TANJAI.buildSharedBrief;
+TANJAI.buildSharedBrief = function(d={}, type="image"){
+  const b = TANJAI.__v91BuildSharedBrief(d, type);
+  const preset = TANJAI.v91CreativePreset(d.workContext, d.imageType || b.imageType, d);
+  b.workContext = d.workContext || preset.context;
+  b.imageType = (d.imageType && !/^ให้ AI ช่วยเลือก/.test(d.imageType)) ? d.imageType : preset.imageType || b.imageType;
+  b.qualityLevel = d.qualityLevel || "Creative Quality สมดุล — สวย ใช้งานจริง ไม่เว่อร์";
+  b.creativityLevel = d.creativityLevel || "คิดต่อพอดีตามข้อมูลผู้ใช้";
+  b.creativeDirection = preset.creativeDirection;
+  b.textPolicy = preset.textPolicy;
+  b.overdoGuard = preset.overdoGuard;
+  b.suggestedCTA = preset.cta || "";
+  if(type === "image" || type === "album" || type === "video"){
+    b.style = preset.style || b.style;
+    b.layout = preset.layout || b.layout;
+    b.density = preset.density || b.density;
+    b.focus = preset.focus || b.focus;
+    b.colorTone = preset.colorTone || b.colorTone;
+    b.visualTone = preset.visualTone || b.visualTone;
+  }
+  if(b.suggestedCTA){
+    const ctaParts = b.suggestedCTA.split("/").map(x => x.trim()).filter(Boolean);
+    const hasCtaAlready = b.textOnImage.includes(b.suggestedCTA) || (ctaParts.length && ctaParts.every(x => b.textOnImage.includes(x)));
+    if(!hasCtaAlready) b.textOnImage = [...b.textOnImage, b.suggestedCTA].slice(0, 5);
+  }
+  return b;
+};
+
+TANJAI.imagePrompt = function(d, outputMode="gpt"){
+  const b = TANJAI.buildSharedBrief(d, "image");
+  return `${TANJAI.v9ExecutionHeader("ให้สร้างภาพประชาสัมพันธ์จริงทันทีจากข้อมูลด้านล่าง")}
+
+ประเภทภาพ: ${b.imageType}
+บริบทงาน: ${b.workContext}
+จุดประสงค์ของภาพ: ${b.purpose}
+กลุ่มเป้าหมาย: ${b.audience}
+ช่องทางใช้งาน: ${b.channel}
+ขนาดภาพ: ${b.size}
+
+หัวข้อหลัก:
+${b.title}
+
+ข้อมูลจริงของงาน:
+${b.keyFacts.map(x => "- " + x).join("\n")}
+
+ข้อความที่ควรมีบนภาพ:
+${b.textOnImage.map(x => "- " + x).join("\n")}
+
+ไฟล์แนบ / ภาพอ้างอิง:
+${b.attachmentGuide}
+
+Creative Quality Direction:
+- ระดับคุณภาพ: ${b.qualityLevel}
+- ระดับการคิดต่อ: ${b.creativityLevel}
+- ทิศทางสร้างสรรค์: ${b.creativeDirection}
+- กฎข้อความบนภาพ: ${b.textPolicy}
+- กฎกันเว่อร์ / กันมั่ว: ${b.overdoGuard}
+
+แนวทางภาพ:
+- สไตล์: ${b.style}
+- โทนภาพ: ${b.visualTone}
+- โทนสี: ${b.colorTone}
+- Layout: ${b.layout}
+- ความหนาแน่น: ${b.density}
+- จุดเด่นของภาพ: ${b.focus}
+- โทนภาษา: ${b.tone}
+
+${TANJAI.v9ProtectedBlock(d, "image")}
+
+ให้สร้างภาพทันทีตามข้อมูลข้างต้น
+หากเครื่องมือปลายทางไม่สามารถสร้างภาพได้โดยตรง ให้บอกเหตุผลตรง ๆ และส่ง Prompt พร้อมใช้กลับมาแทน`;
+};
+
+TANJAI.executionPrompt = function(type, d, extra={}){
+  if(type === "image") return TANJAI.imagePrompt(d, "gpt");
+  if(type === "album") return TANJAI.v9AlbumPrompt(d);
+  if(type === "post") return TANJAI.v9ContentPrompt(d);
+  if(type === "mc") return TANJAI.v9MCPrompt(d);
+  if(type === "video") return TANJAI.v9VideoPrompt(d, extra);
+  if(type === "voice") return TANJAI.v9VoicePrompt(d, extra);
+  if(type === "deck") return TANJAI.v9DeckPrompt(d, extra);
+  if(type === "kit") return TANJAI.promptPack ? TANJAI.promptPack(d) : TANJAI.v9ContentPrompt(d);
+  return TANJAI.v9ContentPrompt(d);
+};
+

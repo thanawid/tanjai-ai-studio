@@ -24,7 +24,11 @@ document.addEventListener("DOMContentLoaded", () => {
     colorTones: ["ม่วง–ทอง พรีเมียม","ม่วง–ทอง เทคโนโลยี","น้ำเงิน–ขาว ทางการ","ชมพู–ม่วง สดใส","ดำ–ทอง หรูหรา","ให้ AI เลือกให้เหมาะสม"],
     videoFormats: ["คลิปประชาสัมพันธ์","คลิปข่าวด่วน","คลิปกิจกรรม / โครงการ","คลิปรีวิว","คลิปโซเชียลไวรัล","คลิปแนวสารคดีสั้น"],
     slideStyles: ["ทางการสำหรับผู้บริหาร","สรุปประชุม","นำเสนอโครงการ","รายงานผล","Pitch Deck","สไลด์อบรม"],
-    workTypes: ["นายกลงพื้นที่","ติดตามปัญหากลุ่มเป้าหมาย","ตรวจงานโครงการ","กิจกรรมเทศบาล","อบรม / ประชุม","งานพิธีกร / ผู้ดำเนินรายการ","พิธีเปิด / พิธีปิด","ลงพื้นที่ช่วยเหลือ","รณรงค์ / ประชาสัมพันธ์","อื่น ๆ"]
+    workTypes: ["นายกลงพื้นที่","ติดตามปัญหากลุ่มเป้าหมาย","ตรวจงานโครงการ","กิจกรรมเทศบาล","อบรม / ประชุม","งานพิธีกร / ผู้ดำเนินรายการ","พิธีเปิด / พิธีปิด","ลงพื้นที่ช่วยเหลือ","รณรงค์ / ประชาสัมพันธ์","อื่น ๆ"],
+    workContexts: ["ให้ AI ช่วยเลือกจากรายละเอียด","แจ้งข่าว / ประกาศ","เชิญชวน / ประชาสัมพันธ์","โปรโมท / แคมเปญ / ขายผลงาน","โปรโมทเพลง / ผลงานสร้างสรรค์","ให้ความรู้ / Infographic","ขั้นตอนบริการ / วิธีใช้งาน","สรุปกิจกรรม / รายงานผล","งานพิธี / งานบุญ / งานชุมชน","อบรม / ประชุม / สัมมนา","ขอบคุณ / แสดงความยินดี / อวยพร","รณรงค์ / สร้างความตระหนัก","ไว้อาลัย / สุภาพ / ลดสี","อื่น ๆ"],
+    imageTypes: ["ให้ AI ช่วยเลือกตามบริบท","โพสต์โซเชียล","โปสเตอร์ประชาสัมพันธ์","อินโฟกราฟิก","ภาพแน่นข้อมูล","ภาพอ่านง่าย","ปก / Cover","ปกเพลง / โปรโมทเพลง","ภาพเชิญชวนกิจกรรม","ภาพแจ้งข่าว","ภาพสรุปกิจกรรม","ชุดภาพโพสต์ Facebook","ภาพแนวนอน / แบนเนอร์","ภาพไว้อาลัย / สุภาพ","อื่น ๆ"],
+    qualityLevels: ["Creative Quality สมดุล — สวย ใช้งานจริง ไม่เว่อร์","คุมข้อมูลเข้ม — เน้นความถูกต้องและอ่านง่าย","สวยพรีเมียม — ยกระดับงานให้ดูแพงแต่ไม่มั่ว","สดใสโซเชียล — ดึงดูดแต่ยังอ่านชัด","ทางการสะอาด — เหมาะกับหน่วยงานและประกาศ"],
+    creativityLevels: ["คิดต่อพอดีตามข้อมูลผู้ใช้","คิดต่อได้มากขึ้นแต่ห้ามแต่งข้อมูลจริง","ตามผู้ใช้สั่งมากที่สุด ไม่ตีความเกิน","ลดความเว่อร์ เน้นงานใช้งานจริง"]
   };
 
 // Render forms
@@ -32,6 +36,29 @@ document.addEventListener("DOMContentLoaded", () => {
   $("#routerResult").innerHTML = TANJAI.resultShell("router", "คำแนะนำจาก AI Router", "ระบบจะแนะนำเมนูและปลายทางที่เหมาะกับโจทย์", "routerOut", `<button class="btn primary" data-copybox="routerOut">คัดลอกคำแนะนำ</button>`);
 
   $("#imageForm").innerHTML = TANJAI.field("image") + `
+    <div class="form-section creative-quality-wrap-v91"><div class="section-title"><b>2</b><h4>บริบทงาน + Creative Quality</h4></div>
+      <p class="mini-note">เลือกให้ใกล้กับงานที่สุด ระบบจะช่วยคิดโทน / รูปแบบ / ความหนาแน่นให้พอดี ไม่เว่อร์ และไม่มั่วข้อมูลจริง</p>
+      <div class="form-grid">
+        <label>บริบทงาน<select id="image-workContext">${opts(toolOptions.workContexts)}</select></label>
+        <label>ประเภทภาพ<select id="image-imageType">${opts(toolOptions.imageTypes)}</select></label>
+        <label>ระดับคุณภาพงาน<select id="image-qualityLevel">${opts(toolOptions.qualityLevels)}</select></label>
+        <label>ระดับการคิดต่อ<select id="image-creativityLevel">${opts(toolOptions.creativityLevels)}</select></label>
+        <div class="full preset-wrap">
+          <small class="preset-label">ตัวเลือกเร็วตามงานจริง</small>
+          <div class="preset-row creative-preset-row-v91">
+            <button type="button" class="chip-btn" data-v91-context="โปรโมทเพลง / ผลงานสร้างสรรค์" data-v91-type="ปกเพลง / โปรโมทเพลง">โปรโมทเพลง</button>
+            <button type="button" class="chip-btn" data-v91-context="แจ้งข่าว / ประกาศ" data-v91-type="ภาพแจ้งข่าว">แจ้งข่าว</button>
+            <button type="button" class="chip-btn" data-v91-context="เชิญชวน / ประชาสัมพันธ์" data-v91-type="ภาพเชิญชวนกิจกรรม">เชิญร่วมงาน</button>
+            <button type="button" class="chip-btn" data-v91-context="ให้ความรู้ / Infographic" data-v91-type="อินโฟกราฟิก">Infographic</button>
+            <button type="button" class="chip-btn" data-v91-context="สรุปกิจกรรม / รายงานผล" data-v91-type="ภาพสรุปกิจกรรม">สรุปกิจกรรม</button>
+            <button type="button" class="chip-btn" data-v91-context="ไว้อาลัย / สุภาพ / ลดสี" data-v91-type="ภาพไว้อาลัย / สุภาพ">ลดสี / ไว้อาลัย</button>
+          </div>
+        </div>
+        <div class="full v91-quality-preview" id="image-qualityPreview">
+          <b>Creative Quality:</b> ระบบจะช่วยเลือกทิศทางภาพให้เหมาะกับบริบทงาน และคุมไม่ให้เติมข้อมูลเกินจริง
+        </div>
+      </div>
+    </div>
     <div class="form-section"><div class="section-title"><b>2</b><h4>ภาพอ้างอิง / ภาพจริง</h4></div>
       <div class="form-grid">
         <label class="full">แนบภาพจริง / ภาพอ้างอิง
@@ -342,7 +369,7 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "Prompt สคริป
   };
 
 
-  // v9.0 Prompt Architecture Engine
+  // v9.1 Context & Creative Quality System
   TANJAI.quickActions = [
     {label:"หน้าหลัก", icon:"🏠", view:"dashboard", hint:"กลับหน้าแรก"},
     {label:"สร้างชุดสื่อ", icon:"🧩", view:"kit", hint:"Prompt ครบชุดจากข้อมูลเดียว"},
@@ -674,6 +701,163 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "Prompt สคริป
     TANJAI.toast("ตั้งค่าโหมดภาพจริงให้แล้ว");
   };
 
+
+  const setSelectOptionValue = (selector, value) => {
+    const el = $(selector);
+    if(!el || !value) return;
+    const exact = Array.from(el.options || []).find(o => o.value === value || o.textContent === value);
+    if(exact){ el.value = exact.value; return; }
+    const opt = document.createElement("option");
+    opt.textContent = value;
+    opt.value = value;
+    el.appendChild(opt);
+    el.value = value;
+  };
+
+  const v91CreativePresets = {
+    "โปรโมทเพลง / ผลงานสร้างสรรค์": {
+      style:"Modern Premium Clean",
+      layout:"Poster Layout",
+      density:"สมดุล อ่านง่าย",
+      focus:"เน้นหัวข้อหลัก",
+      colorTone:"ให้ AI เลือกให้เหมาะสม",
+      tone:"โปรโมทแบบทันสมัย",
+      mainCategory:"โปรโมชัน / โฆษณา",
+      subCategory:"ปกคลิป / ปกเพลง",
+      preview:"งานเพลงควรเน้นอารมณ์ ชื่อเพลงใหญ่ ภาพบุคคลหรือ mood เด่น ไม่ยัดข้อมูลแน่น และไม่เติม QR/โลโก้ถ้าไม่มีไฟล์จริง"
+    },
+    "แจ้งข่าว / ประกาศ": {
+      style:"Modern Premium Clean",
+      layout:"Clean Social Card",
+      density:"สมดุล อ่านง่าย",
+      focus:"เน้นหัวข้อหลัก",
+      colorTone:"น้ำเงิน–ขาว ทางการ",
+      tone:"ทางการ สุภาพ อ่านง่าย",
+      mainCategory:"แจ้งข่าว / ประกาศ",
+      subCategory:"แจ้งข่าวสำคัญ",
+      preview:"งานแจ้งข่าวต้องอ่านเร็ว หัวข้อใหญ่ ข้อมูลสำคัญชัด ไม่ตกแต่งเยอะเกิน และห้ามเดาวันเวลา/สถานที่"
+    },
+    "เชิญชวน / ประชาสัมพันธ์": {
+      style:"สดใสโซเชียล",
+      layout:"Hero Center Layout",
+      density:"สมดุล อ่านง่าย",
+      focus:"เน้นหัวข้อหลัก",
+      colorTone:"ให้ AI เลือกให้เหมาะสม",
+      tone:"เป็นกันเอง สดใส ใช้กับโซเชียล",
+      mainCategory:"กิจกรรม / โครงการ / อบรม",
+      subCategory:"เชิญร่วมกิจกรรม",
+      preview:"งานเชิญชวนควรเห็นชื่องานชัด มีบรรยากาศน่าเข้าร่วม และจัดวันเวลา/สถานที่เป็นกล่องข้อมูลถ้ามีจริง"
+    },
+    "ให้ความรู้ / Infographic": {
+      style:"Modern Premium Clean",
+      layout:"Infographic Layout",
+      density:"ข้อมูลเยอะ แต่อ่านง่าย",
+      focus:"เน้นหัวข้อหลัก",
+      colorTone:"ให้ AI เลือกให้เหมาะสม",
+      tone:"ทางการ สุภาพ อ่านง่าย",
+      mainCategory:"รณรงค์ / ให้ความรู้",
+      subCategory:"อบรมให้ความรู้",
+      preview:"งานให้ความรู้ควรเป็นลำดับ เข้าใจง่าย ใช้กล่องข้อมูล/ไอคอนช่วย แต่ต้องไม่แน่นจนอ่านยาก"
+    },
+    "ขั้นตอนบริการ / วิธีใช้งาน": {
+      style:"Modern Premium Clean",
+      layout:"Infographic Layout",
+      density:"ข้อมูลเยอะ แต่อ่านง่าย",
+      focus:"เน้นหัวข้อหลัก",
+      colorTone:"น้ำเงิน–ขาว ทางการ",
+      tone:"ทางการ สุภาพ อ่านง่าย",
+      mainCategory:"รณรงค์ / ให้ความรู้",
+      subCategory:"กำหนดเอง",
+      preview:"งานขั้นตอนบริการควรแยกเป็น Step 1-2-3 ชัดเจน อ่านง่าย และใช้ข้อมูลที่ผู้ใช้ให้เท่านั้น"
+    },
+    "สรุปกิจกรรม / รายงานผล": {
+      style:"Modern Premium Clean",
+      layout:"ภาพเต็ม + กล่องข้อความ",
+      density:"สมดุล อ่านง่าย",
+      focus:"เน้นภาพกิจกรรม",
+      colorTone:"ให้ AI เลือกให้เหมาะสม",
+      tone:"ทางการ สุภาพ อ่านง่าย",
+      mainCategory:"สรุปผลงาน / รายงานผล",
+      subCategory:"ลงพื้นที่",
+      preview:"งานสรุปกิจกรรมควรใช้ภาพจริงหรือบรรยากาศเด่น พร้อมข้อความว่าใคร ทำอะไร ที่ไหน และเกิดประโยชน์อะไร"
+    },
+    "งานพิธี / งานบุญ / งานชุมชน": {
+      style:"Modern Premium Clean",
+      layout:"Poster Layout",
+      density:"สมดุล อ่านง่าย",
+      focus:"เน้นบรรยากาศ",
+      colorTone:"ให้ AI เลือกให้เหมาะสม",
+      tone:"ทางการ สุภาพ อ่านง่าย",
+      mainCategory:"กิจกรรม / โครงการ / อบรม",
+      subCategory:"เชิญร่วมกิจกรรม",
+      preview:"งานพิธีควรสุภาพ เป็นระเบียบ ไม่ใช้เอฟเฟกต์เว่อร์ และให้ความสำคัญกับชื่อพิธี/หน่วยงาน"
+    },
+    "รณรงค์ / สร้างความตระหนัก": {
+      style:"Modern Premium Clean",
+      layout:"Infographic Layout",
+      density:"ข้อมูลเยอะ แต่อ่านง่าย",
+      focus:"เน้นหัวข้อหลัก",
+      colorTone:"ให้ AI เลือกให้เหมาะสม",
+      tone:"ทางการ สุภาพ อ่านง่าย",
+      mainCategory:"รณรงค์ / ให้ความรู้",
+      subCategory:"รณรงค์ป้องกันโรค",
+      preview:"งานรณรงค์ควรมี message ชัด กระตุ้นให้เข้าใจ/ร่วมมือ โดยไม่ทำภาพน่ากลัวหรือเว่อร์เกิน"
+    },
+    "ไว้อาลัย / สุภาพ / ลดสี": {
+      style:"Modern Premium Clean",
+      layout:"Hero Center Layout",
+      density:"โล่งมาก ดูแพง",
+      focus:"เน้นหัวข้อหลัก",
+      colorTone:"ดำ–ทอง หรูหรา",
+      tone:"ทางการ สุภาพ อ่านง่าย",
+      mainCategory:"อื่น ๆ",
+      subCategory:"กำหนดเอง",
+      preview:"งานไว้อาลัย/ลดสีควรเรียบ สุภาพ ลดสี ไม่ใช้เอฟเฟกต์ฉูดฉาด และข้อความต้องน้อย อ่านง่าย"
+    }
+  };
+
+  const refreshV91QualityPreview = () => {
+    const ctx = $("#image-workContext")?.value || "ให้ AI ช่วยเลือกจากรายละเอียด";
+    const type = $("#image-imageType")?.value || "ให้ AI ช่วยเลือกตามบริบท";
+    const preset = v91CreativePresets[ctx];
+    const box = $("#image-qualityPreview");
+    if(box){
+      box.innerHTML = `<b>Creative Quality:</b> ${preset?.preview || "ระบบจะอ่านหัวข้อและรายละเอียด แล้วช่วยเลือกทิศทางภาพให้พอดีกับงาน ไม่ยัดข้อมูลเกินจริง"}<br><span>บริบท: ${ctx} · ประเภทภาพ: ${type}</span>`;
+    }
+  };
+
+  const applyV91CreativePreset = (ctx, imageType, toast=true) => {
+    if(ctx) setSelectOptionValue("#image-workContext", ctx);
+    if(imageType) setSelectOptionValue("#image-imageType", imageType);
+    const selectedCtx = $("#image-workContext")?.value || ctx;
+    const preset = v91CreativePresets[selectedCtx];
+    if(preset){
+      setSelectOptionValue("#image-style", preset.style);
+      setSelectOptionValue("#image-layout", preset.layout);
+      setSelectOptionValue("#image-density", preset.density);
+      setSelectOptionValue("#image-focus", preset.focus);
+      setSelectOptionValue("#image-colorTone", preset.colorTone);
+      setSelectOptionValue("#image-tone", preset.tone);
+      setSelectOptionValue("#image-mainCategory", preset.mainCategory);
+      setSelectOptionValue("#image-subCategory", preset.subCategory);
+    }
+    refreshV91QualityPreview();
+    if(toast) TANJAI.toast("ตั้งค่า Creative Quality ตามบริบทงานให้แล้ว");
+  };
+
+  const setupV91CreativeQuality = () => {
+    $("#image-workContext")?.addEventListener("change", () => applyV91CreativePreset($("#image-workContext").value, null, false));
+    $("#image-imageType")?.addEventListener("change", refreshV91QualityPreview);
+    $("#image-qualityLevel")?.addEventListener("change", refreshV91QualityPreview);
+    $("#image-creativityLevel")?.addEventListener("change", refreshV91QualityPreview);
+    $$("[data-v91-context]").forEach(btn => btn.addEventListener("click", () => {
+      applyV91CreativePreset(btn.dataset.v91Context, btn.dataset.v91Type, true);
+      $$("[data-v91-context]").forEach(b => b.classList.remove("selected"));
+      btn.classList.add("selected");
+    }));
+    refreshV91QualityPreview();
+  };
+
   const setupImageSafeMode = () => {
     const imageInput = $("#image-photos");
     const mode = $("#image-useMode");
@@ -709,6 +893,7 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "Prompt สคริป
   };
 
   setupImageSafeMode();
+  setupV91CreativeQuality();
   $("#post-photos")?.addEventListener("change", ()=>renderUploadPreview("#post-photos", "#post-photoPreview"));
   $("#mc-photos")?.addEventListener("change", ()=>renderUploadPreview("#mc-photos", "#mc-photoPreview"));
 
