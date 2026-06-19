@@ -1,8 +1,0 @@
-V8.8 — Thai Tone Mark Safe Hero
-
-- คงเลขเวอร์ชันเป็น v8.8
-- แก้บรรทัด Hero “สร้างสื่อไว ด้วยพลัง AI” ให้แสดงวรรณยุกต์ชัดขึ้น
-- แยก class hero-tagline-thai และใช้ Noto Sans Thai เป็นหลัก
-- ปิด gradient/text-fill ที่ทำให้ไม้เอกดูเหมือนหาย
-- เพิ่ม line-height และ overflow visible เพื่อไม่ให้วรรณยุกต์ถูกตัด
-- ไม่แตะฟีเจอร์หลัก / Sidebar / Album / Prompt Pack / FAB / Login
