@@ -3100,3 +3100,105 @@ body.auth-locked .owner-watermark{
     white-space:normal;
   }
 }
+
+
+/* V8.9 — Content Menu Reorder */
+.creation-menu-grid-v89{
+  grid-template-columns:repeat(4,minmax(0,1fr));
+}
+.creation-menu-grid-v89 .home-choice-card{
+  min-height:210px;
+}
+.creation-menu-grid-v89 .home-choice-card:first-child{
+  border-color:rgba(246,208,135,.32);
+  background:linear-gradient(135deg,rgba(246,208,135,.10),rgba(142,231,255,.045));
+}
+.creation-menu-grid-v89 .home-choice-card:first-child img{
+  object-fit:contain;
+  padding:20px;
+  background:rgba(255,255,255,.06);
+}
+@media (max-width:1180px){
+  .creation-menu-grid-v89{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+}
+@media (max-width:720px){
+  .creation-menu-grid-v89{
+    grid-template-columns:1fr !important;
+  }
+}
+
+
+/* V8.9.1 — MC Script Mode */
+.summary-chip{
+  white-space:nowrap;
+}
+@media (max-width:720px){
+  .summary-output-tabs{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .summary-chip{
+    font-size:12px;
+  }
+}
+
+
+/* V8.9.2 — MC Shortcut + Menu Cleanup */
+.nav .nav-feature,
+.nav .mc-shortcut{
+  border-color:rgba(246,208,135,.18);
+}
+.nav .mc-shortcut{
+  background:rgba(246,208,135,.055);
+}
+.creation-menu-grid-v892{
+  grid-template-columns:repeat(4,minmax(0,1fr));
+}
+.creation-menu-grid-v892 .home-choice-card{
+  min-height:210px;
+}
+.menu-primary-v892{
+  border-color:rgba(246,208,135,.32);
+  background:linear-gradient(135deg,rgba(246,208,135,.10),rgba(142,231,255,.045));
+}
+.menu-primary-v892 img{
+  object-fit:contain;
+  padding:20px;
+  background:rgba(255,255,255,.06);
+}
+.mc-card-v892{
+  border-color:rgba(246,208,135,.34);
+  background:linear-gradient(135deg,rgba(246,208,135,.12),rgba(255,255,255,.04));
+}
+.mc-emoji-v892{
+  height:104px;
+  display:grid;
+  place-items:center;
+  font-size:58px;
+  border-radius:18px;
+  background:radial-gradient(circle at 50% 35%, rgba(246,208,135,.22), rgba(255,255,255,.045));
+  border:1px solid rgba(255,255,255,.08);
+  margin-bottom:12px;
+}
+@media (max-width:1180px){
+  .creation-menu-grid-v892{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+  .fab-menu{
+    grid-template-columns:repeat(2, 58px) !important;
+  }
+}
+@media (max-width:720px){
+  .creation-menu-grid-v892{
+    grid-template-columns:1fr !important;
+  }
+  .mobile-tabbar{
+    grid-template-columns:repeat(5, 1fr);
+  }
+  .mobile-tabbar span{
+    font-size:9.5px;
+  }
+}

@@ -38,7 +38,7 @@ TANJAI.switchView = function(id, options = {}){
     router:"AI Router",
     image:"สร้างภาพ",
     album:"ชุดภาพโพสต์ Facebook Pro",
-    post:"สคริปต์สรุปงาน",
+    post:"เรียบเรียงเนื้อหา",
     video:"ทำวิดีโอ",
     voice:"เสียงพากย์",
     deck:"ทำสไลด์",
