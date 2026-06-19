@@ -273,3 +273,7 @@
 
 ## V8.9.7 — Remove Output Chips
 เอาแถบชิปผลลัพธ์ในหน้าเรียบเรียงเนื้อหาและงานพิธีกรออก เหลือ dropdown สำหรับเลือกประเภทงานให้ชัดเจน
+
+
+## V9.0 — Prompt Architecture Blueprint
+เพิ่ม Universal Prompt Engine + Mode Adapter ครอบทุกเมนู โดยแต่ละเมนูใช้กฎเฉพาะของตัวเองและรองรับทุกอุปกรณ์ตามฐาน V8.9.7

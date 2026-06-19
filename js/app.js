@@ -342,7 +342,7 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "Prompt สคริป
   };
 
 
-  // v8.9.7 Remove Output Chips
+  // v9.0 Prompt Architecture Engine
   TANJAI.quickActions = [
     {label:"หน้าหลัก", icon:"🏠", view:"dashboard", hint:"กลับหน้าแรก"},
     {label:"สร้างชุดสื่อ", icon:"🧩", view:"kit", hint:"Prompt ครบชุดจากข้อมูลเดียว"},

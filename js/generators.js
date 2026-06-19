@@ -1010,3 +1010,498 @@ ${photoPart}
 - หากเป็นภาพนายกลงพื้นที่ ให้เน้นการติดตาม รับฟังปัญหา ตรวจสอบ และประสานการช่วยเหลืออย่างเหมาะสม
 - เว้นชื่อ/ตำแหน่งให้สะกดตามข้อมูลที่ให้มา`;
 };
+
+
+
+/* =========================================================
+   V9 Prompt Architecture Engine
+   Core เดียว / Output หลายโหมด
+   - Shared Brief
+   - Auto Detect
+   - Mode Adapter
+   - No internal form metadata in final prompts
+========================================================= */
+
+TANJAI.v9Clean = function(text="", fallback="ไม่ระบุ"){
+  const value = String(text || "")
+    .replaceAll("ประชม", "ประชุม")
+    .replaceAll("พ.ศ.2571-2575", "พ.ศ. 2571–2575")
+    .replaceAll("พ.ศ. 2571-2575", "พ.ศ. 2571–2575")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+  return value || fallback;
+};
+
+TANJAI.v9List = function(items=[]){
+  return items.map(x => String(x || "").trim()).filter(Boolean);
+};
+
+TANJAI.v9DetectImageType = function(d){
+  const text = `${d.title} ${d.detail} ${d.mainCategory} ${d.subCategory} ${d.workType}`.toLowerCase();
+  if(/เพลง|single|ซิงเกิล|mv|music|ฟังได้แล้ว|โปรโมทเพลง|อัลบั้ม/.test(text)) return "ภาพโปรโมทเพลง / ผลงานสร้างสรรค์";
+  if(/ขอเชิญ|เชิญร่วม|ขอเรียนเชิญ|ร่วมกิจกรรม|เปิดรับ|สมัคร/.test(text)) return "ภาพเชิญชวน / ประชาสัมพันธ์กิจกรรม";
+  if(/แจ้งข่าว|ประกาศ|โปรดทราบ|เตือน|ระวัง|มิจฉาชีพ|ปิดถนน|ไฟดับ|หยุดให้บริการ/.test(text)) return "ภาพแจ้งข่าว / ประกาศ";
+  if(/สรุปกิจกรรม|ลงพื้นที่|ประชุม|ร่วมประชุม|ตรวจงาน|ติดตาม|บรรยากาศ|กิจกรรม/.test(text)) return "ภาพสรุปกิจกรรม / ภาพโพสต์งาน";
+  if(/ขั้นตอน|วิธี|ข้อมูลควรรู้|infographic|อินโฟกราฟิก|ข้อควรรู้|流程|1\)|2\)|3\)/.test(text)) return "ภาพอินโฟกราฟิก";
+  if(/เกษียณ|แสดงความยินดี|ขอบคุณ|มอบ|อาลัย|ไว้อาลัย|รำลึก/.test(text)) return "ภาพเชิงพิธี / บุคคล";
+  if(/ภาษี|ชำระ|เอกสาร|ทะเบียน|บริการ|ขั้นตอนบริการ/.test(text)) return "ภาพให้ความรู้ / ขั้นตอนบริการ";
+  return "ภาพประชาสัมพันธ์";
+};
+
+TANJAI.v9Purpose = function(type, d){
+  const title = TANJAI.v9Clean(d.title, "หัวข้องาน");
+  if(type === "image"){
+    const imageType = TANJAI.v9DetectImageType(d);
+    if(/เพลง/.test(imageType)) return `โปรโมทผลงาน “${title}” ให้เหมาะกับโซเชียล`;
+    if(/เชิญชวน/.test(imageType)) return `เชิญชวนกลุ่มเป้าหมายให้รับทราบและเข้าร่วมกิจกรรม “${title}”`;
+    if(/แจ้งข่าว|ประกาศ/.test(imageType)) return `แจ้งข้อมูลสำคัญให้เข้าใจเร็วและอ่านง่าย`;
+    if(/สรุปกิจกรรม/.test(imageType)) return `สรุปกิจกรรมหรือเหตุการณ์ให้เป็นภาพโพสต์ที่น่าเชื่อถือ`;
+    if(/อินโฟกราฟิก|ขั้นตอนบริการ/.test(imageType)) return `อธิบายข้อมูลให้เป็นลำดับ เข้าใจง่าย`;
+    return `ประชาสัมพันธ์เรื่อง “${title}” ให้ชัดเจนและพร้อมใช้งานจริง`;
+  }
+  if(type === "post") return `สรุปและเรียบเรียงข้อมูลให้เป็นข้อความพร้อมใช้`;
+  if(type === "mc") return `สร้างสคริปต์พิธีกรและคำกล่าวที่อ่านได้จริงบนเวที`;
+  if(type === "video") return `วางโครงคลิป/วิดีโอให้ถ่ายทำหรือตัดต่อได้ทันที`;
+  if(type === "voice") return `เขียนสคริปต์เสียงพากย์ที่อ่านออกเสียงได้ลื่นไหล`;
+  if(type === "deck") return `จัดโครงสไลด์และ Speaker Notes สำหรับนำเสนอ`;
+  if(type === "album") return `จัดชุดภาพโพสต์ Facebook พร้อมแคปชั่นและลำดับภาพ`;
+  return `สร้างผลลัพธ์พร้อมใช้งาน`;
+};
+
+TANJAI.v9TextOnImage = function(d, imageType="ภาพประชาสัมพันธ์"){
+  const title = TANJAI.v9Clean(d.title, "");
+  const org = TANJAI.v9Clean(d.orgName, "");
+  const detail = TANJAI.v9Clean(d.detail, "");
+  const dateTime = TANJAI.v9Clean(d.dateTime, "");
+  const place = TANJAI.v9Clean(d.place, "");
+  const items = [];
+
+  if(title) items.push(title);
+  if(/เพลง/.test(imageType)){
+    if(org) items.push(org);
+    items.push("เพลงใหม่");
+    items.push("ฟังได้แล้ววันนี้");
+  }else{
+    if(dateTime) items.push(dateTime);
+    if(place) items.push(place);
+    if(org && !items.includes(org)) items.push(org);
+  }
+
+  if(items.length < 3 && detail && detail.length <= 80) items.push(detail);
+  return [...new Set(items)].filter(Boolean).slice(0, 5);
+};
+
+TANJAI.v9AttachmentGuide = function(d, type="image"){
+  const count = Number(d.photoCount || 0);
+  const names = TANJAI.v9Clean(d.photoNames, "");
+  const mode = TANJAI.v9Clean(d.useMode, "");
+  const hasPhotos = count > 0 || !!names;
+  const isRealMode = /ภาพจริง|ต้นฉบับ|รีทัช|ปรับภาพจริง|reference|อ้างอิง/.test(`${mode} ${d.detail} ${d.extraFocus || ""}`);
+  const hasPerson = !!d.safeFace || /บุคคล|ผู้บริหาร|นายก|ประธาน|คน|ภาพถ่าย|รูปถ่าย|หน้า/.test(`${d.detail} ${d.people} ${mode}`);
+
+  if(!hasPhotos && type !== "post" && type !== "mc") return "ไม่มีไฟล์แนบ หรือยังไม่ได้ระบุไฟล์แนบ";
+  if(type === "post") return "หากมีรูปเอกสารแนบ ให้อ่านข้อมูลจากภาพก่อน แล้วค่อยสรุป หากอ่านไม่ชัดให้ระบุว่า “ข้อความส่วนนี้อ่านไม่ชัด”";
+  if(type === "mc") return "หากมีภาพกำหนดการหรือเอกสารพิธี ให้ใช้เพื่อสกัดลำดับพิธี ชื่อบุคคล ตำแหน่ง และช่วงกิจกรรม โดยไม่เดาข้อมูลที่อ่านไม่ชัด";
+
+  const lines = [];
+  if(hasPhotos){
+    lines.push(`มีภาพแนบ ${count || "หลาย"} รูป${names ? `: ${names}` : ""}`);
+    lines.push("ให้ใช้ภาพแนบเป็น reference หรือภาพอ้างอิงหลักตามบริบทของงาน");
+  }
+  if(isRealMode || hasPerson){
+    lines.push("หากมีบุคคลจริงในภาพ ให้คงอัตลักษณ์เดิม ห้ามเปลี่ยนใบหน้า");
+    lines.push("สามารถปรับแสง สี ความคมชัด และจัดองค์ประกอบได้ แต่ห้ามสร้างบุคคลใหม่แทนต้นฉบับ");
+  }
+  return lines.join("\n");
+};
+
+TANJAI.buildSharedBrief = function(d={}, type="image"){
+  const title = TANJAI.v9Clean(d.title, "หัวข้องาน");
+  const orgName = TANJAI.v9Clean(d.orgName, "หน่วยงาน / แบรนด์");
+  const detail = TANJAI.v9Clean(d.detail, "ยังไม่ได้ระบุรายละเอียดเพิ่มเติม");
+  const imageType = TANJAI.v9DetectImageType(d);
+  const purpose = TANJAI.v9Purpose(type, d);
+  const textOnImage = TANJAI.v9TextOnImage(d, imageType);
+  const keyFacts = TANJAI.v9List([
+    detail,
+    d.dateTime ? `วัน / เวลา: ${d.dateTime}` : "",
+    d.place ? `สถานที่: ${d.place}` : "",
+    d.people ? `ผู้เกี่ยวข้อง: ${d.people}` : ""
+  ]);
+
+  return {
+    type,
+    title,
+    orgName,
+    workType: TANJAI.v9Clean(d.workType || d.mainCategory || imageType, imageType),
+    audience: TANJAI.v9Clean(d.audience, "กลุ่มเป้าหมายหลัก"),
+    tone: TANJAI.v9Clean(d.tone, "ทางการ สุภาพ อ่านง่าย"),
+    visualTone: TANJAI.v9Clean(d.visualTone || d.tone, "ให้ AI เลือกให้เหมาะสมตามงาน"),
+    detail,
+    dateTime: TANJAI.v9Clean(d.dateTime, ""),
+    place: TANJAI.v9Clean(d.place, ""),
+    people: TANJAI.v9Clean(d.people, ""),
+    channel: TANJAI.v9Clean(d.channel, d.size || "ช่องทางใช้งานตามที่กำหนด"),
+    size: TANJAI.v9Clean(d.size, "4:5 Facebook / Line 1080x1350"),
+    style: TANJAI.v9Clean(d.style, "Modern Premium Clean"),
+    layout: TANJAI.v9Clean(d.layout, "Layout อ่านง่าย เหมาะกับงาน"),
+    density: TANJAI.v9Clean(d.density, "สมดุล อ่านง่าย"),
+    focus: TANJAI.v9Clean(d.focus, "เน้นหัวข้อหลักและข้อมูลสำคัญ"),
+    colorTone: TANJAI.v9Clean(d.colorTone, "ให้ AI เลือกให้เหมาะสม"),
+    imageType,
+    purpose,
+    textOnImage,
+    keyFacts,
+    attachmentGuide: TANJAI.v9AttachmentGuide(d, type),
+    avoid: TANJAI.v9Clean(d.avoid, "ห้ามแต่งข้อมูลจริงเพิ่มเอง")
+  };
+};
+
+TANJAI.v9ProtectedBlock = function(d, type="general"){
+  const words = TANJAI.v9List([d.title, d.orgName, d.people, d.dateTime, d.place]).join("\n");
+  const base = [
+    "ห้ามแต่งชื่อบุคคล หน่วยงาน วันที่ เวลา สถานที่ หรือชื่อโครงการขึ้นเอง",
+    "หากข้อมูลไม่ครบ ให้ระบุว่า “จากข้อมูลเบื้องต้น” หรือเว้นช่องให้เติม",
+    "ตรวจคำไทยก่อนส่งออก",
+  ];
+  if(type === "image" || type === "album" || type === "video"){
+    base.push("ห้ามสร้าง QR Code ปลอม");
+    base.push("ห้ามวาดโลโก้ใหม่ ให้ใช้ไฟล์โลโก้จริงเท่านั้นหากมีการแนบ");
+    base.push("หากมีบุคคลจริงในภาพแนบ ต้องคงอัตลักษณ์เดิม ห้ามเปลี่ยนใบหน้า");
+  }
+  return `คำที่ต้องสะกดตรง ห้ามแก้มั่ว:
+${words || "ยังไม่มีคำเฉพาะที่ระบุ"}
+
+ข้อห้ามสำคัญ:
+${base.map(x => "- " + x).join("\n")}`;
+};
+
+TANJAI.v9ExecutionHeader = function(action){
+  return `คำสั่งนี้เป็นคำสั่งให้ลงมือทำทันที
+
+${action}
+ห้ามตอบกลับมาเป็นเพียงการสรุปบรีฟ
+ห้ามถามยืนยันก่อน
+หากข้อมูลไม่พอ ให้ใช้ข้อมูลที่มีอย่างเหมาะสม และระบุว่า “จากข้อมูลเบื้องต้น”`;
+};
+
+TANJAI.imagePrompt = function(d, outputMode="gpt"){
+  const b = TANJAI.buildSharedBrief(d, "image");
+  return `${TANJAI.v9ExecutionHeader("ให้สร้างภาพประชาสัมพันธ์จริงทันทีจากข้อมูลด้านล่าง")}
+
+ประเภทภาพ: ${b.imageType}
+จุดประสงค์ของภาพ: ${b.purpose}
+กลุ่มเป้าหมาย: ${b.audience}
+ช่องทางใช้งาน: ${b.channel}
+ขนาดภาพ: ${b.size}
+
+หัวข้อหลัก:
+${b.title}
+
+ข้อมูลจริงของงาน:
+${b.keyFacts.map(x => "- " + x).join("\n")}
+
+ข้อความที่ควรมีบนภาพ:
+${b.textOnImage.map(x => "- " + x).join("\n")}
+
+ไฟล์แนบ / ภาพอ้างอิง:
+${b.attachmentGuide}
+
+แนวทางภาพ:
+- สไตล์: ${b.style}
+- โทนภาพ: ${b.visualTone}
+- โทนสี: ${b.colorTone}
+- Layout: ${b.layout}
+- ความหนาแน่น: ${b.density}
+- จุดเด่นของภาพ: ${b.focus}
+- โทนภาษา: ${b.tone}
+
+${TANJAI.v9ProtectedBlock(d, "image")}
+
+ให้สร้างภาพทันทีตามข้อมูลข้างต้น
+หากเครื่องมือปลายทางไม่สามารถสร้างภาพได้โดยตรง ให้บอกเหตุผลตรง ๆ และส่ง Prompt พร้อมใช้กลับมาแทน`;
+};
+
+TANJAI.v9AlbumPrompt = function(d){
+  const b = TANJAI.buildSharedBrief(d, "album");
+  return `${TANJAI.v9ExecutionHeader("ให้สร้างแนวทางชุดภาพโพสต์ Facebook จากข้อมูลด้านล่าง")}
+
+หัวข้อชุดโพสต์:
+${b.title}
+
+ข้อมูลสำคัญ:
+${b.keyFacts.map(x => "- " + x).join("\n")}
+
+ไฟล์แนบ / ภาพจริง:
+${b.attachmentGuide}
+
+ให้จัดผลลัพธ์เป็น:
+1) ภาพปกโพสต์
+2) ภาพรอง 3–6 ภาพ
+3) ข้อความบนแต่ละภาพ
+4) Caption พร้อมโพสต์
+5) คำแนะนำการเรียงภาพในอัลบั้ม
+
+แนวทางภาพ:
+- โทน: ${b.visualTone}
+- สไตล์: ${b.style}
+- Layout: Facebook Album Clean
+- ข้อความอ่านง่าย
+- ไม่ใส่ข้อมูลที่ไม่ได้ระบุ
+
+${TANJAI.v9ProtectedBlock(d, "album")}
+
+ให้สร้างชุดคำสั่งพร้อมใช้งานทันที`;
+};
+
+TANJAI.v9VideoPrompt = function(d, extra={}){
+  const b = TANJAI.buildSharedBrief(d, "video");
+  const duration = extra.length || d.length || "60 วินาที";
+  return `${TANJAI.v9ExecutionHeader("ให้สร้าง Storyboard วิดีโอจากข้อมูลด้านล่าง")}
+
+หัวข้อวิดีโอ:
+${b.title}
+
+รายละเอียดสำคัญ:
+${b.keyFacts.map(x => "- " + x).join("\n")}
+
+ความยาวเป้าหมาย:
+${duration}
+
+ช่องทางใช้งาน:
+${b.channel}
+
+ไฟล์แนบ:
+${b.attachmentGuide}
+
+ให้จัดผลลัพธ์เป็น:
+1) Hook เปิดคลิป
+2) Storyboard แยกซีน
+3) ภาพ/ฟุตเทจที่ควรใช้ในแต่ละซีน
+4) ข้อความบนจอ
+5) เสียงพากย์
+6) คำแนะนำจังหวะตัดต่อ
+7) CTA ปิดคลิป
+
+${TANJAI.v9ProtectedBlock(d, "video")}
+
+ให้สร้าง Storyboard พร้อมใช้งานทันที`;
+};
+
+TANJAI.v9VoicePrompt = function(d, extra={}){
+  const b = TANJAI.buildSharedBrief(d, "voice");
+  const duration = extra.length || d.length || "60 วินาที";
+  const style = extra.style || d.style || b.tone;
+  return `${TANJAI.v9ExecutionHeader("ให้เขียนสคริปต์เสียงพากย์จากข้อมูลด้านล่าง")}
+
+หัวข้อ:
+${b.title}
+
+ข้อมูลสำคัญ:
+${b.keyFacts.map(x => "- " + x).join("\n")}
+
+ความยาวเสียง:
+${duration}
+
+โทนเสียง:
+${style}
+
+กลุ่มเป้าหมาย:
+${b.audience}
+
+ให้เขียนเป็นสคริปต์อ่านออกเสียงจริง:
+- เปิดเรื่องให้น่าสนใจ
+- เรียบเรียงลื่นไหล
+- ภาษาไทยชัดเจน
+- ไม่มีประโยคยาวเกินไป
+- ปิดท้ายชัดเจน
+
+${TANJAI.v9ProtectedBlock(d, "voice")}
+
+ให้เขียนสคริปต์เสียงทันที`;
+};
+
+TANJAI.v9DeckPrompt = function(d, extra={}){
+  const b = TANJAI.buildSharedBrief(d, "deck");
+  const count = extra.count || d.count || "8";
+  return `${TANJAI.v9ExecutionHeader("ให้สร้างโครงสไลด์จากข้อมูลด้านล่าง")}
+
+หัวข้อสไลด์:
+${b.title}
+
+รายละเอียดสำคัญ:
+${b.keyFacts.map(x => "- " + x).join("\n")}
+
+จำนวนสไลด์:
+${count}
+
+กลุ่มผู้ฟัง:
+${b.audience}
+
+ให้จัดผลลัพธ์เป็น:
+1) ชื่อสไลด์แต่ละหน้า
+2) Bullet สำคัญ
+3) Speaker Notes
+4) ภาพประกอบที่แนะนำ
+5) สไลด์สรุปปิดท้าย
+
+${TANJAI.v9ProtectedBlock(d, "deck")}
+
+ให้สร้าง Outline สไลด์ทันที`;
+};
+
+TANJAI.v9ContentPrompt = function(d){
+  const b = TANJAI.buildSharedBrief(d, "post");
+  const output = d.channel || "สรุปงาน";
+  return `${TANJAI.v9ExecutionHeader("ให้สรุปและเรียบเรียงเนื้อหาจากข้อมูลด้านล่าง")}
+
+หากมีรูปเอกสารแนบ ให้อ่านข้อมูลจากภาพก่อน แล้วค่อยสรุป
+หากอ่านข้อความจากภาพไม่ชัด ห้ามเดา ให้ระบุว่า “ข้อความส่วนนี้อ่านไม่ชัด”
+
+หัวข้องาน:
+${b.title}
+
+หน่วยงาน / เจ้าของงาน:
+${b.orgName}
+
+รายละเอียด:
+${b.detail}
+
+วัน / เวลา:
+${b.dateTime || "ไม่ระบุ"}
+
+สถานที่:
+${b.place || "ไม่ระบุ"}
+
+บุคคล / หน่วยงานที่เกี่ยวข้อง:
+${b.people || "ไม่ระบุ"}
+
+ต้องการเรียบเรียงเป็น:
+${output}
+
+ขอผลลัพธ์พร้อมใช้:
+1) สรุปงาน
+2) โพสต์ Facebook / Line
+3) แคปชั่นสั้น
+4) สคริปต์เสียง
+5) สคริปต์คลิป
+6) ข้อความสำหรับทำสื่อ
+7) คำที่ต้องตรวจสอบก่อนเผยแพร่
+
+${TANJAI.v9ProtectedBlock(d, "post")}
+
+ให้เรียบเรียงเนื้อหาทันที`;
+};
+
+TANJAI.v9MCPrompt = function(d){
+  const b = TANJAI.buildSharedBrief(d, "mc");
+  const output = d.channel || "สคริปต์พิธีกรเต็ม";
+  const style = d.style || b.tone || "ทางการ สุภาพ อ่านง่าย";
+  return `${TANJAI.v9ExecutionHeader("ให้เขียนสคริปต์พิธีกร / ผู้ดำเนินรายการจากข้อมูลด้านล่าง")}
+
+หากข้อมูลไม่พอ ให้ใช้คำว่า “จากข้อมูลเบื้องต้น” และเว้นช่องให้เติมภายหลัง
+ห้ามแต่งชื่อบุคคล ตำแหน่ง หน่วยงาน วันที่ เวลา หรือสถานที่ขึ้นเอง
+
+ชื่องาน:
+${b.title}
+
+หน่วยงาน / ผู้จัด:
+${b.orgName}
+
+วัน / เวลา:
+${b.dateTime || "ไม่ระบุ"}
+
+สถานที่:
+${b.place || "ไม่ระบุ"}
+
+ประธาน / ผู้กล่าวรายงาน / ผู้เกี่ยวข้อง:
+${b.people || "ไม่ระบุ"}
+
+กำหนดการ / ลำดับพิธี:
+${b.detail}
+
+ต้องการสร้าง:
+${output}
+
+สไตล์พิธีกร:
+${style}
+
+ไฟล์แนบ:
+${b.attachmentGuide}
+
+ขอผลลัพธ์พร้อมใช้บนเวที:
+1) สคริปต์พิธีกรเต็ม
+2) คำเชิญประธาน
+3) คำเชิญผู้กล่าวรายงาน
+4) คำกล่าวรายงาน
+5) คำกล่าวประธาน
+6) คำเชื่อมช่วง
+7) สคริปต์เปิด / ปิดงาน
+8) เวอร์ชันย่อถืออ่าน
+9) หมายเหตุสำหรับพิธีกร
+
+รูปแบบภาษา:
+- สุภาพ
+- อ่านออกเสียงง่าย
+- แยกช่วงชัดเจน
+- ใส่ [เว้นจังหวะ] เมื่อจำเป็น
+- หากข้อมูลไม่ชัด ให้ใช้ [เติมชื่อ...] แทนการเดา
+
+${TANJAI.v9ProtectedBlock(d, "mc")}
+
+ให้เขียนสคริปต์พิธีกรทันที`;
+};
+
+TANJAI.discussPrompt = function(type, d){
+  const b = TANJAI.buildSharedBrief(d, type);
+  const taskNames = {
+    image:"ภาพประชาสัมพันธ์",
+    album:"ชุดภาพโพสต์ Facebook",
+    post:"เรียบเรียงเนื้อหา / สรุปงาน",
+    mc:"สคริปต์พิธีกร / ผู้ดำเนินรายการ",
+    video:"วิดีโอ / Storyboard",
+    voice:"สคริปต์เสียง",
+    deck:"สไลด์",
+    kit:"Prompt Pack"
+  };
+  return `Prompt สำหรับแก้ / คุยต่อ
+
+ช่วยตรวจและปรับงานประเภท “${taskNames[type] || "สื่อประชาสัมพันธ์"}”
+ยังไม่ต้องสร้างผลงานสุดท้าย ให้ช่วยเกลาคำสั่งให้คมขึ้น
+
+ข้อมูลกลาง:
+- หัวข้อ: ${b.title}
+- เจ้าของงาน: ${b.orgName}
+- จุดประสงค์: ${b.purpose}
+- กลุ่มเป้าหมาย: ${b.audience}
+- รายละเอียด: ${b.detail}
+
+ช่วยเสนอ:
+1) จุดที่ควรปรับให้ชัดขึ้น
+2) คำที่ควรระวังหรือควรสะกดให้ตรง
+3) เวอร์ชัน Prompt ที่กระชับกว่า
+4) ข้อควรตรวจสอบก่อนนำไปใช้จริง
+
+${TANJAI.v9ProtectedBlock(d, type)}`;
+};
+
+TANJAI.executionPrompt = function(type, d, extra={}){
+  if(type === "image") return TANJAI.imagePrompt(d, "gpt");
+  if(type === "album") return TANJAI.v9AlbumPrompt(d);
+  if(type === "post") return TANJAI.v9ContentPrompt(d);
+  if(type === "mc") return TANJAI.v9MCPrompt(d);
+  if(type === "video") return TANJAI.v9VideoPrompt(d, extra);
+  if(type === "voice") return TANJAI.v9VoicePrompt(d, extra);
+  if(type === "deck") return TANJAI.v9DeckPrompt(d, extra);
+  if(type === "kit") return TANJAI.promptPack ? TANJAI.promptPack(d) : TANJAI.v9ContentPrompt(d);
+  return TANJAI.v9ContentPrompt(d);
+};
+
+TANJAI.videoStoryboard = function(d, length="60 วินาที"){
+  return TANJAI.v9VideoPrompt(d, {length});
+};
+
+TANJAI.deckOutline = function(d, count=8){
+  return TANJAI.v9DeckPrompt(d, {count});
+};
+
