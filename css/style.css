@@ -3243,3 +3243,35 @@ body.auth-locked .owner-watermark{
   outline:2px solid rgba(56,189,248,.58);
   outline-offset:3px;
 }
+
+
+/* V8.9.4 — Separate Content and MC Modes */
+.post-mode-switch-v894{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin:0 0 14px;
+}
+.mode-pill-v894{
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.045);
+  color:#dbeafe;
+  border-radius:999px;
+  padding:10px 14px;
+  font-weight:950;
+  cursor:pointer;
+  transition:.18s;
+}
+.mode-pill-v894:hover{
+  border-color:rgba(56,189,248,.35);
+  background:rgba(56,189,248,.08);
+}
+.mode-pill-v894.active{
+  border-color:rgba(56,189,248,.58);
+  background:linear-gradient(135deg,rgba(56,189,248,.16),rgba(124,58,237,.16));
+  box-shadow:0 12px 36px rgba(56,189,248,.10);
+}
+#postForm[data-post-mode="mc"] .form-note{
+  border-color:rgba(246,208,135,.30);
+  background:linear-gradient(135deg,rgba(246,208,135,.10),rgba(124,58,237,.08));
+}
