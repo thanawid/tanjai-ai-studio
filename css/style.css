@@ -3873,3 +3873,59 @@ body.auth-locked .app-shell {
     justify-content: space-between;
   }
 }
+
+
+/* V9.1.1 — Clean Creative Quality UI + Dark Dropdown Theme */
+
+/* เอากล่องอธิบาย Creative Quality ที่รกออก แต่คง logic หลังบ้านไว้ */
+#image-qualityPreview,
+.v91-quality-preview{
+  display:none !important;
+}
+
+/* ปรับ select/dropdown ให้เข้าธีมดาร์กของเว็บ */
+select,
+textarea,
+input{
+  color-scheme: dark;
+}
+
+select{
+  background-color:#080e1c !important;
+  color:#e5e7eb !important;
+  border:1px solid rgba(148,163,184,.22) !important;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.02);
+}
+
+select:focus{
+  border-color:rgba(129,140,248,.85) !important;
+  box-shadow:
+    0 0 0 3px rgba(99,102,241,.18),
+    inset 0 0 0 1px rgba(255,255,255,.04) !important;
+  outline:none !important;
+}
+
+select option,
+select optgroup{
+  background-color:#0b1020 !important;
+  color:#e5e7eb !important;
+}
+
+select option:checked{
+  background-color:#4f46e5 !important;
+  color:#ffffff !important;
+}
+
+select option:hover,
+select option:focus{
+  background-color:#312e81 !important;
+  color:#ffffff !important;
+}
+
+/* บาง browser ใช้ native UI จึงอาจคุม hover ไม่ได้ 100% แต่พื้น/ตัวอักษรจะยังเป็นโทนเข้ม */
+@media (max-width:720px){
+  select{
+    font-size:15px !important;
+    min-height:46px;
+  }
+}

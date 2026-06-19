@@ -1,0 +1,27 @@
+V9.1.1 — Clean Creative Quality UI + Dark Dropdown Theme
+
+ฐานงาน:
+- ใช้ไฟล์ฐานที่ผู้ใช้อัปโหลดล่าสุด: tanjai-ai-studio-v9-1-improved (1).zip
+
+แก้รวม 2 จุด:
+
+1) Clean Creative Quality UI
+- เอากล่องอธิบาย Creative Quality ยาว ๆ ใต้ปุ่มลัดออก
+- คง dropdown และปุ่มลัดไว้ครบ
+- คง logic หลังบ้านของ Creative Quality ไว้เหมือนเดิม
+- หน้า “สร้างภาพ” ดูสะอาดขึ้น ไม่กลับไปเป็น helper note รก ๆ
+
+2) Dark Dropdown Theme
+- ปรับ select/dropdown ให้เป็นโทนเข้ม
+- ปรับพื้นหลัง option เป็นดำอมกรมท่า
+- ปรับตัวอักษรเป็นสีอ่อน
+- ปรับ focus ring ให้เข้ากับธีมม่วง/ฟ้า
+- ปรับ selected option ให้ดูเข้าธีมมากขึ้น
+
+คงเดิม:
+- ทุกอย่างจากไฟล์ฐานที่แนบ
+- V9.1 Context & Creative Quality System
+- Prompt Architecture
+- Mobile UX
+- Fixed Menu Visuals
+- Separate MC Workspace

@@ -281,3 +281,7 @@
 
 ## V9.1 — Context & Creative Quality System
 เพิ่มบริบทงาน ประเภทภาพ และ Creative Quality Lock เพื่อให้ Prompt ภาพสวยขึ้น ตรงใจขึ้น ไม่เว่อร์ และไม่มั่วข้อมูลจริง
+
+
+## V9.1.1 — Clean Creative Quality UI + Dark Dropdown Theme
+ใช้ฐานจากไฟล์ที่ผู้ใช้อัปโหลดล่าสุด แล้วเอากล่องอธิบาย Creative Quality ที่รกออก พร้อมปรับ dropdown/select เป็นโทนเข้ม โดยคง logic หลังบ้านเดิมไว้ครบ

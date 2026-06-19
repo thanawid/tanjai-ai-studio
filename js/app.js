@@ -54,9 +54,6 @@ document.addEventListener("DOMContentLoaded", () => {
             <button type="button" class="chip-btn" data-v91-context="ไว้อาลัย / สุภาพ / ลดสี" data-v91-type="ภาพไว้อาลัย / สุภาพ">ลดสี / ไว้อาลัย</button>
           </div>
         </div>
-        <div class="full v91-quality-preview" id="image-qualityPreview">
-          <b>Creative Quality:</b> ระบบจะช่วยเลือกทิศทางภาพให้เหมาะกับบริบทงาน และคุมไม่ให้เติมข้อมูลเกินจริง
-        </div>
       </div>
     </div>
     <div class="form-section"><div class="section-title"><b>2</b><h4>ภาพอ้างอิง / ภาพจริง</h4></div>
@@ -805,13 +802,8 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "Prompt สคริป
   };
 
   const refreshV91QualityPreview = () => {
-    const ctx = $("#image-workContext")?.value || "ให้ AI ช่วยเลือกจากรายละเอียด";
-    const type = $("#image-imageType")?.value || "ให้ AI ช่วยเลือกตามบริบท";
-    const preset = v91CreativePresets[ctx];
-    const box = $("#image-qualityPreview");
-    if(box){
-      box.innerHTML = `<b>Creative Quality:</b> ${preset?.preview || "ระบบจะอ่านหัวข้อและรายละเอียด แล้วช่วยเลือกทิศทางภาพให้พอดีกับงาน ไม่ยัดข้อมูลเกินจริง"}<br><span>บริบท: ${ctx} · ประเภทภาพ: ${type}</span>`;
-    }
+    // V9.1.1: คง logic หลังบ้านไว้ แต่ไม่โชว์กล่องอธิบายยาวในฟอร์ม
+    return;
   };
 
   const applyV91CreativePreset = (ctx, imageType, toast=true) => {
