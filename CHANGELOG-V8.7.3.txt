@@ -1,7 +1,0 @@
-V8.7.3 — Prompt Workspace Foundation
-
-- เพิ่มแกน Prompt Pack ในเมนูสร้างชุดสื่อ
-- เพิ่มตัวเลือกเครื่องมือปลายทาง เช่น ChatGPT / Gemini / Claude / Canva / CapCut / Runway / Kling
-- สร้าง Prompt Pack ครบชุดจากข้อมูลเดียว
-- เพิ่มเอกสาร PROJECT_RULES.md / PROMPT_WORKSPACE_SPEC.md / AI_HANDOFF_PROMPT.md / RESPONSIVE_CHECKLIST.md
-- คงระบบ ZIP / caption / preview / sidebar / hero เดิม
