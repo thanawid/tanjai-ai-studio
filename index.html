@@ -69,8 +69,8 @@
 
         <span>วางงาน / เรียบเรียง</span>
         <button class="nav-link" data-view="kit"><i>🧩</i><b>สร้างชุดสื่อ</b></button>
-        <button class="nav-link" data-view="post" data-content-shortcut="true"><i>✍️</i><b>เรียบเรียงเนื้อหา</b></button>
-        <button class="nav-link mc-shortcut" data-view="post" data-mc-shortcut="true"><i>🎤</i><b>งานพิธีกร</b></button>
+        <button class="nav-link" data-view="post"><i>✍️</i><b>เรียบเรียงเนื้อหา</b></button>
+        <button class="nav-link" data-view="mc"><i>🎤</i><b>งานพิธีกร</b></button>
 
         <span>ต่อยอด / ตัวอย่าง</span>
         <button class="nav-link" data-view="destinationHub"><i>🚀</i><b>เครื่องมือปลายทาง</b></button>
@@ -96,7 +96,7 @@
         <div class="top-actions">
           <button class="btn secondary nav-back-btn" id="topBackBtn" type="button">← ย้อนกลับ</button>
           <button class="btn secondary nav-home-btn" data-view="dashboard" type="button">หน้าหลัก</button>
-          <span class="status-pill">พร้อมใช้งาน</span><span class="version-badge">v8.9.4</span>
+          <span class="status-pill">พร้อมใช้งาน</span><span class="version-badge">v8.9.5</span>
           <button class="btn secondary logout-btn" id="logoutBtn" type="button">ออกจากระบบ</button>
           <button class="btn secondary" id="openCommandTop" onclick="window.TANJAI&&TANJAI.openCommandPalette&&TANJAI.openCommandPalette()">⌘ ค้นหาคำสั่ง</button><button class="btn secondary" data-view="router">AI Router</button>
           <button class="btn primary" data-view="kit">+ สร้างชุดสื่อ</button>
@@ -153,12 +153,12 @@
         <div class="dashboard-grid dashboard-sales-grid-v861">
           <section class="panel wide">
             <div class="panel-head">
-              <div><h3>เมนูสร้างงาน</h3><p>จัดกลุ่มใหม่ให้หาเจอง่าย: ผลิตสื่ออยู่ก่อน แล้วค่อยวางงาน / เรียบเรียง / งานพิธีกร</p></div>
+              <div><h3>เมนูสร้างงาน</h3><p>จัดกลุ่มใหม่ให้หาเจอง่าย: ผลิตสื่อ / สรุปงาน / งานพิธีกร แยกหน้ากันชัดเจน</p></div>
             </div>
             <div class="sample-grid compact-sample-grid-v861 creation-menu-grid-v892">
               <article class="home-choice-card" data-view="kit"><img src="assets/icons/kit.svg" alt=""><b>สร้างชุดสื่อ</b><span>Prompt ครบชุดจากข้อมูลเดียว</span></article>
-              <article class="home-choice-card" data-view="post" data-content-shortcut="true"><img src="assets/previews/post-1.png" data-random-previews="assets/previews/post-1.png|assets/previews/post-2.png|assets/previews/post-3.png" alt=""><b>เรียบเรียงเนื้อหา</b><span>สรุปงาน โพสต์ สคริปต์เสียง คลิป</span></article>
-              <article class="home-choice-card" data-view="post" data-mc-shortcut="true"><div class="mc-emoji-v892">🎤</div><b>งานพิธีกร</b><span>สคริปต์พิธีกร คำเชิญประธาน คำกล่าว</span></article>
+              <article class="home-choice-card" data-view="post"><img src="assets/previews/post-1.png" data-random-previews="assets/previews/post-1.png|assets/previews/post-2.png|assets/previews/post-3.png" alt=""><b>เรียบเรียงเนื้อหา</b><span>สรุปงาน โพสต์ สคริปต์เสียง คลิป</span></article>
+              <article class="home-choice-card" data-view="mc"><div class="mc-emoji-v892">🎤</div><b>งานพิธีกร</b><span>สคริปต์พิธีกร คำเชิญประธาน คำกล่าว</span></article>
               <article class="home-choice-card" data-view="image"><img src="assets/previews/image-1.png" data-random-previews="assets/previews/image-1.png|assets/previews/image-2.png|assets/previews/image-3.png" alt=""><b>สร้างภาพ</b><span>Prompt ภาพพร้อมใช้</span></article>
               <article class="home-choice-card" data-view="album"><img src="assets/previews/image-2.png" data-random-previews="assets/previews/image-1.png|assets/previews/image-2.png|assets/previews/image-3.png" alt=""><b>ชุดภาพโพสต์ Facebook</b><span>อัปโหลดรูป ใส่กรอบ แคปชั่น ZIP</span></article>
               <article class="home-choice-card" data-view="video"><img src="assets/previews/video-1.png" data-random-previews="assets/previews/video-1.png|assets/previews/video-2.png|assets/previews/video-3.png" alt=""><b>ทำวิดีโอ</b><span>Hook + Storyboard + Voice Over</span></article>
@@ -201,7 +201,9 @@
 
       <section id="album" class="view"><div class="studio-layout"><section class="panel form-panel"><div class="panel-head"><div><h3>🧷 ชุดภาพโพสต์ Facebook</h3><p>อัปโหลดหลายภาพ ปรับแสงสี ครอป ใส่กรอบข้อความ และดาวน์โหลดภาพพร้อมโพสต์ โดยไม่สร้างภาพใหม่</p></div></div><div id="albumForm"></div></section><aside class="panel result-panel"><div id="albumResult"></div></aside></div></section>
 
-      <section id="post" class="view"><div class="studio-layout"><section class="panel form-panel"><div class="panel-head"><div><h3>✍️ เรียบเรียงเนื้อหา</h3><p>ครัวกลางสำหรับสรุปงาน โพสต์ สคริปต์เสียง สคริปต์คลิป และงานพิธีกร รองรับทั้งกรอกเองและแนบภาพเอกสาร</p></div></div><div id="postForm"></div></section><aside class="panel result-panel"><div id="postResult"></div></aside></div></section>
+      <section id="post" class="view"><div class="studio-layout"><section class="panel form-panel"><div class="panel-head"><div><h3>✍️ เรียบเรียงเนื้อหา</h3><p>ใช้สำหรับสรุปงาน เรียบเรียงข้อมูล เขียนโพสต์ แคปชั่น สคริปต์เสียง สคริปต์คลิป และข้อความสำหรับทำสื่อ</p></div></div><div id="postForm"></div></section><aside class="panel result-panel"><div id="postResult"></div></aside></div></section>
+
+      <section id="mc" class="view"><div class="studio-layout"><section class="panel form-panel"><div class="panel-head"><div><h3>🎤 งานพิธีกร</h3><p>สร้างสคริปต์พิธีกร คำเชิญประธาน คำกล่าวรายงาน คำกล่าวประธาน คำเชื่อมช่วง และเวอร์ชันย่อถืออ่าน</p></div></div><div id="mcForm"></div></section><aside class="panel result-panel"><div id="mcResult"></div></aside></div></section>
 
       <section id="video" class="view"><div class="studio-layout"><section class="panel form-panel"><div class="panel-head"><div><h3>🎬 ทำวิดีโอ</h3><p>วางโครงคลิปตั้งแต่ Hook, Storyboard, เสียงพากย์ และข้อความบนจอ</p></div></div><div id="videoForm"></div></section><aside class="panel result-panel"><div id="videoResult"></div></aside></div></section>
 

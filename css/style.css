@@ -3275,3 +3275,17 @@ body.auth-locked .owner-watermark{
   border-color:rgba(246,208,135,.30);
   background:linear-gradient(135deg,rgba(246,208,135,.10),rgba(124,58,237,.08));
 }
+
+
+/* V8.9.5 — Separate MC Workspace */
+.mc-note-v895{
+  border-color:rgba(246,208,135,.30) !important;
+  background:linear-gradient(135deg,rgba(246,208,135,.10),rgba(124,58,237,.08)) !important;
+}
+#mc .panel-head h3,
+.nav-link[data-view="mc"] b{
+  letter-spacing:-.01em;
+}
+#mc .summary-chip{
+  white-space:nowrap;
+}

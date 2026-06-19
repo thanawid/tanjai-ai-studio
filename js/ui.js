@@ -24,7 +24,7 @@ TANJAI.downloadText = function(text, filename){
   URL.revokeObjectURL(a.href);
 };
 
-TANJAI.validViews = ["dashboard","router","image","album","post","video","voice","deck","kit","promptHub","destinationHub","projects","library","guide"];
+TANJAI.validViews = ["dashboard","router","image","album","post","mc","video","voice","deck","kit","promptHub","destinationHub","projects","library","guide"];
 
 TANJAI.switchView = function(id, options = {}){
   if(!TANJAI.validViews.includes(id)) id = "dashboard";
@@ -39,6 +39,7 @@ TANJAI.switchView = function(id, options = {}){
     image:"สร้างภาพ",
     album:"ชุดภาพโพสต์ Facebook Pro",
     post:"เรียบเรียงเนื้อหา",
+    mc:"งานพิธีกร",
     video:"ทำวิดีโอ",
     voice:"เสียงพากย์",
     deck:"ทำสไลด์",
@@ -136,6 +137,7 @@ TANJAI.getToolDestinations = function(tool){
   const map = {
     image:[{label:"เปิด ทันใจ GPT", url:GPT},{label:"เปิด Canva", url:"https://www.canva.com/"}],
     album:[{label:"เปิด Canva", url:"https://www.canva.com/"},{label:"เปิด ทันใจ GPT", url:GPT}],
+    mc:[{label:"เปิด ทันใจ GPT", url:GPT},{label:"เปิด Notebook Tool", url:"https://notebooklm.google.com/"},{label:"เปิด Canva", url:"https://www.canva.com/"}],
     post:[{label:"เปิด ทันใจ GPT", url:GPT},{label:"เปิด Notebook Tool", url:"https://notebooklm.google.com/"},{label:"เปิด Canva", url:"https://www.canva.com/"},{label:"เปิด CapCut", url:"https://www.capcut.com/"}],
     video:[{label:"เปิด ทันใจ GPT", url:GPT},{label:"เปิด CapCut", url:"https://www.capcut.com/"}],
     voice:[{label:"เปิด ทันใจ GPT", url:GPT},{label:"เปิด Voice Tool", url:"https://aistudio.google.com/"},{label:"เปิด CapCut", url:"https://www.capcut.com/"}],
@@ -151,6 +153,7 @@ TANJAI.primaryActionButtons = function(tool, bodyId){
   if(tool === "image") return btn("คัดลอก Prompt สั่งทำทันที", `data-copybox="${bodyId}"`, "primary") + btn("เปิด ทันใจ GPT", `data-open="${GPT}"`);
   if(tool === "album") return btn("ดาวน์โหลดทั้งหมด", `id="albumDownloadAllTop"`, "primary") + btn("ล้างรูป", `id="albumClearTop"`);
   if(tool === "post") return btn("คัดลอก Prompt สั่งทำทันที", `data-copybox="${bodyId}"`, "primary") + btn("เปิด ทันใจ GPT", `data-open="${GPT}"`);
+  if(tool === "mc") return btn("คัดลอกสคริปต์พิธีกร", `data-copybox="${bodyId}"`, "primary") + btn("เปิด ทันใจ GPT", `data-open="${GPT}"`);
   if(tool === "video") return btn("คัดลอก Prompt วิดีโอ", `data-copybox="${bodyId}"`, "primary") + btn("เปิด CapCut", `data-open="https://www.capcut.com/"`);
   if(tool === "voice") return btn("คัดลอก Prompt เสียง", `data-copybox="${bodyId}"`, "primary") + btn("เปิด Voice Tool", `data-open="https://aistudio.google.com/"`);
   if(tool === "deck") return btn("คัดลอก Prompt สไลด์", `data-copybox="${bodyId}"`, "primary") + btn("เปิด Slide Tool", `data-open="https://gamma.app/"`);
