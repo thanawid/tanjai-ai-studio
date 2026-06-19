@@ -177,14 +177,6 @@ document.addEventListener("DOMContentLoaded", () => {
         </label>
         <label class="full">สิ่งที่อยากให้เน้นเพิ่มเติม<textarea id="post-extra" placeholder="เช่น เน้นสรุปให้กระชับ / ภาษาเป็นทางการ / โพสต์อ่านง่าย / สคริปต์เสียง 1 นาที"></textarea></label>
       </div>
-      <div class="summary-output-tabs">
-        <span class="summary-chip">สรุปงาน</span>
-        <span class="summary-chip">โพสต์</span>
-        <span class="summary-chip">แคปชั่น</span>
-        <span class="summary-chip">สคริปต์เสียง</span>
-        <span class="summary-chip">สคริปต์คลิป</span>
-        <span class="summary-chip">ข้อความทำสื่อ</span>
-      </div>
     </div>
     <div class="button-row"><button class="btn primary" id="makePost">เรียบเรียงเนื้อหา</button><button class="btn secondary" id="savePost">บันทึก</button></div>`;
 
@@ -202,16 +194,6 @@ document.addEventListener("DOMContentLoaded", () => {
           <div id="mc-photoPreview" class="upload-preview-grid"></div>
         </label>
         <label class="full">ข้อมูลพิธี / สิ่งที่อยากให้เน้น<textarea id="mc-extra" placeholder="เช่น ประธานในพิธี / ผู้กล่าวรายงาน / ลำดับพิธี / ช่วงมอบรางวัล / ถ่ายภาพร่วมกัน / คำเรียกแขกผู้มีเกียรติ"></textarea></label>
-      </div>
-      <div class="summary-output-tabs">
-        <span class="summary-chip">สคริปต์พิธีกร</span>
-        <span class="summary-chip">คำเชิญประธาน</span>
-        <span class="summary-chip">คำเชิญผู้กล่าวรายงาน</span>
-        <span class="summary-chip">คำกล่าวรายงาน</span>
-        <span class="summary-chip">คำกล่าวประธาน</span>
-        <span class="summary-chip">คำเชื่อมช่วง</span>
-        <span class="summary-chip">เปิด / ปิดงาน</span>
-        <span class="summary-chip">ถืออ่าน</span>
       </div>
     </div>
     <div class="button-row"><button class="btn primary" id="makeMC">สร้างสคริปต์พิธีกร</button><button class="btn secondary" id="saveMC">บันทึก</button></div>`;
@@ -360,7 +342,7 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "Prompt สคริป
   };
 
 
-  // v8.9.6 Clean Helper Notes + Fixed Menu Visuals + Mobile UX Fix
+  // v8.9.7 Remove Output Chips
   TANJAI.quickActions = [
     {label:"หน้าหลัก", icon:"🏠", view:"dashboard", hint:"กลับหน้าแรก"},
     {label:"สร้างชุดสื่อ", icon:"🧩", view:"kit", hint:"Prompt ครบชุดจากข้อมูลเดียว"},

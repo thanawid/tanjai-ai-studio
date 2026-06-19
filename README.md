@@ -269,3 +269,7 @@
 
 ## V8.9.6 — Clean Helper Notes + Fixed Menu Visuals + Mobile UX Fix
 มัดรวม Clean Helper Notes, Fixed Menu Visuals และ Mobile UX Fix ในเวอร์ชันเดียว
+
+
+## V8.9.7 — Remove Output Chips
+เอาแถบชิปผลลัพธ์ในหน้าเรียบเรียงเนื้อหาและงานพิธีกรออก เหลือ dropdown สำหรับเลือกประเภทงานให้ชัดเจน

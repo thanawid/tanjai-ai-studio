@@ -3513,3 +3513,10 @@ body.auth-locked .owner-watermark{
     object-fit:cover !important;
   }
 }
+
+
+/* V8.9.7 — Remove Output Chips */
+#post .summary-output-tabs,
+#mc .summary-output-tabs{
+  display:none !important;
+}
