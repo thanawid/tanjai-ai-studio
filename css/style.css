@@ -3202,3 +3202,44 @@ body.auth-locked .owner-watermark{
     font-size:9.5px;
   }
 }
+
+
+/* V8.9.3 — Clean Idle Borders + Sidebar Order */
+/* ให้กรอบเด่นขึ้นเฉพาะเมนูที่ active หรือกำลัง hover เท่านั้น */
+.nav-link:not(.active):not(:hover),
+.nav .nav-feature:not(.active):not(:hover),
+.nav .mc-shortcut:not(.active):not(:hover){
+  border-color:transparent !important;
+  background:transparent !important;
+  box-shadow:none !important;
+}
+
+/* การ์ดที่ยังไม่ได้กด ไม่ควรดูเหมือนถูกเลือกค้าง */
+.tool-card.highlight:not(:hover),
+.dashboard-main-tools-v861 .tool-card:not(:hover),
+.creation-menu-grid-v892 .home-choice-card:not(:hover),
+.creation-menu-grid-v893 .home-choice-card:not(:hover){
+  border-color:var(--line) !important;
+  background:linear-gradient(135deg,rgba(255,255,255,.07),rgba(255,255,255,.035)) !important;
+  box-shadow:none !important;
+}
+
+/* งานพิธีกรยังเห็นชัดจากไอคอน แต่ไม่ใช้กรอบค้าง */
+.mc-card-v892:not(:hover),
+.menu-primary-v892:not(:hover){
+  border-color:var(--line) !important;
+  background:rgba(255,255,255,.045) !important;
+  box-shadow:none !important;
+}
+
+.nav-link:focus,
+.tool-card:focus,
+.home-choice-card:focus{
+  outline:none;
+}
+.nav-link:focus-visible,
+.tool-card:focus-visible,
+.home-choice-card:focus-visible{
+  outline:2px solid rgba(56,189,248,.58);
+  outline-offset:3px;
+}
