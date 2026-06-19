@@ -3021,3 +3021,32 @@ body.auth-locked .owner-watermark{
   display:block;
   content:"";
 }
+
+
+/* V8.8 — Final Hero Copy Refresh */
+.hero-title span:last-child{
+  color:#ffffff !important;
+  background:none !important;
+  -webkit-text-fill-color:currentColor !important;
+  text-shadow:0 2px 18px rgba(0,0,0,.20);
+  letter-spacing:-.02em;
+}
+.hero-lead{
+  max-width:44ch;
+  line-height:1.82;
+}
+.hero-sales-stats article b{
+  font-size:clamp(21px, 2vw, 28px);
+  letter-spacing:-.02em;
+}
+.hero-sales-stats article span{
+  line-height:1.35;
+}
+@media (max-width:720px){
+  .hero-sales-stats article b{
+    font-size:22px;
+  }
+  .hero-lead{
+    max-width:100%;
+  }
+}
