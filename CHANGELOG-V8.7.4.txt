@@ -1,0 +1,9 @@
+V8.7.4 — Universal Prompt Pack
+
+- รวมแนวคิด Prompt Workspace จาก V8.7.3
+- ปรับเมนูสร้างชุดสื่อให้ไม่ต้องเลือก AI ปลายทางก่อน
+- เปลี่ยนเป็น Universal Prompt Pack: กรอกครั้งเดียว ใช้ต่อได้หลาย AI
+- เพิ่ม Prompt กลางพร้อมใช้ทุก AI
+- แยก Prompt ตามงาน ภาพ / โพสต์ / ชุดภาพ Facebook / วิดีโอ / เสียง / สไลด์
+- เพิ่มคำสั่งกันหลุดและคำที่ต้องสะกดตรง
+- คงระบบ ZIP / caption / preview / sidebar / hero / album เดิม

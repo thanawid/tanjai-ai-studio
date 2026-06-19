@@ -163,7 +163,7 @@ document.addEventListener("DOMContentLoaded", () => {
   `;
 
   $("#postForm").innerHTML = TANJAI.field("post") + `
-    <div class="form-note">เมนูนี้ใช้สรุปงานจากข้อมูลและรูปภาพ เช่น นายกลงพื้นที่ ตรวจงาน ช่วยเหลือกลุ่มเป้าหมาย แล้วนำไปต่อได้ทั้งนำเสนอ ทำคลิป และโพสต์โซเชียล</div>
+    <div class="form-note">เมนูนี้ช่วยจัดบรีฟจากข้อมูลและรูปภาพ แล้วแตกเป็นข้อความ โพสต์ คลิป และ Prompt ใช้ต่อกับ AI อื่นได้เร็วขึ้น</div>
     <div class="form-section"><div class="section-title"><b>2</b><h4>ตั้งค่าสคริปต์สรุปงาน</h4></div>
       <div class="form-grid">
         <label>ประเภทงาน<select id="post-workType">${opts(toolOptions.workTypes || ["นายกลงพื้นที่","กิจกรรมเทศบาล","อื่น ๆ"])}</select></label>
@@ -213,7 +213,15 @@ document.addEventListener("DOMContentLoaded", () => {
         <label>หมวดงาน<select id="deck-mainCategory">${opts(toolOptions.mainCategories)}</select></label>
       </div>
     </div><div class="button-row"><button class="btn primary" id="makeDeck">สร้าง Outline</button><button class="btn secondary" id="saveDeck">บันทึก</button></div>`;
-  $("#kitForm").innerHTML = TANJAI.field("kit") + `<div class="button-row"><button class="btn primary" id="makeKit">สร้างชุดสื่อ</button><button class="btn secondary" id="saveKit">บันทึก</button></div>`;
+  $("#kitForm").innerHTML = TANJAI.field("kit") + `
+    <div class="form-section">
+      <div class="section-title"><b>2</b><h4>Universal Prompt Pack</h4></div>
+      <div class="prompt-workspace-note">
+        ระบบจะจัดชุดคำสั่งให้ครบโดยอัตโนมัติ ไม่ต้องเลือก AI ปลายทางก่อน — ได้ Prompt กลาง + Prompt แยกงานภาพ โพสต์ วิดีโอ เสียง และสไลด์ พร้อมใช้ต่อกับ AI หลายตัว
+      </div>
+      <input id="kit-packMode" type="hidden" value="Universal Prompt Pack">
+    </div>
+    <div class="button-row"><button class="btn primary" id="makeKit">สร้าง Prompt พร้อมจบ</button><button class="btn secondary" id="saveKit">บันทึก</button></div>`;
 
   // Results
   $("#imageResult").innerHTML = TANJAI.readyOutputShell("image", "Prompt พร้อมใช้", "คัดลอกแล้วส่งต่อ AI สร้างภาพหรือทันใจ GPT ได้ทันที", "imageOut");
@@ -222,7 +230,7 @@ $("#postResult").innerHTML = TANJAI.readyOutputShell("post", "ข้อควา
   $("#videoResult").innerHTML = TANJAI.readyOutputShell("video", "Storyboard พร้อมใช้", "คัดลอกแล้วนำไปทำคลิปต่อได้ทันที", "videoOut");
   $("#voiceResult").innerHTML = TANJAI.readyOutputShell("voice", "สคริปต์เสียงพร้อมใช้", "คัดลอกแล้วนำไปใช้ต่อกับ Voice Tool หรือ CapCut ได้ทันที", "voiceOut");
   $("#deckResult").innerHTML = TANJAI.readyOutputShell("deck", "Outline พร้อมใช้", "คัดลอกแล้วนำไปทำสไลด์ต่อได้ทันที", "deckOut");
-  $("#kitResult").innerHTML = TANJAI.readyOutputShell("kit", "ชุดสื่อพร้อมใช้", "คัดลอกแล้วต่อยอดงานทั้งแพ็กได้ทันที", "kitOut");
+  $("#kitResult").innerHTML = TANJAI.readyOutputShell("kit", "Universal Prompt Pack", "กรอกครั้งเดียว ได้ Prompt พร้อมใช้ต่อกับ AI หลายตัว โดยไม่ต้องเลือกปลายทางก่อน", "kitOut");
 
   TANJAI.renderLibrary();
   TANJAI.renderPromptHub();
@@ -769,35 +777,27 @@ $("#postResult").innerHTML = TANJAI.readyOutputShell("post", "ข้อควา
   };
   $("#makeKit").onclick = () => {
     const d=TANJAI.commonData("kit");
-    const out = `ชุดสื่อ: ${d.title}
+    const out = TANJAI.promptPack(d);
+    const advancedOut = `AI Handoff Note
 
-=== 1) Prompt ภาพ ===
-${TANJAI.imagePrompt({...d, size:"4:5 Facebook / Line 1080x1350", style:"Modern Premium Clean"}, "prompt")}
+Universal Prompt Pack นี้ออกแบบให้ใช้ต่อได้หลาย AI โดยไม่ต้องเลือกปลายทางก่อน
+- คัดลอกทั้งชุด หากต้องการให้ AI เข้าใจบริบทครบ
+- คัดลอกเฉพาะส่วน หากต้องการใช้กับงานเฉพาะ เช่น ภาพ วิดีโอ เสียง หรือสไลด์
+- แนบรูปจริงเพิ่มใน AI ปลายทางเมื่อจำเป็น
+- ตรวจชื่อบุคคล หน่วยงาน สถานที่ และวันที่ก่อนเผยแพร่
 
-=== 2) โพสต์ ===
-${TANJAI.postText(d)}
-
-=== 3) Storyboard วิดีโอ ===
-${TANJAI.videoStoryboard(d, "60 วินาที")}
-
-=== 4) สคริปต์เสียงพากย์ ===
-${TANJAI.voiceScript(d, "60 วินาที", "ทางการ สุภาพ")}
-
-=== 5) Outline สไลด์ ===
-${TANJAI.deckOutline(d, 8)}`;
-    const advancedOut = `หมายเหตุการส่งมอบ
 ${TANJAI.outputDeliveryGuard("ชุดไฟล์สื่อ")}`;
     TANJAI.setReadyOutput("kit", {
-      title:"ชุดสื่อพร้อมใช้",
-      desc:"คัดลอกแล้วต่อยอดงานทั้งแพ็กได้ทันที",
+      title:"Universal Prompt Pack",
+      desc:"พร้อมใช้ต่อกับ ChatGPT / Gemini / Claude / Canva / CapCut / Runway / Kling โดยไม่ต้องเลือก AI ก่อน",
       main:out,
-      advancedTitle1:"แนวทางใช้ต่อ",
+      advancedTitle1:"วิธีใช้ต่อ",
       advanced1:toolUsageTips.kit,
-      advancedTitle2:"ข้อกำชับการส่งมอบไฟล์",
+      advancedTitle2:"AI Handoff Note",
       advanced2:advancedOut
     });
     TANJAI.state.lastKit=out;
-    TANJAI.toast("สร้างชุดสื่อแล้ว");
+    TANJAI.toast("สร้าง Universal Prompt Pack แล้ว");
   };
 
 

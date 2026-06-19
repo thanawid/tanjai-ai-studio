@@ -2688,3 +2688,24 @@ body.auth-locked .owner-watermark{
     border-radius:12px;
   }
 }
+
+
+/* V8.7.3 — Prompt Workspace Foundation */
+.prompt-workspace-note{
+  border:1px solid rgba(34,211,238,.14);
+  border-radius:18px;
+  background:rgba(255,255,255,.035);
+  padding:12px 14px;
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.6;
+}
+.result-box{
+  line-height:1.62;
+}
+@media(max-width:720px){
+  .result-box{
+    font-size:13px;
+    line-height:1.58;
+  }
+}
