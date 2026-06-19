@@ -432,8 +432,9 @@ body.auth-locked .ambient{
   position:fixed;
   inset:0;
   z-index:9999;
-  display:grid;
-  place-items:center;
+  display:flex;
+  align-items:center;
+  justify-content:center;
   padding:24px;
   background:
     radial-gradient(circle at 18% 16%, rgba(139,92,246,.34), transparent 32%),
@@ -457,6 +458,7 @@ body:not(.auth-locked) .login-gate{
   text-align:center;
   position:relative;
   overflow:hidden;
+  margin: auto;
 }
 .login-card::before{
   content:"";
