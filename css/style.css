@@ -3589,3 +3589,41 @@ body.auth-locked .owner-watermark{
     font-size:13px;
   }
 }
+
+/* v9.1 Firebase Auth UI */
+.login-actions-v9 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 10px;
+}
+.user-profile-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 4px 4px 4px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+}
+.user-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--cyan);
+}
+.login-gate {
+  display: flex; /* Override hidden if needed */
+}
+body.auth-locked .app-shell {
+  filter: blur(8px);
+  pointer-events: none;
+}
+@media (max-width: 720px) {
+  .login-actions-v9 {
+    grid-template-columns: 1fr;
+  }
+  .user-profile-top {
+    width: 100%;
+    justify-content: space-between;
+  }
+}

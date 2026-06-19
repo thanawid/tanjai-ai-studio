@@ -38,7 +38,31 @@ This document outlines all improvements made to Tanjai AI Studio v9.1 to ensure 
 
 ## 🔐 Security Enhancements
 
-### 2. **XSS Prevention in projects.js**
+### 2. **Firebase Authentication System (New in v9.1.1)**
+- **Feature:** Replaced simple password gate with robust Firebase Auth.
+- **Capabilities:**
+  - Secure Email/Password Login & Registration.
+  - Persistent user sessions.
+  - Protected routes (unauthorized users cannot access the workspace).
+  - Individual user profiles.
+- **Benefits:**
+  - Professional-grade security.
+  - Foundation for subscription models.
+  - User-specific data isolation.
+
+### 3. **Cloud Firestore Database (New in v9.1.1)**
+- **Feature:** Migrated project storage from LocalStorage to Cloud Firestore.
+- **Capabilities:**
+  - Automatic data synchronization across devices.
+  - Real-time project updates.
+  - Secure data storage linked to User ID (UID).
+  - Scalable storage for hundreds of projects per user.
+- **Benefits:**
+  - No more data loss when clearing browser cache.
+  - Access work from anywhere (Mobile/Desktop).
+  - Faster loading for large project lists.
+
+### 4. **XSS Prevention in projects.js**
 - **Issue:** Project titles, tools, and dates were directly inserted into HTML using `innerHTML`
   - Vulnerability: Malicious scripts could be injected through project names
   - Risk: Data corruption, session hijacking, credential theft

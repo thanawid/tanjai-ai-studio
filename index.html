@@ -28,14 +28,17 @@
 
       <form id="loginForm" class="login-form">
         <label>
-          รหัสเข้าใช้งาน
-          <input id="loginPassword" type="password" autocomplete="current-password" placeholder="กรอกรหัสเข้าใช้งาน">
+          อีเมลผู้ใช้งาน
+          <input id="loginEmail" type="email" autocomplete="username" placeholder="example@email.com" required>
         </label>
-        <label class="remember-line">
-          <input id="rememberLogin" type="checkbox">
-          <span>จดจำการเข้าใช้งาน</span>
+        <label>
+          รหัสผ่าน
+          <input id="loginPassword" type="password" autocomplete="current-password" placeholder="กรอกรหัสผ่าน" required>
         </label>
-        <button class="btn primary" type="submit">เข้าสู่ระบบ</button>
+        <div class="login-actions-v9">
+          <button class="btn primary" type="submit" id="signInBtn">เข้าสู่ระบบ</button>
+          <button class="btn secondary" type="button" id="signUpBtn">สมัครสมาชิก</button>
+        </div>
         <p id="loginError" class="login-error" role="alert"></p>
       </form>
 
@@ -97,7 +100,10 @@
           <button class="btn secondary nav-back-btn" id="topBackBtn" type="button">← ย้อนกลับ</button>
           <button class="btn secondary nav-home-btn" data-view="dashboard" type="button">หน้าหลัก</button>
           <span class="status-pill">พร้อมใช้งาน</span><span class="version-badge">v9.1</span>
-          <button class="btn secondary logout-btn" id="logoutBtn" type="button">ออกจากระบบ</button>
+          <div class="user-profile-top">
+            <span class="user-name" id="userDisplayName">User</span>
+            <button class="btn secondary logout-btn" id="logoutBtn" type="button">ออกจากระบบ</button>
+          </div>
           <button class="btn secondary" id="openCommandTop" onclick="window.TANJAI&&TANJAI.openCommandPalette&&TANJAI.openCommandPalette()">⌘ ค้นหาคำสั่ง</button><button class="btn secondary" data-view="router">AI Router</button>
           <button class="btn primary" data-view="kit">+ สร้างชุดสื่อ</button>
         </div>
@@ -296,6 +302,8 @@
   <script src="js/voice.js"></script>
   <script src="js/projects.js"></script>
   <script src="js/ui.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script type="module" src="js/firebase-auth.js"></script>
   <script src="js/app.js"></script>
   <script src="js/album.js"></script>
   <script src="js/proofread.js"></script>
