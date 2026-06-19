@@ -3050,3 +3050,37 @@ body.auth-locked .owner-watermark{
     max-width:100%;
   }
 }
+
+
+/* V8.8 — Thai Tone Mark Safe Hero */
+.hero-title,
+.hero-title span,
+.hero-title .hero-tagline-thai{
+  overflow:visible !important;
+}
+.hero-title .hero-tagline-thai{
+  display:inline-block;
+  font-family:"Noto Sans Thai","Prompt","Kanit",sans-serif !important;
+  font-weight:900 !important;
+  line-height:1.28 !important;
+  padding-top:.08em;
+  padding-bottom:.03em;
+  letter-spacing:0 !important;
+  color:#ffffff !important;
+  background:none !important;
+  -webkit-background-clip:initial !important;
+  background-clip:initial !important;
+  -webkit-text-fill-color:#ffffff !important;
+  text-shadow:0 2px 18px rgba(0,0,0,.24), 0 0 18px rgba(142,231,255,.10);
+  font-synthesis-weight:none;
+}
+.hero-title .hero-tagline-thai::selection{
+  background:rgba(142,231,255,.32);
+  color:#fff;
+  -webkit-text-fill-color:#fff;
+}
+@media (max-width:720px){
+  .hero-title .hero-tagline-thai{
+    line-height:1.32 !important;
+  }
+}
