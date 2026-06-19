@@ -100,9 +100,10 @@
           <button class="btn secondary nav-back-btn" id="topBackBtn" type="button">← ย้อนกลับ</button>
           <button class="btn secondary nav-home-btn" data-view="dashboard" type="button">หน้าหลัก</button>
           <span class="status-pill">พร้อมใช้งาน</span><span class="version-badge">v9.1</span>
-          <div class="user-profile-top">
-            <span class="user-name" id="userDisplayName">User</span>
-            <button class="btn secondary logout-btn" id="logoutBtn" type="button">ออกจากระบบ</button>
+          <div class="user-profile-top" style="display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.05); padding: 6px 16px; border-radius: 99px; border: 1px solid var(--line);">
+            <div class="user-avatar" style="width: 32px; height: 32px; background: var(--grad); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white;">U</div>
+            <span class="user-name" id="userDisplayName" style="font-weight: 600; font-size: 14px;">User</span>
+            <button class="btn secondary logout-btn" id="logoutBtn" type="button" style="padding: 6px 12px; font-size: 12px; border-radius: 99px;">ออกจากระบบ</button>
           </div>
           <button class="btn secondary" id="openCommandTop" onclick="window.TANJAI&&TANJAI.openCommandPalette&&TANJAI.openCommandPalette()">⌘ ค้นหาคำสั่ง</button><button class="btn secondary" data-view="router">AI Router</button>
           <button class="btn primary" data-view="kit">+ สร้างชุดสื่อ</button>
@@ -110,7 +111,7 @@
       </header>
 
       <section id="dashboard" class="view active">
-        <div class="hero-card sales-dashboard-hero">
+        <div class="hero-card sales-dashboard-hero" style="background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.15), transparent), radial-gradient(circle at bottom left, rgba(236, 72, 153, 0.1), transparent), var(--panel); border: 1px solid var(--line2); backdrop-filter: var(--blur);">
           <div class="hero-copy">
             <p class="eyebrow">PROMPT WORKSPACE FOR MEDIA</p>
             <h3 class="hero-title"><span>ทันใจ AI Studio</span><span class="hero-tagline-thai">สร้างสื่อไว ด้วยพลัง AI</span></h3>
