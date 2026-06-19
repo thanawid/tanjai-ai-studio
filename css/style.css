@@ -3289,3 +3289,227 @@ body.auth-locked .owner-watermark{
 #mc .summary-chip{
   white-space:nowrap;
 }
+
+
+/* V8.9.6 — Mobile UX Emergency Patch + Clean Helper Notes */
+/* เอากล่องคำอธิบายใหญ่กลางฟอร์มออก ให้ใช้คำอธิบายใต้หัวหน้าเมนูแทน */
+.form-note{
+  display:none !important;
+}
+
+/* ป้าย AI Preview ไม่ควรอยู่บนการ์ดเมนูหลัก */
+.sample-grid article::after{
+  display:none !important;
+}
+
+@media (max-width:720px){
+  html, body{
+    max-width:100%;
+    overflow-x:hidden;
+  }
+  body{
+    padding-bottom:calc(92px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .app-shell{
+    display:block !important;
+    width:100%;
+  }
+  .workspace{
+    padding:18px 14px calc(118px + env(safe-area-inset-bottom, 0px)) !important;
+    width:100%;
+    max-width:100%;
+    overflow:hidden;
+  }
+
+  /* ปุ่มบนสุดซ้ำกับ bottom tabbar เยอะเกินบนมือถือ */
+  .topbar{
+    display:block !important;
+    margin-bottom:16px !important;
+  }
+  .topbar h2{
+    font-size:34px !important;
+    line-height:1.12 !important;
+  }
+  .top-actions{
+    display:none !important;
+  }
+
+  /* Hero มือถือ: ลดความสูงและซ่อนวงแหวนภาพใหญ่ที่กินพื้นที่ */
+  .hero-card,
+  .sales-dashboard-hero{
+    display:block !important;
+    min-height:auto !important;
+    padding:24px 20px 26px !important;
+    border-radius:26px !important;
+    margin-bottom:16px !important;
+  }
+  .hero-card .hero-title,
+  .sales-dashboard-hero .hero-title{
+    gap:6px !important;
+    margin:8px 0 12px !important;
+  }
+  .hero-title span:first-child,
+  .sales-dashboard-hero .hero-title span:first-child{
+    font-size:40px !important;
+    line-height:1.08 !important;
+    white-space:normal !important;
+  }
+  .hero-title span:last-child,
+  .sales-dashboard-hero .hero-title span:last-child{
+    font-size:27px !important;
+    line-height:1.16 !important;
+  }
+  .hero-lead,
+  .hero-card .hero-copy > p:not(.eyebrow),
+  .sales-dashboard-hero .hero-copy > p:not(.eyebrow){
+    font-size:16px !important;
+    line-height:1.65 !important;
+  }
+  .hero-visual{
+    display:none !important;
+  }
+  .hero-actions{
+    display:grid !important;
+    grid-template-columns:1fr !important;
+    gap:10px !important;
+    margin-top:18px !important;
+  }
+  .hero-actions .btn{
+    width:100% !important;
+    text-align:center !important;
+    padding:14px 12px !important;
+  }
+  .hero-stats,
+  .hero-sales-stats{
+    grid-template-columns:1fr !important;
+    max-width:none !important;
+    gap:10px !important;
+  }
+  .hero-stats article{
+    padding:14px 16px !important;
+    border-radius:18px !important;
+  }
+  .hero-stats b{
+    font-size:30px !important;
+    line-height:1.12 !important;
+  }
+  .hero-stats span{
+    font-size:14px !important;
+  }
+
+  .dashboard-grid,
+  .studio-layout{
+    grid-template-columns:1fr !important;
+    gap:14px !important;
+  }
+  .panel{
+    padding:18px !important;
+    border-radius:22px !important;
+  }
+  .panel h3{
+    font-size:23px !important;
+  }
+
+  /* การ์ดหน้าแรกบนมือถือให้กระชับ ไม่เป็นภาพใหญ่ยาว ๆ */
+  .sample-grid,
+  .compact-sample-grid-v861,
+  .creation-menu-grid-v892{
+    grid-template-columns:1fr !important;
+    gap:12px !important;
+  }
+  .sample-grid article.home-choice-card,
+  .compact-sample-grid-v861 .home-choice-card,
+  .creation-menu-grid-v892 .home-choice-card{
+    display:grid !important;
+    grid-template-columns:96px 1fr !important;
+    grid-template-rows:auto auto !important;
+    column-gap:14px !important;
+    align-items:center !important;
+    min-height:auto !important;
+    padding:12px !important;
+    border-radius:20px !important;
+  }
+  .sample-grid article.home-choice-card img,
+  .compact-sample-grid-v861 .home-choice-card img,
+  .creation-menu-grid-v892 .home-choice-card img{
+    grid-row:1 / 3 !important;
+    width:96px !important;
+    height:74px !important;
+    margin:0 !important;
+    border-radius:14px !important;
+    object-fit:cover !important;
+  }
+  .mc-emoji-v892{
+    grid-row:1 / 3 !important;
+    width:96px !important;
+    height:74px !important;
+    margin:0 !important;
+    font-size:40px !important;
+    border-radius:14px !important;
+  }
+  .sample-grid article.home-choice-card b{
+    font-size:18px !important;
+    line-height:1.28 !important;
+    margin:0 !important;
+  }
+  .sample-grid article.home-choice-card span{
+    font-size:13px !important;
+    line-height:1.45 !important;
+    margin-top:3px !important;
+  }
+
+  /* มือถือมี bottom tabbar แล้ว ไม่ต้องมีปุ่ม + ลอยทับ */
+  .fab-main,
+  .fab-menu{
+    display:none !important;
+  }
+  .owner-watermark{
+    display:none !important;
+  }
+  .mobile-tabbar{
+    left:10px !important;
+    right:10px !important;
+    bottom:calc(10px + env(safe-area-inset-bottom, 0px)) !important;
+    padding:8px 6px !important;
+    border-radius:22px !important;
+    z-index:9999 !important;
+  }
+  .mobile-tabbar button{
+    padding:7px 2px !important;
+    min-width:0 !important;
+  }
+  .mobile-tabbar span{
+    font-size:10px !important;
+    line-height:1.2 !important;
+  }
+
+  .owner-footer{
+    margin-bottom:20px !important;
+  }
+
+  .result-panel{
+    position:relative !important;
+    top:auto !important;
+  }
+}
+
+
+/* V8.9.6 — Fixed Menu Visuals Final */
+.fixed-menu-visuals-v896 .home-choice-card img{
+  object-fit:cover;
+  background:rgba(255,255,255,.04);
+}
+.fixed-menu-visuals-v896 .home-choice-card{
+  overflow:hidden;
+}
+@media (min-width:721px){
+  .fixed-menu-visuals-v896 .home-choice-card img{
+    height:132px !important;
+  }
+}
+@media (max-width:720px){
+  .fixed-menu-visuals-v896 .home-choice-card img{
+    object-fit:cover !important;
+  }
+}

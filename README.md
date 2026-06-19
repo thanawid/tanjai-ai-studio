@@ -261,3 +261,11 @@
 
 ## V8.9.5 — Separate MC Workspace
 แยกงานพิธีกรเป็นหน้า #mc จริง แก้ข้อความค้างจากหน้าเรียบเรียงเนื้อหา และเพิ่มผลลัพธ์/ฟอร์มเฉพาะงานพิธีกร
+
+
+## V8.9.6 — Mobile UX Emergency Patch
+แก้ UI มือถือหนักมาก: ซ่อน Hero visual/FAB/watermark, ปรับการ์ดหน้าแรกให้กระชับ, เอา AI Preview และกล่อง form-note ออก
+
+
+## V8.9.6 — Clean Helper Notes + Fixed Menu Visuals + Mobile UX Fix
+มัดรวม Clean Helper Notes, Fixed Menu Visuals และ Mobile UX Fix ในเวอร์ชันเดียว
