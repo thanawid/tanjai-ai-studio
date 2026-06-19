@@ -1,8 +1,0 @@
-V8.8 — Collapsible FAB Speed Dial
-
-- ปรับ Floating Action Button (FAB) ขวาล่างให้ยุบเหลือปุ่ม + ปุ่มเดียวเป็นค่าเริ่มต้น
-- กด + แล้วค่อยเปิด Speed Dial: ภาพ / โพสต์ / วิดีโอ / GPT
-- กด + ซ้ำ, กดนอกเมนู, กด Escape หรือเลือกเมนูแล้วให้หุบกลับ
-- ลดขนาด FAB และปุ่มย่อยให้ไม่แย่งซีน
-- แก้ CSS ให้ hidden ซ่อนเมนูจริง ไม่ถูก display:grid ทับ
-- คง Sidebar / Hero / Prompt Pack / Album / ZIP / Caption เดิม
