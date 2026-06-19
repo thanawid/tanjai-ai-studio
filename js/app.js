@@ -112,7 +112,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <label class="full">ข้อห้าม / หมายเหตุ<textarea id="image-avoid" placeholder="เช่น ห้ามสร้าง QR ปลอม ห้ามวาดโลโก้ใหม่ เว้นพื้นที่ด้านบน ใช้รูปจริงตามแนบ"></textarea></label>
       </div>
     </div>
-    <div class="button-row"><button class="btn primary" id="makeImage">สร้างคำสั่งภาพ</button><button class="btn secondary" id="saveImage">บันทึก</button></div>
+    <div class="button-row"><button class="btn primary" id="makeImage">สร้าง Prompt ภาพทันที</button><button class="btn secondary" id="saveImage">บันทึก</button></div>
   `;
 
   $("#albumForm").innerHTML = `
@@ -185,7 +185,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <span class="summary-chip">ข้อความบนภาพ</span>
       </div>
     </div>
-    <div class="button-row"><button class="btn primary" id="makePost">สร้างสคริปต์สรุปงาน</button><button class="btn secondary" id="savePost">บันทึก</button></div>`;
+    <div class="button-row"><button class="btn primary" id="makePost">สร้าง Prompt โพสต์ทันที</button><button class="btn secondary" id="savePost">บันทึก</button></div>`;
   $("#videoForm").innerHTML = TANJAI.field("video") + `
     <div class="form-note">เมนูนี้ใช้ทำวิดีโอหรือทำคลิปได้โดยตรง สร้าง Hook, Storyboard, Voice Over และข้อความบนจอ</div>
     <div class="form-section"><div class="section-title"><b>2</b><h4>ตั้งค่าวิดีโอ / คลิป</h4></div>
@@ -195,7 +195,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <label>ช่องทาง<select id="video-channel">${opts(toolOptions.channels)}</select></label>
         <label>หมวดงาน<select id="video-mainCategory">${opts(toolOptions.mainCategories)}</select></label>
       </div>
-    </div><div class="button-row"><button class="btn primary" id="makeVideo">สร้าง Storyboard / คลิป</button><button class="btn secondary" id="saveVideo">บันทึก</button></div>`;
+    </div><div class="button-row"><button class="btn primary" id="makeVideo">สร้าง Prompt วิดีโอทันที</button><button class="btn secondary" id="saveVideo">บันทึก</button></div>`;
   $("#voiceForm").innerHTML = TANJAI.field("voice") + `
     <div class="form-section"><div class="section-title"><b>2</b><h4>ตั้งค่าเสียง</h4></div>
       <div class="form-grid">
@@ -204,7 +204,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <label>ช่องทางใช้งาน<select id="voice-channel">${opts(toolOptions.channels)}</select></label>
         <label>หมวดงาน<select id="voice-mainCategory">${opts(toolOptions.mainCategories)}</select></label>
       </div>
-    </div><div class="button-row"><button class="btn primary" id="makeVoice">สร้างสคริปต์เสียง</button><button class="btn secondary" id="saveVoice">บันทึก</button></div>`;
+    </div><div class="button-row"><button class="btn primary" id="makeVoice">สร้าง Prompt เสียงทันที</button><button class="btn secondary" id="saveVoice">บันทึก</button></div>`;
   $("#deckForm").innerHTML = TANJAI.field("deck") + `
     <div class="form-section"><div class="section-title"><b>2</b><h4>ตั้งค่าสไลด์</h4></div>
       <div class="form-grid">
@@ -212,25 +212,25 @@ document.addEventListener("DOMContentLoaded", () => {
         <label>รูปแบบสไลด์<select id="deck-format">${opts(toolOptions.slideStyles)}</select></label>
         <label>หมวดงาน<select id="deck-mainCategory">${opts(toolOptions.mainCategories)}</select></label>
       </div>
-    </div><div class="button-row"><button class="btn primary" id="makeDeck">สร้าง Outline</button><button class="btn secondary" id="saveDeck">บันทึก</button></div>`;
+    </div><div class="button-row"><button class="btn primary" id="makeDeck">สร้าง Prompt สไลด์ทันที</button><button class="btn secondary" id="saveDeck">บันทึก</button></div>`;
   $("#kitForm").innerHTML = TANJAI.field("kit") + `
     <div class="form-section">
       <div class="section-title"><b>2</b><h4>Universal Prompt Pack</h4></div>
       <div class="prompt-workspace-note">
-        ระบบจะจัดชุดคำสั่งให้ครบโดยอัตโนมัติ ไม่ต้องเลือก AI ปลายทางก่อน — ได้ Prompt กลาง + Prompt แยกงานภาพ โพสต์ วิดีโอ เสียง และสไลด์ พร้อมใช้ต่อกับ AI หลายตัว
+        ระบบจะจัดชุดคำสั่งให้ครบโดยอัตโนมัติ ไม่ต้องเลือก AI ปลายทางก่อน — ได้ทั้ง Prompt สำหรับแก้/คุยต่อ และ Prompt สำหรับสั่ง AI ลงมือทำทันที
       </div>
       <input id="kit-packMode" type="hidden" value="Universal Prompt Pack">
     </div>
-    <div class="button-row"><button class="btn primary" id="makeKit">สร้าง Prompt พร้อมจบ</button><button class="btn secondary" id="saveKit">บันทึก</button></div>`;
+    <div class="button-row"><button class="btn primary" id="makeKit">สร้าง Prompt สั่งทำทันที</button><button class="btn secondary" id="saveKit">บันทึก</button></div>`;
 
   // Results
-  $("#imageResult").innerHTML = TANJAI.readyOutputShell("image", "Prompt พร้อมใช้", "คัดลอกแล้วส่งต่อ AI สร้างภาพหรือทันใจ GPT ได้ทันที", "imageOut");
+  $("#imageResult").innerHTML = TANJAI.readyOutputShell("image", "Prompt ภาพ — สั่งทำทันที", "คัดลอกแล้วให้ AI สร้างภาพทันที พร้อม Prompt สำหรับแก้/คุยต่อในรายละเอียด", "imageOut");
 $("#albumResult").innerHTML = TANJAI.readyOutputShell("album", "ชุดภาพพร้อมโพสต์", "ปรับภาพจริง ใส่กรอบ และดาวน์โหลดเป็นภาพพร้อมลง Facebook", "albumOut");
-$("#postResult").innerHTML = TANJAI.readyOutputShell("post", "ข้อความพร้อมใช้", "คัดลอกไปใช้ต่อเป็นโพสต์ แคปชั่น หรือข้อความประชาสัมพันธ์ได้ทันที", "postOut");
-  $("#videoResult").innerHTML = TANJAI.readyOutputShell("video", "Storyboard พร้อมใช้", "คัดลอกแล้วนำไปทำคลิปต่อได้ทันที", "videoOut");
-  $("#voiceResult").innerHTML = TANJAI.readyOutputShell("voice", "สคริปต์เสียงพร้อมใช้", "คัดลอกแล้วนำไปใช้ต่อกับ Voice Tool หรือ CapCut ได้ทันที", "voiceOut");
-  $("#deckResult").innerHTML = TANJAI.readyOutputShell("deck", "Outline พร้อมใช้", "คัดลอกแล้วนำไปทำสไลด์ต่อได้ทันที", "deckOut");
-  $("#kitResult").innerHTML = TANJAI.readyOutputShell("kit", "Universal Prompt Pack", "กรอกครั้งเดียว ได้ Prompt พร้อมใช้ต่อกับ AI หลายตัว โดยไม่ต้องเลือกปลายทางก่อน", "kitOut");
+$("#postResult").innerHTML = TANJAI.readyOutputShell("post", "Prompt โพสต์ — สั่งทำทันที", "คัดลอกแล้วให้ AI เขียนโพสต์ทันที พร้อม Prompt สำหรับแก้/คุยต่อ", "postOut");
+  $("#videoResult").innerHTML = TANJAI.readyOutputShell("video", "Prompt วิดีโอ — สั่งทำทันที", "คัดลอกแล้วให้ AI สร้าง Storyboard / Prompt วิดีโอทันที", "videoOut");
+  $("#voiceResult").innerHTML = TANJAI.readyOutputShell("voice", "Prompt เสียง — สั่งทำทันที", "คัดลอกแล้วให้ AI เขียนสคริปต์เสียงทันที", "voiceOut");
+  $("#deckResult").innerHTML = TANJAI.readyOutputShell("deck", "Prompt สไลด์ — สั่งทำทันที", "คัดลอกแล้วให้ AI สร้าง Outline สไลด์ทันที", "deckOut");
+  $("#kitResult").innerHTML = TANJAI.readyOutputShell("kit", "Universal Execution Prompt Pack", "กรอกครั้งเดียว ได้ทั้ง Prompt สำหรับแก้/คุยต่อ และ Prompt สำหรับสั่ง AI ทำงานทันที", "kitOut");
 
   TANJAI.renderLibrary();
   TANJAI.renderPromptHub();
@@ -238,32 +238,32 @@ $("#postResult").innerHTML = TANJAI.readyOutputShell("post", "ข้อควา
   TANJAI.renderProjects();
 
   TANJAI.updateImageResultMode = function(mode){
-    const promptText = TANJAI.state.lastImagePrompt || "";
-    const gptText = TANJAI.state.lastImageGPT || "";
+    const discussText = TANJAI.state.lastImagePrompt || "";
+    const executeText = TANJAI.state.lastImageGPT || "";
     const criticText = TANJAI.state.lastImageCritic || "";
-    if(mode === "gpt"){
+    if(mode === "prompt"){
       TANJAI.setReadyOutput("image", {
-        title:"คำสั่งพร้อมใช้สำหรับทันใจ GPT",
-        desc:"คัดลอกแล้วเปิดทันใจ GPT ต่อได้ทันที",
-        main:gptText,
-        advancedTitle1:"Prompt พร้อมใช้สำหรับ AI สร้างภาพ",
-        advanced1:promptText,
+        title:"Prompt สำหรับแก้ / คุยต่อ",
+        desc:"ใช้เมื่อต้องการให้ AI ช่วยปรับบรีฟ ตรวจคำผิด หรือเกลาคำสั่งก่อนสั่งสร้างจริง",
+        main:discussText,
+        advancedTitle1:"Prompt สำหรับสั่ง AI ทำงานทันที",
+        advanced1:executeText,
         advancedTitle2:"ตัวช่วยตรวจความพร้อม",
         advanced2:criticText
       });
-      TANJAI.state.lastImageMode = "gpt";
+      TANJAI.state.lastImageMode = "prompt";
       return;
     }
     TANJAI.setReadyOutput("image", {
-      title:"Prompt พร้อมใช้",
-      desc:"คัดลอกแล้วส่งต่อ AI สร้างภาพหรือทันใจ GPT ได้ทันที",
-      main:promptText,
-      advancedTitle1:"คำสั่งพร้อมใช้สำหรับทันใจ GPT",
-      advanced1:gptText,
+      title:"Prompt สำหรับสั่ง AI ทำงานทันที",
+      desc:"คัดลอกไปวางแล้วให้ AI สร้างภาพทันที ไม่ใช่แค่สรุปบรีฟ",
+      main:executeText,
+      advancedTitle1:"Prompt สำหรับแก้ / คุยต่อ",
+      advanced1:discussText,
       advancedTitle2:"ตัวช่วยตรวจความพร้อม",
       advanced2:criticText
     });
-    TANJAI.state.lastImageMode = "prompt";
+    TANJAI.state.lastImageMode = "gpt";
   };
 
 
@@ -714,90 +714,108 @@ $("#postResult").innerHTML = TANJAI.readyOutputShell("post", "ข้อควา
     const d = getImageDataForPrompt();
     const critic = TANJAI.promptCritic(d);
     d.criticSummary = critic;
-    const promptOut = TANJAI.imagePrompt(d, "prompt");
-    const gptOut = TANJAI.imagePrompt(d, "gpt");
-    TANJAI.state.lastImagePrompt = promptOut;
-    TANJAI.state.lastImageGPT = gptOut;
-    TANJAI.state.lastImage = promptOut;
+    const discussOut = TANJAI.discussPrompt("image", d);
+    const executeOut = TANJAI.executionPrompt("image", d);
+    TANJAI.state.lastImagePrompt = discussOut;
+    TANJAI.state.lastImageGPT = executeOut;
+    TANJAI.state.lastImage = executeOut;
     TANJAI.state.lastImageCritic = critic;
-    TANJAI.updateImageResultMode?.("prompt");
-    TANJAI.toast("สร้าง Prompt ภาพแล้ว");
+    TANJAI.updateImageResultMode?.("gpt");
+    TANJAI.toast("สร้าง Prompt ภาพแบบสั่งทำทันทีแล้ว");
   };
   $("#makePost").onclick = () => {
     const d=TANJAI.commonData("post");
-    const out=TANJAI.postText(d);
+    const executeOut=TANJAI.executionPrompt("post", d);
+    const discussOut=TANJAI.discussPrompt("post", d);
     TANJAI.setReadyOutput("post", {
-      title:"ข้อความพร้อมใช้",
-      desc:"คัดลอกไปใช้ต่อเป็นโพสต์ แคปชั่น หรือข้อความประชาสัมพันธ์ได้ทันที",
-      main:out,
-      advancedTitle1:"แนวทางใช้ต่อ",
-      advanced1:toolUsageTips.post
+      title:"Prompt โพสต์ — สั่งทำทันที",
+      desc:"คัดลอกไปวางแล้วให้ AI เขียนโพสต์ทันที ไม่ใช่แค่สรุปบรีฟ",
+      main:executeOut,
+      advancedTitle1:"Prompt สำหรับแก้ / คุยต่อ",
+      advanced1:discussOut,
+      advancedTitle2:"ตัวอย่างโพสต์จากระบบ",
+      advanced2:TANJAI.postText(d)
     });
-    TANJAI.state.lastPost=out;
-    TANJAI.toast("สร้างข้อความพร้อมใช้แล้ว");
+    TANJAI.state.lastPost=executeOut;
+    TANJAI.toast("สร้าง Prompt โพสต์แบบสั่งทำทันทีแล้ว");
   };
   $("#makeVideo").onclick = () => {
     const d=TANJAI.commonData("video");
-    const out=TANJAI.videoStoryboard(d, $("#video-length").value);
+    const length=$("#video-length").value;
+    const executeOut=TANJAI.executionPrompt("video", d, {length});
+    const discussOut=TANJAI.discussPrompt("video", d);
     TANJAI.setReadyOutput("video", {
-      title:"Storyboard พร้อมใช้",
-      desc:"คัดลอกแล้วนำไปทำคลิปต่อได้ทันที",
-      main:out,
-      advancedTitle1:"แนวทางใช้ต่อ",
-      advanced1:toolUsageTips.video
+      title:"Prompt วิดีโอ — สั่งทำทันที",
+      desc:"คัดลอกไปวางแล้วให้ AI สร้าง Storyboard / Prompt วิดีโอทันที",
+      main:executeOut,
+      advancedTitle1:"Prompt สำหรับแก้ / คุยต่อ",
+      advanced1:discussOut,
+      advancedTitle2:"Storyboard ตัวอย่างจากระบบ",
+      advanced2:TANJAI.videoStoryboard(d, length)
     });
-    TANJAI.state.lastVideo=out;
-    TANJAI.toast("สร้าง Storyboard แล้ว");
+    TANJAI.state.lastVideo=executeOut;
+    TANJAI.toast("สร้าง Prompt วิดีโอแบบสั่งทำทันทีแล้ว");
   };
   $("#makeVoice").onclick = () => {
     const d=TANJAI.commonData("voice");
-    const out=TANJAI.voiceScript(d, $("#voice-length").value, $("#voice-style").value);
+    const length=$("#voice-length").value;
+    const style=$("#voice-style").value;
+    const executeOut=TANJAI.executionPrompt("voice", d, {length, style});
+    const discussOut=TANJAI.discussPrompt("voice", d);
     TANJAI.setReadyOutput("voice", {
-      title:"สคริปต์เสียงพร้อมใช้",
-      desc:"คัดลอกแล้วนำไปใช้ต่อกับ Voice Tool หรือ CapCut ได้ทันที",
-      main:out,
-      advancedTitle1:"แนวทางใช้ต่อ",
-      advanced1:toolUsageTips.voice
+      title:"Prompt เสียง — สั่งทำทันที",
+      desc:"คัดลอกไปวางแล้วให้ AI เขียนสคริปต์เสียงทันที",
+      main:executeOut,
+      advancedTitle1:"Prompt สำหรับแก้ / คุยต่อ",
+      advanced1:discussOut,
+      advancedTitle2:"สคริปต์ตัวอย่างจากระบบ",
+      advanced2:TANJAI.voiceScript(d, length, style)
     });
-    TANJAI.state.lastVoice=out;
-    TANJAI.toast("สร้างสคริปต์เสียงแล้ว");
+    TANJAI.state.lastVoice=executeOut;
+    TANJAI.toast("สร้าง Prompt เสียงแบบสั่งทำทันทีแล้ว");
   };
   $("#makeDeck").onclick = () => {
     const d=TANJAI.commonData("deck");
-    const out=TANJAI.deckOutline(d, Number($("#deck-count").value));
+    const count=Number($("#deck-count").value);
+    const executeOut=TANJAI.executionPrompt("deck", d, {count});
+    const discussOut=TANJAI.discussPrompt("deck", d);
     TANJAI.setReadyOutput("deck", {
-      title:"Outline พร้อมใช้",
-      desc:"คัดลอกแล้วนำไปทำสไลด์ต่อได้ทันที",
-      main:out,
-      advancedTitle1:"แนวทางใช้ต่อ",
-      advanced1:toolUsageTips.deck
+      title:"Prompt สไลด์ — สั่งทำทันที",
+      desc:"คัดลอกไปวางแล้วให้ AI สร้าง Outline สไลด์ทันที",
+      main:executeOut,
+      advancedTitle1:"Prompt สำหรับแก้ / คุยต่อ",
+      advanced1:discussOut,
+      advancedTitle2:"Outline ตัวอย่างจากระบบ",
+      advanced2:TANJAI.deckOutline(d, count)
     });
-    TANJAI.state.lastDeck=out;
-    TANJAI.toast("สร้าง Outline สไลด์แล้ว");
+    TANJAI.state.lastDeck=executeOut;
+    TANJAI.toast("สร้าง Prompt สไลด์แบบสั่งทำทันทีแล้ว");
   };
   $("#makeKit").onclick = () => {
     const d=TANJAI.commonData("kit");
     const out = TANJAI.promptPack(d);
+    const discussOut = TANJAI.discussPrompt("kit", d);
     const advancedOut = `AI Handoff Note
 
-Universal Prompt Pack นี้ออกแบบให้ใช้ต่อได้หลาย AI โดยไม่ต้องเลือกปลายทางก่อน
-- คัดลอกทั้งชุด หากต้องการให้ AI เข้าใจบริบทครบ
-- คัดลอกเฉพาะส่วน หากต้องการใช้กับงานเฉพาะ เช่น ภาพ วิดีโอ เสียง หรือสไลด์
+Universal Execution Prompt Pack นี้ออกแบบให้ใช้ต่อได้หลาย AI โดยไม่ต้องเลือกปลายทางก่อน
+- ส่วนหลักคือ Prompt สำหรับสั่ง AI ทำงานทันที
+- ส่วน Prompt สำหรับแก้ / คุยต่อ ใช้ตอนอยากปรับโทนหรือเกลาคำสั่ง
+- หาก AI ปลายทางทำงานจริงไม่ได้ ต้องให้บอกเหตุผลตรง ๆ และส่ง Prompt พร้อมใช้แทน
 - แนบรูปจริงเพิ่มใน AI ปลายทางเมื่อจำเป็น
 - ตรวจชื่อบุคคล หน่วยงาน สถานที่ และวันที่ก่อนเผยแพร่
 
 ${TANJAI.outputDeliveryGuard("ชุดไฟล์สื่อ")}`;
     TANJAI.setReadyOutput("kit", {
-      title:"Universal Prompt Pack",
-      desc:"พร้อมใช้ต่อกับ ChatGPT / Gemini / Claude / Canva / CapCut / Runway / Kling โดยไม่ต้องเลือก AI ก่อน",
+      title:"Universal Execution Prompt Pack",
+      desc:"มีทั้ง Prompt สำหรับแก้/คุยต่อ และ Prompt สำหรับสั่ง AI ทำงานทันที",
       main:out,
-      advancedTitle1:"วิธีใช้ต่อ",
-      advanced1:toolUsageTips.kit,
+      advancedTitle1:"Prompt สำหรับแก้ / คุยต่อ",
+      advanced1:discussOut,
       advancedTitle2:"AI Handoff Note",
       advanced2:advancedOut
     });
     TANJAI.state.lastKit=out;
-    TANJAI.toast("สร้าง Universal Prompt Pack แล้ว");
+    TANJAI.toast("สร้าง Universal Execution Prompt Pack แล้ว");
   };
 
 

@@ -148,13 +148,13 @@ TANJAI.getToolDestinations = function(tool){
 TANJAI.primaryActionButtons = function(tool, bodyId){
   const GPT = TANJAI.customGptUrl || TANJAI_CUSTOM_GPT_URL;
   const btn = (label, attrs, cls="secondary")=>`<button class="btn ${cls}" ${attrs}>${label}</button>`;
-  if(tool === "image") return btn("คัดลอก Prompt", `data-copybox="${bodyId}"`, "primary") + btn("เปิด ทันใจ GPT", `data-open="${GPT}"`);
+  if(tool === "image") return btn("คัดลอก Prompt สั่งทำทันที", `data-copybox="${bodyId}"`, "primary") + btn("เปิด ทันใจ GPT", `data-open="${GPT}"`);
   if(tool === "album") return btn("ดาวน์โหลดทั้งหมด", `id="albumDownloadAllTop"`, "primary") + btn("ล้างรูป", `id="albumClearTop"`);
-  if(tool === "post") return btn("คัดลอกข้อความ", `data-copybox="${bodyId}"`, "primary") + btn("เปิด ทันใจ GPT", `data-open="${GPT}"`);
-  if(tool === "video") return btn("คัดลอก Storyboard", `data-copybox="${bodyId}"`, "primary") + btn("เปิด CapCut", `data-open="https://www.capcut.com/"`);
-  if(tool === "voice") return btn("คัดลอกสคริปต์", `data-copybox="${bodyId}"`, "primary") + btn("เปิด Voice Tool", `data-open="https://aistudio.google.com/"`);
-  if(tool === "deck") return btn("คัดลอก Outline", `data-copybox="${bodyId}"`, "primary") + btn("เปิด Slide Tool", `data-open="https://gamma.app/"`);
-  if(tool === "kit") return btn("คัดลอกชุดสื่อ", `data-copybox="${bodyId}"`, "primary") + btn("เปิด ทันใจ GPT", `data-open="${GPT}"`);
+  if(tool === "post") return btn("คัดลอก Prompt สั่งทำทันที", `data-copybox="${bodyId}"`, "primary") + btn("เปิด ทันใจ GPT", `data-open="${GPT}"`);
+  if(tool === "video") return btn("คัดลอก Prompt วิดีโอ", `data-copybox="${bodyId}"`, "primary") + btn("เปิด CapCut", `data-open="https://www.capcut.com/"`);
+  if(tool === "voice") return btn("คัดลอก Prompt เสียง", `data-copybox="${bodyId}"`, "primary") + btn("เปิด Voice Tool", `data-open="https://aistudio.google.com/"`);
+  if(tool === "deck") return btn("คัดลอก Prompt สไลด์", `data-copybox="${bodyId}"`, "primary") + btn("เปิด Slide Tool", `data-open="https://gamma.app/"`);
+  if(tool === "kit") return btn("คัดลอก Prompt Pack", `data-copybox="${bodyId}"`, "primary") + btn("เปิด ทันใจ GPT", `data-open="${GPT}"`);
   return btn("คัดลอกผลลัพธ์", `data-copybox="${bodyId}"`, "primary");
 };
 
