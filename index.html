@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700;800;900&family=Noto+Sans+Thai:wght@400;500;600;700;800;900&family=Prompt:wght@500;600;700;800;900&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
   <meta name="theme-color" content="#060713">
-  <meta name="description" content="ทันใจ AI Studio — Collapsible FAB Speed Dial สำหรับสร้างสื่อไว ด้วยพลัง AI">
+  <meta name="description" content="ทันใจ AI Studio — MVP Sales Polish สำหรับสร้าง Prompt และชุดคำสั่งผลิตสื่อ">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/animations.css">
 </head>
@@ -93,7 +93,7 @@
         <div class="top-actions">
           <button class="btn secondary nav-back-btn" id="topBackBtn" type="button">← ย้อนกลับ</button>
           <button class="btn secondary nav-home-btn" data-view="dashboard" type="button">หน้าหลัก</button>
-          <span class="status-pill">พร้อมใช้งาน</span><span class="version-badge">v8.7.6</span>
+          <span class="status-pill">พร้อมใช้งาน</span><span class="version-badge">v8.7.7</span>
           <button class="btn secondary logout-btn" id="logoutBtn" type="button">ออกจากระบบ</button>
           <button class="btn secondary" id="openCommandTop" onclick="window.TANJAI&&TANJAI.openCommandPalette&&TANJAI.openCommandPalette()">⌘ ค้นหาคำสั่ง</button><button class="btn secondary" data-view="router">AI Router</button>
           <button class="btn primary" data-view="kit">+ สร้างชุดสื่อ</button>
@@ -103,18 +103,18 @@
       <section id="dashboard" class="view active">
         <div class="hero-card sales-dashboard-hero">
           <div class="hero-copy">
-            <p class="eyebrow">AI Media Workspace</p>
-            <h3 class="hero-title"><span>ทันใจ AI Studio</span><span>สร้างสื่อไว ด้วยพลัง AI</span></h3>
-            <p>ระบบช่วยสร้างสื่อและคอนเทนต์โซเชียล<br>ภาพ โพสต์ คลิป เสียง และสไลด์ได้ทันที</p>
+            <p class="eyebrow">PROMPT WORKSPACE FOR MEDIA</p>
+            <h3 class="hero-title"><span>ทันใจ AI Studio</span><span>สร้าง Prompt พร้อมผลิตสื่อ</span></h3>
+            <p class="hero-lead">ระบบช่วยจัดบรีฟและสร้างชุดคำสั่งพร้อมใช้ สำหรับทำภาพ โพสต์ คลิป เสียง และสไลด์กับ AI หลายเครื่องมือ โดยไม่ต้องเริ่มคิดจากศูนย์</p>
             <div class="hero-actions">
-              <button class="btn primary" data-view="router">เริ่มด้วย AI Router</button>
-              <button class="btn secondary" data-view="kit">สร้างชุดสื่อ</button>
-              <button class="btn secondary" data-view="album">ชุดภาพโพสต์ Facebook</button>
+              <button class="btn primary" data-view="kit">สร้าง Prompt พร้อมจบ</button>
+              <button class="btn secondary" data-view="library">ดูตัวอย่างงาน</button>
+              <button class="btn secondary" data-view="guide">ใช้งาน 3 นาทีเป็น</button>
             </div>
-            <div class="hero-stats">
-              <article><b>เริ่ม</b><span>ด้วย AI Router</span></article>
-              <article><b>ครบ</b><span>ภาพ โพสต์ คลิป เสียง สไลด์</span></article>
-              <article><b>พร้อม</b><span>ต่อยอดและนำไปใช้จริง</span></article>
+            <div class="hero-stats hero-sales-stats">
+              <article><b>กรอก</b><span>ข้อมูลครั้งเดียว</span></article>
+              <article><b>ได้</b><span>Prompt ครบชุด</span></article>
+              <article><b>ใช้ต่อ</b><span>ChatGPT / Canva / CapCut</span></article>
             </div>
           </div>
           <div class="hero-visual">
@@ -133,6 +133,19 @@
           <button class="tool-card" data-view="projects"><img src="assets/icons/dest.svg" alt=""><b>โปรเจกต์ / งานที่บันทึกไว้</b><span>กลับมาดูงานเดิม บันทึกไอเดีย และต่อยอดงานที่ทำไว้</span></button>
           <button class="tool-card" data-view="destinationHub"><img src="assets/icons/dest.svg" alt=""><b>เครื่องมือเสริม</b><span>Prompt Hub เครื่องมือปลายทาง ตัวอย่างงาน และคู่มือระบบ</span></button>
         </div>
+
+        <section class="panel mvp-sales-strip-v877">
+          <div class="mvp-sales-copy">
+            <p class="eyebrow">WHAT THIS TOOL DOES</p>
+            <h3>เว็บนี้ช่วยอะไร?</h3>
+            <p>ช่วยเปลี่ยนข้อมูลดิบให้เป็น Prompt พร้อมใช้งานจริง แยกเป็นโหมดคุยต่อและโหมดสั่ง AI ทำงานทันที เหมาะกับคนทำสื่อที่อยากทำงานไวขึ้นและลดการลองผิดลองถูก</p>
+          </div>
+          <div class="mvp-benefit-grid-v877">
+            <article><b>1</b><span>เลือกงาน</span><small>ภาพ / โพสต์ / วิดีโอ / เสียง / สไลด์</small></article>
+            <article><b>2</b><span>กรอกข้อมูล</span><small>ชื่อหน่วยงาน รายละเอียด วันเวลา สถานที่</small></article>
+            <article><b>3</b><span>คัดลอก Prompt</span><small>นำไปใช้กับ ChatGPT, Canva, CapCut หรือเครื่องมือ AI ที่ต้องการ</small></article>
+          </div>
+        </section>
 
         <div class="dashboard-grid dashboard-sales-grid-v861">
           <section class="panel wide">
@@ -214,15 +227,37 @@
       </section>
 
       <section id="library" class="view">
-        <div class="panel"><div class="panel-head"><div><h3>⭐ ตัวอย่างงาน</h3><p>เลือกตัวอย่างแล้วนำไปต่อยอดได้ทันที</p></div></div><div id="libraryGrid" class="library-grid"></div></div>
+        <div class="panel mvp-library-v877">
+          <div class="panel-head">
+            <div><h3>⭐ ตัวอย่างงานพร้อมใช้</h3><p>เลือกแนวงานที่ใกล้เคียง แล้วระบบจะพาไปกรอกข้อมูลต่อในเมนูที่เหมาะสมทันที</p></div>
+            <button class="btn primary" data-view="kit">สร้าง Prompt ครบชุด</button>
+          </div>
+          <div class="sales-example-filter-v877">
+            <span>ตัวอย่างสำหรับขาย MVP:</span>
+            <b>เทศบาล / อบต.</b>
+            <b>โรงเรียน</b>
+            <b>เพจ / ครีเอเตอร์</b>
+            <b>ร้านค้า</b>
+          </div>
+          <div id="libraryGrid" class="library-grid"></div>
+        </div>
       </section>
 
       <section id="guide" class="view">
-        <div class="panel">
-          <h3>⚙️ คู่มือระบบ</h3>
+        <div class="panel guide-mvp-v877">
+          <div class="panel-head">
+            <div><h3>⚙️ ใช้งาน 3 นาทีเป็น</h3><p>คู่มือสั้นสำหรับผู้ใช้ใหม่ที่ยังไม่เคยใช้ Prompt หรือ AI มาก่อน</p></div>
+            <button class="btn primary" data-view="kit">เริ่มสร้าง Prompt</button>
+          </div>
+          <div class="quick-guide-v877">
+            <article><b>01</b><h4>เลือกประเภทงาน</h4><p>เช่น ภาพประชาสัมพันธ์ โพสต์ Facebook วิดีโอ เสียงพากย์ หรือสไลด์</p></article>
+            <article><b>02</b><h4>กรอกข้อมูลจริง</h4><p>ใส่หัวข้อ หน่วยงาน รายละเอียด วันเวลา สถานที่ และบุคคลสำคัญเท่าที่มี</p></article>
+            <article><b>03</b><h4>กดสร้าง Prompt</h4><p>ระบบจะแยก Prompt สำหรับแก้/คุยต่อ และ Prompt สำหรับสั่ง AI ทำงานทันที</p></article>
+            <article><b>04</b><h4>คัดลอกไปใช้ต่อ</h4><p>นำไปวางใน ChatGPT, Canva, CapCut หรือเครื่องมือปลายทางที่ต้องการ แล้วแนบรูปประกอบถ้ามี</p></article>
+          </div>
           <div class="guide-grid">
-            <article><h4>วิธีใช้งาน</h4><ol><li>เลือกเครื่องมือที่ต้องการ</li><li>กรอกหัวข้อและรายละเอียด</li><li>กดสร้าง</li><li>คัดลอกไปวางในเครื่องมือที่ต้องการ</li></ol></article>
-            <article><h4>การใช้เสียงพากย์</h4><ol><li>เข้าเมนูเสียงพากย์</li><li>เลือกความยาวและโทนเสียง</li><li>กดสร้างสคริปต์เสียง</li><li> หรือคัดลอกไปใช้กับ CapCut / Voice Tool</li></ol></article>
+            <article><h4>จำง่าย ๆ</h4><ol><li>เลือกงาน</li><li>กรอกข้อมูล</li><li>กดสร้าง</li><li>คัดลอก Prompt</li><li>นำไปใช้กับ AI ปลายทาง</li></ol></article>
+            <article><h4>คำเตือนสำคัญ</h4><ol><li>ห้ามแต่งข้อมูลจริงเพิ่มเอง</li><li>ตรวจชื่อคน หน่วยงาน วันที่ และสถานที่ก่อนเผยแพร่</li><li>ถ้า AI ปลายทางสร้างภาพไม่ได้ ให้ใช้ Prompt ที่ระบบเตรียมไว้ไปวางในเครื่องมือสร้างภาพ</li><li>ถ้ามีรูปถ่าย ให้แนบรูปไปพร้อม Prompt ทุกครั้ง</li></ol></article>
           </div>
           <div class="rights-box">สงวนสิทธิ์การใช้งาน Dashboard และระบบ “ทันใจ AI Studio” สำหรับผู้ได้รับสิทธิ์เท่านั้น ห้ามคัดลอก ดัดแปลง แจกจ่าย เผยแพร่ต่อ หรือนำไปใช้ในเชิงพาณิชย์โดยไม่ได้รับอนุญาต<br><br>พัฒนาโดย Thanawid Ritchi</div>
         </div>

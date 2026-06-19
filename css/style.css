@@ -2711,7 +2711,7 @@ body.auth-locked .owner-watermark{
 }
 
 
-/* V8.7.6 — Collapsible FAB Speed Dial */
+/* V8.7.7 — Collapsible FAB Speed Dial */
 .fab-main{
   width:52px !important;
   height:52px !important;
@@ -2767,5 +2767,230 @@ body.auth-locked .owner-watermark{
     width:56px !important;
     height:52px !important;
     font-size:18px !important;
+  }
+}
+
+
+/* V8.7.7 — MVP Sales Polish */
+.hero-lead{
+  max-width:58ch;
+  line-height:1.72;
+}
+.hero-title span:last-child{
+  color:#f6e5b5;
+}
+.hero-sales-stats article{
+  min-width:0;
+}
+.mvp-sales-strip-v877{
+  display:grid;
+  grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);
+  gap:18px;
+  align-items:center;
+  margin:18px 0;
+}
+.mvp-sales-copy h3{
+  margin:4px 0 8px;
+  font-size:28px;
+}
+.mvp-sales-copy p{
+  color:var(--muted);
+  line-height:1.72;
+  margin:0;
+}
+.mvp-benefit-grid-v877{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+}
+.mvp-benefit-grid-v877 article{
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:18px;
+  padding:14px;
+  background:rgba(255,255,255,.045);
+}
+.mvp-benefit-grid-v877 b{
+  display:grid;
+  place-items:center;
+  width:34px;
+  height:34px;
+  border-radius:12px;
+  background:linear-gradient(135deg,rgba(142,231,255,.22),rgba(246,208,135,.18));
+  color:#fff;
+  margin-bottom:10px;
+}
+.mvp-benefit-grid-v877 span{
+  display:block;
+  font-weight:900;
+  color:#fff;
+}
+.mvp-benefit-grid-v877 small{
+  display:block;
+  color:rgba(255,255,255,.64);
+  line-height:1.45;
+  margin-top:4px;
+}
+.sales-example-filter-v877{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  align-items:center;
+  margin:-4px 0 18px;
+  color:rgba(255,255,255,.68);
+  font-size:13px;
+}
+.sales-example-filter-v877 b{
+  padding:7px 10px;
+  border-radius:999px;
+  background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.10);
+  color:#f6e5b5;
+}
+.sales-example-card-v877{
+  display:flex;
+  flex-direction:column;
+  min-height:260px;
+}
+.sales-example-card-v877 h4{
+  margin:8px 0 6px;
+  font-size:18px;
+}
+.sales-example-card-v877 p{
+  line-height:1.62;
+}
+.example-mini-meta-v877{
+  display:grid;
+  gap:4px;
+  margin:auto 0 12px;
+  color:rgba(255,255,255,.58);
+}
+.quick-guide-v877{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:12px;
+  margin-bottom:18px;
+}
+.quick-guide-v877 article{
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:20px;
+  padding:16px;
+  background:linear-gradient(135deg,rgba(255,255,255,.07),rgba(255,255,255,.035));
+}
+.quick-guide-v877 b{
+  display:inline-grid;
+  place-items:center;
+  width:38px;
+  height:32px;
+  border-radius:12px;
+  margin-bottom:10px;
+  color:#8ee7ff;
+  background:rgba(142,231,255,.08);
+  border:1px solid rgba(142,231,255,.16);
+}
+.quick-guide-v877 h4{
+  margin:0 0 6px;
+  font-size:17px;
+}
+.quick-guide-v877 p{
+  margin:0;
+  color:rgba(255,255,255,.66);
+  line-height:1.55;
+}
+@media (max-width: 1180px){
+  .mvp-sales-strip-v877{
+    grid-template-columns:1fr;
+  }
+  .quick-guide-v877{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
+@media (max-width: 900px){
+  .hero-card{
+    grid-template-columns:1fr !important;
+  }
+  .hero-visual{
+    min-height:250px;
+  }
+  .mvp-benefit-grid-v877{
+    grid-template-columns:1fr;
+  }
+  .dashboard-sales-grid-v861{
+    grid-template-columns:1fr !important;
+  }
+}
+@media (max-width: 720px){
+  .topbar{
+    gap:8px;
+  }
+  .top-actions{
+    gap:6px;
+  }
+  .top-actions .btn{
+    padding:9px 10px;
+    font-size:12px;
+  }
+  .hero-card.sales-dashboard-hero{
+    padding:20px !important;
+  }
+  .hero-title{
+    font-size:clamp(28px, 9vw, 42px) !important;
+    line-height:1.12 !important;
+  }
+  .hero-lead{
+    font-size:14px;
+    line-height:1.7;
+  }
+  .hero-actions{
+    display:grid;
+    grid-template-columns:1fr;
+    width:100%;
+  }
+  .hero-actions .btn{
+    width:100%;
+  }
+  .hero-stats{
+    grid-template-columns:1fr !important;
+  }
+  .tool-grid.dashboard-main-tools-v861{
+    grid-template-columns:1fr !important;
+  }
+  .panel{
+    padding:16px !important;
+    border-radius:22px !important;
+  }
+  .panel-head{
+    flex-direction:column;
+    align-items:stretch !important;
+  }
+  .panel-head .btn{
+    width:100%;
+  }
+  .sample-grid.compact-sample-grid-v861,
+  .library-grid,
+  .projects-grid{
+    grid-template-columns:1fr !important;
+  }
+  .quick-guide-v877{
+    grid-template-columns:1fr;
+  }
+  .guide-grid{
+    grid-template-columns:1fr !important;
+  }
+  .sales-example-card-v877 .button-row{
+    display:grid;
+    grid-template-columns:1fr;
+  }
+  .sales-example-card-v877 .button-row .btn{
+    width:100%;
+  }
+  .mvp-sales-copy h3{
+    font-size:24px;
+  }
+  .mvp-benefit-grid-v877 article,
+  .quick-guide-v877 article{
+    padding:14px;
+  }
+  .floating-chip{
+    transform:scale(.86);
   }
 }

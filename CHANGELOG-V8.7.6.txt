@@ -1,4 +1,4 @@
-V8.7.6 — Collapsible FAB Speed Dial
+V8.7.7 — Collapsible FAB Speed Dial
 
 - ปรับ Floating Action Button (FAB) ขวาล่างให้ยุบเหลือปุ่ม + ปุ่มเดียวเป็นค่าเริ่มต้น
 - กด + แล้วค่อยเปิด Speed Dial: ภาพ / โพสต์ / วิดีโอ / GPT

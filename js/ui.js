@@ -223,24 +223,37 @@ TANJAI.setReadyOutput = function(tool, options={}){
   });
 };
 
-TANJAI.applyTemplate = function(key){
+TANJAI.applyTemplate = function(key, targetView){
   const t = TANJAI.templates[key]; if(!t) return;
-  const view = TANJAI.state.currentView === "dashboard" ? "image" : TANJAI.state.currentView;
+  const current = TANJAI.state.currentView === "dashboard" || TANJAI.state.currentView === "library" ? (t.primaryView || "kit") : TANJAI.state.currentView;
+  const view = targetView || current;
   TANJAI.switchView(view);
   const prefix = view === "kit" ? "kit" : view;
   ["title","orgName","audience","detail","dateTime","place","people"].forEach(k=>{
     const el = TANJAI.$(`#${prefix}-${k}`);
     if(el) el.value = t[k] || "";
   });
+  const orgType = TANJAI.$(`#${prefix}-orgType`);
+  if(orgType && t.orgType) orgType.value = t.orgType;
+  TANJAI.toast?.("ใส่ตัวอย่างให้แล้ว — ตรวจข้อมูลจริงก่อนกดสร้าง Prompt");
 };
 
 TANJAI.renderLibrary = function(){
   const el = TANJAI.$("#libraryGrid"); if(!el) return;
   el.innerHTML = Object.entries(TANJAI.templates).map(([key,t])=>`
-    <article class="library-card">
+    <article class="library-card sales-example-card-v877">
+      <span class="tag">${t.tag || "ตัวอย่าง"}</span>
       <b>${t.icon} ${t.name}</b>
-      <p>${t.title}<br>${t.detail}</p>
-      <button class="btn secondary" data-template="${key}">ใช้ตัวอย่างนี้</button>
+      <h4>${t.title}</h4>
+      <p>${t.detail}</p>
+      <div class="example-mini-meta-v877">
+        <small>เหมาะกับ: ${t.orgType || "หลายประเภทงาน"}</small>
+        <small>เริ่มที่เมนู: ${t.primaryView === "kit" ? "สร้าง Prompt ครบชุด" : (t.primaryView || "image")}</small>
+      </div>
+      <div class="button-row">
+        <button class="btn primary" data-template="${key}" data-template-view="${t.primaryView || "kit"}">ใช้ตัวอย่างนี้</button>
+        <button class="btn secondary" data-template="${key}" data-template-view="kit">สร้าง Prompt ครบชุด</button>
+      </div>
     </article>
   `).join("");
 };
