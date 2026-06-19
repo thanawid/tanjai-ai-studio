@@ -2709,3 +2709,63 @@ body.auth-locked .owner-watermark{
     line-height:1.58;
   }
 }
+
+
+/* V8.7.6 — Collapsible FAB Speed Dial */
+.fab-main{
+  width:52px !important;
+  height:52px !important;
+  font-size:25px !important;
+  right:22px !important;
+  bottom:22px !important;
+  display:grid;
+  place-items:center;
+}
+.fab-main.is-open{
+  transform:rotate(45deg) scale(.96) !important;
+}
+.fab-menu[hidden]{
+  display:none !important;
+}
+.fab-menu{
+  right:22px !important;
+  bottom:84px !important;
+  width:auto !important;
+  grid-template-columns:repeat(2, 58px) !important;
+  gap:8px !important;
+  padding:8px;
+  border-radius:22px;
+  border:1px solid rgba(255,255,255,.10);
+  background:rgba(8,13,25,.58);
+  backdrop-filter:blur(14px);
+  box-shadow:0 18px 52px rgba(0,0,0,.34);
+}
+.fab-menu button{
+  width:58px !important;
+  height:54px !important;
+  padding:7px 5px !important;
+  border-radius:15px !important;
+  font-size:19px !important;
+}
+.fab-menu button span{
+  font-size:10px !important;
+}
+@media (max-width: 720px){
+  .fab-main{
+    right:18px !important;
+    bottom:92px !important;
+    width:50px !important;
+    height:50px !important;
+    font-size:24px !important;
+  }
+  .fab-menu{
+    right:18px !important;
+    bottom:148px !important;
+    grid-template-columns:repeat(2, 56px) !important;
+  }
+  .fab-menu button{
+    width:56px !important;
+    height:52px !important;
+    font-size:18px !important;
+  }
+}
