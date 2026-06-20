@@ -144,13 +144,16 @@ ${list(suggestions, "โครง Prompt พร้อมใช้งาน")}`;
 };
 
 /**
- * V9 Clean - Thai text normalization
+ * V9 Clean - Thai text normalization (อัปเดตการเว้นวรรค ไทย-อังกฤษ)
  */
 TANJAI.v9Clean = function(text = "", fallback = "ไม่ระบุ") {
   const value = String(text || "")
     .replaceAll("ประชม", "ประชุม")
     .replaceAll("พ.ศ.2571-2575", "พ.ศ. 2571–2575")
     .replaceAll("พ.ศ. 2571-2575", "พ.ศ. 2571–2575")
+    // เพิ่มการเว้นวรรคระหว่างอักษรไทยและอังกฤษ/ตัวเลข
+    .replace(/([ก-๙])([a-zA-Z0-9])/g, '$1 $2')
+    .replace(/([a-zA-Z0-9])([ก-๙])/g, '$1 $2')
     .replace(/\n{3,}/g, "\n\n")
     .trim();
   return value || fallback;
@@ -491,50 +494,47 @@ TANJAI.v91BuildSharedBrief = function(d = {}, type = "image") {
 };
 
 /**
- * Image Prompt Generator - V9.1
+ * Image Prompt Generator - V9.1 (อัปเดตโครงสร้างแยก Content และ Technical Style)
  */
 TANJAI.imagePrompt = function(d, outputMode = "gpt") {
   const b = TANJAI.v91BuildSharedBrief(d, "image");
-  return `${TANJAI.v9ExecutionHeader("ให้สร้างภาพประชาสัมพันธ์จริงทันทีจากข้อมูลด้านล่าง")}
+  
+  return `${TANJAI.v9ExecutionHeader("ให้สร้างภาพตามข้อมูลด้านล่าง โดยแยกส่วนเนื้อหาและสไตล์ภาพออกจากกันอย่างชัดเจน")}
 
-ประเภทภาพ: ${b.imageType}
-บริบทงาน: ${b.workContext}
-จุดประสงค์ของภาพ: ${b.purpose}
-กลุ่มเป้าหมาย: ${b.audience}
-ช่องทางใช้งาน: ${b.channel}
-ขนาดภาพ: ${b.size}
+[1] ข้อมูลหลักของงาน (เนื้อหา):
+- ประเภทภาพ: ${b.imageType}
+- บริบทงาน: ${b.workContext}
+- จุดประสงค์ของภาพ: ${b.purpose}
+- กลุ่มเป้าหมาย: ${b.audience}
+- หัวข้อหลัก: ${b.title}
+- ข้อมูลจริงของงาน:
+${b.keyFacts.length > 0 ? b.keyFacts.map(x => "  " + x).join("\n") : "  ไม่มีข้อมูลเพิ่มเติม"}
 
-หัวข้อหลัก:
-${b.title}
+[2] ข้อความที่ต้องใส่ในภาพ (Text on Image):
+${b.textOnImage.length > 0 ? b.textOnImage.map(x => `"${x}"`).join(", ") : "ไม่บังคับใส่ข้อความ"}
 
-ข้อมูลจริงของงาน:
-${b.keyFacts.map(x => x).join("\n")}
+[3] แนวทางภาพและเทคนิค (Visual & Technical Specs):
+- สไตล์และเทคนิคภาพ: ${b.style}
+- โทนภาพรวม (Visual Tone): ${b.visualTone}
+- โทนสี (Color Tone): ${b.colorTone}
+- การจัดวาง (Layout): ${b.layout}
+- ความหนาแน่น (Density): ${b.density}
+- จุดเน้นของภาพ (Focus): ${b.focus}
 
-ข้อความที่ควรมีบนภาพ:
-${b.textOnImage.map(x => "- " + x).join("\n")}
-
-ไฟล์แนบ / ภาพอ้างอิง:
-${b.attachmentGuide}
-
-Creative Quality Direction:
+[4] Creative Quality Direction:
 - ระดับคุณภาพ: ${b.qualityLevel}
-- ระดับการคิดต่อ: ${b.creativityLevel}
 - ทิศทางสร้างสรรค์: ${b.creativeDirection}
 - กฎข้อความบนภาพ: ${b.textPolicy}
 - กฎกันเว่อร์ / กันมั่ว: ${b.overdoGuard}
 
-แนวทางภาพ:
-- สไตล์: ${b.style}
-- โทนภาพ: ${b.visualTone}
-- โทนสี: ${b.colorTone}
-- Layout: ${b.layout}
-- ความหนาแน่น: ${b.density}
-- จุดเด่นของภาพ: ${b.focus}
-- โทนภาษา: ${b.tone}
+[5] ไฟล์แนบ / ภาพอ้างอิง:
+${b.attachmentGuide}
 
 ${TANJAI.v9ProtectedBlock(d, "image")}
 
-ให้สร้างภาพทันทีตามข้อมูลข้างต้น`;
+**⚠️ คำสั่งพิเศษสำหรับ AI สร้างภาพ:**
+1. โปรดอ่านหมวด [3] แนวทางภาพและเทคนิคอย่างละเอียด หากในสไตล์ภาพมีการระบุ **สเปกอุปกรณ์** (เช่น Canon EOS R5, 85mm f/1.2L) หรือ **เทคนิคการจัดแสง** (เช่น Rembrandt lighting, Snoot, Grid, Low-key cinematic) ให้นำไปใช้เป็น "พารามิเตอร์เพื่อเรนเดอร์ภาพ" เท่านั้น
+2. **ห้าม** นำชื่อสเปกกล้อง เลนส์ หรือชื่อเทคนิคการจัดแสง ไปเขียนเป็นตัวอักษรลงบนภาพเด็ดขาด`;
 };
 
 /**
