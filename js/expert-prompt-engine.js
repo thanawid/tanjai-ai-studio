@@ -7,7 +7,7 @@ window.TANJAI = window.TANJAI || {};
  */
 (function(){
   const T = window.TANJAI;
-  T.expertPromptVersion = "Expert Engine 1.2 — Creative Create First";
+  T.expertPromptVersion = "Expert Engine 1.4 — Automatic PR Creative Director";
 
   const clean = (value = "", fallback = "") => {
     const result = String(value || "")
@@ -212,6 +212,21 @@ ${silentQualityGate([
   T.buildImageExecutionPrompt = function(d = {}){
     const a = analyze(d, "image");
     const context = imageContextProfile(d);
+    const selectedStyle = clean(d.style || a.design.style, "AI PR Creative Director — เลือกแนวให้อัตโนมัติ");
+    const thaiPrPosterMode = /Thai PR Poster Premium|High-Impact Thai PR Poster|โปสเตอร์ประชาสัมพันธ์ไทยสีสด/i.test([
+      selectedStyle, d.layout, d.workContext, d.imageType
+    ].filter(Boolean).join(" "));
+    const thaiPrPosterProfile = thaiPrPosterMode ? `
+=== THAI PR POSTER PREMIUM PROFILE ===
+- สร้างงานต้นฉบับใหม่ที่ได้ DNA จากโปสเตอร์ประชาสัมพันธ์ไทยคุณภาพสูง ห้ามคัดลอกองค์ประกอบ ตรา ตัวละคร หรือรูปแบบเฉพาะของผลงานอื่น
+- วางลำดับภาพ 5 ชั้น: (1) identity zone ด้านบนสำหรับโลโก้จริง (2) announcement ribbon (3) hero headline ใหญ่ 2–4 บรรทัด (4) action/deadline band (5) information cards และ footer
+- Hero headline ต้องเป็นจุดเด่นที่สุด ใช้ตัวอักษรไทยหนาแบบ dimensional 3D, bevel, ขอบขาวหนา, เงานุ่ม และ contrast สูง โดยคงข้อความจาก TEXT LOCK เท่านั้น
+- ใช้การ์ดมุมมน แถบริบบิ้น ป้ายทรง capsule หมายเลขขั้นตอน และ icon/ภาพประกอบแบบ sticker 3D ที่เกี่ยวข้องกับเรื่องจริง ทำให้ข้อมูลแน่นแต่แยกกลุ่มอ่านง่าย
+- ใช้สีอิ่มสดแบบ premium campaign, highlight สีทอง, white breathing space, rim light, soft glow และเงาหลายระดับ เพื่อสร้างมิติ ห้ามใช้เอฟเฟกต์จนข้อความอ่านยาก
+- โลโก้ ตราหน่วยงาน ภาพบุคคล QR Code และ barcode ใช้ได้เฉพาะไฟล์จริงที่ผู้ใช้แนบมา และต้องคงรูปเดิม ห้ามวาดเลียนแบบหรือสร้างใหม่
+- หากไม่มีไฟล์จริง ให้ตัดองค์ประกอบนั้นออกและจัดสมดุล Layout ใหม่ ห้ามใส่โลโก้หรือ QR จำลอง ห้ามพิมพ์ placeholder บนภาพ
+- ภาพต้องอ่านตามลำดับ: เรื่องอะไร > ต้องทำอะไร > เมื่อไร > วิธีดำเนินการ/ช่องทาง > เจ้าของเรื่อง โดยแสดงเฉพาะข้อมูลจริงที่มี
+- ตรวจความอ่านง่ายที่ขนาดมือถือ: หัวข้อเด่นทันที ตัวหนังสือรองไม่เล็กเกินไป ระยะขอบปลอดภัย และไม่มีข้อความชนหรือถูกตัด` : "";
     const hasRealPhotos = Number(d.photoCount || 0) > 0;
     const mode = clean(d.useMode, "สร้างภาพใหม่ด้วย AI");
     const confirmedFacts = unique(a.facts);
@@ -255,11 +270,25 @@ ${silentQualityGate([
 - ภาษาภาพ: ${context.org.visual}
 - ลำดับสาร: ${context.task.hierarchy}
 - โครงสร้างภาพ: ${context.task.layout}
-- Style: ${clean(d.style || a.design.style, "Modern Premium Clean")}
+- Style: ${selectedStyle}
 - Color: ${clean(d.colorTone || a.design.color, "เหมาะกับบริบท")}
 - Layout: ${clean(d.layout || a.design.layout, "อ่านง่าย มีลำดับชัด")}
 - Density: ${clean(d.density, "สมดุล อ่านง่าย")}
 - จุดเน้น: ${clean(d.brainFocus || d.focus, a.design.hierarchy?.[0] || d.title || "สารหลัก")}
+
+=== PR CREATIVE ROUTER — DEFAULT FOR EVERY IMAGE ===
+- ผลลัพธ์เริ่มต้นของทันใจต้องเป็นภาพประชาสัมพันธ์หรือ Key Visual ที่ออกแบบเสร็จพร้อมใช้ ไม่ใช่ภาพประกอบทั่วไปและไม่ใช่เทมเพลตเปล่า
+- วิเคราะห์บรีฟแล้วเลือก Art Direction ที่เหมาะที่สุดเพียงหนึ่งตระกูลโดยอัตโนมัติ:
+  1) Civic Announcement — ข่าว ประกาศ แจ้งเตือน: หัวข้อทรงพลัง contrast สูง ข้อมูลสำคัญอ่านเร็ว
+  2) Community Invitation — กิจกรรม ชุมชน การศึกษา: สดใส อบอุ่น มีฉากเล่าเรื่องและภาพประกอบเป็นมิตร
+  3) Service Infographic — ขั้นตอน ความรู้ สุขภาพ: editorial infographic การ์ดข้อมูลและลำดับสายตาชัด
+  4) Social Campaign — โปรโมชัน ผลงาน เพลง รณรงค์: bold campaign visual, dramatic crop, emotional hook
+  5) Formal & Respectful — พิธีการ ไว้อาลัย เรื่องอ่อนไหว: สุภาพ สงบ ลดสี ใช้พื้นที่ว่างและ typography อย่างให้เกียรติ
+- ห้ามผสมหลายตระกูลจนภาพไร้ทิศทาง และห้ามใช้ม่วง–ทองหรือหัวข้อ 3D กับทุกงาน ให้สี รูปทรง และระดับเอฟเฟกต์เกิดจากความหมายของบรีฟ
+- ทุกภาพต้องมี signature visual device เฉพาะเรื่องหนึ่งอย่าง เช่น visual metaphor, ฉากจำลอง, วัตถุฮีโร่, เส้นนำสายตา หรือกรอบข้อมูลที่ออกแบบเฉพาะงาน
+- จัดลำดับแบบ Headline-first: ผู้ชมต้องรู้ภายใน 3 วินาทีว่าเรื่องอะไร สำคัญอย่างไร และควรทำอะไรต่อ จากนั้นจึงอ่านรายละเอียดรอง
+- ยกระดับงานด้วย typography hierarchy, layered depth, custom shapes, controlled lighting, purposeful illustration และ mobile-safe spacing โดยคงความเป็นงานประชาสัมพันธ์ไทยร่วมสมัย
+- สร้างงานต้นฉบับใหม่ทุกครั้ง ห้ามเลียนแบบ Layout ตรา ตัวละคร หรือองค์ประกอบเฉพาะจากผลงานของผู้อื่น
 
 === CREATIVE DIRECTOR MODE ===
 - ล็อกเฉพาะข้อเท็จจริง แต่เปิดอิสระเต็มที่ในการสร้างฉาก แสง สี มุมมอง อารมณ์ สไตล์ จังหวะภาพ และ Layout
@@ -274,6 +303,7 @@ ${silentQualityGate([
 - หลีกเลี่ยงทุกอย่างอยู่กึ่งกลาง, icon grid, กล่องข้อความเรียงสูตร, gradient ตกแต่งไร้เหตุผล, วัตถุลอยสุ่ม, คนยิ้มแบบโฆษณาทั่วไป และองค์ประกอบมากเกินไป
 - ใช้เรื่องเล่าทางภาพหนึ่งแกน มี focal point เดียว และ motif สนับสนุนไม่เกินสองอย่าง
 - ความครีเอทีฟห้ามเปลี่ยนข้อเท็จจริง ใบหน้า อัตลักษณ์ โลโก้ ข้อความ หรือตัวเลขที่ยืนยันแล้ว
+${thaiPrPosterProfile}
 
 === SOURCE OF TRUTH ===
 ข้อมูลที่ยืนยันแล้ว:

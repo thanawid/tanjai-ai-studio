@@ -37,6 +37,8 @@ TANJAI.categories = {
     "3:1 ป้ายไวนิลแนวนอน"
   ],
   "imageStyles": [
+    "AI PR Creative Director — เลือกแนวให้อัตโนมัติ",
+    "Thai PR Poster Premium — สีสด ตัวอักษรเด่น",
     "Modern Premium Clean",
     "ราชการพรีเมียม อ่านง่าย",
     "สดใสโซเชียล",
@@ -45,6 +47,8 @@ TANJAI.categories = {
     "อบอุ่นชุมชน"
   ],
   "layouts": [
+    "AI PR Creative Director — เลือก Layout อัตโนมัติ",
+    "High-Impact Thai PR Poster",
     "Hero Center Layout",
     "Split Layout ซ้ายข้อความ ขวาภาพ",
     "Infographic Layout",
