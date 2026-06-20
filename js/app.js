@@ -1011,8 +1011,8 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "Prompt สคริป
       main:executeOut,
       advancedTitle1:"Prompt สำหรับแก้ / คุยต่อ",
       advanced1:discussOut,
-      advancedTitle2:"ตัวอย่างสรุป / โพสต์จากระบบ",
-      advanced2:TANJAI.postText(d)
+      advancedTitle2:"Prompt Brain วิเคราะห์บรีฟ + ตัวอย่าง",
+      advanced2:`${TANJAI.promptBrainReport ? TANJAI.promptBrainReport(d, "post") : ""}\n\n---\nตัวอย่างสรุป / โพสต์จากระบบ:\n${TANJAI.postText(d)}`
     });
     TANJAI.state.lastPost=executeOut;
     TANJAI.toast("สร้าง Prompt เรียบเรียงเนื้อหาแล้ว");
@@ -1027,8 +1027,8 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "Prompt สคริป
       main:executeOut,
       advancedTitle1:"Prompt สำหรับแก้ / คุยต่อ",
       advanced1:discussOut,
-      advancedTitle2:"ตัวอย่างสคริปต์พิธีกรจากระบบ",
-      advanced2:TANJAI.mcScriptSample ? TANJAI.mcScriptSample(d) : executeOut
+      advancedTitle2:"Prompt Brain วิเคราะห์บรีฟ + ตัวอย่าง",
+      advanced2:`${TANJAI.promptBrainReport ? TANJAI.promptBrainReport(d, "mc") : ""}\n\n---\nตัวอย่างสคริปต์พิธีกรจากระบบ:\n${TANJAI.mcScriptSample ? TANJAI.mcScriptSample(d) : executeOut}`
     });
     TANJAI.state.lastMC=executeOut;
     TANJAI.toast("สร้าง Prompt สคริปต์พิธีกรแล้ว");
@@ -1044,8 +1044,8 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "Prompt สคริป
       main:executeOut,
       advancedTitle1:"Prompt สำหรับแก้ / คุยต่อ",
       advanced1:discussOut,
-      advancedTitle2:"Storyboard ตัวอย่างจากระบบ",
-      advanced2:TANJAI.videoStoryboard(d, length)
+      advancedTitle2:"Prompt Brain วิเคราะห์บรีฟ + Storyboard ตัวอย่าง",
+      advanced2:`${TANJAI.promptBrainReport ? TANJAI.promptBrainReport(d, "video") : ""}\n\n---\nStoryboard ตัวอย่างจากระบบ:\n${TANJAI.videoStoryboard(d, length)}`
     });
     TANJAI.state.lastVideo=executeOut;
     TANJAI.toast("สร้าง Prompt วิดีโอแบบสั่งทำทันทีแล้ว");
@@ -1062,8 +1062,8 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "Prompt สคริป
       main:executeOut,
       advancedTitle1:"Prompt สำหรับแก้ / คุยต่อ",
       advanced1:discussOut,
-      advancedTitle2:"สคริปต์ตัวอย่างจากระบบ",
-      advanced2:TANJAI.voiceScript(d, length, style)
+      advancedTitle2:"Prompt Brain วิเคราะห์บรีฟ + สคริปต์ตัวอย่าง",
+      advanced2:`${TANJAI.promptBrainReport ? TANJAI.promptBrainReport(d, "voice") : ""}\n\n---\nสคริปต์ตัวอย่างจากระบบ:\n${TANJAI.voiceScript(d, length, style)}`
     });
     TANJAI.state.lastVoice=executeOut;
     TANJAI.toast("สร้าง Prompt เสียงแบบสั่งทำทันทีแล้ว");
@@ -1079,8 +1079,8 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "Prompt สคริป
       main:executeOut,
       advancedTitle1:"Prompt สำหรับแก้ / คุยต่อ",
       advanced1:discussOut,
-      advancedTitle2:"Outline ตัวอย่างจากระบบ",
-      advanced2:TANJAI.deckOutline(d, count)
+      advancedTitle2:"Prompt Brain วิเคราะห์บรีฟ + Outline ตัวอย่าง",
+      advanced2:`${TANJAI.promptBrainReport ? TANJAI.promptBrainReport(d, "deck") : ""}\n\n---\nOutline ตัวอย่างจากระบบ:\n${TANJAI.deckOutline(d, count)}`
     });
     TANJAI.state.lastDeck=executeOut;
     TANJAI.toast("สร้าง Prompt สไลด์แบบสั่งทำทันทีแล้ว");
@@ -1105,8 +1105,8 @@ ${TANJAI.outputDeliveryGuard("ชุดไฟล์สื่อ")}`;
       main:out,
       advancedTitle1:"Prompt สำหรับแก้ / คุยต่อ",
       advanced1:discussOut,
-      advancedTitle2:"AI Handoff Note",
-      advanced2:advancedOut
+      advancedTitle2:"Prompt Brain วิเคราะห์บรีฟ + AI Handoff Note",
+      advanced2:`${TANJAI.promptBrainReport ? TANJAI.promptBrainReport(d, "kit") : ""}\n\n---\n${advancedOut}`
     });
     TANJAI.state.lastKit=out;
     TANJAI.toast("สร้าง Universal Execution Prompt Pack แล้ว");

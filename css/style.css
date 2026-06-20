@@ -3961,3 +3961,24 @@ select option:focus{
   border-color: rgba(139, 92, 246, 0.6); /* ใช้สีม่วงประจำธีม */
   box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
 }
+/* V9.1.4 — Prompt Brain Engine */
+.brain-engine-section-v914{
+  border-color:rgba(168,85,247,.35) !important;
+  background:
+    radial-gradient(circle at top right, rgba(168,85,247,.16), transparent 34%),
+    linear-gradient(145deg, rgba(15,23,42,.90), rgba(35,18,55,.78));
+}
+.brain-engine-section-v914 .section-title b{
+  background:linear-gradient(135deg, rgba(99,102,241,.28), rgba(236,72,153,.26));
+  box-shadow:0 0 0 1px rgba(255,255,255,.10) inset;
+}
+.brain-engine-section-v914 input[type="text"],
+.brain-engine-section-v914 input:not([type]){
+  border-color:rgba(168,85,247,.28);
+}
+.brain-engine-section-v914 .checkline{
+  padding:12px 14px;
+  border:1px solid rgba(168,85,247,.25);
+  border-radius:14px;
+  background:rgba(255,255,255,.045);
+}
