@@ -355,6 +355,19 @@ input:focus, select:focus, textarea:focus {
   }
 }
 
+/* Thai copy should wrap by phrase without forced desktop line breaks. */
+.hero-lead,
+.panel p,
+.tool-card span,
+.home-choice-card span{
+  text-wrap:pretty;
+}
+.panel h3,
+.tool-card b,
+.home-choice-card b{
+  text-wrap:balance;
+}
+
 
 /* v6.1.4 Responsive All Devices */
 .mobile-menu-btn{display:none;border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.08);color:#fff;width:46px;height:46px;border-radius:16px;font-size:22px;font-weight:1000;line-height:1;box-shadow:0 12px 34px rgba(0,0,0,.18)}

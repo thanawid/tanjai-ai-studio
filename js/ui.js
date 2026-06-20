@@ -74,22 +74,26 @@ TANJAI.switchView = function(id, options = {}){
     dashboard:"สวัสดีครับ! 👋",
     router:"AI Router",
     image:"สร้างภาพ",
-    album:"ชุดภาพโพสต์ Facebook Pro",
+    album:"ชุดภาพโพสต์ Facebook",
     post:"เรียบเรียงเนื้อหา",
     mc:"งานพิธีกร",
     video:"ทำวิดีโอ",
     voice:"เสียงพากย์",
     deck:"ทำสไลด์",
     kit:"สร้างชุดสื่อ",
-    promptHub:"Prompt Hub",
-    destinationHub:"Destination Hub",
+    promptHub:"คลัง Prompt",
+    destinationHub:"เครื่องมือปลายทาง",
     projects:"โปรเจกต์",
     library:"ตัวอย่างงาน",
     guide:"คู่มือระบบ"
   };
+  const tabNames = {
+    ...names,
+    dashboard:"หน้าหลัก"
+  };
   const title = TANJAI.$("#pageTitle");
   if(title) title.textContent = names[id] || "ทันใจ AI Studio";
-  document.title = `${names[id] || "ทันใจ AI Studio"} | ทันใจ AI Studio`;
+  document.title = `${tabNames[id] || "ทันใจ AI Studio"} | ทันใจ AI Studio`;
 
   if(id === "projects") TANJAI.renderProjects?.();
 
