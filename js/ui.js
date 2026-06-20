@@ -192,7 +192,7 @@ TANJAI.getToolDestinations = function(tool){
 TANJAI.primaryActionButtons = function(tool, bodyId){
   const GPT = TANJAI.customGptUrl || TANJAI_CUSTOM_GPT_URL;
   const btn = (label, attrs, cls="secondary")=>`<button class="btn ${cls}" ${attrs}>${label}</button>`;
-  if(tool === "image") return btn("คัดลอกคำสั่งสร้างภาพจริง", `data-copy-image="execute"`, "primary") + btn("คัดลอก Prompt มืออาชีพ", `data-copy-image="prompt"`) + btn("เปิด ทันใจ GPT", `data-open="${GPT}"`);
+  if(tool === "image") return btn("คัดลอกและเปิด ทันใจ GPT", `data-copyopen="${bodyId}"`, "primary");
   if(tool === "album") return btn("ดาวน์โหลดทั้งหมด", `id="albumDownloadAllTop"`, "primary") + btn("ล้างรูป", `id="albumClearTop"`);
   if(tool === "post") return btn("คัดลอก Prompt พร้อมใช้", `data-copybox="${bodyId}"`, "primary") + btn("เปิด ทันใจ GPT", `data-open="${GPT}"`);
   if(tool === "mc") return btn("คัดลอกสคริปต์พิธีกร", `data-copybox="${bodyId}"`, "primary") + btn("เปิด ทันใจ GPT", `data-open="${GPT}"`);

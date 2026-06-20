@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
     workContexts: ["ให้ AI ช่วยเลือกจากรายละเอียด","แจ้งข่าว / ประกาศ","เชิญชวน / ประชาสัมพันธ์","โปรโมท / แคมเปญ / ขายผลงาน","โปรโมทเพลง / ผลงานสร้างสรรค์","ให้ความรู้ / Infographic","ขั้นตอนบริการ / วิธีใช้งาน","สรุปกิจกรรม / รายงานผล","งานพิธี / งานบุญ / งานชุมชน","อบรม / ประชุม / สัมมนา","ขอบคุณ / แสดงความยินดี / อวยพร","รณรงค์ / สร้างความตระหนัก","ไว้อาลัย / สุภาพ / ลดสี","อื่น ๆ"],
     imageTypes: ["ให้ AI ช่วยเลือกตามบริบท","โพสต์โซเชียล","โปสเตอร์ประชาสัมพันธ์","อินโฟกราฟิก","ภาพแน่นข้อมูล","ภาพอ่านง่าย","ปก / Cover","ปกเพลง / โปรโมทเพลง","ภาพเชิญชวนกิจกรรม","ภาพแจ้งข่าว","ภาพสรุปกิจกรรม","ชุดภาพโพสต์ Facebook","ภาพแนวนอน / แบนเนอร์","ภาพไว้อาลัย / สุภาพ","อื่น ๆ"],
     qualityLevels: ["Creative Quality สมดุล — สวย ใช้งานจริง ไม่เว่อร์","คุมข้อมูลเข้ม — เน้นความถูกต้องและอ่านง่าย","สวยพรีเมียม — ยกระดับงานให้ดูแพงแต่ไม่มั่ว","สดใสโซเชียล — ดึงดูดแต่ยังอ่านชัด","ทางการสะอาด — เหมาะกับหน่วยงานและประกาศ"],
-    creativityLevels: ["คิดต่อพอดีตามข้อมูลผู้ใช้","คิดต่อได้มากขึ้นแต่ห้ามแต่งข้อมูลจริง","ตามผู้ใช้สั่งมากที่สุด ไม่ตีความเกิน","ลดความเว่อร์ เน้นงานใช้งานจริง"]
+    creativityLevels: ["ครีเอทีฟเต็มที่ในองค์ประกอบภาพ แต่ห้ามแต่งข้อมูลจริง","คิดต่อพอดีตามข้อมูลผู้ใช้","ตามผู้ใช้สั่งมากที่สุด ไม่ตีความเกิน","ลดความเว่อร์ เน้นงานใช้งานจริง"]
   };
 
 // Render forms
@@ -141,7 +141,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <label class="full">ข้อห้าม / หมายเหตุ<textarea id="image-avoid" placeholder="เช่น ห้ามสร้าง QR ปลอม ห้ามวาดโลโก้ใหม่ เว้นพื้นที่ด้านบน ใช้รูปจริงตามแนบ"></textarea></label>
       </div>
     </div>
-    <div class="button-row"><button class="btn primary" id="makeImage">สร้าง Prompt ภาพ 2 แบบ</button><button class="btn secondary" id="saveImage">บันทึก</button></div>
+    <div class="button-row"><button class="btn primary" id="makeImage">สร้างภาพพร้อมใช้</button><button class="btn secondary" id="saveImage">บันทึก</button></div>
   `;
 
   $("#albumForm").innerHTML = `
@@ -266,7 +266,7 @@ document.addEventListener("DOMContentLoaded", () => {
   TANJAI.simplifyExpertForms?.();
 
   // Results
-  $("#imageResult").innerHTML = TANJAI.readyOutputShell("image", "คำสั่งสร้างภาพจริง — Create First", "คัดลอกไปวางใน AI ที่เปิดใช้การสร้างภาพ ระบบจะสั่งเรียกเครื่องมือก่อนตอบข้อความ", "imageOut");
+  $("#imageResult").innerHTML = TANJAI.readyOutputShell("image", "ภาพพร้อมสร้าง — Creative Director", "กดครั้งเดียวเพื่อคัดลอกคำสั่งและเปิด ทันใจ GPT จากนั้นวางคำสั่งเพื่อสร้างภาพจริง", "imageOut");
 $("#albumResult").innerHTML = TANJAI.readyOutputShell("album", "ชุดภาพพร้อมโพสต์", "ปรับภาพจริง ใส่กรอบ และดาวน์โหลดเป็นภาพพร้อมลง Facebook", "albumOut");
 $("#postResult").innerHTML = TANJAI.readyOutputShell("post", "Prompt งานเขียนพร้อมใช้ — นักวางกลยุทธ์เนื้อหา", "ปรับผลลัพธ์ตามชนิดงานจริง เช่น สรุป ข่าว โพสต์ Facebook ข้อความ LINE หรือแคปชั่น", "postOut");
 $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "Prompt พิธีกรพร้อมใช้ — ผู้กำกับงานเวที", "คุมลำดับพิธี ชื่อ ตำแหน่ง คำกำกับเวที และบัตรคำพูด", "mcOut");
@@ -298,8 +298,8 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "Prompt พิธีก
       return;
     }
     TANJAI.setReadyOutput("image", {
-      title:"คำสั่งสร้างภาพจริง — Create First",
-      desc:"คัดลอกไปวางใน AI ที่เปิดใช้การสร้างภาพ คำสั่งจะให้เรียกเครื่องมือก่อนตอบข้อความหรือชื่อไฟล์",
+      title:"ภาพพร้อมสร้าง — Creative Director",
+      desc:"กดปุ่มเดียวเพื่อคัดลอกและเปิด ทันใจ GPT ระบบจะคิด Art Direction ภายในแล้วสร้างภาพจริงทันที",
       main:executeText,
       advancedTitle1:"Prompt มืออาชีพสำหรับตรวจและปรับต่อ",
       advanced1:discussText,

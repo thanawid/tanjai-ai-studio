@@ -87,7 +87,7 @@ TANJAI.commonData = function(prefix) {
     workContext: v("workContext") || "",
     imageType: v("imageType") || "",
     qualityLevel: v("qualityLevel") || "Creative Quality สมดุล — สวย ใช้งานจริง ไม่เว่อร์",
-    creativityLevel: v("creativityLevel") || "คิดต่อพอดีตามข้อมูลผู้ใช้"
+    creativityLevel: v("creativityLevel") || "ครีเอทีฟเต็มที่ในองค์ประกอบภาพ แต่ห้ามแต่งข้อมูลจริง"
   };
 
   return baseData;
@@ -309,7 +309,7 @@ TANJAI.buildSharedBrief = function(d = {}, type = "image") {
     attachmentGuide: TANJAI.v9AttachmentGuide(d, type),
     workContext: d.workContext || "",
     qualityLevel: d.qualityLevel || "Creative Quality สมดุล — สวย ใช้งานจริง ไม่เว่อร์",
-    creativityLevel: d.creativityLevel || "คิดต่อพอดีตามข้อมูลผู้ใช้"
+    creativityLevel: d.creativityLevel || "ครีเอทีฟเต็มที่ในองค์ประกอบภาพ แต่ห้ามแต่งข้อมูลจริง"
   };
 };
 
@@ -485,7 +485,7 @@ TANJAI.v91BuildSharedBrief = function(d = {}, type = "image") {
   b.workContext = d.workContext || preset.context;
   b.imageType = (d.imageType && !/^ให้ AI ช่วยเลือก/.test(d.imageType)) ? d.imageType : preset.imageType || b.imageType;
   b.qualityLevel = d.qualityLevel || "Creative Quality สมดุล — สวย ใช้งานจริง ไม่เว่อร์";
-  b.creativityLevel = d.creativityLevel || "คิดต่อพอดีตามข้อมูลผู้ใช้";
+  b.creativityLevel = d.creativityLevel || "ครีเอทีฟเต็มที่ในองค์ประกอบภาพ แต่ห้ามแต่งข้อมูลจริง";
   b.creativeDirection = preset.creativeDirection;
   b.textPolicy = preset.textPolicy;
   b.overdoGuard = preset.overdoGuard;

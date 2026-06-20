@@ -7,7 +7,7 @@ window.TANJAI = window.TANJAI || {};
  */
 (function(){
   const T = window.TANJAI;
-  T.expertPromptVersion = "Expert Engine 1.1 — Create First";
+  T.expertPromptVersion = "Expert Engine 1.2 — Creative Create First";
 
   const clean = (value = "", fallback = "") => {
     const result = String(value || "")
@@ -260,6 +260,20 @@ ${silentQualityGate([
 - Layout: ${clean(d.layout || a.design.layout, "อ่านง่าย มีลำดับชัด")}
 - Density: ${clean(d.density, "สมดุล อ่านง่าย")}
 - จุดเน้น: ${clean(d.brainFocus || d.focus, a.design.hierarchy?.[0] || d.title || "สารหลัก")}
+
+=== CREATIVE DIRECTOR MODE ===
+- ล็อกเฉพาะข้อเท็จจริง แต่เปิดอิสระเต็มที่ในการสร้างฉาก แสง สี มุมมอง อารมณ์ สไตล์ จังหวะภาพ และ Layout
+- คิดภายในแบบเงียบ ๆ แล้วเลือก Big Idea ที่แรงที่สุดเพียงหนึ่งแนว พร้อม Visual Metaphor ที่สื่อสารเรื่องนี้โดยเฉพาะ ห้ามรายงานขั้นตอนคิดก่อนสร้างภาพ
+- สร้างภาพให้มีจุดนำสายตาชัด ลำดับ foreground / midground / background มีมิติ ใช้ negative space อย่างตั้งใจ และครอปต่อเป็น 1:1 / 4:5 / 9:16 ได้โดยไม่เสียสารหลัก
+- ใช้แสง สี contrast texture และ scale เพื่อสร้าง emotional hook ให้ภาพหยุดสายตา แต่ยังน่าเชื่อถือและอ่านง่ายบนมือถือ
+- ระดับความกล้าทางครีเอทีฟ: ${clean(d.creativityLevel, "ครีเอทีฟเต็มที่ในองค์ประกอบภาพ แต่ห้ามแต่งข้อมูลจริง")}
+- สร้างรายละเอียดเชิงภาพที่ไม่ใช่ข้อเท็จจริงได้ เช่น วัสดุ พื้นผิว บรรยากาศ ลำแสง ฉากนามธรรม และองค์ประกอบเชิงสัญลักษณ์
+
+=== ANTI-GENERIC QUALITY BAR ===
+- ผลลัพธ์ต้องดูเหมือนงานที่ออกแบบเฉพาะบรีฟนี้ ไม่ใช่ stock photo หรือ template สำเร็จรูป
+- หลีกเลี่ยงทุกอย่างอยู่กึ่งกลาง, icon grid, กล่องข้อความเรียงสูตร, gradient ตกแต่งไร้เหตุผล, วัตถุลอยสุ่ม, คนยิ้มแบบโฆษณาทั่วไป และองค์ประกอบมากเกินไป
+- ใช้เรื่องเล่าทางภาพหนึ่งแกน มี focal point เดียว และ motif สนับสนุนไม่เกินสองอย่าง
+- ความครีเอทีฟห้ามเปลี่ยนข้อเท็จจริง ใบหน้า อัตลักษณ์ โลโก้ ข้อความ หรือตัวเลขที่ยืนยันแล้ว
 
 === SOURCE OF TRUTH ===
 ข้อมูลที่ยืนยันแล้ว:
