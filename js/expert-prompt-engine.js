@@ -7,7 +7,7 @@ window.TANJAI = window.TANJAI || {};
  */
 (function(){
   const T = window.TANJAI;
-  T.expertPromptVersion = "Expert Engine 1.4 — Automatic PR Creative Director";
+  T.expertPromptVersion = "Expert Engine 1.5 — High-Production Illustrated PR";
 
   const clean = (value = "", fallback = "") => {
     const result = String(value || "")
@@ -227,6 +227,24 @@ ${silentQualityGate([
 - หากไม่มีไฟล์จริง ให้ตัดองค์ประกอบนั้นออกและจัดสมดุล Layout ใหม่ ห้ามใส่โลโก้หรือ QR จำลอง ห้ามพิมพ์ placeholder บนภาพ
 - ภาพต้องอ่านตามลำดับ: เรื่องอะไร > ต้องทำอะไร > เมื่อไร > วิธีดำเนินการ/ช่องทาง > เจ้าของเรื่อง โดยแสดงเฉพาะข้อมูลจริงที่มี
 - ตรวจความอ่านง่ายที่ขนาดมือถือ: หัวข้อเด่นทันที ตัวหนังสือรองไม่เล็กเกินไป ระยะขอบปลอดภัย และไม่มีข้อความชนหรือถูกตัด` : "";
+    const photoLedMode = Number(d.photoCount || 0) > 0 || /ภาพจริง|ต้นฉบับ|รีทัช|photoreal|cinematic photo/i.test([
+      d.useMode,d.style,d.imageType,d.focus
+    ].filter(Boolean).join(" "));
+    const productionProfile = photoLedMode ? `
+=== PHOTO-LED PR PRODUCTION PROFILE ===
+- ใช้ภาพจริงที่แนบเป็น hero visual และคงอัตลักษณ์เดิม แต่ยกระดับด้วยกรอบ แถบหัวข้อ custom shapes และ typography hierarchy แบบงานประชาสัมพันธ์
+- ห้ามเปลี่ยนภาพจริงให้เป็นการ์ตูนหรือสร้างบุคคลใหม่ ห้ามใช้เอฟเฟกต์บังใบหน้าและสาระสำคัญ
+- แม้ใช้ภาพถ่าย ผลลัพธ์ต้องดูเป็น PR key visual ที่ออกแบบเฉพาะงาน ไม่ใช่แค่ภาพถ่ายแปะข้อความ` : `
+=== HIGH-PRODUCTION ILLUSTRATED THAI PR PROFILE — DEFAULT ===
+- ค่าเริ่มต้นต้องเป็นโปสเตอร์กราฟิกประชาสัมพันธ์ไทยแบบ richly layered illustration ผสม vector + polished 3D ไม่ใช่ภาพถ่ายพื้นหลังใบเดียวแปะข้อความ
+- สร้างอย่างน้อย 5 ชั้นที่มีหน้าที่ชัด: atmospheric background, hero illustration/object, dimensional Thai headline, supporting visual motifs และ information/footer zone
+- หัวข้อหลักใช้ตัวอักษรไทยหนา custom display lettering มี outline, extrusion/bevel, controlled shadow และ contrast สูงตามอารมณ์งาน ห้ามใช้ตัวอักษรบางวางกลางภาพแบบ Quote Card ทั่วไป
+- ใช้ฉากวาดหรือฉากจำลอง, hero object, icon/sticker 3D, ribbon, badge, capsule และ custom panel เท่าที่ช่วยเล่าเรื่อง โดยทุกองค์ประกอบต้องเกี่ยวข้องกับบรีฟ
+- หากข้อมูลจริงมีน้อย ให้เพิ่มความสมบูรณ์ด้วย visual storytelling, สี, แสง, texture และองค์ประกอบเชิงสัญลักษณ์ ห้ามเติมข้อความ ตัวเลข บุคคล โลโก้ หรือข้อเท็จจริงใหม่
+- งานคำคมหรือข้อความสั้นต้องทำเป็น illustrated campaign poster: หัวข้อเด่น + hero metaphor + graphic environment ห้ามใช้โต๊ะ กาแฟ นาฬิกา หรือ stock-photo scene เป็นภาพหลัก เว้นแต่ผู้ใช้ขอภาพถ่าย
+- ใช้ชุดสีหลัก 3–4 สีแบบ premium high-saturation พร้อม white highlight และ dark anchor ให้ภาพสด มีมิติ และยังอ่านง่าย
+- รายละเอียดต้องแน่นอย่างมีระบบ แต่ไม่รก: หนึ่ง Big Idea, หนึ่ง hero visual และ motif สนับสนุนไม่เกินสามอย่าง
+- หาก Router เลือก Formal & Respectful ให้ลด saturation ตัดเอฟเฟกต์สนุกและตัวอักษร 3D ที่ไม่เหมาะสม แต่ยังรักษาคุณภาพแบบ layered editorial design`;
     const hasRealPhotos = Number(d.photoCount || 0) > 0;
     const mode = clean(d.useMode, "สร้างภาพใหม่ด้วย AI");
     const confirmedFacts = unique(a.facts);
@@ -274,6 +292,7 @@ ${silentQualityGate([
 - Color: ${clean(d.colorTone || a.design.color, "เหมาะกับบริบท")}
 - Layout: ${clean(d.layout || a.design.layout, "อ่านง่าย มีลำดับชัด")}
 - Density: ${clean(d.density, "สมดุล อ่านง่าย")}
+- Production quality: ${clean(d.qualityLevel, "High-Production PR — งานกราฟิกหลายชั้น")}
 - จุดเน้น: ${clean(d.brainFocus || d.focus, a.design.hierarchy?.[0] || d.title || "สารหลัก")}
 
 === PR CREATIVE ROUTER — DEFAULT FOR EVERY IMAGE ===
@@ -282,13 +301,14 @@ ${silentQualityGate([
   1) Civic Announcement — ข่าว ประกาศ แจ้งเตือน: หัวข้อทรงพลัง contrast สูง ข้อมูลสำคัญอ่านเร็ว
   2) Community Invitation — กิจกรรม ชุมชน การศึกษา: สดใส อบอุ่น มีฉากเล่าเรื่องและภาพประกอบเป็นมิตร
   3) Service Infographic — ขั้นตอน ความรู้ สุขภาพ: editorial infographic การ์ดข้อมูลและลำดับสายตาชัด
-  4) Social Campaign — โปรโมชัน ผลงาน เพลง รณรงค์: bold campaign visual, dramatic crop, emotional hook
+  4) Social Campaign — โปรโมชัน ผลงาน เพลง คำคม รณรงค์: layered illustrated campaign, dimensional typography, hero metaphor และ emotional hook
   5) Formal & Respectful — พิธีการ ไว้อาลัย เรื่องอ่อนไหว: สุภาพ สงบ ลดสี ใช้พื้นที่ว่างและ typography อย่างให้เกียรติ
-- ห้ามผสมหลายตระกูลจนภาพไร้ทิศทาง และห้ามใช้ม่วง–ทองหรือหัวข้อ 3D กับทุกงาน ให้สี รูปทรง และระดับเอฟเฟกต์เกิดจากความหมายของบรีฟ
+- ห้ามผสมหลายตระกูลจนภาพไร้ทิศทาง และห้ามใช้ม่วง–ทองหรือ Layout เดิมกับทุกงาน ให้สี รูปทรง และระดับเอฟเฟกต์เกิดจากความหมายของบรีฟ
 - ทุกภาพต้องมี signature visual device เฉพาะเรื่องหนึ่งอย่าง เช่น visual metaphor, ฉากจำลอง, วัตถุฮีโร่, เส้นนำสายตา หรือกรอบข้อมูลที่ออกแบบเฉพาะงาน
 - จัดลำดับแบบ Headline-first: ผู้ชมต้องรู้ภายใน 3 วินาทีว่าเรื่องอะไร สำคัญอย่างไร และควรทำอะไรต่อ จากนั้นจึงอ่านรายละเอียดรอง
 - ยกระดับงานด้วย typography hierarchy, layered depth, custom shapes, controlled lighting, purposeful illustration และ mobile-safe spacing โดยคงความเป็นงานประชาสัมพันธ์ไทยร่วมสมัย
 - สร้างงานต้นฉบับใหม่ทุกครั้ง ห้ามเลียนแบบ Layout ตรา ตัวละคร หรือองค์ประกอบเฉพาะจากผลงานของผู้อื่น
+${productionProfile}
 
 === CREATIVE DIRECTOR MODE ===
 - ล็อกเฉพาะข้อเท็จจริง แต่เปิดอิสระเต็มที่ในการสร้างฉาก แสง สี มุมมอง อารมณ์ สไตล์ จังหวะภาพ และ Layout
