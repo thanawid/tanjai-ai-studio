@@ -2,7 +2,7 @@ window.TANJAI = window.TANJAI || {};
 
 /**
  * ===================================================
- * TANJAI AI Studio v9.1.4 — Prompt Brain Engine
+ * TANJAI AI Studio v9.1.4 — Prompt Brain Engine (base layer, upgraded by v9.1.5)
  * ===================================================
  * Purpose:
  * - Turn raw form answers into professional, safe, complete execution prompts.
@@ -247,8 +247,8 @@ window.TANJAI = window.TANJAI || {};
     const base = originalField ? originalField(prefix, data) : "";
     return base + `
       <div class="form-section brain-engine-section-v914">
-        <div class="section-title"><b>🧠</b><h4>Prompt Brain Engine</h4></div>
-        <p class="mini-note">ระบบจะวิเคราะห์บรีฟ แยกข้อมูลจริง/ข้อมูลที่ห้ามแต่ง และช่วยคิด Creative Direction ให้อัตโนมัติ</p>
+        <div class="section-title"><b>🧠</b><h4>Professional Brief-to-Prompt</h4></div>
+        <p class="mini-note">ระบบจะวิเคราะห์บรีฟ แยกข้อมูลจริง / ข้อมูลที่ยังไม่ระบุ / สิ่งที่ AI ช่วยคิดได้ แล้วสร้าง Prompt พร้อมใช้จริง</p>
         <div class="form-grid">
           <label>เป้าหมายผลลัพธ์<input id="${prefix}-brainGoal" placeholder="เช่น อยากให้คนสนใจเข้าร่วม / อ่านแล้วเข้าใจเร็ว / ใช้เป็นภาพทางการ"></label>
           <label>เน้นเด่นที่สุด<input id="${prefix}-brainFocus" placeholder="เช่น ชื่องาน / วันที่ / สถานที่ / ข้อความเตือน"></label>
