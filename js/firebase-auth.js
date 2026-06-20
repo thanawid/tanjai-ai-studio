@@ -4,6 +4,9 @@ import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWith
 import { getFirestore, collection, addDoc, query, where, getDocs, deleteDoc, doc, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // Initialize Firebase
+if(!window.firebaseConfig){
+    throw new Error("Missing Firebase config");
+}
 const app = initializeApp(window.firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);

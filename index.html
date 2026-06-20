@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700;800;900&family=Noto+Sans+Thai:wght@400;500;600;700;800;900&family=Prompt:wght@500;600;700;800;900&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
   <meta name="theme-color" content="#060713">
-  <meta name="description" content="ทันใจ AI Studio — Hero Copy Refresh สำหรับสร้าง Prompt และชุดคำสั่งผลิตสื่อ">
+  <meta name="description" content="ทันใจ AI Studio v9.1.3 — ระบบจัดบรีฟและสร้าง Prompt สำหรับภาพ โพสต์ คลิป เสียง สไลด์ พร้อม guard กันส่งออกผิดรูปแบบ">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/animations.css">
 </head>
@@ -99,7 +99,7 @@
         <div class="top-actions">
           <button class="btn secondary nav-back-btn" id="topBackBtn" type="button">← ย้อนกลับ</button>
           <button class="btn secondary nav-home-btn" data-view="dashboard" type="button">หน้าหลัก</button>
-          <span class="status-pill">พร้อมใช้งาน</span><span class="version-badge">v9.1.1</span>
+          <span class="status-pill">พร้อมใช้งาน</span><span class="version-badge">v9.1.3</span>
           <div class="user-profile-top" style="display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.05); padding: 6px 16px; border-radius: 99px; border: 1px solid var(--line);">
             <div class="user-avatar" style="width: 32px; height: 32px; background: var(--grad); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white;">U</div>
             <span class="user-name" id="userDisplayName" style="font-weight: 600; font-size: 14px;">User</span>
@@ -215,7 +215,7 @@
 
         <section class="panel album-pro-summary-v861">
           <div class="panel-head">
-            <div><h3>ชุดภาพโพสต์ Facebook</h3><p>ทำชุดภาพโพสต์หลายรูป พร้อมแคปชั่น พรีวิวจำลองหน้าโพสต์ และดาวน์โหลดเป็น ZIP</p></div>
+            <div><h3>ชุดภาพโพสต์ Facebook</h3><p>ทำชุดภาพโพสต์หลายรูปจากภาพจริง พร้อมแคปชั่น พรีวิวจำลองหน้าโพสต์ และดาวน์โหลดเป็น ZIP</p></div>
             <button class="btn primary" data-view="album">เปิดชุดภาพโพสต์ Facebook</button>
           </div>
         </section>
@@ -333,6 +333,7 @@
   <script src="js/ui.js"></script>
   <script src="js/firebase-config.js"></script>
   <script type="module" src="js/firebase-auth.js"></script>
+  <script src="js/auth-fallback.js"></script>
   <script src="js/app.js"></script>
   <script src="js/album.js"></script>
   <script src="js/proofread.js"></script>

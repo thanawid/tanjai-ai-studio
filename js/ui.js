@@ -6,13 +6,33 @@ TANJAI.$$ = s => Array.from(document.querySelectorAll(s));
 
 TANJAI.toast = function(msg){
   const t = TANJAI.$("#toast");
+  if(!t){ console.log("TANJAI:", msg); return; }
   t.textContent = msg;
   t.classList.add("show");
   setTimeout(()=>t.classList.remove("show"), 2600);
 };
 
-TANJAI.copyText = function(text){
-  navigator.clipboard.writeText(text || "").then(()=>TANJAI.toast("คัดลอกแล้ว — เปิดเครื่องมือที่ต้องการ แล้วกด Ctrl+V เพื่อวาง"));
+TANJAI.copyText = async function(text){
+  const value = String(text || "");
+  try{
+    if(navigator.clipboard && window.isSecureContext !== false){
+      await navigator.clipboard.writeText(value);
+    }else{
+      const ta = document.createElement("textarea");
+      ta.value = value;
+      ta.setAttribute("readonly", "");
+      ta.style.position = "fixed";
+      ta.style.left = "-9999px";
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      ta.remove();
+    }
+    TANJAI.toast("คัดลอกแล้ว — เปิดเครื่องมือที่ต้องการ แล้วกด Ctrl+V เพื่อวาง");
+  }catch(err){
+    console.warn("Copy failed", err);
+    TANJAI.toast("คัดลอกอัตโนมัติไม่ได้ กรุณาเลือกข้อความแล้วคัดลอกเอง");
+  }
 };
 
 TANJAI.downloadText = function(text, filename){
@@ -28,6 +48,8 @@ TANJAI.validViews = ["dashboard","router","image","album","post","mc","video","v
 
 TANJAI.switchView = function(id, options = {}){
   if(!TANJAI.validViews.includes(id)) id = "dashboard";
+  TANJAI.state = TANJAI.state || {};
+  TANJAI.state.currentView = id;
 
   TANJAI.$$(".view").forEach(v => v.classList.remove("active"));
   TANJAI.$("#"+id)?.classList.add("active");
@@ -278,69 +300,14 @@ TANJAI.renderDestinations = function(){
 };
 
 
-/* v6.2.8 fallback setupNavigationHistory */
+/* v9.1.3 startup-safe utilities */
 if(!TANJAI.setupNavigationHistory){
   TANJAI.setupNavigationHistory = function(){};
 }
 
-// ตัวอย่างการแสดงภาพผลลัพธ์ในกล่อง Result
 TANJAI.showImageResult = function(imageUrl) {
   const box = document.getElementById("imageOut");
+  if(!box || !imageUrl) return;
   box.innerHTML = `<img src="${imageUrl}" style="max-width:100%; border-radius:12px;" alt="Result">
                    <a href="${imageUrl}" download class="btn primary">ดาวน์โหลดภาพ</a>`;
-};
-// แทนที่โค้ดเดิมใน ui.js ส่วน $("#imageForm").innerHTML = ... ด้วยชุดนี้ครับ
-$("#imageForm").innerHTML = TANJAI.field("image") + `
-  <details class="form-section-advanced" open>
-    <summary class="section-title"><b>2</b><h4>Creative Quality & Style (ปรับแต่งความสวย)</h4></summary>
-    <div class="form-grid">
-      <label>บริบทงาน<select id="image-workContext">${opts(toolOptions.workContexts)}</select></label>
-      <label>ประเภทภาพ<select id="image-imageType">${opts(toolOptions.imageTypes)}</select></label>
-      <label>สไตล์ภาพ<select id="image-style">${opts(TANJAI.categories.imageStyles)}</select></label>
-      <label>Layout<select id="image-layout">${opts(toolOptions.layouts)}</select></label>
-    </div>
-  </details>
-
-  <details class="form-section-advanced">
-    <summary class="section-title"><b>3</b><h4>การปกป้องภาพและโหมดการใช้ (Safety & Mode)</h4></summary>
-    <div class="form-grid">
-       <label class="full">โหมดการใช้ภาพ<select id="image-useMode">
-          <option>สร้างภาพใหม่ด้วย AI</option>
-          <option>ใช้ภาพจริงเป็นต้นฉบับ</option>
-       </select></label>
-       <!-- ใส่ Safe Check Grid ตรงนี้ -->
-    </div>
-  </details>
-
-  <div class="button-row" style="margin-top:20px;">
-    <button class="btn primary" id="makeImage" style="width:100%; padding:15px;">สร้างภาพด้วย AI ทันที</button>
-  </div>
-`;
-$("#makeImage").onclick = async () => {
-  const d = getImageDataForPrompt();
-  const btn = $("#makeImage");
-  
-  // 1. เปลี่ยนสถานะปุ่ม
-  btn.textContent = "กำลังร่ายมนตร์ AI...";
-  btn.disabled = true;
-
-  try {
-    // 2. เรียกฟังก์ชันสร้างภาพ
-    const imageUrl = await TANJAI.generateInAppImage(d);
-    
-    // 3. แสดงผลในหน้าเว็บ
-    const resultBox = $("#imageOut");
-    resultBox.innerHTML = `
-      <div class="generated-image-wrap">
-        <img src="${imageUrl}" style="width:100%; border-radius:16px; border: 2px solid var(--accent);" alt="Result">
-        <a href="${imageUrl}" download="tanjai-ai-image.jpg" class="btn primary" style="margin-top:10px; width:100%">ดาวน์โหลดภาพ</a>
-      </div>
-    `;
-    TANJAI.toast("สร้างภาพเสร็จแล้ว!");
-  } catch (err) {
-    TANJAI.toast("เกิดข้อผิดพลาดในการสร้างภาพ");
-  } finally {
-    btn.textContent = "สร้างภาพด้วย AI ทันที";
-    btn.disabled = false;
-  }
 };

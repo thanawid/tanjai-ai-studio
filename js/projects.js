@@ -17,21 +17,29 @@ TANJAI.escapeHtml = function(text) {
 };
 
 // Firebase Integrated Projects Module
+TANJAI.isCloudAuth = function(){
+  const user = window.TANJAI_AUTH && window.TANJAI_AUTH.getCurrentUser && window.TANJAI_AUTH.getCurrentUser();
+  return !!(user && user.uid && user.mode !== "local-fallback");
+};
+
+TANJAI.saveProjectLocal = function(title, text, tool){
+  const items = JSON.parse(localStorage.getItem("tanjaiV5Projects") || "[]");
+  items.unshift({
+    title: String(title || "").trim(),
+    text: String(text || "").trim(),
+    tool: String(tool || "").trim(),
+    date: new Date().toLocaleString("th-TH")
+  });
+  localStorage.setItem("tanjaiV5Projects", JSON.stringify(items.slice(0, 80)));
+  TANJAI.renderProjects();
+  TANJAI.toast("บันทึกโปรเจกต์ (Local) แล้ว");
+};
+
 TANJAI.saveProject = function(title, text, tool) {
-  if (window.TANJAI_AUTH && window.TANJAI_AUTH.saveProjectToCloud) {
+  if (TANJAI.isCloudAuth() && window.TANJAI_AUTH && window.TANJAI_AUTH.saveProjectToCloud) {
     window.TANJAI_AUTH.saveProjectToCloud(title, text, tool);
   } else {
-    // Fallback to local if Firebase not ready
-    const items = JSON.parse(localStorage.getItem("tanjaiV5Projects") || "[]");
-    items.unshift({
-      title: String(title || "").trim(),
-      text: String(text || "").trim(),
-      tool: String(tool || "").trim(),
-      date: new Date().toLocaleString("th-TH")
-    });
-    localStorage.setItem("tanjaiV5Projects", JSON.stringify(items.slice(0, 80)));
-    TANJAI.renderProjects();
-    TANJAI.toast("บันทึกโปรเจกต์ (Local) แล้ว");
+    TANJAI.saveProjectLocal(title, text, tool);
   }
 };
 
@@ -40,7 +48,7 @@ TANJAI.renderProjects = async function() {
   if (!el) return;
   
   let items = [];
-  if (window.TANJAI_AUTH && window.TANJAI_AUTH.getCurrentUser()) {
+  if (TANJAI.isCloudAuth() && window.TANJAI_AUTH && window.TANJAI_AUTH.getProjectsFromCloud) {
     el.innerHTML = `<div class="empty-state"><b>กำลังโหลดงานจาก Cloud...</b></div>`;
     items = await window.TANJAI_AUTH.getProjectsFromCloud();
   } else {
@@ -78,7 +86,7 @@ TANJAI.renderProjects = async function() {
       const projectId = btn.dataset.id;
       
       if (confirm("คุณต้องการลบโปรเจกต์นี้ใช่หรือไม่?")) {
-        if (projectId && window.TANJAI_AUTH) {
+        if (projectId && TANJAI.isCloudAuth() && window.TANJAI_AUTH) {
           await window.TANJAI_AUTH.deleteProjectFromCloud(projectId);
         } else {
           items.splice(idx, 1);
