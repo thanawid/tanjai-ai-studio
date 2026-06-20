@@ -4117,3 +4117,98 @@ textarea:focus-visible{
     margin:5px 0 0;
   }
 }
+
+/* Quick Mode — fewer visible steps, full power under one optional panel */
+.quick-mode-banner{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin:0 0 12px;
+  border:1px solid rgba(34,211,238,.24);
+  border-radius:16px;
+  padding:10px 13px;
+  background:linear-gradient(135deg,rgba(6,182,212,.10),rgba(99,102,241,.08));
+  color:#dbeafe;
+}
+.quick-mode-banner b{
+  flex:0 0 auto;
+  border-radius:999px;
+  padding:5px 8px;
+  background:rgba(34,211,238,.14);
+  color:#a5f3fc;
+  font-size:10px;
+  letter-spacing:.09em;
+}
+.quick-mode-banner span{font-size:12px;line-height:1.5}
+
+.quick-brief-section{
+  border-color:rgba(56,189,248,.26) !important;
+  background:
+    radial-gradient(circle at top right,rgba(56,189,248,.09),transparent 34%),
+    rgba(255,255,255,.035) !important;
+}
+.quick-advanced{
+  margin-top:14px;
+  border:1px solid rgba(148,163,184,.18);
+  border-radius:15px;
+  background:rgba(3,7,18,.28);
+  overflow:hidden;
+}
+.standalone-advanced{margin:12px 0 14px}
+.quick-advanced > summary{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:12px 14px;
+  color:#dbeafe;
+  font-weight:800;
+  cursor:pointer;
+  list-style:none;
+  user-select:none;
+}
+.quick-advanced > summary::-webkit-details-marker{display:none}
+.quick-advanced > summary::after{
+  content:"＋";
+  color:#7dd3fc;
+  font-size:18px;
+  line-height:1;
+}
+.quick-advanced[open] > summary::after{content:"−"}
+.quick-advanced > summary small{
+  margin-left:auto;
+  color:var(--muted);
+  font-size:11px;
+  font-weight:600;
+}
+.quick-advanced-body{
+  border-top:1px solid rgba(148,163,184,.14);
+  padding:14px;
+}
+.quick-advanced-body > .form-section{
+  margin:12px 0 0;
+  background:rgba(255,255,255,.025);
+}
+.quick-advanced-grid:empty{display:none}
+.form-panel > div[id$="Form"] > .button-row{
+  position:sticky;
+  bottom:10px;
+  z-index:12;
+  border:1px solid rgba(148,163,184,.18);
+  border-radius:18px;
+  padding:10px;
+  background:rgba(7,10,25,.88);
+  backdrop-filter:blur(18px);
+  box-shadow:0 16px 44px rgba(0,0,0,.30);
+}
+
+@media(max-width:720px){
+  .quick-mode-banner{align-items:flex-start}
+  .quick-mode-banner span{font-size:11px}
+  .quick-advanced-body{padding:12px}
+  .form-panel > div[id$="Form"] > .button-row{
+    bottom:calc(92px + env(safe-area-inset-bottom,0px));
+    display:grid;
+    grid-template-columns:1fr auto;
+  }
+}

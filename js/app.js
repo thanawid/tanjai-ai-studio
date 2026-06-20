@@ -263,6 +263,8 @@ document.addEventListener("DOMContentLoaded", () => {
     </div>
     <div class="button-row"><button class="btn primary" id="makeKit">สร้าง Prompt สั่งทำทันที</button><button class="btn secondary" id="saveKit">บันทึก</button></div>`;
 
+  TANJAI.simplifyExpertForms?.();
+
   // Results
   $("#imageResult").innerHTML = TANJAI.readyOutputShell("image", "Expert Prompt ภาพ — Art Director", "Prompt เฉพาะงานภาพ พร้อม Creative Direction, Production Prompt และ Negative Prompt", "imageOut");
 $("#albumResult").innerHTML = TANJAI.readyOutputShell("album", "ชุดภาพพร้อมโพสต์", "ปรับภาพจริง ใส่กรอบ และดาวน์โหลดเป็นภาพพร้อมลง Facebook", "albumOut");
