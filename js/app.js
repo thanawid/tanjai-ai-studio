@@ -35,56 +35,56 @@ document.addEventListener("DOMContentLoaded", () => {
   $("#routerForm").innerHTML = `<div class="form-section"><div class="section-title"><b>?</b><h4>อยากทำอะไรครับ?</h4></div><label class="full">พิมพ์โจทย์ของพี่<textarea id="router-query" placeholder="เช่น อยากทำโพสต์ประชาสัมพันธ์โครงการปลูกต้นไม้ / อยากทำเสียงพากย์คลิปแจ้งข่าว / อยากทำสไลด์นำเสนอ"></textarea></label></div><div class="button-row"><button class="btn primary" id="askRouter">ให้ Router แนะนำ</button><button class="btn secondary" id="goRecommended">ไปที่เมนูที่แนะนำ</button></div>`;
   $("#routerResult").innerHTML = TANJAI.resultShell("router", "คำแนะนำจาก AI Router", "ระบบจะแนะนำเมนูและปลายทางที่เหมาะกับโจทย์", "routerOut", `<button class="btn primary" data-copybox="routerOut">คัดลอกคำแนะนำ</button>`);
 
-  $("#imageForm").innerHTML = TANJAI.field("image") + `
-    <div class="form-section creative-quality-wrap-v91"><div class="section-title"><b>2</b><h4>บริบทงาน + Creative Quality</h4></div>
-      <p class="mini-note">เลือกให้ใกล้กับงานที่สุด ระบบจะช่วยคิดโทน / รูปแบบ / ความหนาแน่นให้พอดี ไม่เว่อร์ และไม่มั่วข้อมูลจริง</p>
-      <div class="form-grid">
-        <label>บริบทงาน<select id="image-workContext">${opts(toolOptions.workContexts)}</select></label>
-        <label>ประเภทภาพ<select id="image-imageType">${opts(toolOptions.imageTypes)}</select></label>
-        <label>ระดับคุณภาพงาน<select id="image-qualityLevel">${opts(toolOptions.qualityLevels)}</select></label>
-        <label>ระดับการคิดต่อ<select id="image-creativityLevel">${opts(toolOptions.creativityLevels)}</select></label>
-        <div class="full preset-wrap">
-          <small class="preset-label">ตัวเลือกเร็วตามงานจริง</small>
-          <div class="preset-row creative-preset-row-v91">
-            <button type="button" class="chip-btn" data-v91-context="โปรโมทเพลง / ผลงานสร้างสรรค์" data-v91-type="ปกเพลง / โปรโมทเพลง">โปรโมทเพลง</button>
-            <button type="button" class="chip-btn" data-v91-context="แจ้งข่าว / ประกาศ" data-v91-type="ภาพแจ้งข่าว">แจ้งข่าว</button>
-            <button type="button" class="chip-btn" data-v91-context="เชิญชวน / ประชาสัมพันธ์" data-v91-type="ภาพเชิญชวนกิจกรรม">เชิญร่วมงาน</button>
-            <button type="button" class="chip-btn" data-v91-context="ให้ความรู้ / Infographic" data-v91-type="อินโฟกราฟิก">Infographic</button>
-            <button type="button" class="chip-btn" data-v91-context="สรุปกิจกรรม / รายงานผล" data-v91-type="ภาพสรุปกิจกรรม">สรุปกิจกรรม</button>
-            <button type="button" class="chip-btn" data-v91-context="ไว้อาลัย / สุภาพ / ลดสี" data-v91-type="ภาพไว้อาลัย / สุภาพ">ลดสี / ไว้อาลัย</button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="form-section"><div class="section-title"><b>2</b><h4>ภาพอ้างอิง / ภาพจริง</h4></div>
-      <div class="form-grid">
+  $("#imageForm").innerHTML = `
+    <div class="form-section image-step-card">
+      <div class="section-title"><b>1</b><h4>ข้อมูลงาน</h4></div>
+      <p class="mini-note">กรอกเท่าที่มี ระบบจะช่วยคิดต่อให้อัตโนมัติแบบไม่มั่วข้อมูลจริง</p>
+      <div class="form-grid image-compact-grid">
+        <label>หัวข้องาน<input id="image-title" placeholder="เช่น ชื่องาน / ประกาศ / กิจกรรม / แคมเปญ / โปรโมชัน"></label>
+        <label>ชื่อองค์กร / หน่วยงาน<input id="image-orgName" placeholder="เช่น เทศบาลเมืองบางรักน้อย / หน่วยงาน / แบรนด์"></label>
+        <label class="full">รายละเอียดเบื้องต้น<textarea id="image-detail" placeholder="ใส่ข้อมูลจริงของงาน เช่น ใคร / ทำอะไร / เพื่ออะไร / จุดสำคัญที่ต้องการสื่อ"></textarea></label>
+        <label class="full">ข้อความบนภาพ (ถ้ามี)<textarea id="image-textOnImage" placeholder="เช่น ขอเชิญร่วมวิ่งการกุศล
+เทศบาลเมืองบางรักน้อย
+จากข้อมูลเบื้องต้น"></textarea><small>ใส่เฉพาะข้อความที่อยากให้ปรากฏในภาพจริง ระบบจะหยิบไปใช้ก่อนข้อความอื่น</small></label>
+        <label>วัน / เวลา<input id="image-dateTime" placeholder="ถ้ามี"></label>
+        <label>สถานที่<input id="image-place" placeholder="ถ้ามี"></label>
         <label class="full">แนบภาพจริง / ภาพอ้างอิง
           <input id="image-photos" type="file" accept="image/*" multiple>
-          <small>ถ้าเป็นภาพบุคคลจริง ภาพกิจกรรม หรือภาพผู้บริหาร แนะนำใช้โหมดภาพจริงเพื่อคงหน้าคนและฉากเดิม</small>
+          <small>ถ้ามีภาพบุคคลจริง ภาพกิจกรรม หรือภาพผู้บริหาร ระบบจะแนะนำโหมดภาพจริงให้เพื่อลดโอกาสหน้าเพี้ยน</small>
           <div id="image-photoPreview" class="upload-preview-grid"></div>
         </label>
       </div>
     </div>
-    <div class="form-section"><div class="section-title"><b>3</b><h4>โหมดการใช้ภาพ</h4></div>
-      <div class="form-grid">
-        <label class="full">โหมดการใช้ภาพ<select id="image-useMode">
+
+    <div class="form-section image-step-card">
+      <div class="section-title"><b>2</b><h4>รูปแบบภาพ</h4></div>
+      <p class="mini-note">เลือกเท่าที่จำเป็น ที่เหลือระบบจะจัดโทนและรูปแบบให้เอง</p>
+      <div class="form-grid image-compact-grid">
+        <label>โหมดการใช้ภาพ<select id="image-useMode">
           <option>สร้างภาพใหม่ด้วย AI</option>
           <option>ใช้ภาพจริงเป็นต้นฉบับ</option>
           <option>ปรับภาพจริง + ใส่กราฟิก</option>
           <option>รีทัชภาพจริง</option>
-        </select><small>เลือกให้ตรงกับลักษณะงาน เพื่อลดโอกาสหน้าเพี้ยนและช่วยให้ Prompt แม่นขึ้น</small></label>
+        </select><small>ถ้ามีภาพคนจริง แนะนำใช้โหมดภาพจริง</small></label>
+        <label>ช่องทาง / ขนาดภาพ<select id="image-size">${opts(TANJAI.categories.sizes)}</select></label>
+        <label>บริบทงาน<select id="image-workContext">${opts(toolOptions.workContexts)}</select></label>
+        <label>ประเภทภาพ<select id="image-imageType">${opts(toolOptions.imageTypes)}</select></label>
+        <label>โทนสี<select id="image-colorTone">${opts(toolOptions.colorTones)}</select></label>
         <label id="image-originalityWrap">ระดับการคงต้นฉบับ<select id="image-originalityLevel">
           <option>สูงสุด — คงคน คงฉาก คงองค์ประกอบเดิมมากที่สุด</option>
           <option>สมดุล — ปรับภาพได้มากขึ้น แต่ยังไม่เปลี่ยนบุคคล</option>
           <option>ยืดหยุ่น — ใช้เมื่อยอมให้มีการตกแต่งภาพมากขึ้น</option>
         </select></label>
-        <div class="full preset-wrap">
-          <small class="preset-label">Preset ใช้งานเร็ว</small>
-          <div class="preset-row">
-            <button type="button" class="chip-btn" data-image-preset="real-post">โพสต์จากภาพจริง</button>
-            <button type="button" class="chip-btn" data-image-preset="real-poster">โปสเตอร์จากภาพจริง</button>
-            <button type="button" class="chip-btn" data-image-preset="beautify">ปรับภาพให้สวย</button>
-            <button type="button" class="chip-btn" data-image-preset="retouch">รีทัชแบบไม่เปลี่ยนคน</button>
+        <div class="full preset-wrap simplified-preset-wrap">
+          <small class="preset-label">เลือกเร็ว</small>
+          <div class="preset-row creative-preset-row-v91 image-simple-preset-grid">
+            <button type="button" class="chip-btn municipal-chip" data-image-quick="municipal">เทศบาล ม่วง–ทอง</button>
+            <button type="button" class="chip-btn" data-v91-context="แจ้งข่าว / ประกาศ" data-v91-type="ภาพแจ้งข่าว">แจ้งข่าว</button>
+            <button type="button" class="chip-btn" data-v91-context="เชิญชวน / ประชาสัมพันธ์" data-v91-type="ภาพเชิญชวนกิจกรรม">เชิญร่วมงาน</button>
+            <button type="button" class="chip-btn" data-v91-context="ให้ความรู้ / Infographic" data-v91-type="อินโฟกราฟิก">Infographic</button>
+            <button type="button" class="chip-btn" data-v91-context="สรุปกิจกรรม / รายงานผล" data-v91-type="ภาพสรุปกิจกรรม">สรุปกิจกรรม</button>
+            <button type="button" class="chip-btn" data-image-preset="real-post">ใช้ภาพจริง</button>
+            <button type="button" class="chip-btn" data-v91-context="ไว้อาลัย / สุภาพ / ลดสี" data-v91-type="ภาพไว้อาลัย / สุภาพ">ไว้อาลัย</button>
           </div>
         </div>
         <div id="image-photoHint" class="full soft-alert" hidden>พบภาพแนบจริง แนะนำใช้โหมด “ใช้ภาพจริงเป็นต้นฉบับ” เพื่อป้องกันหน้าเพี้ยน</div>
@@ -97,46 +97,54 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
       </div>
     </div>
+
     <input id="image-smartCoach" type="hidden" value="on">
     <input id="image-smartThinking" type="hidden" value="ให้ AI ช่วยคิดต่ออัตโนมัติ">
     <input id="image-smartOutput" type="hidden" value="สรุปคำสั่ง + Prompt พร้อมส่งเข้า GPT">
     <input id="image-smartBackup" type="hidden" value="on">
     <input id="image-smartConfirm" type="hidden" value="on">
     <input id="image-smartMunicipal" type="hidden" value="on">
-    <div class="form-section" id="image-safetyWrap">
-<div class="section-title"><b>4</b><h4>การปกป้องภาพจริง</h4></div>
-      <p class="mini-note">เหมาะสำหรับภาพกิจกรรม ภาพผู้บริหาร ภาพประชาสัมพันธ์ และภาพถ่ายจริงที่ต้องการคงบุคคลเดิม</p>
-      <div class="safe-check-grid">
-        <label class="checkline"><input id="image-safeUseMain" type="checkbox" checked> ใช้ภาพจริงเป็นภาพหลัก</label>
+
+    <div class="form-section image-step-card">
+      <div class="section-title"><b>3</b><h4>ตั้งค่าเพิ่มเติม</h4></div>
+      <p class="mini-note">ไม่จำเป็นต้องเปิดทุกครั้ง ถ้าต้องการคุมงานละเอียดค่อยขยายเพิ่ม</p>
+      <div class="quick-check-grid image-quick-check-grid">
+        <label class="checkline"><input id="image-municipalPreset" type="checkbox" checked> งานเทศบาลใช้โทนม่วง–ทองอัตโนมัติ</label>
         <label class="checkline"><input id="image-safeFace" type="checkbox" checked> ห้ามเปลี่ยนใบหน้า</label>
-        <label class="checkline"><input id="image-safeNewPerson" type="checkbox" checked> ห้ามสร้างบุคคลใหม่</label>
-        <label class="checkline"><input id="image-safeLook" type="checkbox" checked> ห้ามเปลี่ยนทรงผม / ชุด / รูปร่าง</label>
-        <label class="checkline"><input id="image-safeScene" type="checkbox" checked> ห้ามเปลี่ยนฉากหลัก</label>
-        <label class="checkline"><input id="image-safeAdjustOnly" type="checkbox" checked> อนุญาตเฉพาะการปรับแสง สี ความคมชัด</label>
-        <label class="checkline"><input id="image-safeOverlay" type="checkbox" checked> อนุญาตให้ใส่ข้อความ / กรอบ / กล่องข้อความ / กราฟิกเสริม</label>
-        <label class="checkline"><input id="image-safeNoCover" type="checkbox" checked> ห้ามบังใบหน้าหรือรายละเอียดสำคัญ</label>
+        <label class="checkline"><input id="image-safeNoCover" type="checkbox" checked> ห้ามบังใบหน้าหรือจุดสำคัญ</label>
       </div>
+      <details class="image-advanced-details">
+        <summary>เปิดตัวเลือกขั้นสูง</summary>
+        <div class="form-grid image-advanced-grid">
+          <label>ประเภทองค์กร<select id="image-orgType">${opts(toolOptions.orgTypes)}</select></label>
+          <label>กลุ่มเป้าหมาย<select id="image-audience">${opts(TANJAI.categories.audiences)}</select></label>
+          <label>โทนภาษา<select id="image-tone">${opts(TANJAI.categories.tones)}</select></label>
+          <label>ระดับคุณภาพงาน<select id="image-qualityLevel">${opts(toolOptions.qualityLevels)}</select></label>
+          <label>ระดับการคิดต่อ<select id="image-creativityLevel">${opts(toolOptions.creativityLevels)}</select></label>
+          <label>สไตล์ภาพ<select id="image-style">${opts(TANJAI.categories.imageStyles)}</select></label>
+          <label>Layout<select id="image-layout">${opts(toolOptions.layouts)}</select></label>
+          <label>ความหนาแน่น<select id="image-density">${opts(toolOptions.densities)}</select></label>
+          <label>จุดเด่นของภาพ<select id="image-focus">${opts(toolOptions.focuses)}</select></label>
+          <label>หมวดงานหลัก<select id="image-mainCategory">${opts(toolOptions.mainCategories)}</select></label>
+          <label>หัวข้องานย่อย<select id="image-subCategory">${opts(toolOptions.subCategories)}</select></label>
+          <label class="full">บุคคล / หน่วยงานที่เกี่ยวข้อง<input id="image-people" placeholder="ถ้ามี"></label>
+          <div class="full form-note compact-note">ระบบล็อกข้อห้ามสำคัญให้อัตโนมัติ เช่น ห้ามแต่งข้อมูลจริง ห้ามสร้างโลโก้ปลอม และห้ามตอบเป็น path ภายใน</div>
+          <div class="full form-section nested-safety-card" id="image-safetyWrap">
+            <div class="section-title compact-title"><b>✓</b><h4>การปกป้องภาพจริง</h4></div>
+            <div class="safe-check-grid">
+              <label class="checkline"><input id="image-safeUseMain" type="checkbox" checked> ใช้ภาพจริงเป็นภาพหลัก</label>
+              <label class="checkline"><input id="image-safeNewPerson" type="checkbox" checked> ห้ามสร้างบุคคลใหม่</label>
+              <label class="checkline"><input id="image-safeLook" type="checkbox" checked> ห้ามเปลี่ยนทรงผม / ชุด / รูปร่าง</label>
+              <label class="checkline"><input id="image-safeScene" type="checkbox" checked> ห้ามเปลี่ยนฉากหลัก</label>
+              <label class="checkline"><input id="image-safeAdjustOnly" type="checkbox" checked> อนุญาตเฉพาะการปรับแสง สี ความคมชัด</label>
+              <label class="checkline"><input id="image-safeOverlay" type="checkbox" checked> อนุญาตให้ใส่ข้อความ / กรอบ / กราฟิกเสริม</label>
+            </div>
+          </div>
+          <label class="full">ข้อห้าม / หมายเหตุ<textarea id="image-avoid" placeholder="เช่น ห้ามสร้าง QR ปลอม ห้ามวาดโลโก้ใหม่ เว้นพื้นที่ด้านบน ใช้รูปจริงตามแนบ"></textarea></label>
+        </div>
+      </details>
+      <div class="button-row"><button class="btn primary" id="makeImage">สร้าง Prompt ภาพทันที</button><button class="btn secondary" id="saveImage">บันทึก</button></div>
     </div>
-    <div class="form-section"><div class="section-title"><b>5</b><h4>ประเภทงานและช่องทาง</h4></div>
-      <div class="form-grid">
-        <label>ประเภทองค์กร<select id="image-orgType">${opts(toolOptions.orgTypes)}</select></label>
-        <label>หมวดงานหลัก<select id="image-mainCategory">${opts(toolOptions.mainCategories)}</select></label>
-        <label>หัวข้องานย่อย<select id="image-subCategory">${opts(toolOptions.subCategories)}</select></label>
-        <label>ช่องทาง / ขนาดภาพ<select id="image-size">${opts(TANJAI.categories.sizes)}</select></label>
-      </div>
-    </div>
-    <div class="form-section"><div class="section-title"><b>6</b><h4>แนวภาพและความสวย</h4></div>
-      <div class="form-grid">
-        <label>สไตล์ภาพ<select id="image-style">${opts(TANJAI.categories.imageStyles)}</select></label>
-        <label>Layout<select id="image-layout">${opts(toolOptions.layouts)}</select></label>
-        <label>โทนสี<select id="image-colorTone">${opts(toolOptions.colorTones)}</select></label>
-        <label>ความหนาแน่น<select id="image-density">${opts(toolOptions.densities)}</select></label>
-        <label>จุดเด่นของภาพ<select id="image-focus">${opts(toolOptions.focuses)}</select></label>
-        <label>โทนภาษา<select id="image-tone">${opts(TANJAI.categories.tones)}</select></label>
-        <label class="full">ข้อห้าม / หมายเหตุ<textarea id="image-avoid" placeholder="เช่น ห้ามสร้าง QR ปลอม ห้ามวาดโลโก้ใหม่ เว้นพื้นที่ด้านบน ใช้รูปจริงตามแนบ"></textarea></label>
-      </div>
-    </div>
-    <div class="button-row"><button class="btn primary" id="makeImage">สร้าง Prompt ภาพทันที</button><button class="btn secondary" id="saveImage">บันทึก</button></div>
   `;
 
   $("#albumForm").innerHTML = `
@@ -806,6 +814,24 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "Prompt สคริป
     return;
   };
 
+  const isMunicipalImageJob = () => {
+    const orgType = $("#image-orgType")?.value || "";
+    const orgName = $("#image-orgName")?.value || "";
+    return /เทศบาล|อบต\.|องค์การบริหารส่วนตำบล|หน่วยงานราชการ/.test(`${orgType} ${orgName}`);
+  };
+
+  const applyMunicipalImageDefaults = (toast=false) => {
+    const allow = $("#image-municipalPreset");
+    if(allow && !allow.checked) return;
+    if(!isMunicipalImageJob()) return;
+    setSelectOptionValue("#image-colorTone", "ม่วง–ทอง พรีเมียม");
+    setSelectOptionValue("#image-style", "Modern Premium Clean");
+    setSelectOptionValue("#image-tone", "ทางการ สุภาพ อ่านง่าย");
+    const currentCtx = $("#image-workContext")?.value || "";
+    if(!currentCtx || currentCtx === "ให้ AI ช่วยเลือกจากรายละเอียด") setSelectOptionValue("#image-workContext", "เชิญชวน / ประชาสัมพันธ์");
+    if(toast) TANJAI.toast("ตั้งค่าโทนเทศบาล ม่วง–ทองให้แล้ว");
+  };
+
   const applyV91CreativePreset = (ctx, imageType, toast=true) => {
     if(ctx) setSelectOptionValue("#image-workContext", ctx);
     if(imageType) setSelectOptionValue("#image-imageType", imageType);
@@ -821,6 +847,7 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "Prompt สคริป
       setSelectOptionValue("#image-mainCategory", preset.mainCategory);
       setSelectOptionValue("#image-subCategory", preset.subCategory);
     }
+    applyMunicipalImageDefaults(false);
     refreshV91QualityPreview();
     if(toast) TANJAI.toast("ตั้งค่า Creative Quality ตามบริบทงานให้แล้ว");
   };
@@ -830,11 +857,21 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "Prompt สคริป
     $("#image-imageType")?.addEventListener("change", refreshV91QualityPreview);
     $("#image-qualityLevel")?.addEventListener("change", refreshV91QualityPreview);
     $("#image-creativityLevel")?.addEventListener("change", refreshV91QualityPreview);
-    $$("[data-v91-context]").forEach(btn => btn.addEventListener("click", () => {
+    $("#image-orgName")?.addEventListener("input", () => applyMunicipalImageDefaults(false));
+    $("#image-orgType")?.addEventListener("change", () => applyMunicipalImageDefaults(false));
+    $("#image-municipalPreset")?.addEventListener("change", () => applyMunicipalImageDefaults(false));
+    $$('[data-v91-context]').forEach(btn => btn.addEventListener("click", () => {
       applyV91CreativePreset(btn.dataset.v91Context, btn.dataset.v91Type, true);
-      $$("[data-v91-context]").forEach(b => b.classList.remove("selected"));
+      $$('[data-v91-context]').forEach(b => b.classList.remove("selected"));
       btn.classList.add("selected");
     }));
+    $$('[data-image-quick="municipal"]').forEach(btn => btn.addEventListener("click", () => {
+      setSelectOptionValue("#image-orgType", "เทศบาล / อบต. / หน่วยงานราชการ");
+      applyMunicipalImageDefaults(true);
+      $$('[data-image-quick="municipal"]').forEach(b => b.classList.remove("selected"));
+      btn.classList.add("selected");
+    }));
+    applyMunicipalImageDefaults(false);
     refreshV91QualityPreview();
   };
 

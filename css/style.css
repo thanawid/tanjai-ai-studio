@@ -3982,3 +3982,99 @@ select option:focus{
   border-radius:14px;
   background:rgba(255,255,255,.045);
 }
+
+/* V9.1.6 — Image Menu Simplified Workflow */
+.image-step-card{
+  background:rgba(255,255,255,.04);
+}
+.image-compact-grid{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+.image-simple-preset-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:10px;
+}
+.image-simple-preset-grid .chip-btn{
+  width:100%;
+  justify-content:center;
+  text-align:center;
+}
+.municipal-chip{
+  border-color:rgba(196,146,255,.45);
+  box-shadow:0 0 0 1px rgba(255,215,130,.12) inset;
+}
+.image-quick-check-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+  margin-bottom:12px;
+}
+.image-advanced-details{
+  border:1px solid var(--line);
+  border-radius:18px;
+  background:rgba(255,255,255,.02);
+  overflow:hidden;
+}
+.image-advanced-details summary{
+  cursor:pointer;
+  list-style:none;
+  padding:14px 16px;
+  font-weight:800;
+  color:#f8fbff;
+}
+.image-advanced-details summary::-webkit-details-marker{display:none}
+.image-advanced-details[open] summary{
+  border-bottom:1px solid var(--line);
+}
+.image-advanced-grid{
+  padding:16px;
+}
+.nested-safety-card{
+  margin:0;
+  padding:14px;
+  border-radius:18px;
+  background:rgba(255,255,255,.025);
+}
+.compact-title b{
+  width:30px;
+  height:30px;
+  font-size:14px;
+}
+.compact-title h4{
+  font-size:16px;
+}
+.compact-note{
+  margin:0;
+}
+@media (max-width: 1100px){
+  .image-simple-preset-grid{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+  .image-quick-check-grid{
+    grid-template-columns:1fr;
+  }
+}
+@media (max-width: 760px){
+  .image-compact-grid,
+  .image-advanced-grid{
+    grid-template-columns:1fr;
+  }
+  .image-simple-preset-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  .image-step-card{
+    padding:16px;
+  }
+  .image-advanced-details summary{
+    padding:13px 14px;
+  }
+  .image-quick-check-grid{
+    gap:8px;
+  }
+}
+@media (max-width: 520px){
+  .image-simple-preset-grid{
+    grid-template-columns:1fr 1fr;
+  }
+}

@@ -193,7 +193,9 @@ window.TANJAI = window.TANJAI || {};
     const org = clean(d.orgName, "");
     const date = clean(d.dateTime, "");
     const place = clean(d.place, "");
+    const custom = String(d.textOnImage || "").split(/\n|,/).map(x => clean(x, "")).filter(Boolean);
     const items = [];
+    custom.forEach(x => items.push(x));
     if(kind === "charity-run"){
       if(/ขอเชิญ|ร่วมวิ่ง|วิ่งการกุศล/.test(detail)) items.push(detail.length <= 40 ? detail : "ขอเชิญร่วมวิ่งการกุศล");
       else if(title) items.push(title);
