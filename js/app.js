@@ -141,7 +141,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <label class="full">ข้อห้าม / หมายเหตุ<textarea id="image-avoid" placeholder="เช่น ห้ามสร้าง QR ปลอม ห้ามวาดโลโก้ใหม่ เว้นพื้นที่ด้านบน ใช้รูปจริงตามแนบ"></textarea></label>
       </div>
     </div>
-    <div class="button-row"><button class="btn primary" id="makeImage">สร้าง Prompt ภาพทันที</button><button class="btn secondary" id="saveImage">บันทึก</button></div>
+    <div class="button-row"><button class="btn primary" id="makeImage">สร้าง Prompt ภาพ 2 แบบ</button><button class="btn secondary" id="saveImage">บันทึก</button></div>
   `;
 
   $("#albumForm").innerHTML = `
@@ -266,7 +266,7 @@ document.addEventListener("DOMContentLoaded", () => {
   TANJAI.simplifyExpertForms?.();
 
   // Results
-  $("#imageResult").innerHTML = TANJAI.readyOutputShell("image", "Prompt ภาพพร้อมใช้ — ผู้กำกับงานภาพ", "Prompt เฉพาะงานภาพ พร้อมแนวทางสร้างสรรค์ คำสั่งพร้อมผลิต และข้อห้ามของภาพ", "imageOut");
+  $("#imageResult").innerHTML = TANJAI.readyOutputShell("image", "คำสั่งสร้างภาพจริง — Create First", "คัดลอกไปวางใน AI ที่เปิดใช้การสร้างภาพ ระบบจะสั่งเรียกเครื่องมือก่อนตอบข้อความ", "imageOut");
 $("#albumResult").innerHTML = TANJAI.readyOutputShell("album", "ชุดภาพพร้อมโพสต์", "ปรับภาพจริง ใส่กรอบ และดาวน์โหลดเป็นภาพพร้อมลง Facebook", "albumOut");
 $("#postResult").innerHTML = TANJAI.readyOutputShell("post", "Prompt งานเขียนพร้อมใช้ — นักวางกลยุทธ์เนื้อหา", "ปรับผลลัพธ์ตามชนิดงานจริง เช่น สรุป ข่าว โพสต์ Facebook ข้อความ LINE หรือแคปชั่น", "postOut");
 $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "Prompt พิธีกรพร้อมใช้ — ผู้กำกับงานเวที", "คุมลำดับพิธี ชื่อ ตำแหน่ง คำกำกับเวที และบัตรคำพูด", "mcOut");
@@ -286,10 +286,10 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "Prompt พิธีก
     const criticText = TANJAI.state.lastImageCritic || "";
     if(mode === "prompt"){
       TANJAI.setReadyOutput("image", {
-        title:"Prompt สำหรับแก้ / คุยต่อ",
-        desc:"ใช้เมื่อต้องการให้ AI ช่วยปรับบรีฟ ตรวจคำผิด หรือเกลาคำสั่งก่อนสั่งสร้างจริง",
+        title:"Prompt มืออาชีพ — สำหรับตรวจและปรับต่อ",
+        desc:"ใช้เมื่อต้องการดู Creative Direction, TEXT LOCK, Negative Prompt และรายละเอียดการผลิตก่อนสั่งสร้าง",
         main:discussText,
-        advancedTitle1:"Prompt สำหรับสั่ง AI ทำงานทันที",
+        advancedTitle1:"คำสั่งสร้างภาพจริงทันที",
         advanced1:executeText,
         advancedTitle2:"ตัวช่วยตรวจความพร้อม",
         advanced2:criticText
@@ -298,10 +298,10 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "Prompt พิธีก
       return;
     }
     TANJAI.setReadyOutput("image", {
-      title:"Prompt ภาพพร้อมใช้ — ผู้กำกับงานภาพ",
-      desc:"คัดลอกไปวางเพื่อให้ AI วางแนวทางภาพและสร้างงานตามเกณฑ์คุณภาพเฉพาะงาน",
+      title:"คำสั่งสร้างภาพจริง — Create First",
+      desc:"คัดลอกไปวางใน AI ที่เปิดใช้การสร้างภาพ คำสั่งจะให้เรียกเครื่องมือก่อนตอบข้อความหรือชื่อไฟล์",
       main:executeText,
-      advancedTitle1:"Prompt สำหรับแก้ / คุยต่อ",
+      advancedTitle1:"Prompt มืออาชีพสำหรับตรวจและปรับต่อ",
       advanced1:discussText,
       advancedTitle2:"ตัวช่วยตรวจความพร้อม",
       advanced2:criticText
@@ -1029,14 +1029,14 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "Prompt พิธีก
     const d = getImageDataForPrompt();
     const critic = TANJAI.promptCritic(d);
     d.criticSummary = critic;
-    const discussOut = TANJAI.discussPrompt("image", d);
+    const professionalOut = TANJAI.buildImageExpertPrompt(d);
     const executeOut = TANJAI.executionPrompt("image", d);
-    TANJAI.state.lastImagePrompt = discussOut;
+    TANJAI.state.lastImagePrompt = professionalOut;
     TANJAI.state.lastImageGPT = executeOut;
     TANJAI.state.lastImage = executeOut;
     TANJAI.state.lastImageCritic = critic;
     TANJAI.updateImageResultMode?.("gpt");
-    TANJAI.toast("สร้าง Prompt ภาพแล้ว");
+    TANJAI.toast("สร้างคำสั่งภาพจริงและ Prompt มืออาชีพแล้ว");
   };
   $("#makePost").onclick = () => {
     const d=TANJAI.commonData("post");

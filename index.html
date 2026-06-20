@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700;800;900&family=Noto+Sans+Thai:wght@400;500;600;700;800;900&family=Prompt:wght@500;600;700;800;900&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
   <meta name="theme-color" content="#060713">
-  <meta name="description" content="ทันใจ AI Studio v9.1.5 — Professional Brief-to-Prompt Output ระบบวิเคราะห์บรีฟและสร้าง Prompt มืออาชีพสำหรับภาพ โพสต์ คลิป เสียง สไลด์">
+  <meta name="description" content="ทันใจ AI Studio V9.1.6 — AI Media Workspace เปลี่ยนไอเดียให้เป็น Prompt พร้อมใช้สำหรับภาพ โพสต์ วิดีโอ เสียง และสไลด์">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/animations.css">
 </head>
@@ -27,6 +27,7 @@
       <p class="eyebrow">สำหรับสมาชิก</p>
       <h1>ทันใจ AI Studio</h1>
       <p class="login-subtitle">สร้างสื่อไว ด้วยพลัง AI</p>
+      <span class="version-badge login-version-badge" aria-label="เวอร์ชัน 9.1.6">V9.1.6</span>
 
       <form id="loginForm" class="login-form">
         <label>
@@ -100,7 +101,10 @@
       <header class="topbar">
         <button class="mobile-menu-btn" id="mobileMenuBtn" type="button" aria-label="เปิดเมนูหลัก" aria-controls="mainSidebar" aria-expanded="false">☰</button>
         <div>
-          <p class="eyebrow">ทันใจ AI Studio</p>
+          <div class="topbar-kicker">
+            <p class="eyebrow">ทันใจ AI Studio</p>
+            <span class="version-badge" aria-label="เวอร์ชัน 9.1.6">V9.1.6</span>
+          </div>
           <h2 id="pageTitle" aria-live="polite">สวัสดีครับ! 👋</h2>
         </div>
         <div class="top-actions">
@@ -119,9 +123,9 @@
       <section id="dashboard" class="view active">
         <div class="hero-card sales-dashboard-hero" style="background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.15), transparent), radial-gradient(circle at bottom left, rgba(236, 72, 153, 0.1), transparent), var(--panel); border: 1px solid var(--line2); backdrop-filter: var(--blur);">
           <div class="hero-copy">
-            <p class="eyebrow">พื้นที่สร้าง Prompt สำหรับงานสื่อ</p>
+            <p class="eyebrow">AI MEDIA WORKSPACE</p>
             <h3 class="hero-title"><span>ทันใจ AI Studio</span><span class="hero-tagline-thai">สร้างสื่อไว ด้วยพลัง AI</span></h3>
-            <p class="hero-lead">ระบบวิเคราะห์บรีฟ แยกข้อมูลจริงออกจากข้อมูลที่ห้ามแต่ง แล้วสร้าง Prompt มืออาชีพสำหรับภาพ โพสต์ วิดีโอ เสียง และสไลด์ ช่วยให้ทำงานเร็วขึ้น แม่นยำขึ้น และปลอดภัยขึ้น</p>
+            <p class="hero-lead"><span>เปลี่ยนไอเดียให้เป็น Prompt พร้อมใช้</span><span>ภาพ โพสต์ วิดีโอ เสียง และสไลด์ — พร้อมใช้ทันที</span></p>
             <div class="hero-actions">
               <button class="btn primary" data-view="kit">สร้างชุดสื่อทันที</button>
               <button class="btn secondary" data-view="library">ดูตัวอย่างงาน</button>

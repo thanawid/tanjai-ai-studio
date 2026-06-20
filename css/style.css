@@ -1058,6 +1058,35 @@ body:not(.auth-locked) .login-gate{
   font-weight:1000;
   letter-spacing:.02em;
 }
+.login-version-badge{
+  margin-top:12px;
+  padding:6px 10px;
+  font-size:11px;
+}
+.topbar-kicker{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.topbar-kicker .version-badge{
+  padding:5px 9px;
+  font-size:10px;
+}
+.hero-lead > span{
+  display:block;
+}
+.hero-lead > span + span{
+  margin-top:2px;
+}
+@media(min-width:721px){
+  .hero-lead{
+    max-width:56ch !important;
+  }
+  .hero-lead > span{
+    white-space:nowrap;
+  }
+}
 .result-buttons{
   display:flex;
   gap:8px;
