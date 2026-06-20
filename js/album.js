@@ -1,7 +1,7 @@
-/* v8.7.2 — Clean Frame Output + Smart Text Fit
+/* v9.2.0 — Facebook Cover + Lite Album System
    Safe photo processing for real uploaded images only.
-   Separate cover upload + support uploads, cleaner frame output,
-   smarter text fitting, and synced preview / download results.
+   Cover Frame + Lite Frames + Additional Frame, face-aware crop when supported,
+   smart theme selection, safe text, and synced preview / download results.
 */
 (function(){
   function ensureAlbumInputs(){
@@ -60,9 +60,9 @@
       lite3: val("album-lite3",""),
       lite4: val("album-lite4",""),
       ratio: val("album-ratio","16:9"),
-      colorTone: val("album-colorTone","เขียว–เหลือง–ขาว"),
+      colorTone: val("album-colorTone","AI เลือกโทนสีให้เข้ากับงาน"),
       mode: val("album-autoMode", val("album-mode","ปรับภาพ + ครอป + ใส่กรอบ")),
-      layoutMode: val("album-layoutMode","Template Frame System — Cover + Lite"),
+      layoutMode: val("album-layoutMode","Facebook Cover + Lite + Additional Frame System"),
       useCoverOnly: !!document.getElementById("album-makeCover")?.checked
     };
   }
@@ -92,14 +92,27 @@
   }
 
   function theme(d=data()){
-    const raw=(d.colorTone||"").toLowerCase();
+    let raw=(d.colorTone||"").toLowerCase();
+    if(!raw || raw.includes("ai เลือก")){
+      const cue=[d.frameStyle,d.categoryLabel,d.title,d.detail].filter(Boolean).join(" ").toLowerCase();
+      if(/ด่วน|เตือน|ฉุกเฉิน|สำคัญ/.test(cue)) raw="แดง ส้ม ทอง";
+      else if(/สุขภาพ|ชุมชน|สิ่งแวดล้อม|ต้นไม้/.test(cue)) raw="เขียว เหลือง";
+      else if(/โรงเรียน|การศึกษา|เด็ก|อบรม/.test(cue)) raw="น้ำเงิน เหลือง";
+      else if(/สินค้า|โปรโม|ครีเอเตอร์|เพจ|เพลง/.test(cue)) raw="ม่วง ชมพู ทอง";
+      else if(/พิธี|ทางการ|ประชุม|ราชการ|เทศบาล|อบต/.test(cue)) raw="น้ำเงิน ทอง";
+      else raw="น้ำเงิน ขาว";
+    }
     let t;
-    if(raw.includes("ม่วง") || raw.includes("ทอง")){
+    if(raw.includes("แดง")){
+      t={accent:"#DC2626",accent2:"#F59E0B",dark:"#450A0A",deep:"#1F0808"};
+    } else if(raw.includes("ม่วง") || raw.includes("ชมพู")){
       t={accent:"#8B5CF6",accent2:"#FBBF24",dark:"#170C33",deep:"#0B0820"};
     } else if(raw.includes("เขียว") || raw.includes("เหลือง")){
       t={accent:"#16A34A",accent2:"#FACC15",dark:"#07351D",deep:"#041A0F"};
+    } else if(raw.includes("น้ำเงิน") && raw.includes("ทอง")){
+      t={accent:"#1D4ED8",accent2:"#FBBF24",dark:"#0A1F4E",deep:"#06132F"};
     } else if(raw.includes("น้ำเงิน")){
-      t={accent:"#2563EB",accent2:"#93C5FD",dark:"#0A1F4E",deep:"#06132F"};
+      t={accent:"#2563EB",accent2:raw.includes("เหลือง")?"#FACC15":"#93C5FD",dark:"#0A1F4E",deep:"#06132F"};
     } else if(raw.includes("ส้ม") || raw.includes("อำพัน") || raw.includes("amber")){
       t={accent:"#D97706",accent2:"#FCD34D",dark:"#3A1A05",deep:"#1F1004"};
     } else if(raw.includes("ดำ") || raw.includes("หรู")){
@@ -131,10 +144,35 @@
     return {name:"ribbon", titleScale:1.0, showFooterBar:true, showAccentSweep:true, liteCompact:false};
   }
 
-  function coverDraw(img, ctx, w, h, enhance=true){
-    const sw=img.naturalWidth||img.width, sh=img.naturalHeight||img.height;
+  function cropPlacement(sw,sh,w,h,focal=null,targetYRatio=.46){
     const scale=Math.max(w/sw,h/sh), nw=sw*scale, nh=sh*scale;
-    const x=(w-nw)/2, y=(h-nh)/2;
+    let x=(w-nw)/2, y=(h-nh)/2;
+    if(focal && Number.isFinite(focal.x) && Number.isFinite(focal.y)){
+      x=(w*.5)-(focal.x*scale);
+      y=(h*targetYRatio)-(focal.y*scale);
+      x=Math.min(0,Math.max(w-nw,x));
+      y=Math.min(0,Math.max(h-nh,y));
+    }
+    return {scale,nw,nh,x,y};
+  }
+
+  async function detectFaceFocus(img){
+    if(typeof window.FaceDetector !== "function") return null;
+    try{
+      const faces=await new window.FaceDetector({fastMode:true,maxDetectedFaces:16}).detect(img);
+      const boxes=faces.map(f=>f.boundingBox).filter(Boolean);
+      if(!boxes.length) return null;
+      const left=Math.min(...boxes.map(b=>b.x));
+      const top=Math.min(...boxes.map(b=>b.y));
+      const right=Math.max(...boxes.map(b=>b.x+b.width));
+      const bottom=Math.max(...boxes.map(b=>b.y+b.height));
+      return {x:(left+right)/2,y:(top+bottom)/2,width:right-left,height:bottom-top,count:boxes.length};
+    }catch(_error){ return null; }
+  }
+
+  function coverDraw(img, ctx, w, h, enhance=true, focal=null, targetYRatio=.46){
+    const sw=img.naturalWidth||img.width, sh=img.naturalHeight||img.height;
+    const {nw,nh,x,y}=cropPlacement(sw,sh,w,h,focal,targetYRatio);
     ctx.save();
     if(enhance) ctx.filter="brightness(1.06) contrast(1.045) saturate(1.08)";
     ctx.drawImage(img,x,y,nw,nh);
@@ -333,15 +371,18 @@
     const brandH=Math.round(h*(land?0.108:0.08));
     const brandX=pad+Math.round(w*.014);
     const brandY=pad+Math.round(h*.012);
-    drawRibbon(ctx,brandX,brandY,brandW,brandH,th,'dark');
-    const logoS=Math.round(brandH*1.05);
-    const logoX=brandX-Math.round(logoS*.18);
-    const logoY=brandY-Math.round((logoS-brandH)/2);
-    const hasLogo=drawLogo(ctx,logoX,logoY,logoS);
-    const brandTextX=hasLogo ? logoX+logoS+Math.round(w*.012) : brandX+Math.round(w*.018);
-    drawText(ctx, hasRealOrg(d.org) ? d.org : 'หน่วยงาน / แบรนด์ของคุณ', brandTextX, brandY+Math.round(brandH*.18), brandW-(brandTextX-brandX)-Math.round(w*.025), 2, `900 ${Math.round(Math.min(w,h)*0.028)}px "Prompt","Noto Sans Thai",sans-serif`, '#fff', Math.round(Math.min(w,h)*0.032));
-    const orgSub = d.categoryLabel ? smartShort(d.categoryLabel,26) : (d.place ? smartShort(d.place,24) : 'Template Frame System');
-    drawText(ctx, orgSub, brandTextX, brandY+Math.round(brandH*.62), brandW-(brandTextX-brandX)-Math.round(w*.025), 1, `800 ${Math.round(Math.min(w,h)*0.018)}px "Noto Sans Thai","Prompt",sans-serif`, 'rgba(255,255,255,.84)', Math.round(Math.min(w,h)*0.024));
+    const brandLabel=hasRealOrg(d.org) ? d.org : '';
+    if(brandLabel || state.logo){
+      drawRibbon(ctx,brandX,brandY,brandW,brandH,th,'dark');
+      const logoS=Math.round(brandH*1.05);
+      const logoX=brandX-Math.round(logoS*.18);
+      const logoY=brandY-Math.round((logoS-brandH)/2);
+      const hasLogo=drawLogo(ctx,logoX,logoY,logoS);
+      const brandTextX=hasLogo ? logoX+logoS+Math.round(w*.012) : brandX+Math.round(w*.018);
+      if(brandLabel) drawText(ctx,brandLabel,brandTextX,brandY+Math.round(brandH*.18),brandW-(brandTextX-brandX)-Math.round(w*.025),2,`900 ${Math.round(Math.min(w,h)*0.028)}px "Prompt","Noto Sans Thai",sans-serif`,'#fff',Math.round(Math.min(w,h)*0.032));
+      const orgSub=hasRealOrg(d.org) && d.categoryLabel ? smartShort(d.categoryLabel,26) : (d.place ? smartShort(d.place,24) : '');
+      if(orgSub) drawText(ctx,orgSub,brandTextX,brandY+Math.round(brandH*.62),brandW-(brandTextX-brandX)-Math.round(w*.025),1,`800 ${Math.round(Math.min(w,h)*0.018)}px "Noto Sans Thai","Prompt",sans-serif`,'rgba(255,255,255,.84)',Math.round(Math.min(w,h)*0.024));
+    }
 
     const panelX=pad+Math.round(w*.015);
     const panelY=Math.round(h*(land?0.55:0.5));
@@ -392,29 +433,39 @@
     const detailShort = smartShort(safeDetail, 86);
     const footerShort = smartShort(safeFooter, 72);
 
-    if(idx===1) return detailShort || [d.dateTime,d.place].filter(Boolean).join(' • ');
-    if(idx===2) return d.place ? `บรรยากาศการประชุมและการมีส่วนร่วม ณ ${smartShort(d.place,32)}` : 'บรรยากาศการประชุมและการมีส่วนร่วมของชุมชน';
-    if(idx===3) return footerShort || 'ร่วมติดตามและขับเคลื่อนงานเพื่อชุมชนอย่างต่อเนื่อง';
-    return footerShort || (d.place ? `ภาพเพิ่มเติม ณ ${smartShort(d.place,32)}` : 'ภาพเพิ่มเติมของอัลบั้ม');
+    const meta=[d.dateTime,d.place].filter(Boolean).join(' • ');
+    if(idx===1) return detailShort || meta || smartShort(d.title,72);
+    if(idx===2) return footerShort || meta || smartShort(d.categoryLabel,72) || smartShort(d.title,72);
+    if(idx===3) return meta || detailShort || footerShort || smartShort(d.title,72);
+    return footerShort || smartShort(d.categoryLabel,72) || smartShort(d.title,72);
+  }
+  function drawSequenceBadge(ctx,w,h,idx,th){
+    const s=Math.round(Math.min(w,h)*.075);
+    const x=Math.round(Math.min(w,h)*.035), y=x;
+    ctx.save();
+    ctx.shadowColor=th.shadow; ctx.shadowBlur=Math.round(s*.22); ctx.shadowOffsetY=Math.round(s*.08);
+    fillRoundRect(ctx,x,y,s,s,Math.round(s*.28),th.chip,'rgba(255,255,255,.82)',Math.max(2,Math.round(s*.04)));
+    ctx.shadowBlur=0; ctx.fillStyle='#fff'; ctx.font=`900 ${Math.round(s*.48)}px "Prompt","Kanit",sans-serif`;
+    ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(String(idx+1),x+s/2,y+s/2+1);
+    ctx.restore();
   }
   function drawLiteFrame(ctx,w,h,d,idx,th){
     const pst=preset(d);
     const pad=Math.round(Math.min(w,h)*0.024);
+    drawBorderFrame(ctx,w,h,th);
+    drawSequenceBadge(ctx,w,h,idx,th);
+    if(state.logo){
+      const ls=Math.round(Math.min(w,h)*.082);
+      drawLogo(ctx,w-pad-ls,pad,ls);
+    }
     const bottomH=Math.round(h*(w>=h?(pst.liteCompact?0.155:0.17):(pst.liteCompact?0.13:0.145)));
     const y=h-pad-bottomH;
     const x=pad;
     const boxW=w-pad*2;
     drawGlassPanel(ctx,x,y,boxW,bottomH,Math.round(bottomH*.28),th,.68);
 
-    const hasLogo = !!state.logo;
     const leftPad=x+Math.round(w*.026);
-    let rightReserve=Math.round(w*.03);
-    if(hasLogo){
-      const ls=Math.round(bottomH*.56);
-      const logoY=y+Math.round((bottomH-ls)/2);
-      drawLogo(ctx,w-pad-ls,logoY,ls);
-      rightReserve = Math.round(w*.03) + ls + Math.round(w*.018);
-    }
+    const rightReserve=Math.round(w*.03);
 
     const textY=y+Math.round(bottomH*.24);
     const textW=boxW-(leftPad-x)-rightReserve;
@@ -423,6 +474,8 @@
 
   function drawAdditionalFrame(ctx,w,h,d,idx,th){
     const pad=Math.round(Math.min(w,h)*0.025);
+    drawBorderFrame(ctx,w,h,th);
+    drawSequenceBadge(ctx,w,h,idx,th);
     const boxW=Math.round(w*0.68);
     const boxH=Math.round(h*(w>=h?0.12:0.1));
     const x=pad;
@@ -449,14 +502,16 @@
     const ctx=canvas.getContext('2d');
     const img=await makeImage(file);
     const enhance=!d.mode.includes('ครอป + ใส่กรอบเท่านั้น');
-    coverDraw(img,ctx,sz.w,sz.h,enhance);
+    const faceFocus=await detectFaceFocus(img);
+    coverDraw(img,ctx,sz.w,sz.h,enhance,faceFocus,idx===0?.38:.46);
     if(!d.mode.includes('ปรับภาพเท่านั้น')){
       if(idx===0) drawCoverFrame(ctx,sz.w,sz.h,d,th);
       else if(idx<4) drawLiteFrame(ctx,sz.w,sz.h,d,idx,th);
       else drawAdditionalFrame(ctx,sz.w,sz.h,d,idx,th);
     }
     const blob=await canvasToBlob(canvas); const url=URL.createObjectURL(blob);
-    return {blob,url,filename:`facebook_album_${String(idx+1).padStart(2,'0')}.jpg`};
+    const role=idx===0?'cover':idx<4?'lite':'additional';
+    return {blob,url,filename:`facebook_album_${String(idx+1).padStart(2,'0')}_${role}_${sz.w}x${sz.h}.jpg`};
   }
 
   function normalizeFiles(fileList, warn=true, max=4){
@@ -513,15 +568,15 @@
   }
 
   function captionText(d){
-    const org = hasRealOrg(d.org) ? d.org : 'ชื่อหน่วยงาน / แบรนด์ของคุณ';
+    const org = hasRealOrg(d.org) ? d.org : '';
     const title = d.title || 'กิจกรรม / ข่าวประชาสัมพันธ์';
     const parts=[];
     parts.push(`📌 ${title}`);
-    parts.push(`${org} ขอประชาสัมพันธ์ข้อมูลให้ประชาชนและผู้ที่เกี่ยวข้องได้รับทราบ`);
+    parts.push(org ? `${org} ขอประชาสัมพันธ์ข้อมูลให้ประชาชนและผู้ที่เกี่ยวข้องได้รับทราบ` : `ขอประชาสัมพันธ์ข้อมูลให้ผู้ที่เกี่ยวข้องได้รับทราบ`);
     const meta=[d.dateTime && `📅 ${d.dateTime}`, d.place && `📍 ${d.place}`].filter(Boolean); if(meta.length) parts.push(meta.join('\n'));
     if(d.detail) parts.push(smartShort(d.detail,220));
     if(d.footer) parts.push(stripHashtags(d.footer));
-    const hashBase = hasRealOrg(d.org) ? d.org.replace(/\s+/g,'') : 'ประชาสัมพันธ์';
+    const hashBase = org ? org.replace(/\s+/g,'') : 'ประชาสัมพันธ์';
     parts.push(`#${hashBase} #กิจกรรม #ประชาสัมพันธ์`);
     return parts.filter(Boolean).join('\n\n');
   }
@@ -659,6 +714,7 @@
     if(window.TANJAI && TANJAI.proofread && typeof TANJAI.proofread.runActive === 'function') TANJAI.proofread.runActive(false);
     let files=syncStateFiles();
     if(!files.length) files=collectFilesFromInputs(false);
+    if(!val('album-title','')) return alert('กรุณากรอกหัวข้องานสำหรับ Cover Frame');
     if(!state.coverFile) return alert('กรุณาเลือกภาพหน้าปกหลัก 1 ภาพ');
     if(files.length < 4) return alert('กรุณาอัปโหลดภาพหน้าปก 1 ภาพ และภาพรองอย่างน้อย 3 ภาพ');
     if(files.length > 5) files=files.slice(0,5);
@@ -701,5 +757,8 @@
       if(e.target && (e.target.id==='album-coverFile' || e.target.id==='album-supportFiles')){ collectFilesFromInputs(true); renderUploadPreview(); }
     });
   });
-  window.TANJAI_ALBUM_PRO={generate,downloadAll,renderFacebookPreview,renderUploadPreview,collectFilesFromInputs};
+  window.TANJAI_ALBUM_PRO={
+    generate,downloadAll,renderFacebookPreview,renderUploadPreview,collectFilesFromInputs,
+    _test:{cropPlacement,liteText,theme,size}
+  };
 })();
