@@ -4087,3 +4087,33 @@ textarea:focus-visible{
     transition-duration:.01ms !important;
   }
 }
+
+/* Expert Prompt Engine — distinct questions for each specialist menu */
+.expert-menu-section{
+  border-color:rgba(56,189,248,.28) !important;
+  background:
+    radial-gradient(circle at top right,rgba(56,189,248,.10),transparent 36%),
+    linear-gradient(145deg,rgba(9,18,35,.92),rgba(20,28,54,.76)) !important;
+}
+.expert-menu-section .section-title b{
+  background:linear-gradient(135deg,rgba(14,165,233,.30),rgba(99,102,241,.30));
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);
+}
+.expert-menu-section .section-title h4::after{
+  content:"EXPERT MODE";
+  display:inline-flex;
+  margin-left:9px;
+  border:1px solid rgba(56,189,248,.25);
+  border-radius:999px;
+  padding:3px 7px;
+  color:#a5f3fc;
+  font-size:9px;
+  letter-spacing:.1em;
+  vertical-align:middle;
+}
+@media(max-width:720px){
+  .expert-menu-section .section-title h4::after{
+    display:table;
+    margin:5px 0 0;
+  }
+}

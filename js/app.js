@@ -192,11 +192,11 @@ document.addEventListener("DOMContentLoaded", () => {
   `;
 
   $("#postForm").innerHTML = TANJAI.field("post") + `
-    <div class="form-note">ใช้สำหรับสรุปงาน เรียบเรียงข้อมูล เขียนโพสต์ แคปชั่น สคริปต์เสียง สคริปต์คลิป และข้อความสำหรับทำสื่อ</div>
+    <div class="form-note">ผู้เชี่ยวชาญงานเขียนสำหรับสรุปงาน ข่าวประชาสัมพันธ์ โพสต์ Facebook ข้อความ Line และแคปชั่นโดยเฉพาะ</div>
     <div class="form-section"><div class="section-title"><b>2</b><h4>ตั้งค่าการเรียบเรียงเนื้อหา</h4></div>
       <div class="form-grid">
         <label>ประเภทงาน<select id="post-workType">${opts((toolOptions.workTypes || ["นายกลงพื้นที่","กิจกรรมเทศบาล","อื่น ๆ"]).filter(x => !/พิธีกร|พิธีเปิด|พิธีปิด/.test(x)))}</select></label>
-        <label>ต้องการเรียบเรียงเป็น<select id="post-channel"><option>สรุปงาน</option><option>เรียบเรียงข้อมูล</option><option>โพสต์ Facebook / Line</option><option>แคปชั่น</option><option>สคริปต์เสียง</option><option>สคริปต์คลิป</option><option>ข้อความสำหรับทำสื่อ</option><option>ครบชุด: สรุป + โพสต์ + สคริปต์เสียง + สคริปต์คลิป</option></select></label>
+        <label>ต้องการเรียบเรียงเป็น<select id="post-channel"><option>สรุปงาน</option><option>เรียบเรียงข้อมูล</option><option>ข่าวประชาสัมพันธ์</option><option>โพสต์ Facebook</option><option>ข้อความ Line</option><option>แคปชั่น</option></select></label>
         <label>ความยาว<select id="post-length">${opts(toolOptions.postLengths)}</select></label>
         <label>หมวดงาน<select id="post-mainCategory">${opts(toolOptions.mainCategories)}</select></label>
         <label class="full">แนบรูปประกอบ / รูปเอกสาร / รูปลงพื้นที่
@@ -204,7 +204,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <small>ถ้าเป็นภาพเอกสาร ให้นำ Prompt พร้อมรูปไปใช้กับ AI ที่วิเคราะห์ภาพได้ เช่น ChatGPT / Gemini แล้วให้ AI อ่านเอกสารก่อนสรุป</small>
           <div id="post-photoPreview" class="upload-preview-grid"></div>
         </label>
-        <label class="full">สิ่งที่อยากให้เน้นเพิ่มเติม<textarea id="post-extra" placeholder="เช่น เน้นสรุปให้กระชับ / ภาษาเป็นทางการ / โพสต์อ่านง่าย / สคริปต์เสียง 1 นาที"></textarea></label>
+        <label class="full">สิ่งที่อยากให้เน้นเพิ่มเติม<textarea id="post-extra" placeholder="เช่น เน้นผลต่อประชาชน / เปิดเรื่องให้ตรงประเด็น / ลดภาษาราชการ / CTA ชัด"></textarea></label>
       </div>
     </div>
     <div class="button-row"><button class="btn primary" id="makePost">เรียบเรียงเนื้อหา</button><button class="btn secondary" id="savePost">บันทึก</button></div>`;
@@ -255,23 +255,23 @@ document.addEventListener("DOMContentLoaded", () => {
     </div><div class="button-row"><button class="btn primary" id="makeDeck">สร้าง Prompt สไลด์ทันที</button><button class="btn secondary" id="saveDeck">บันทึก</button></div>`;
   $("#kitForm").innerHTML = TANJAI.field("kit") + `
     <div class="form-section">
-      <div class="section-title"><b>2</b><h4>Universal Prompt Pack</h4></div>
+      <div class="section-title"><b>2</b><h4>Campaign Director</h4></div>
       <div class="prompt-workspace-note">
-        ระบบจะจัดชุดคำสั่งให้ครบโดยอัตโนมัติ ไม่ต้องเลือก AI ปลายทางก่อน — ได้ทั้ง Prompt สำหรับแก้/คุยต่อ และ Prompt สำหรับสั่ง AI ลงมือทำทันที
+        ระบบจะสร้าง Campaign Spine กลาง แล้วแตกบทบาท ภาพ โพสต์ วิดีโอ เสียง และสไลด์ให้สอดคล้องกันโดยไม่ใช้ข้อความซ้ำทั้งชุด
       </div>
-      <input id="kit-packMode" type="hidden" value="Universal Prompt Pack">
+      <input id="kit-packMode" type="hidden" value="Integrated Campaign Expert Prompt">
     </div>
     <div class="button-row"><button class="btn primary" id="makeKit">สร้าง Prompt สั่งทำทันที</button><button class="btn secondary" id="saveKit">บันทึก</button></div>`;
 
   // Results
-  $("#imageResult").innerHTML = TANJAI.readyOutputShell("image", "Prompt ภาพ — สั่งทำทันที", "คัดลอกแล้วให้ AI สร้างภาพทันที พร้อม Prompt สำหรับแก้/คุยต่อในรายละเอียด", "imageOut");
+  $("#imageResult").innerHTML = TANJAI.readyOutputShell("image", "Expert Prompt ภาพ — Art Director", "Prompt เฉพาะงานภาพ พร้อม Creative Direction, Production Prompt และ Negative Prompt", "imageOut");
 $("#albumResult").innerHTML = TANJAI.readyOutputShell("album", "ชุดภาพพร้อมโพสต์", "ปรับภาพจริง ใส่กรอบ และดาวน์โหลดเป็นภาพพร้อมลง Facebook", "albumOut");
-$("#postResult").innerHTML = TANJAI.readyOutputShell("post", "Prompt สรุปงาน — สั่งทำทันที", "คัดลอกแล้วให้ AI สรุปและเรียบเรียงเนื้อหาทันที", "postOut");
-$("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "Prompt สคริปต์พิธีกร — สั่งทำทันที", "คัดลอกแล้วให้ AI เขียนสคริปต์พิธีกรพร้อมใช้บนเวที", "mcOut");
-  $("#videoResult").innerHTML = TANJAI.readyOutputShell("video", "Prompt วิดีโอ — สั่งทำทันที", "คัดลอกแล้วให้ AI สร้าง Storyboard / Prompt วิดีโอทันที", "videoOut");
-  $("#voiceResult").innerHTML = TANJAI.readyOutputShell("voice", "Prompt เสียง — สั่งทำทันที", "คัดลอกแล้วให้ AI เขียนสคริปต์เสียงทันที", "voiceOut");
-  $("#deckResult").innerHTML = TANJAI.readyOutputShell("deck", "Prompt สไลด์ — สั่งทำทันที", "คัดลอกแล้วให้ AI สร้าง Outline สไลด์ทันที", "deckOut");
-  $("#kitResult").innerHTML = TANJAI.readyOutputShell("kit", "Universal Execution Prompt Pack", "กรอกครั้งเดียว ได้ทั้ง Prompt สำหรับแก้/คุยต่อ และ Prompt สำหรับสั่ง AI ทำงานทันที", "kitOut");
+$("#postResult").innerHTML = TANJAI.readyOutputShell("post", "Expert Prompt งานเขียน — Content Strategist", "ปรับผลลัพธ์ตามชนิดงานจริง: สรุป ข่าว Facebook Line หรือแคปชั่น", "postOut");
+$("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "Expert Prompt พิธีกร — Stage Director", "คุมลำดับพิธี ชื่อ ตำแหน่ง Stage Direction และ Cue Card", "mcOut");
+  $("#videoResult").innerHTML = TANJAI.readyOutputShell("video", "Expert Prompt วิดีโอ — Creative Director", "คุม Hook, Story Arc, เวลารวม, Storyboard, VO และ Shot List", "videoOut");
+  $("#voiceResult").innerHTML = TANJAI.readyOutputShell("voice", "Expert Prompt เสียง — Voice Director", "คุมเวลาพูด ภาษาสำหรับหู จังหวะ คำเน้น และคำอ่าน", "voiceOut");
+  $("#deckResult").innerHTML = TANJAI.readyOutputShell("deck", "Expert Prompt สไลด์ — Presentation Strategist", "คุม Story Arc, Takeaway Title, Visual Direction และ Speaker Notes", "deckOut");
+  $("#kitResult").innerHTML = TANJAI.readyOutputShell("kit", "Expert Prompt ชุดสื่อ — Campaign Director", "สร้างแกนแคมเปญเดียว แล้วแตกบทบาทแต่ละสื่อโดยไม่ทำข้อความซ้ำกัน", "kitOut");
 
   TANJAI.renderLibrary();
   TANJAI.renderPromptHub();
@@ -296,8 +296,8 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "Prompt สคริป
       return;
     }
     TANJAI.setReadyOutput("image", {
-      title:"Prompt สำหรับสั่ง AI ทำงานทันที",
-      desc:"คัดลอกไปวางแล้วให้ AI สร้างภาพทันที ไม่ใช่แค่สรุปบรีฟ",
+      title:"Expert Prompt ภาพ — Art Director",
+      desc:"คัดลอกไปวางแล้วให้ AI วาง Art Direction และผลิตภาพตาม Quality Gate เฉพาะงาน",
       main:executeText,
       advancedTitle1:"Prompt สำหรับแก้ / คุยต่อ",
       advanced1:discussText,
@@ -324,50 +324,12 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "Prompt สคริป
 
   TANJAI.activateContentMode = function(){
     TANJAI.switchView("post");
-    setTimeout(() => {
-      const workType = document.getElementById("post-workType");
-      const channel = document.getElementById("post-channel");
-      const title = document.getElementById("post-title");
-      const detail = document.getElementById("post-detail");
-      const extra = document.getElementById("post-extra");
-      const d = TANJAI.postModeDefaults || {};
-
-      const wasAutoMC =
-        (title && title.value.trim() === d.mcTitle) ||
-        (detail && detail.value.trim() === d.mcDetail) ||
-        (extra && extra.value.trim() === d.mcExtra);
-
-      if(workType && /พิธีกร|พิธีเปิด|พิธีปิด/.test(workType.value)) workType.value = "กิจกรรมเทศบาล";
-      if(channel && /พิธีกร|คำกล่าว/.test(channel.value)) channel.value = "ครบชุด: สรุป + โพสต์ + สคริปต์เสียง + สคริปต์คลิป";
-
-      if(wasAutoMC){
-        if(title && title.value.trim() === d.mcTitle) title.value = "";
-        if(detail && detail.value.trim() === d.mcDetail) detail.value = "";
-        if(extra && extra.value.trim() === d.mcExtra) extra.value = "";
-      }
-
-      TANJAI.setPostModeUI("content");
-      TANJAI.toast?.("เปิดโหมดเรียบเรียงทั่วไปแล้ว");
-    }, 80);
+    TANJAI.toast?.("เปิดผู้เชี่ยวชาญงานเขียนแล้ว");
   };
 
   TANJAI.activateMCMode = function(){
-    TANJAI.switchView("post");
-    setTimeout(() => {
-      const workType = document.getElementById("post-workType");
-      const channel = document.getElementById("post-channel");
-      const title = document.getElementById("post-title");
-      const detail = document.getElementById("post-detail");
-      const extra = document.getElementById("post-extra");
-      const d = TANJAI.postModeDefaults || {};
-      if(workType) workType.value = "งานพิธีกร / ผู้ดำเนินรายการ";
-      if(channel) channel.value = "สคริปต์พิธีกร / ผู้ดำเนินรายการ";
-      if(title && !title.value.trim()) title.value = d.mcTitle;
-      if(detail && !detail.value.trim()) detail.value = d.mcDetail;
-      if(extra && !extra.value.trim()) extra.value = d.mcExtra;
-      TANJAI.setPostModeUI("mc");
-      TANJAI.toast?.("เปิดโหมดงานพิธีกรแล้ว — ตรวจชื่อประธานและลำดับพิธีก่อนใช้งาน");
-    }, 80);
+    TANJAI.switchView("mc");
+    TANJAI.toast?.("เปิดผู้เชี่ยวชาญงานพิธีกรแล้ว — ตรวจชื่อประธานและลำดับพิธีก่อนใช้งาน");
   };
 
 
@@ -377,7 +339,7 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "Prompt สคริป
     {label:"สร้างชุดสื่อ", icon:"🧩", view:"kit", hint:"Prompt ครบชุดจากข้อมูลเดียว"},
     {label:"สร้างภาพ", icon:"🖼️", view:"image", hint:"Prompt ภาพพร้อมใช้"},
     {label:"ชุดภาพโพสต์ Facebook", icon:"🧷", view:"album", hint:"อัปโหลดรูป ใส่กรอบ แคปชั่น ZIP"},
-    {label:"เรียบเรียงเนื้อหา", icon:"✍️", view:"post", hint:"สรุปงาน โพสต์ สคริปต์เสียง สคริปต์คลิป"},
+    {label:"เรียบเรียงเนื้อหา", icon:"✍️", view:"post", hint:"สรุปงาน ข่าว โพสต์ Line และแคปชั่น"},
     {label:"งานพิธีกร", icon:"🎤", view:"mc", hint:"สคริปต์พิธีกร คำเชิญประธาน คำกล่าว คำเชื่อมช่วง"},
     {label:"ทำวิดีโอ", icon:"🎬", view:"video", hint:"Storyboard / Hook / Voice Over"},
     {label:"เสียงพากย์", icon:"🎙️", view:"voice", hint:"สคริปต์เสียงอ่าน"},
@@ -1072,39 +1034,39 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "Prompt สคริป
     TANJAI.state.lastImage = executeOut;
     TANJAI.state.lastImageCritic = critic;
     TANJAI.updateImageResultMode?.("gpt");
-    TANJAI.toast("สร้าง Prompt ภาพแบบสั่งทำทันทีแล้ว");
+    TANJAI.toast("สร้าง Expert Prompt ภาพแล้ว");
   };
   $("#makePost").onclick = () => {
     const d=TANJAI.commonData("post");
     const executeOut=TANJAI.executionPrompt("post", d);
     const discussOut=TANJAI.discussPrompt("post", d);
     TANJAI.setReadyOutput("post", {
-      title:"Prompt สรุปงาน / เรียบเรียง — สั่งทำทันที",
-      desc:"คัดลอกไปวางแล้วให้ AI สรุปและเรียบเรียงเนื้อหาทันที",
+      title:"Expert Prompt งานเขียน — Content Strategist",
+      desc:"ผลลัพธ์จะยึดชนิดงานที่เลือก ไม่ปนสคริปต์เสียงหรือวิดีโอ",
       main:executeOut,
       advancedTitle1:"Prompt สำหรับแก้ / คุยต่อ",
       advanced1:discussOut,
-      advancedTitle2:"Prompt Brain วิเคราะห์บรีฟ + ตัวอย่าง",
+      advancedTitle2:"Brief Analysis + ตัวอย่างงานเขียน",
       advanced2:`${TANJAI.promptBrainReport ? TANJAI.promptBrainReport(d, "post") : ""}\n\n---\nตัวอย่างสรุป / โพสต์จากระบบ:\n${TANJAI.postText(d)}`
     });
     TANJAI.state.lastPost=executeOut;
-    TANJAI.toast("สร้าง Prompt เรียบเรียงเนื้อหาแล้ว");
+    TANJAI.toast("สร้าง Expert Prompt งานเขียนแล้ว");
   };
   $("#makeMC").onclick = () => {
     const d=TANJAI.commonData("mc");
     const executeOut=TANJAI.executionPrompt("mc", d);
     const discussOut=TANJAI.discussPrompt("mc", d);
     TANJAI.setReadyOutput("mc", {
-      title:"Prompt สคริปต์พิธีกร — สั่งทำทันที",
-      desc:"คัดลอกไปวางแล้วให้ AI เขียนสคริปต์พิธีกรพร้อมใช้บนเวที",
+      title:"Expert Prompt พิธีกร — Stage Director",
+      desc:"คุม Run of Show, Stage Direction, ชื่อ ตำแหน่ง และ Cue Card",
       main:executeOut,
       advancedTitle1:"Prompt สำหรับแก้ / คุยต่อ",
       advanced1:discussOut,
-      advancedTitle2:"Prompt Brain วิเคราะห์บรีฟ + ตัวอย่าง",
+      advancedTitle2:"Brief Analysis + ตัวอย่างงานเวที",
       advanced2:`${TANJAI.promptBrainReport ? TANJAI.promptBrainReport(d, "mc") : ""}\n\n---\nตัวอย่างสคริปต์พิธีกรจากระบบ:\n${TANJAI.mcScriptSample ? TANJAI.mcScriptSample(d) : executeOut}`
     });
     TANJAI.state.lastMC=executeOut;
-    TANJAI.toast("สร้าง Prompt สคริปต์พิธีกรแล้ว");
+    TANJAI.toast("สร้าง Expert Prompt พิธีกรแล้ว");
   };
   $("#makeVideo").onclick = () => {
     const d=TANJAI.commonData("video");
@@ -1112,16 +1074,16 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "Prompt สคริป
     const executeOut=TANJAI.executionPrompt("video", d, {length});
     const discussOut=TANJAI.discussPrompt("video", d);
     TANJAI.setReadyOutput("video", {
-      title:"Prompt วิดีโอ — สั่งทำทันที",
-      desc:"คัดลอกไปวางแล้วให้ AI สร้าง Storyboard / Prompt วิดีโอทันที",
+      title:"Expert Prompt วิดีโอ — Creative Director",
+      desc:"คุม Hook, Story Arc, เวลารวม Storyboard, VO และ Shot List",
       main:executeOut,
       advancedTitle1:"Prompt สำหรับแก้ / คุยต่อ",
       advanced1:discussOut,
-      advancedTitle2:"Prompt Brain วิเคราะห์บรีฟ + Storyboard ตัวอย่าง",
+      advancedTitle2:"Brief Analysis + Storyboard ตัวอย่าง",
       advanced2:`${TANJAI.promptBrainReport ? TANJAI.promptBrainReport(d, "video") : ""}\n\n---\nStoryboard ตัวอย่างจากระบบ:\n${TANJAI.videoStoryboard(d, length)}`
     });
     TANJAI.state.lastVideo=executeOut;
-    TANJAI.toast("สร้าง Prompt วิดีโอแบบสั่งทำทันทีแล้ว");
+    TANJAI.toast("สร้าง Expert Prompt วิดีโอแล้ว");
   };
   $("#makeVoice").onclick = () => {
     const d=TANJAI.commonData("voice");
@@ -1130,16 +1092,16 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "Prompt สคริป
     const executeOut=TANJAI.executionPrompt("voice", d, {length, style});
     const discussOut=TANJAI.discussPrompt("voice", d);
     TANJAI.setReadyOutput("voice", {
-      title:"Prompt เสียง — สั่งทำทันที",
-      desc:"คัดลอกไปวางแล้วให้ AI เขียนสคริปต์เสียงทันที",
+      title:"Expert Prompt เสียง — Voice Director",
+      desc:"คุมเวลาพูด ภาษาสำหรับหู จังหวะ คำเน้น และคำอ่าน",
       main:executeOut,
       advancedTitle1:"Prompt สำหรับแก้ / คุยต่อ",
       advanced1:discussOut,
-      advancedTitle2:"Prompt Brain วิเคราะห์บรีฟ + สคริปต์ตัวอย่าง",
+      advancedTitle2:"Brief Analysis + สคริปต์ตัวอย่าง",
       advanced2:`${TANJAI.promptBrainReport ? TANJAI.promptBrainReport(d, "voice") : ""}\n\n---\nสคริปต์ตัวอย่างจากระบบ:\n${TANJAI.voiceScript(d, length, style)}`
     });
     TANJAI.state.lastVoice=executeOut;
-    TANJAI.toast("สร้าง Prompt เสียงแบบสั่งทำทันทีแล้ว");
+    TANJAI.toast("สร้าง Expert Prompt เสียงแล้ว");
   };
   $("#makeDeck").onclick = () => {
     const d=TANJAI.commonData("deck");
@@ -1147,42 +1109,42 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "Prompt สคริป
     const executeOut=TANJAI.executionPrompt("deck", d, {count});
     const discussOut=TANJAI.discussPrompt("deck", d);
     TANJAI.setReadyOutput("deck", {
-      title:"Prompt สไลด์ — สั่งทำทันที",
-      desc:"คัดลอกไปวางแล้วให้ AI สร้าง Outline สไลด์ทันที",
+      title:"Expert Prompt สไลด์ — Presentation Strategist",
+      desc:"คุม Story Arc, Takeaway Title, Visual Direction และ Speaker Notes",
       main:executeOut,
       advancedTitle1:"Prompt สำหรับแก้ / คุยต่อ",
       advanced1:discussOut,
-      advancedTitle2:"Prompt Brain วิเคราะห์บรีฟ + Outline ตัวอย่าง",
+      advancedTitle2:"Brief Analysis + Outline ตัวอย่าง",
       advanced2:`${TANJAI.promptBrainReport ? TANJAI.promptBrainReport(d, "deck") : ""}\n\n---\nOutline ตัวอย่างจากระบบ:\n${TANJAI.deckOutline(d, count)}`
     });
     TANJAI.state.lastDeck=executeOut;
-    TANJAI.toast("สร้าง Prompt สไลด์แบบสั่งทำทันทีแล้ว");
+    TANJAI.toast("สร้าง Expert Prompt สไลด์แล้ว");
   };
   $("#makeKit").onclick = () => {
     const d=TANJAI.commonData("kit");
     const out = TANJAI.promptPack(d);
     const discussOut = TANJAI.discussPrompt("kit", d);
-    const advancedOut = `AI Handoff Note
+    const advancedOut = `Campaign Director Handoff Note
 
-Universal Execution Prompt Pack นี้ออกแบบให้ใช้ต่อได้หลาย AI โดยไม่ต้องเลือกปลายทางก่อน
-- ส่วนหลักคือ Prompt สำหรับสั่ง AI ทำงานทันที
-- ส่วน Prompt สำหรับแก้ / คุยต่อ ใช้ตอนอยากปรับโทนหรือเกลาคำสั่ง
-- หาก AI ปลายทางทำงานจริงไม่ได้ ต้องให้บอกเหตุผลตรง ๆ และส่ง Prompt พร้อมใช้แทน
-- แนบรูปจริงเพิ่มใน AI ปลายทางเมื่อจำเป็น
-- ตรวจชื่อบุคคล หน่วยงาน สถานที่ และวันที่ก่อนเผยแพร่
+Expert Prompt นี้สร้าง Campaign Spine ก่อนแตกงานเป็นแต่ละสื่อ
+- ทุกสื่อต้องใช้ Core Message, ชื่อเฉพาะ, วันที่ และ CTA ตรงกัน
+- แต่ละช่องทางมีบทบาทของตัวเอง ไม่คัดลอกข้อความเดียวกันทั้งชุด
+- ใช้ Missing Data Register ชุดเดียวเพื่อลดข้อมูลขัดกัน
+- แนบรูปจริงและไฟล์อ้างอิงใน AI ปลายทางเมื่อจำเป็น
+- ตรวจชื่อบุคคล หน่วยงาน สถานที่ วันที่ และตัวเลขก่อนเผยแพร่
 
 ${TANJAI.outputDeliveryGuard("ชุดไฟล์สื่อ")}`;
     TANJAI.setReadyOutput("kit", {
-      title:"Universal Execution Prompt Pack",
-      desc:"มีทั้ง Prompt สำหรับแก้/คุยต่อ และ Prompt สำหรับสั่ง AI ทำงานทันที",
+      title:"Expert Prompt ชุดสื่อ — Campaign Director",
+      desc:"สร้างแกนแคมเปญเดียว แล้วแตกบทบาท ภาพ โพสต์ วิดีโอ เสียง และสไลด์อย่างสอดคล้อง",
       main:out,
       advancedTitle1:"Prompt สำหรับแก้ / คุยต่อ",
       advanced1:discussOut,
-      advancedTitle2:"Prompt Brain วิเคราะห์บรีฟ + AI Handoff Note",
+      advancedTitle2:"Brief Analysis + Campaign Handoff",
       advanced2:`${TANJAI.promptBrainReport ? TANJAI.promptBrainReport(d, "kit") : ""}\n\n---\n${advancedOut}`
     });
     TANJAI.state.lastKit=out;
-    TANJAI.toast("สร้าง Universal Execution Prompt Pack แล้ว");
+    TANJAI.toast("สร้าง Expert Prompt ชุดสื่อแล้ว");
   };
 
 
