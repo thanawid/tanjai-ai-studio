@@ -14,6 +14,10 @@ TANJAI.toast = function(msg){
 
 TANJAI.copyText = async function(text){
   const value = String(text || "");
+  if(!value.trim()){
+    TANJAI.toast("ยังไม่มีผลลัพธ์ให้คัดลอก — กรุณากดสร้างก่อน");
+    return false;
+  }
   try{
     if(navigator.clipboard && window.isSecureContext !== false){
       await navigator.clipboard.writeText(value);
@@ -29,9 +33,11 @@ TANJAI.copyText = async function(text){
       ta.remove();
     }
     TANJAI.toast("คัดลอกแล้ว — เปิดเครื่องมือที่ต้องการ แล้วกด Ctrl+V เพื่อวาง");
+    return true;
   }catch(err){
     console.warn("Copy failed", err);
     TANJAI.toast("คัดลอกอัตโนมัติไม่ได้ กรุณาเลือกข้อความแล้วคัดลอกเอง");
+    return false;
   }
 };
 
@@ -41,7 +47,7 @@ TANJAI.downloadText = function(text, filename){
   a.href = URL.createObjectURL(blob);
   a.download = filename || "tanjai-output.txt";
   a.click();
-  URL.revokeObjectURL(a.href);
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 };
 
 TANJAI.validViews = ["dashboard","router","image","album","post","mc","video","voice","deck","kit","promptHub","destinationHub","projects","library","guide"];
@@ -51,9 +57,18 @@ TANJAI.switchView = function(id, options = {}){
   TANJAI.state = TANJAI.state || {};
   TANJAI.state.currentView = id;
 
-  TANJAI.$$(".view").forEach(v => v.classList.remove("active"));
-  TANJAI.$("#"+id)?.classList.add("active");
-  TANJAI.$$(".nav-link").forEach(b => b.classList.toggle("active", b.dataset.view === id));
+  TANJAI.$$(".view").forEach(v => {
+    const active = v.id === id;
+    v.classList.toggle("active", active);
+    v.setAttribute("aria-hidden", active ? "false" : "true");
+  });
+
+  TANJAI.$$(".nav-link, .mobile-tabbar [data-view], #mobileQuickNav [data-view]").forEach(b => {
+    const active = b.dataset.view === id;
+    b.classList.toggle("active", active);
+    if(active) b.setAttribute("aria-current", "page");
+    else b.removeAttribute("aria-current");
+  });
 
   const names = {
     dashboard:"สวัสดีครับ! 👋",
@@ -74,6 +89,7 @@ TANJAI.switchView = function(id, options = {}){
   };
   const title = TANJAI.$("#pageTitle");
   if(title) title.textContent = names[id] || "ทันใจ AI Studio";
+  document.title = `${names[id] || "ทันใจ AI Studio"} | ทันใจ AI Studio`;
 
   if(id === "projects") TANJAI.renderProjects?.();
 

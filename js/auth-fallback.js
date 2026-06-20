@@ -2,12 +2,19 @@ window.TANJAI = window.TANJAI || {};
 
 /**
  * Tanjai Auth Fallback v9.1.3
- * ใช้เมื่อ Firebase CDN/Config ไม่พร้อม เพื่อไม่ให้เว็บค้างอยู่หน้า Login ตลอดกาล
- * โหมดนี้เก็บสถานะเฉพาะในเครื่องผู้ใช้ ไม่ใช้ Cloud Firestore
+ * โหมด Local เป็นทางเลือกสำหรับการพัฒนาเท่านั้น และปิดไว้โดยค่าเริ่มต้น
+ * ห้ามใช้โหมดนี้แทนระบบยืนยันตัวตนบนเว็บจริง
  */
 (function(){
   const KEY = "tanjaiLocalAuthV913";
-  const allowLocalFallback = true;
+  const allowLocalFallback = window.TANJAI_ENABLE_LOCAL_FALLBACK === true;
+
+  function showUnavailable(){
+    const error = document.getElementById("loginError");
+    if(error && !window.TANJAI_AUTH){
+      error.textContent = "เชื่อมต่อระบบสมาชิกไม่ได้ กรุณาตรวจสอบอินเทอร์เน็ตแล้วรีเฟรชหน้าเว็บ";
+    }
+  }
 
   function showApp(userName){
     document.body.classList.remove("auth-locked");
@@ -34,17 +41,21 @@ window.TANJAI = window.TANJAI || {};
   }
 
   function installFallback(){
-    if(window.TANJAI_AUTH || !allowLocalFallback) return;
+    if(window.TANJAI_AUTH) return;
+    if(!allowLocalFallback){
+      showUnavailable();
+      return;
+    }
     console.warn("TANJAI: Firebase Auth unavailable, local fallback enabled.");
     window.TANJAI_AUTH = {
       login: async (email, password) => {
-        if(!password || String(password).trim().length < 4) throw new Error("กรุณากรอกรหัสผ่านอย่างน้อย 4 ตัวอักษร");
+        if(!password || String(password).trim().length < 6) throw new Error("กรุณากรอกรหัสผ่านอย่างน้อย 6 ตัวอักษร");
         const user = writeLocalUser(email || "local@tanjai");
         showApp((user.email || "local").split("@")[0]);
         TANJAI.toast?.("เข้าสู่ระบบโหมด Local แล้ว");
       },
       register: async (email, password) => {
-        if(!password || String(password).trim().length < 4) throw new Error("กรุณากรอกรหัสผ่านอย่างน้อย 4 ตัวอักษร");
+        if(!password || String(password).trim().length < 6) throw new Error("กรุณากรอกรหัสผ่านอย่างน้อย 6 ตัวอักษร");
         const user = writeLocalUser(email || "local@tanjai");
         showApp((user.email || "local").split("@")[0]);
         TANJAI.toast?.("สร้างผู้ใช้โหมด Local แล้ว");

@@ -22,8 +22,19 @@ TANJAI.isCloudAuth = function(){
   return !!(user && user.uid && user.mode !== "local-fallback");
 };
 
+TANJAI.readLocalProjects = function(){
+  try{
+    const value = JSON.parse(localStorage.getItem("tanjaiV5Projects") || "[]");
+    return Array.isArray(value) ? value : [];
+  }catch(_error){
+    localStorage.removeItem("tanjaiV5Projects");
+    TANJAI.toast?.("ข้อมูลโปรเจกต์เดิมเสียหาย ระบบเริ่มรายการใหม่ให้แล้ว");
+    return [];
+  }
+};
+
 TANJAI.saveProjectLocal = function(title, text, tool){
-  const items = JSON.parse(localStorage.getItem("tanjaiV5Projects") || "[]");
+  const items = TANJAI.readLocalProjects();
   items.unshift({
     title: String(title || "").trim(),
     text: String(text || "").trim(),
@@ -36,6 +47,10 @@ TANJAI.saveProjectLocal = function(title, text, tool){
 };
 
 TANJAI.saveProject = function(title, text, tool) {
+  if(!String(text || "").trim()){
+    TANJAI.toast("ยังไม่มีผลลัพธ์ให้บันทึก — กรุณากดสร้างก่อน");
+    return;
+  }
   if (TANJAI.isCloudAuth() && window.TANJAI_AUTH && window.TANJAI_AUTH.saveProjectToCloud) {
     window.TANJAI_AUTH.saveProjectToCloud(title, text, tool);
   } else {
@@ -46,13 +61,15 @@ TANJAI.saveProject = function(title, text, tool) {
 TANJAI.renderProjects = async function() {
   const el = TANJAI.$("#projectsList");
   if (!el) return;
+  const clearButton = TANJAI.$("#clearProjects");
+  if(clearButton) clearButton.hidden = TANJAI.isCloudAuth();
   
   let items = [];
   if (TANJAI.isCloudAuth() && window.TANJAI_AUTH && window.TANJAI_AUTH.getProjectsFromCloud) {
     el.innerHTML = `<div class="empty-state"><b>กำลังโหลดงานจาก Cloud...</b></div>`;
     items = await window.TANJAI_AUTH.getProjectsFromCloud();
   } else {
-    items = JSON.parse(localStorage.getItem("tanjaiV5Projects") || "[]");
+    items = TANJAI.readLocalProjects();
   }
   
   if (!items.length) {
@@ -63,10 +80,10 @@ TANJAI.renderProjects = async function() {
   el.innerHTML = items.map((p, i) => `
     <article class="project-card">
       <b>${TANJAI.escapeHtml(p.title)}</b>
-      <span>${TANJAI.escapeHtml(p.tool)} • ${p.date ? (p.date.includes('T') ? new Date(p.date).toLocaleString('th-TH') : p.date) : ''}</span>
+      <span>${TANJAI.escapeHtml(p.tool)} • ${TANJAI.escapeHtml(p.date ? (String(p.date).includes('T') ? new Date(p.date).toLocaleString('th-TH') : p.date) : '')}</span>
       <div class="button-row">
         <button class="btn secondary" data-copy-project="${i}">คัดลอก</button>
-        <button class="btn secondary" data-del-project="${i}" data-id="${p.id || ''}">ลบ</button>
+        <button class="btn secondary" data-del-project="${i}" data-id="${TANJAI.escapeHtml(p.id || '')}">ลบ</button>
       </div>
     </article>
   `).join("");

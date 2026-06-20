@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="dark">
   <title>ทันใจ AI Studio | สร้างสื่อไว ด้วยพลัง AI</title>
   <link rel="icon" href="favicon.ico">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
@@ -16,6 +17,7 @@
   <link rel="stylesheet" href="css/animations.css">
 </head>
 <body class="auth-locked">
+  <a class="skip-link" href="#mainContent">ข้ามไปยังเนื้อหาหลัก</a>
 
   <section class="login-gate" id="loginGate" aria-label="เข้าสู่ระบบ">
     <div class="login-card">
@@ -33,23 +35,27 @@
         </label>
         <label>
           รหัสผ่าน
-          <input id="loginPassword" type="password" autocomplete="current-password" placeholder="กรอกรหัสผ่าน" required>
+          <span class="password-field">
+            <input id="loginPassword" type="password" autocomplete="current-password" placeholder="กรอกรหัสผ่าน" minlength="6" aria-describedby="loginHelp loginError" required>
+            <button class="password-toggle" id="togglePassword" type="button" aria-controls="loginPassword" aria-pressed="false">แสดง</button>
+          </span>
         </label>
         <div class="login-actions-v9">
           <button class="btn primary" type="submit" id="signInBtn">เข้าสู่ระบบ</button>
           <button class="btn secondary" type="button" id="signUpBtn">สมัครสมาชิก</button>
         </div>
-        <p id="loginError" class="login-error" role="alert"></p>
+        <p id="loginHelp" class="login-help">รหัสผ่านอย่างน้อย 6 ตัวอักษร</p>
+        <p id="loginError" class="login-error" role="alert" aria-live="assertive"></p>
       </form>
 
       <small class="login-note">ระบบสำหรับผู้ได้รับสิทธิ์ใช้งานเท่านั้น</small>
     </div>
   </section>
 
-  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <button class="sidebar-overlay" id="sidebarOverlay" type="button" aria-label="ปิดเมนู" tabindex="-1"></button>
   <div class="ambient"></div>
   <div class="app-shell">
-    <aside class="sidebar">
+    <aside class="sidebar" id="mainSidebar" aria-label="เมนูหลัก">
       <div class="brand">
         <img src="assets/logo.jpg" alt="ทันใจ AI Studio">
         <div>
@@ -90,11 +96,12 @@
       </div>
     </aside>
 
-    <main class="workspace">
+    <main class="workspace" id="mainContent" tabindex="-1">
       <header class="topbar">
+        <button class="mobile-menu-btn" id="mobileMenuBtn" type="button" aria-label="เปิดเมนูหลัก" aria-controls="mainSidebar" aria-expanded="false">☰</button>
         <div>
           <p class="eyebrow">ทันใจ AI Studio</p>
-          <h2 id="pageTitle">สวัสดีครับ! 👋</h2>
+          <h2 id="pageTitle" aria-live="polite">สวัสดีครับ! 👋</h2>
         </div>
         <div class="top-actions">
           <button class="btn secondary nav-back-btn" id="topBackBtn" type="button">← ย้อนกลับ</button>
@@ -104,7 +111,7 @@
             <span class="user-name" id="userDisplayName" style="font-weight: 600; font-size: 14px;">User</span>
             <button class="btn secondary logout-btn" id="logoutBtn" type="button" style="padding: 6px 12px; font-size: 12px; border-radius: 99px;">ออกจากระบบ</button>
           </div>
-          <button class="btn secondary" id="openCommandTop" onclick="window.TANJAI&&TANJAI.openCommandPalette&&TANJAI.openCommandPalette()">⌘ ค้นหาคำสั่ง</button><button class="btn secondary" data-view="router">AI Router</button>
+          <button class="btn secondary" id="openCommandTop" type="button">⌘ ค้นหาคำสั่ง</button><button class="btn secondary" data-view="router">AI Router</button>
           <button class="btn primary" data-view="kit">+ สร้างชุดสื่อ</button>
         </div>
       </header>
@@ -261,7 +268,7 @@
 
       <section id="projects" class="view">
         <div class="panel">
-          <div class="panel-head"><div><h3>📁 โปรเจกต์</h3><p>เก็บผลลัพธ์ที่ใช้งานบ่อยไว้ในเครื่องนี้</p></div><button class="btn secondary" id="clearProjects">ล้างโปรเจกต์ที่บันทึกไว้</button></div>
+          <div class="panel-head"><div><h3>📁 โปรเจกต์</h3><p>เก็บผลลัพธ์ที่ใช้งานบ่อยไว้กลับมาใช้ต่อภายหลัง</p></div><button class="btn secondary" id="clearProjects">ล้างโปรเจกต์ในเครื่อง</button></div>
           <div id="projectsList" class="projects-grid"></div>
         </div>
       </section>
@@ -322,7 +329,7 @@
     <button type="button" data-view="dashboard">🏠 หน้าหลัก</button>
   </div>
 
-  <div id="toast" class="toast"></div>
+  <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
   <script src="js/data.js"></script>
   <script src="js/generators.js"></script>

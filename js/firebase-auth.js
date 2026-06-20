@@ -20,6 +20,8 @@ let currentUser = null;
 onAuthStateChanged(auth, (user) => {
     const loginGate = document.getElementById("loginGate");
     const appShell = document.querySelector(".app-shell");
+    const loginError = document.getElementById("loginError");
+    if (loginError) loginError.textContent = "";
     
     if (user) {
         // User is signed in
