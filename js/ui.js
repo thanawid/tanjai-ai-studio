@@ -282,3 +282,65 @@ TANJAI.renderDestinations = function(){
 if(!TANJAI.setupNavigationHistory){
   TANJAI.setupNavigationHistory = function(){};
 }
+
+// ตัวอย่างการแสดงภาพผลลัพธ์ในกล่อง Result
+TANJAI.showImageResult = function(imageUrl) {
+  const box = document.getElementById("imageOut");
+  box.innerHTML = `<img src="${imageUrl}" style="max-width:100%; border-radius:12px;" alt="Result">
+                   <a href="${imageUrl}" download class="btn primary">ดาวน์โหลดภาพ</a>`;
+};
+// แทนที่โค้ดเดิมใน ui.js ส่วน $("#imageForm").innerHTML = ... ด้วยชุดนี้ครับ
+$("#imageForm").innerHTML = TANJAI.field("image") + `
+  <details class="form-section-advanced" open>
+    <summary class="section-title"><b>2</b><h4>Creative Quality & Style (ปรับแต่งความสวย)</h4></summary>
+    <div class="form-grid">
+      <label>บริบทงาน<select id="image-workContext">${opts(toolOptions.workContexts)}</select></label>
+      <label>ประเภทภาพ<select id="image-imageType">${opts(toolOptions.imageTypes)}</select></label>
+      <label>สไตล์ภาพ<select id="image-style">${opts(TANJAI.categories.imageStyles)}</select></label>
+      <label>Layout<select id="image-layout">${opts(toolOptions.layouts)}</select></label>
+    </div>
+  </details>
+
+  <details class="form-section-advanced">
+    <summary class="section-title"><b>3</b><h4>การปกป้องภาพและโหมดการใช้ (Safety & Mode)</h4></summary>
+    <div class="form-grid">
+       <label class="full">โหมดการใช้ภาพ<select id="image-useMode">
+          <option>สร้างภาพใหม่ด้วย AI</option>
+          <option>ใช้ภาพจริงเป็นต้นฉบับ</option>
+       </select></label>
+       <!-- ใส่ Safe Check Grid ตรงนี้ -->
+    </div>
+  </details>
+
+  <div class="button-row" style="margin-top:20px;">
+    <button class="btn primary" id="makeImage" style="width:100%; padding:15px;">สร้างภาพด้วย AI ทันที</button>
+  </div>
+`;
+$("#makeImage").onclick = async () => {
+  const d = getImageDataForPrompt();
+  const btn = $("#makeImage");
+  
+  // 1. เปลี่ยนสถานะปุ่ม
+  btn.textContent = "กำลังร่ายมนตร์ AI...";
+  btn.disabled = true;
+
+  try {
+    // 2. เรียกฟังก์ชันสร้างภาพ
+    const imageUrl = await TANJAI.generateInAppImage(d);
+    
+    // 3. แสดงผลในหน้าเว็บ
+    const resultBox = $("#imageOut");
+    resultBox.innerHTML = `
+      <div class="generated-image-wrap">
+        <img src="${imageUrl}" style="width:100%; border-radius:16px; border: 2px solid var(--accent);" alt="Result">
+        <a href="${imageUrl}" download="tanjai-ai-image.jpg" class="btn primary" style="margin-top:10px; width:100%">ดาวน์โหลดภาพ</a>
+      </div>
+    `;
+    TANJAI.toast("สร้างภาพเสร็จแล้ว!");
+  } catch (err) {
+    TANJAI.toast("เกิดข้อผิดพลาดในการสร้างภาพ");
+  } finally {
+    btn.textContent = "สร้างภาพด้วย AI ทันที";
+    btn.disabled = false;
+  }
+};

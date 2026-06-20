@@ -591,3 +591,17 @@ ${TANJAI.v9ProtectedBlock(d, type)}`;
 if (typeof module !== "undefined" && module.exports) {
   module.exports = TANJAI;
 }
+
+/**
+ * In-App Image Generator using Pollinations.ai
+ * DNA: Keep the style consistent with high-quality tech aesthetics
+ */
+TANJAI.generateInAppImage = async function(d) {
+  const prompt = TANJAI.imagePrompt(d); // ใช้ Prompt ที่คุณทำไว้ดีอยู่แล้ว
+  const encodedPrompt = encodeURIComponent(prompt);
+  
+  // ใช้ Model FLUX ในการวาดภาพเพื่อความสมจริง
+  const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1080&height=1920&nologo=true&seed=${Math.floor(Math.random()*1000)}`;
+  
+  return imageUrl;
+};
