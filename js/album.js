@@ -1,4 +1,4 @@
-/* v9.3.10 — Balanced Ribbon Facebook Album Frame
+/* v9.3.12 — Facebook Album Presets + Visible PR Frames
    Safe photo processing for real uploaded images only.
    Cover Frame + Lite Frames + Additional Frame, face-aware crop when supported,
    smart theme selection, safe text, slot-based crop/frames, Facebook mock preview, and synced preview / download results.
@@ -18,7 +18,7 @@
   const $$ = (q,root=document)=>Array.from(root.querySelectorAll(q));
   const state = {
     coverFile: null, supportFiles: [], files: [], outputs: [], logo: null, caption: "",
-    resolvedRatio: "16:9", resolvedPreviewLayout: "cover-top"
+    resolvedRatio: "1080x800", resolvedPreviewLayout: "cover-top", resolvedFacebookPreset: "wide-top"
   };
 
   function val(id, fallback=""){
@@ -64,6 +64,7 @@
       lite4: val("album-lite4",""),
       ratio: val("album-ratio","auto"),
       previewLayout: val("album-previewLayout","auto"),
+      facebookPreset: val("album-facebookPreset","auto"),
       colorTone: val("album-colorTone","AI เลือกโทนสีให้เข้ากับงาน"),
       mode: val("album-autoMode", val("album-mode","ปรับภาพ + ครอป + ใส่กรอบ")),
       layoutMode: val("album-layoutMode","Facebook Cover + Lite + Additional Frame System"),
@@ -88,6 +89,26 @@
     if(count>=4) return "cover-top";
     return "cover-left";
   }
+  function resolveFacebookPreset(requested="auto",w=1080,h=800){
+    if(requested && requested!=="auto") return requested;
+    const aspect=(Number(w)||1080)/(Number(h)||800);
+    if(aspect<=0.86) return "portrait-left";
+    if(aspect>=1.18) return "wide-top";
+    return "square-grid";
+  }
+  function effectiveFacebookPreset(d=data()){
+    return d.facebookPreset && d.facebookPreset!=="auto" ? d.facebookPreset : (state.resolvedFacebookPreset || "wide-top");
+  }
+  function presetLayout(preset){
+    if(preset==="square-grid") return "grid";
+    if(preset==="portrait-left") return "cover-left";
+    return "cover-top";
+  }
+  function facebookPresetLabel(preset){
+    if(preset==="square-grid") return "4 ภาพจัตุรัส 1080x1080";
+    if(preset==="portrait-left") return "ปกตั้ง 1280x1920 + ภาพรองจัตุรัส";
+    return "ปกกว้าง 1080x800 + ภาพรองจัตุรัส";
+  }
   function previewLayoutLabel(layout){
     if(layout==="cover-left") return "ปกใหญ่ซ้าย + ภาพรองขวา";
     if(layout==="grid") return "ตารางภาพสมดุล";
@@ -108,7 +129,7 @@
   }
   function slotProfile(idx,d=data(),total=state.files.length||4){
     const role=slotRole(idx);
-    const layout=previewLayoutFor(d.previewLayout,total,effectiveRatio(d));
+    const layout=presetLayout(effectiveFacebookPreset(d));
     if(role==="cover"){
       return {role, layout, label:"Cover Frame", frameWeight:"balanced-cover", textDensity:"full", logoScale:.84, targetY:layout==="cover-left"?.43:.41, bottomRatio:.17};
     }
@@ -118,9 +139,13 @@
     return {role, layout, label:`Additional Frame ${idx+1}`, frameWeight:"balanced-minimal", textDensity:"minimal", logoScale:.42, targetY:.50, bottomRatio:.048};
   }
   function slotSize(idx,d=data(),total=state.files.length||4){
+    const preset=effectiveFacebookPreset(d);
+    const role=slotRole(idx);
+    if(preset==="square-grid") return {w:1080,h:1080};
+    if(preset==="portrait-left") return role==="cover" ? {w:1280,h:1920} : {w:1080,h:1080};
+    if(preset==="wide-top") return role==="cover" ? {w:1080,h:800} : {w:1080,h:1080};
     const requested=d.ratio || "auto";
     if(requested !== "auto") return size(d);
-    const role=slotRole(idx);
     const layout=previewLayoutFor(d.previewLayout,total,effectiveRatio(d));
     if(layout==="grid") return {w:1080,h:1080};
     if(layout==="cover-left"){
@@ -277,22 +302,23 @@
   function drawAccentSweep(ctx,w,h,th,pst){
     if(!pst.showAccentSweep) return;
     ctx.save();
+    const min=Math.min(w,h);
     const g1=ctx.createLinearGradient(w*.68,0,w,0);
     g1.addColorStop(0,"rgba(255,255,255,0)");
-    g1.addColorStop(.55,rgba(th.accent,.42));
-    g1.addColorStop(1,rgba(th.accent2,.42));
+    g1.addColorStop(.55,rgba(th.accent,.72));
+    g1.addColorStop(1,rgba(th.accent2,.86));
     ctx.fillStyle=g1;
     ctx.beginPath();
-    ctx.moveTo(w*.84,0);
+    ctx.moveTo(w*.80,0);
     ctx.lineTo(w,0);
-    ctx.lineTo(w,h*.24);
-    ctx.lineTo(w*.93,h*.16);
+    ctx.lineTo(w,h*.27);
+    ctx.lineTo(w*.92,h*.16);
     ctx.closePath();
     ctx.fill();
 
     const g2=ctx.createLinearGradient(w*.72,h,w,h*.6);
-    g2.addColorStop(0,rgba(th.accent2,.44));
-    g2.addColorStop(.65,rgba(th.accent,.28));
+    g2.addColorStop(0,rgba(th.accent2,.82));
+    g2.addColorStop(.65,rgba(th.accent,.56));
     g2.addColorStop(1,"rgba(255,255,255,0)");
     ctx.fillStyle=g2;
     ctx.beginPath();
@@ -302,6 +328,23 @@
     ctx.lineTo(w*.94,h*.86);
     ctx.closePath();
     ctx.fill();
+
+    if(th.proFrame==="Balanced Ribbon"){
+      const side=ctx.createLinearGradient(0,h*.12,w*.10,h*.70);
+      side.addColorStop(0,th.accent2);
+      side.addColorStop(.55,th.accent);
+      side.addColorStop(1,rgba(th.accent2,.40));
+      ctx.strokeStyle=side;
+      ctx.lineCap="round";
+      ctx.lineWidth=Math.max(8,Math.round(min*.014));
+      ctx.beginPath();
+      ctx.moveTo(Math.round(min*.018),h*.12);
+      ctx.bezierCurveTo(w*.075,h*.26,w*.025,h*.49,Math.round(min*.018),h*.70);
+      ctx.stroke();
+      ctx.strokeStyle="rgba(255,255,255,.38)";
+      ctx.lineWidth=Math.max(2,Math.round(min*.003));
+      ctx.stroke();
+    }
     ctx.restore();
   }
   function drawBorderFrame(ctx,w,h,th){
@@ -309,7 +352,7 @@
     const pad=Math.round(min*0.014);
     const radius=Math.round(min*0.020);
     const pro=th.proFrame && th.proFrame !== "None";
-    const thickness=pro ? Math.max(6,Math.round(min*0.009)) : Math.max(3,Math.round(min*.0038));
+    const thickness=pro ? Math.max(8,Math.round(min*0.014)) : Math.max(3,Math.round(min*.0038));
     ctx.save();
 
     if(th.proFrame === "Balanced Ribbon"){
@@ -317,8 +360,8 @@
       balanced.addColorStop(0, th.accent2);
       balanced.addColorStop(.52, th.accent);
       balanced.addColorStop(1, th.border);
-      ctx.shadowColor=rgba(th.accent,.20);
-      ctx.shadowBlur=Math.round(min*.010);
+      ctx.shadowColor=rgba(th.accent,.30);
+      ctx.shadowBlur=Math.round(min*.014);
       fillRoundRect(ctx,pad,pad,w-pad*2,h-pad*2,radius,null,balanced,thickness);
       ctx.shadowBlur=0;
       fillRoundRect(ctx,pad+thickness*.90,pad+thickness*.90,w-pad*2-thickness*1.8,h-pad*2-thickness*1.8,Math.max(7,radius-thickness*.40),null,"rgba(255,255,255,.20)",1);
@@ -361,7 +404,7 @@
   function drawSlotBorderFrame(ctx,w,h,th,weight="lite"){
     const min=Math.min(w,h);
     const pad=Math.round(min*(weight==="minimal"?0.015:0.014));
-    const thickness = weight==="minimal" ? Math.max(2, Math.round(min*0.0025)) : Math.max(3, Math.round(min*0.0042));
+    const thickness = weight==="minimal" ? Math.max(2, Math.round(min*0.0035)) : Math.max(4, Math.round(min*0.0065));
     const radius=Math.round(min*0.019);
     ctx.save();
     if(th.proFrame === "Balanced Ribbon"){
@@ -369,8 +412,8 @@
       balanced.addColorStop(0, th.accent2);
       balanced.addColorStop(.55, th.accent);
       balanced.addColorStop(1, th.border);
-      ctx.shadowColor=rgba(th.accent,.12);
-      ctx.shadowBlur=weight==="minimal" ? 4 : 7;
+      ctx.shadowColor=rgba(th.accent,.20);
+      ctx.shadowBlur=weight==="minimal" ? 5 : 9;
       fillRoundRect(ctx,pad,pad,w-pad*2,h-pad*2,radius,null,balanced,thickness);
       ctx.shadowBlur=0;
       fillRoundRect(ctx,pad+thickness,pad+thickness,w-pad*2-thickness*2,h-pad*2-thickness*2,Math.max(6,radius-thickness*.45),null,"rgba(255,255,255,.16)",1);
@@ -544,8 +587,8 @@
     drawAccentSweep(ctx,w,h,th,pst);
     drawBorderFrame(ctx,w,h,th);
 
-    const brandW=Math.round(w*(land?0.42:0.70));
-    const brandH=Math.round(h*(land?0.074:0.062));
+    const brandW=Math.round(w*(land?0.46:0.74));
+    const brandH=Math.round(h*(land?0.085:0.068));
     const brandX=pad+Math.round(w*.014);
     const brandY=pad+Math.round(h*.012);
     const brandLabel=hasRealOrg(d.org) ? d.org : '';
@@ -627,15 +670,27 @@
 
     // Small accent corner keeps the album identity without covering the photo.
     ctx.save();
-    const corner=ctx.createLinearGradient(w*.74,0,w*.98,h*.24);
-    corner.addColorStop(0,rgba(th.accent,.26));
-    corner.addColorStop(1,rgba(th.accent2,.18));
+    const corner=ctx.createLinearGradient(w*.72,0,w*.98,h*.24);
+    corner.addColorStop(0,rgba(th.accent,.62));
+    corner.addColorStop(1,rgba(th.accent2,.52));
     ctx.fillStyle=corner;
     ctx.beginPath();
-    ctx.moveTo(w*.86,pad);
+    ctx.moveTo(w*.82,pad);
     ctx.lineTo(w-pad,pad);
-    ctx.lineTo(w-pad,h*.14);
-    ctx.lineTo(w*.94,h*.08);
+    ctx.lineTo(w-pad,h*.18);
+    ctx.lineTo(w*.92,h*.10);
+    ctx.closePath();
+    ctx.fill();
+
+    const lead=ctx.createLinearGradient(pad,pad,w*.24,pad+h*.10);
+    lead.addColorStop(0,rgba(th.accent2,.90));
+    lead.addColorStop(1,rgba(th.accent,.46));
+    ctx.fillStyle=lead;
+    ctx.beginPath();
+    ctx.moveTo(pad,pad);
+    ctx.lineTo(w*.24,pad);
+    ctx.lineTo(w*.19,pad+h*.055);
+    ctx.lineTo(pad,pad+h*.085);
     ctx.closePath();
     ctx.fill();
     ctx.restore();
@@ -724,20 +779,22 @@
     const d=data();
     const note=$('#album-smartChoice');
     if(!note) return;
-    const ratioSource=d.ratio==="auto"?'ระบบเลือกอัตโนมัติ':'ผู้ใช้เลือก';
-    const layoutSource=d.previewLayout==="auto"?'ระบบเลือกอัตโนมัติ':'ผู้ใช้เลือก';
-    note.innerHTML=`<b>การแสดงผลชุดนี้</b><span>${d.ratio==='auto'?'ขนาดตาม Slot: Cover / Lite / Additional':'ขนาดเดียวทั้งชุด '+effectiveRatio(d)} (${ratioSource}) · ${previewLayoutLabel(state.resolvedPreviewLayout)} (${layoutSource})</span>`;
+    const selected=effectiveFacebookPreset(d);
+    const source=d.facebookPreset==="auto"?'ระบบวิเคราะห์จากภาพปก':'ผู้ใช้เลือก';
+    note.innerHTML=`<b>รูปแบบอัลบั้มที่ใช้</b><span>${facebookPresetLabel(selected)} · ${previewLayoutLabel(presetLayout(selected))} (${source})</span>`;
     note.classList.add('resolved');
   }
   async function resolveSmartSettings(files){
     const d=data();
-    if(d.ratio==="auto" && files[0]){
+    if(files[0]){
       const coverImage=await makeImage(files[0]);
-      state.resolvedRatio=resolveRatioFromDimensions(coverImage.naturalWidth||coverImage.width,coverImage.naturalHeight||coverImage.height);
+      state.resolvedFacebookPreset=resolveFacebookPreset(d.facebookPreset,coverImage.naturalWidth||coverImage.width,coverImage.naturalHeight||coverImage.height);
     }else{
-      state.resolvedRatio=effectiveRatio(d);
+      state.resolvedFacebookPreset=resolveFacebookPreset(d.facebookPreset);
     }
-    state.resolvedPreviewLayout=previewLayoutFor(d.previewLayout,files.length,state.resolvedRatio);
+    state.resolvedPreviewLayout=presetLayout(state.resolvedFacebookPreset);
+    const coverSize=slotSize(0,d,files.length);
+    state.resolvedRatio=`${coverSize.w}x${coverSize.h}`;
     renderSmartChoice();
   }
   function canvasToBlob(canvas){ return new Promise(res=>canvas.toBlob(b=>res(b),"image/jpeg",.92)); }
@@ -785,13 +842,11 @@
     const esc=s=>String(s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;');
 
     if(!hasCover && !supports.length){
-      host.innerHTML = `
-        <div class="album-slot-empty">
-          <b>โครงอัลบั้ม</b>
-          <span>ภาพ 1 = ปก · ภาพ 2–4 = ภาพรอง · ภาพ 5+ = เพิ่มเติม</span>
-        </div>`;
+      host.replaceChildren();
+      host.hidden=true;
       return;
     }
+    host.hidden=false;
 
     const coverCard = hasCover ? `
       <div class="album-slot-card is-cover">
@@ -828,10 +883,6 @@
         ${coverCard}
         ${supportCards}
       </div>
-      <details class="album-help-details">
-        <summary>โครงอัลบั้ม</summary>
-        <p>Cover ใช้เปิดเรื่อง · Lite ขยายบรรยากาศ · Additional เสริมภาพต่อเนื่อง โดยระบบจะครอปและใส่กรอบตามบทบาทภาพ</p>
-      </details>
     `;
   }
 
@@ -856,8 +907,9 @@
     const cover = state.outputs[0];
     const lites = state.outputs.slice(1,4);
     const additional = state.outputs.slice(4,5);
-    const resolvedRatio=effectiveRatio(data());
-    state.resolvedPreviewLayout=previewLayoutFor(data().previewLayout,state.outputs.length,resolvedRatio);
+    const resolvedPreset=effectiveFacebookPreset(data());
+    const resolvedRatio=facebookPresetLabel(resolvedPreset);
+    state.resolvedPreviewLayout=presetLayout(resolvedPreset);
 
     const coverPreview = cover ? `
       <section class="album-preview-section">
@@ -951,7 +1003,8 @@
     const host=$('#albumFacebookPreview'); if(!host) return;
     const imgs=state.outputs.slice(0,4); const total=state.outputs.length;
     const countClass=imgs.length<=1?'one':imgs.length===2?'two':imgs.length===3?'three':'four';
-    const layout=previewLayoutFor(data().previewLayout,total,effectiveRatio(data()));
+    const preset=effectiveFacebookPreset(data());
+    const layout=presetLayout(preset);
     state.resolvedPreviewLayout=layout;
     const captionEl=$('#albumCaptionText'); const caption=captionEl?captionEl.value:state.caption;
     const pageName = hasRealOrg(data().org) ? data().org : 'ชื่อเพจของคุณ';
@@ -964,7 +1017,7 @@
         </div>
         <div class="fb-preview-caption">${String(caption||'').replace(/</g,'&lt;').replace(/\n/g,'<br>')}</div>
         <div class="fb-preview-grid ${countClass} ${layout}">${cells}</div>
-        <div class="fb-preview-foot">จำลองจากภาพจริง · ${effectiveRatio(data())} · ${previewLayoutLabel(layout)}</div>
+        <div class="fb-preview-foot">จำลองจากขนาดไฟล์จริง · ${facebookPresetLabel(preset)} · ${previewLayoutLabel(layout)}</div>
       </div>`;
   }
 
@@ -1022,7 +1075,7 @@
       if(id==='albumClear' || id==='albumClearTop'){
         e.preventDefault();
         state.outputs.forEach(o=>URL.revokeObjectURL(o.url));
-        state.outputs=[]; state.files=[]; state.coverFile=null; state.supportFiles=[]; state.logo=null; state.resolvedRatio='16:9'; state.resolvedPreviewLayout='cover-top';
+        state.outputs=[]; state.files=[]; state.coverFile=null; state.supportFiles=[]; state.logo=null; state.resolvedRatio='1080x800'; state.resolvedPreviewLayout='cover-top'; state.resolvedFacebookPreset='wide-top';
         const coverInp=$('#album-coverFile'); if(coverInp) coverInp.value='';
         const supportInp=$('#album-supportFiles'); if(supportInp) supportInp.value='';
         const logoInp=$('#album-logoFile'); if(logoInp) logoInp.value='';
@@ -1037,8 +1090,12 @@
     });
     document.addEventListener('change',(e)=>{
       if(e.target && (e.target.id==='album-coverFile' || e.target.id==='album-supportFiles')){ collectFilesFromInputs(true); renderUploadPreview(); }
-      if(e.target && e.target.id==='album-previewLayout' && state.outputs.length){ state.resolvedPreviewLayout=previewLayoutFor(e.target.value,state.outputs.length,effectiveRatio(data())); renderSmartChoice(); renderFacebookPreview(); }
-      if(e.target && e.target.id==='album-ratio' && state.outputs.length) generate();
+      if(e.target && e.target.id==='album-facebookPreset'){
+        state.resolvedFacebookPreset=resolveFacebookPreset(e.target.value);
+        state.resolvedPreviewLayout=presetLayout(state.resolvedFacebookPreset);
+        renderSmartChoice();
+        if(state.outputs.length) generate();
+      }
     });
     document.addEventListener('input',(e)=>{
       if(e.target && e.target.id==='albumCaptionText') renderFacebookPreview();
@@ -1046,6 +1103,6 @@
   });
   window.TANJAI_ALBUM_PRO={
     generate,downloadAll,renderFacebookPreview,renderUploadPreview,collectFilesFromInputs,
-    _test:{cropPlacement,liteText,theme,size,resolveRatioFromDimensions,previewLayoutFor}
+    _test:{cropPlacement,liteText,theme,size,resolveRatioFromDimensions,previewLayoutFor,resolveFacebookPreset,presetLayout,facebookPresetLabel,slotSize}
   };
 })();

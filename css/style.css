@@ -2317,6 +2317,7 @@ body:not(.auth-locked) .login-gate{
 
 /* v8.6.5 — Facebook Album Auto Frame & Smart Enhance */
 .album-upload-preview{display:grid;grid-template-columns:repeat(auto-fill, minmax(120px, 1fr));gap:12px;margin-top:15px}
+.album-upload-preview:empty{display:none;margin-top:0}
 .album-upload-preview img { width: 100%; height: 120px; object-fit: cover; border-radius: 12px; border: 2px solid var(--line); transition: transform 0.2s; }
 .album-upload-preview img:hover { transform: scale(1.05); border-color: var(--primary); }
 .album-file-chip{display:grid;grid-template-columns:36px 1fr auto;align-items:center;gap:10px;border:1px solid rgba(255,255,255,.10);border-radius:14px;padding:10px 12px;background:rgba(255,255,255,.045)}
@@ -3051,18 +3052,20 @@ body.auth-locked .owner-watermark{
 .fb-preview-grid.cover-top .fb-preview-cell:first-child{
   grid-column:1/-1;
   grid-row:auto;
-  min-height:260px;
+  min-height:0;
+  aspect-ratio:1080 / 800;
 }
-.fb-preview-grid.cover-top .fb-preview-cell:not(:first-child){min-height:135px}
+.fb-preview-grid.cover-top .fb-preview-cell:not(:first-child){min-height:0;aspect-ratio:1 / 1}
 .fb-preview-grid.cover-left{
-  grid-template-columns:1.18fr .82fr;
+  grid-template-columns:2fr 1fr;
+  grid-template-rows:repeat(3,minmax(0,1fr));
 }
 .fb-preview-grid.cover-left .fb-preview-cell:first-child{
   grid-column:auto;
   grid-row:span 3;
-  min-height:330px;
+  min-height:450px;
 }
-.fb-preview-grid.cover-left .fb-preview-cell:not(:first-child){min-height:108px}
+.fb-preview-grid.cover-left .fb-preview-cell:not(:first-child){min-height:0}
 .fb-preview-grid.grid{
   grid-template-columns:1fr 1fr;
 }
@@ -3070,7 +3073,8 @@ body.auth-locked .owner-watermark{
 .fb-preview-grid.grid .fb-preview-cell:first-child{
   grid-column:auto;
   grid-row:auto;
-  min-height:180px;
+  min-height:0;
+  aspect-ratio:1 / 1;
 }
 .album-cover-btn{
   min-width:38px;
