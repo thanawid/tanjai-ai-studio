@@ -86,8 +86,8 @@ TANJAI.commonData = function(prefix) {
     // V9.1 Creative Quality fields
     workContext: v("workContext") || "",
     imageType: v("imageType") || "",
-    qualityLevel: v("qualityLevel") || "Creative Quality สมดุล — สวย ใช้งานจริง ไม่เว่อร์",
-    creativityLevel: v("creativityLevel") || "ครีเอทีฟเต็มที่ในองค์ประกอบภาพ แต่ห้ามแต่งข้อมูลจริง"
+    qualityLevel: v("qualityLevel") || "Creative Quality สมดุล — มืออาชีพ มีไอเดีย พร้อมใช้",
+    creativityLevel: v("creativityLevel") || "คิดสร้างสรรค์ระดับกลาง — มี Big Idea แต่ไม่เว่อร์"
   };
 
   return baseData;
@@ -308,8 +308,8 @@ TANJAI.buildSharedBrief = function(d = {}, type = "image") {
     colorTone: d.colorTone || "ให้ AI เลือกให้เหมาะสม",
     attachmentGuide: TANJAI.v9AttachmentGuide(d, type),
     workContext: d.workContext || "",
-    qualityLevel: d.qualityLevel || "Creative Quality สมดุล — สวย ใช้งานจริง ไม่เว่อร์",
-    creativityLevel: d.creativityLevel || "ครีเอทีฟเต็มที่ในองค์ประกอบภาพ แต่ห้ามแต่งข้อมูลจริง"
+    qualityLevel: d.qualityLevel || "Creative Quality สมดุล — มืออาชีพ มีไอเดีย พร้อมใช้",
+    creativityLevel: d.creativityLevel || "คิดสร้างสรรค์ระดับกลาง — มี Big Idea แต่ไม่เว่อร์"
   };
 };
 
@@ -484,8 +484,8 @@ TANJAI.v91BuildSharedBrief = function(d = {}, type = "image") {
   
   b.workContext = d.workContext || preset.context;
   b.imageType = (d.imageType && !/^ให้ AI ช่วยเลือก/.test(d.imageType)) ? d.imageType : preset.imageType || b.imageType;
-  b.qualityLevel = d.qualityLevel || "Creative Quality สมดุล — สวย ใช้งานจริง ไม่เว่อร์";
-  b.creativityLevel = d.creativityLevel || "ครีเอทีฟเต็มที่ในองค์ประกอบภาพ แต่ห้ามแต่งข้อมูลจริง";
+  b.qualityLevel = d.qualityLevel || "Creative Quality สมดุล — มืออาชีพ มีไอเดีย พร้อมใช้";
+  b.creativityLevel = d.creativityLevel || "คิดสร้างสรรค์ระดับกลาง — มี Big Idea แต่ไม่เว่อร์";
   b.creativeDirection = preset.creativeDirection;
   b.textPolicy = preset.textPolicy;
   b.overdoGuard = preset.overdoGuard;

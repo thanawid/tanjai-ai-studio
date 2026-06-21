@@ -32,8 +32,8 @@ document.addEventListener("DOMContentLoaded", () => {
     workTypes: ["นายกลงพื้นที่","ติดตามปัญหากลุ่มเป้าหมาย","ตรวจงานโครงการ","กิจกรรมเทศบาล","อบรม / ประชุม","งานพิธีกร / ผู้ดำเนินรายการ","พิธีเปิด / พิธีปิด","ลงพื้นที่ช่วยเหลือ","รณรงค์ / ประชาสัมพันธ์","อื่น ๆ"],
     workContexts: ["ให้ AI ช่วยเลือกจากรายละเอียด","Thai PR Premium","โปสเตอร์ประชาสัมพันธ์ไทยสีสด","แจ้งข่าว / ประกาศ","เชิญชวน / ประชาสัมพันธ์","โปรโมท / แคมเปญ / ขายผลงาน","โปรโมทเพลง / ผลงานสร้างสรรค์","ให้ความรู้ / Infographic","ขั้นตอนบริการ / วิธีใช้งาน","สรุปกิจกรรม / รายงานผล","งานพิธี / งานบุญ / งานชุมชน","อบรม / ประชุม / สัมมนา","ขอบคุณ / แสดงความยินดี / อวยพร","รณรงค์ / สร้างความตระหนัก","ไว้อาลัย / สุภาพ / ลดสี","อื่น ๆ"],
     imageTypes: ["ให้ AI ช่วยเลือกตามบริบท","โพสต์โซเชียล","โปสเตอร์ประชาสัมพันธ์","อินโฟกราฟิก","ภาพแน่นข้อมูล","ภาพอ่านง่าย","ปก / Cover","ปกเพลง / โปรโมทเพลง","ภาพเชิญชวนกิจกรรม","ภาพแจ้งข่าว","ภาพสรุปกิจกรรม","ชุดภาพโพสต์ Facebook","ภาพแนวนอน / แบนเนอร์","ภาพไว้อาลัย / สุภาพ","อื่น ๆ"],
-    qualityLevels: ["High-Production PR — งานกราฟิกหลายชั้น (แนะนำ)","Creative Quality สมดุล — สวย ใช้งานจริง ไม่เว่อร์","คุมข้อมูลเข้ม — เน้นความถูกต้องและอ่านง่าย","สวยพรีเมียม — ยกระดับงานให้ดูแพงแต่ไม่มั่ว","สดใสโซเชียล — ดึงดูดแต่ยังอ่านชัด","ทางการสะอาด — เหมาะกับหน่วยงานและประกาศ"],
-    creativityLevels: ["ครีเอทีฟเต็มที่ในองค์ประกอบภาพ แต่ห้ามแต่งข้อมูลจริง","คิดต่อพอดีตามข้อมูลผู้ใช้","ตามผู้ใช้สั่งมากที่สุด ไม่ตีความเกิน","ลดความเว่อร์ เน้นงานใช้งานจริง"]
+    qualityLevels: ["Creative Quality สมดุล — มืออาชีพ มีไอเดีย พร้อมใช้ (แนะนำ)","Thai PR Premium — กราฟิกหลายชั้น ข้อมูลเด่น","คุมข้อมูลเข้ม — เน้นความถูกต้องและอ่านง่าย","สวยพรีเมียม — ยกระดับงานให้ดูแพงแต่ไม่มั่ว","สดใสโซเชียล — ดึงดูดแต่ยังอ่านชัด","ทางการสะอาด — เหมาะกับหน่วยงานและประกาศ"],
+    creativityLevels: ["คิดสร้างสรรค์ระดับกลาง — มี Big Idea แต่ไม่เว่อร์ (แนะนำ)","ครีเอทีฟเต็มที่ในองค์ประกอบภาพ แต่ห้ามแต่งข้อมูลจริง","คิดต่อพอดีตามข้อมูลผู้ใช้","ตามผู้ใช้สั่งมากที่สุด ไม่ตีความเกิน","ลดความเว่อร์ เน้นงานใช้งานจริง"]
   };
 
 // Render forms
@@ -268,7 +268,7 @@ document.addEventListener("DOMContentLoaded", () => {
   TANJAI.simplifyExpertForms?.();
 
   // Results
-  $("#imageResult").innerHTML = TANJAI.readyOutputShell("image", "ภาพพร้อมสร้าง — Creative Director", "กดครั้งเดียวเพื่อคัดลอกคำสั่งและเปิด ทันใจ GPT จากนั้นวางคำสั่งเพื่อสร้างภาพจริง", "imageOut");
+  $("#imageResult").innerHTML = TANJAI.readyOutputShell("image", "ภาพพร้อมสร้าง — Creative Director", "ขั้นตอน: คัดลอก Prompt → เปิด ทันใจ GPT → แนบไฟล์จริง (ถ้ามี) → วาง Prompt", "imageOut");
 $("#albumResult").innerHTML = TANJAI.readyOutputShell("album", "ชุดภาพพร้อมโพสต์", "ปรับภาพจริง ใส่กรอบ และดาวน์โหลดเป็นภาพพร้อมลง Facebook", "albumOut");
 $("#postResult").innerHTML = TANJAI.readyOutputShell("post", "Prompt งานเขียนพร้อมใช้ — นักวางกลยุทธ์เนื้อหา", "ปรับผลลัพธ์ตามชนิดงานจริง เช่น สรุป ข่าว โพสต์ Facebook ข้อความ LINE หรือแคปชั่น", "postOut");
 $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "Prompt พิธีกรพร้อมใช้ — ผู้กำกับงานเวที", "คุมลำดับพิธี ชื่อ ตำแหน่ง คำกำกับเวที และบัตรคำพูด", "mcOut");
@@ -301,7 +301,7 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "Prompt พิธีก
     }
     TANJAI.setReadyOutput("image", {
       title:"ภาพพร้อมสร้าง — Creative Director",
-      desc:"กดปุ่มเดียวเพื่อคัดลอกและเปิด ทันใจ GPT ระบบจะคิด Art Direction ภายในแล้วสร้างภาพจริงทันที",
+      desc:"คัดลอก Prompt แล้วเปิด ทันใจ GPT หากเลือกไฟล์ในเว็บ ต้องแนบไฟล์จริงซ้ำในแชทก่อนวาง Prompt",
       main:executeText,
       advancedTitle1:"Prompt มืออาชีพสำหรับตรวจและปรับต่อ",
       advanced1:discussText,
@@ -899,6 +899,7 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "Prompt พิธีก
     imageInput?.addEventListener("change", ()=>{
       renderUploadPreview("#image-photos", "#image-photoPreview");
       recommendRealPhotoMode(true);
+      TANJAI.renderAttachmentHandoff?.("image", Array.from(imageInput.files || []));
     });
     mode?.addEventListener("change", ()=>{
       mode.dataset.userChanged = "1";
@@ -929,8 +930,37 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "Prompt พิธีก
 
   setupImageSafeMode();
   setupV91CreativeQuality();
-  $("#post-photos")?.addEventListener("change", ()=>renderUploadPreview("#post-photos", "#post-photoPreview"));
-  $("#mc-photos")?.addEventListener("change", ()=>renderUploadPreview("#mc-photos", "#mc-photoPreview"));
+  const escapeHandoffText = value => String(value || "")
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+
+  TANJAI.renderAttachmentHandoff = function(tool, files=[]){
+    const host = $(`#${tool}Result`);
+    if(!host) return;
+    let notice = host.querySelector(".attachment-handoff-notice");
+    if(!files.length){ notice?.remove(); return; }
+    if(!notice){
+      notice = document.createElement("div");
+      notice.className = "attachment-handoff-notice";
+      host.querySelector(".result-action")?.insertAdjacentElement("afterend", notice);
+    }
+    const names = files.map(file => escapeHandoffText(file.name)).join("<br>");
+    notice.innerHTML = `
+      <strong>⚠️ ไฟล์ยังไม่ได้ถูกส่งไป ทันใจ GPT</strong>
+      <span>เบราว์เซอร์ไม่สามารถแนบไฟล์ข้ามเว็บไซต์อัตโนมัติได้ เมื่อเปิด GPT ให้กด <b>+</b> และแนบไฟล์เหล่านี้อีกครั้ง:</span>
+      <div class="attachment-handoff-files">${names}</div>
+      <small>ลำดับที่ถูกต้อง: คัดลอก Prompt → เปิด GPT → แนบไฟล์ → วาง Prompt</small>`;
+  };
+
+  const handlePromptAttachmentChange = (tool, inputSelector, previewSelector) => {
+    const input = $(inputSelector);
+    input?.addEventListener("change", ()=>{
+      renderUploadPreview(inputSelector, previewSelector);
+      TANJAI.renderAttachmentHandoff(tool, Array.from(input.files || []));
+    });
+  };
+
+  handlePromptAttachmentChange("post", "#post-photos", "#post-photoPreview");
+  handlePromptAttachmentChange("mc", "#mc-photos", "#mc-photoPreview");
 
   document.getElementById("postModeContent")?.addEventListener("click", () => TANJAI.activateContentMode?.());
   document.getElementById("postModeMC")?.addEventListener("click", () => TANJAI.activateMCMode?.());

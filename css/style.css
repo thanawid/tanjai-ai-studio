@@ -4267,3 +4267,26 @@ textarea:focus-visible{
 .pricing-period-v93{font-size:12px;color:var(--muted);margin-bottom:16px;margin-top:2px}
 .pricing-features-v93{list-style:none;padding:0;margin:0 0 12px;display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--fg2)}
 .pricing-note-v93{font-size:11px;color:var(--muted);margin-top:8px}
+.attachment-handoff-notice{
+  margin:14px 0;
+  padding:14px 16px;
+  border:1px solid rgba(251,191,36,.52);
+  border-radius:16px;
+  background:linear-gradient(135deg,rgba(120,53,15,.28),rgba(30,41,59,.72));
+  color:#f8fafc;
+  display:grid;
+  gap:7px;
+}
+.attachment-handoff-notice strong{color:#fde68a;font-size:15px}
+.attachment-handoff-notice span,.attachment-handoff-notice small{line-height:1.55}
+.attachment-handoff-files{
+  max-height:112px;
+  overflow:auto;
+  padding:9px 11px;
+  border-radius:11px;
+  background:rgba(2,6,23,.55);
+  color:#e2e8f0;
+  font-size:13px;
+  line-height:1.55;
+  word-break:break-word;
+}

@@ -7,7 +7,7 @@ window.TANJAI = window.TANJAI || {};
  */
 (function(){
   const T = window.TANJAI;
-  T.expertPromptVersion = "Expert Engine 1.5 — High-Production Illustrated PR";
+  T.expertPromptVersion = "Expert Engine 1.6 — Smart Balanced Creative PR";
 
   const clean = (value = "", fallback = "") => {
     const result = String(value || "")
@@ -213,10 +213,16 @@ ${silentQualityGate([
     const a = analyze(d, "image");
     const context = imageContextProfile(d);
     const selectedStyle = clean(d.style || a.design.style, "AI PR Creative Director — เลือกแนวให้อัตโนมัติ");
-    const thaiPrPosterMode = /Thai PR Premium|Thai PR Poster Premium|High-Impact Thai PR Poster|โปสเตอร์ประชาสัมพันธ์ไทยสีสด/i.test([
-      selectedStyle, d.layout, d.workContext, d.imageType
+    const routingSignals = [
+      selectedStyle, d.layout, d.workContext, d.imageType, d.qualityLevel,
+      d.mainCategory, d.subCategory, d.title, d.detail, d.tone
+    ].filter(Boolean).join(" ");
+    const thaiPrPosterMode = /Thai PR Premium|Thai PR Poster Premium|High-Impact Thai PR Poster|โปสเตอร์ประชาสัมพันธ์ไทยสีสด|ภาพแน่นข้อมูล/i.test(routingSignals);
+    const respectfulMode = /ไว้อาลัย|ถวายความอาลัย|แสดงความอาลัย|ข่าวเศร้า|มรณ|สูญเสีย|ลดสี|สุภาพ.*อ่อนไหว|พิธีการ.*อ่อนไหว/i.test(routingSignals);
+    const photoLedMode = Number(d.photoCount || 0) > 0 || /ภาพจริง|ต้นฉบับ|รีทัช|photoreal|cinematic photo/i.test([
+      d.useMode,d.style,d.imageType,d.focus
     ].filter(Boolean).join(" "));
-    const thaiPrPosterProfile = thaiPrPosterMode ? `
+    const thaiPrPosterProfile = thaiPrPosterMode && !respectfulMode && !photoLedMode ? `
 === THAI PR PREMIUM PROFILE ===
 - สร้างงานต้นฉบับใหม่ที่ได้ DNA จากโปสเตอร์ประชาสัมพันธ์ไทยคุณภาพสูง ห้ามคัดลอกองค์ประกอบ ตรา ตัวละคร หรือรูปแบบเฉพาะของผลงานอื่น
 - วางลำดับภาพ 5 ชั้น: (1) identity zone ด้านบนสำหรับโลโก้จริง (2) announcement ribbon (3) hero headline ใหญ่ 2–4 บรรทัด (4) action/deadline band (5) information cards และ footer
@@ -229,24 +235,30 @@ ${silentQualityGate([
 - หากไม่มีไฟล์จริง ให้ตัดองค์ประกอบนั้นออกและจัดสมดุล Layout ใหม่ ห้ามใส่โลโก้หรือ QR จำลอง ห้ามพิมพ์ placeholder บนภาพ
 - ภาพต้องอ่านตามลำดับ: เรื่องอะไร > ต้องทำอะไร > เมื่อไร > วิธีดำเนินการ/ช่องทาง > เจ้าของเรื่อง โดยแสดงเฉพาะข้อมูลจริงที่มี
 - ตรวจความอ่านง่ายที่ขนาดมือถือ: หัวข้อเด่นทันที ตัวหนังสือรองไม่เล็กเกินไป ระยะขอบปลอดภัย และไม่มีข้อความชนหรือถูกตัด` : "";
-    const photoLedMode = Number(d.photoCount || 0) > 0 || /ภาพจริง|ต้นฉบับ|รีทัช|photoreal|cinematic photo/i.test([
-      d.useMode,d.style,d.imageType,d.focus
-    ].filter(Boolean).join(" "));
     const productionProfile = photoLedMode ? `
 === PHOTO-LED PR PRODUCTION PROFILE ===
 - ใช้ภาพจริงที่แนบเป็น hero visual และคงอัตลักษณ์เดิม แต่ยกระดับด้วยกรอบ แถบหัวข้อ custom shapes และ typography hierarchy แบบงานประชาสัมพันธ์
 - ห้ามเปลี่ยนภาพจริงให้เป็นการ์ตูนหรือสร้างบุคคลใหม่ ห้ามใช้เอฟเฟกต์บังใบหน้าและสาระสำคัญ
-- แม้ใช้ภาพถ่าย ผลลัพธ์ต้องดูเป็น PR key visual ที่ออกแบบเฉพาะงาน ไม่ใช่แค่ภาพถ่ายแปะข้อความ` : `
-=== HIGH-PRODUCTION ILLUSTRATED THAI PR PROFILE — DEFAULT ===
-- ค่าเริ่มต้นต้องเป็นโปสเตอร์กราฟิกประชาสัมพันธ์ไทยแบบ richly layered illustration ผสม vector + polished 3D ไม่ใช่ภาพถ่ายพื้นหลังใบเดียวแปะข้อความ
-- สร้างอย่างน้อย 5 ชั้นที่มีหน้าที่ชัด: atmospheric background, hero illustration/object, dimensional Thai headline, supporting visual motifs และ information/footer zone
-- หัวข้อหลักใช้ตัวอักษรไทยหนา custom display lettering มี outline, extrusion/bevel, controlled shadow และ contrast สูงตามอารมณ์งาน ห้ามใช้ตัวอักษรบางวางกลางภาพแบบ Quote Card ทั่วไป
-- ใช้ฉากวาดหรือฉากจำลอง, hero object, icon/sticker 3D, ribbon, badge, capsule และ custom panel เท่าที่ช่วยเล่าเรื่อง โดยทุกองค์ประกอบต้องเกี่ยวข้องกับบรีฟ
-- หากข้อมูลจริงมีน้อย ให้เพิ่มความสมบูรณ์ด้วย visual storytelling, สี, แสง, texture และองค์ประกอบเชิงสัญลักษณ์ ห้ามเติมข้อความ ตัวเลข บุคคล โลโก้ หรือข้อเท็จจริงใหม่
-- งานคำคมหรือข้อความสั้นต้องทำเป็น illustrated campaign poster: หัวข้อเด่น + hero metaphor + graphic environment ห้ามใช้โต๊ะ กาแฟ นาฬิกา หรือ stock-photo scene เป็นภาพหลัก เว้นแต่ผู้ใช้ขอภาพถ่าย
-- ใช้ชุดสีหลัก 3–4 สีแบบ premium high-saturation พร้อม white highlight และ dark anchor ให้ภาพสด มีมิติ และยังอ่านง่าย
-- รายละเอียดต้องแน่นอย่างมีระบบ แต่ไม่รก: หนึ่ง Big Idea, หนึ่ง hero visual และ motif สนับสนุนไม่เกินสามอย่าง
-- หาก Router เลือก Formal & Respectful ให้ลด saturation ตัดเอฟเฟกต์สนุกและตัวอักษร 3D ที่ไม่เหมาะสม แต่ยังรักษาคุณภาพแบบ layered editorial design`;
+- แม้ใช้ภาพถ่าย ผลลัพธ์ต้องดูเป็น PR key visual ที่ออกแบบเฉพาะงาน ไม่ใช่แค่ภาพถ่ายแปะข้อความ` : respectfulMode ? `
+=== RESPECTFUL EDITORIAL PR PROFILE ===
+- ใช้ Art Direction สุภาพ สงบ ให้เกียรติ ลด saturation และเอฟเฟกต์สนุกทั้งหมด
+- จัดองค์ประกอบแบบ editorial ที่มีพื้นที่ว่างมาก ลำดับตัวอักษรชัด และใช้รายละเอียดเชิงสัญลักษณ์อย่างสำรวมเท่าที่จำเป็น
+- ห้าม mascot, burst, speed line, sticker สนุก, สีฉูดฉาด และตัวอักษร 3D หนาเกินบริบท
+- ยังต้องเป็นงานออกแบบเฉพาะบรีฟ ไม่ใช่พื้นดำสำเร็จรูปแปะข้อความ และห้ามสร้างบุคคล ตรา วันที่ หรือข้อมูลที่ไม่มีจริง` : thaiPrPosterMode ? `
+=== HIGH-PRODUCTION THAI PR PROFILE — EXPLICIT SELECTION ===
+- ใช้โปสเตอร์ประชาสัมพันธ์ไทยคุณภาพสูงแบบหลายชั้นเมื่อผู้ใช้เลือก Thai PR Premium หรือบรีฟเป็นงานข้อมูลแน่นที่เหมาะจริง
+- สร้าง 5 ชั้นอย่างมีหน้าที่: atmospheric background, hero visual, dimensional headline, supporting motifs และ information/footer zones
+- ใช้ 3D typography, ribbon, badge, custom cards, mascot หรือ burst เฉพาะองค์ประกอบที่ช่วยสื่อสาร ห้ามใส่ครบทุกอย่างจนรก
+- สีต้องเกิดจากบริบท ไม่บังคับม่วง–ทองทุกงาน และต้องอ่านง่ายบนมือถือ
+- หากข้อมูลจริงมีน้อย ให้เพิ่มเฉพาะ visual storytelling, สี, แสง, texture และสัญลักษณ์ ห้ามเพิ่มบุคคล โลโก้ QR ตัวเลข หรือข้อเท็จจริง` : `
+=== BALANCED CREATIVE PR PROFILE — SMART DEFAULT ===
+- ค่าเริ่มต้นเป็นงานประชาสัมพันธ์ไทยร่วมสมัยที่ดูมืออาชีพ มีความครีเอทีฟระดับกลาง และพร้อมใช้จริง ไม่บังคับให้เป็นโปสเตอร์ 3D หรือภาพข้อมูลแน่น
+- เลือก Big Idea หนึ่งแนวและ signature visual device หนึ่งอย่างที่สัมพันธ์กับบรีฟ เช่น visual metaphor, hero object, custom frame, ฉากเล่าเรื่อง หรือเส้นนำสายตา
+- ใช้โครงสร้าง 3–4 ชั้นที่พอดี: contextual background, hero visual, strong headline และ supporting/footer zone ตามปริมาณข้อมูลจริง
+- Typography ต้องมีบุคลิกและลำดับชัด แต่ใช้ bevel, extrusion, ขอบหนา หรือเงาหนักเฉพาะเมื่อช่วยอารมณ์งาน ไม่ใช้โดยอัตโนมัติ
+- หลีกเลี่ยงทั้งสองขั้ว: ไม่ใช่ stock photo ใบเดียวแปะข้อความ และไม่ใช่โปสเตอร์แน่นด้วย ribbon, badge, mascot, burst และกล่องข้อมูลโดยไม่จำเป็น
+- ใช้สี แสง รูปทรง และ texture เพื่อให้หยุดสายตาแบบพอดี โดยเลือก palette จากเนื้อหาและองค์กร ไม่ยึดม่วง–ทอง
+- ถ้าข้อมูลน้อย ให้เพิ่มความน่าสนใจด้วยองค์ประกอบทางภาพและสัญลักษณ์เท่านั้น ห้ามแต่งข้อความ ตัวเลข บุคคล โลโก้ หรือข้อเท็จจริงใหม่`;
     const hasRealPhotos = Number(d.photoCount || 0) > 0;
     const mode = clean(d.useMode, "สร้างภาพใหม่ด้วย AI");
     const confirmedFacts = unique(a.facts);
@@ -255,6 +267,12 @@ ${silentQualityGate([
       meaningful(d.brainNoInvent) ? clean(d.brainNoInvent).split(/[,\n]/g) : []
     ));
     const textLock = unique(a.textOnImage);
+    const attachmentHandoff = hasRealPhotos ? `
+=== ATTACHMENT HANDOFF CHECK ===
+- เว็บไซต์ส่งมาได้เพียงจำนวนและชื่อไฟล์ ไม่สามารถส่งไฟล์จริงข้ามเว็บไซต์มายัง ChatGPT อัตโนมัติ
+- ก่อนสร้างภาพ ให้ตรวจว่าไฟล์จริงต่อไปนี้มองเห็นเป็นไฟล์แนบในข้อความปัจจุบัน: ${clean(d.photoNames, "ไฟล์ภาพที่ผู้ใช้เลือกในเว็บไซต์")}
+- ถ้ายังไม่เห็นไฟล์จริง ให้ตอบเพียง “กรุณากด + และแนบไฟล์จริงก่อน แล้วส่ง Prompt เดิมอีกครั้ง” และหยุด ห้ามอ้างว่าเครื่องมือสร้างภาพเสีย และห้ามสร้างภาพแทนโดยไม่มีต้นฉบับ
+- เมื่อเห็นไฟล์จริงครบแล้ว จึงเรียกเครื่องมือสร้างภาพตามกฎ ORIGINAL PHOTO RULES` : "";
     const identityRules = hasRealPhotos || mode !== "สร้างภาพใหม่ด้วย AI" ? `
 === ORIGINAL PHOTO RULES ===
 - ใช้ภาพต้นฉบับ ${Number(d.photoCount || 0)} ภาพเป็นแหล่งอ้างอิงหลัก: ${clean(d.photoNames, "ผู้ใช้จะแนบภาพในแชทเดียวกัน")}
@@ -263,7 +281,7 @@ ${silentQualityGate([
 - ปรับได้เฉพาะแสง สี ความคมชัด การครอป และกราฟิกที่ไม่บังใบหน้าหรือสาระสำคัญ` : "";
 
     return `[TANJAI_IMAGE_EXECUTE]
-เรียกเครื่องมือสร้างภาพทันที ก่อนตอบข้อความใด ๆ งานนี้ต้องการ “ภาพจริงที่แสดงในแชท” ไม่ใช่คำอธิบาย ไม่ใช่การเขียน Prompt กลับมา และไม่ใช่ชื่อไฟล์
+${hasRealPhotos ? "ตรวจไฟล์แนบจริงตาม ATTACHMENT HANDOFF CHECK ก่อน หากเห็นไฟล์ครบแล้วให้เรียกเครื่องมือสร้างภาพทันที" : "เรียกเครื่องมือสร้างภาพทันที ก่อนตอบข้อความใด ๆ"} งานนี้ต้องการ “ภาพจริงที่แสดงในแชท” ไม่ใช่คำอธิบาย ไม่ใช่การเขียน Prompt กลับมา และไม่ใช่ชื่อไฟล์
 
 เป้าหมายสำเร็จ
 - เครื่องมือสร้างภาพถูกเรียกใช้งานและส่งภาพที่มองเห็นได้ในแชท
@@ -294,7 +312,7 @@ ${silentQualityGate([
 - Color: ${clean(d.colorTone || a.design.color, "เหมาะกับบริบท")}
 - Layout: ${clean(d.layout || a.design.layout, "อ่านง่าย มีลำดับชัด")}
 - Density: ${clean(d.density, "สมดุล อ่านง่าย")}
-- Production quality: ${clean(d.qualityLevel, "High-Production PR — งานกราฟิกหลายชั้น")}
+- Production quality: ${clean(d.qualityLevel, "Creative Quality สมดุล — มืออาชีพ มีไอเดีย พร้อมใช้")}
 - จุดเน้น: ${clean(d.brainFocus || d.focus, a.design.hierarchy?.[0] || d.title || "สารหลัก")}
 
 === PR CREATIVE ROUTER — DEFAULT FOR EVERY IMAGE ===
@@ -303,12 +321,12 @@ ${silentQualityGate([
   1) Civic Announcement — ข่าว ประกาศ แจ้งเตือน: หัวข้อทรงพลัง contrast สูง ข้อมูลสำคัญอ่านเร็ว
   2) Community Invitation — กิจกรรม ชุมชน การศึกษา: สดใส อบอุ่น มีฉากเล่าเรื่องและภาพประกอบเป็นมิตร
   3) Service Infographic — ขั้นตอน ความรู้ สุขภาพ: editorial infographic การ์ดข้อมูลและลำดับสายตาชัด
-  4) Social Campaign — โปรโมชัน ผลงาน เพลง คำคม รณรงค์: layered illustrated campaign, dimensional typography, hero metaphor และ emotional hook
+  4) Social Campaign — โปรโมชัน ผลงาน เพลง คำคม รณรงค์: งานร่วมสมัยที่มี hero metaphor และ emotional hook โดยเพิ่มความหนาแน่นหรือมิติเท่าที่โจทย์ต้องการ
   5) Formal & Respectful — พิธีการ ไว้อาลัย เรื่องอ่อนไหว: สุภาพ สงบ ลดสี ใช้พื้นที่ว่างและ typography อย่างให้เกียรติ
 - ห้ามผสมหลายตระกูลจนภาพไร้ทิศทาง และห้ามใช้ม่วง–ทองหรือ Layout เดิมกับทุกงาน ให้สี รูปทรง และระดับเอฟเฟกต์เกิดจากความหมายของบรีฟ
 - ทุกภาพต้องมี signature visual device เฉพาะเรื่องหนึ่งอย่าง เช่น visual metaphor, ฉากจำลอง, วัตถุฮีโร่, เส้นนำสายตา หรือกรอบข้อมูลที่ออกแบบเฉพาะงาน
 - จัดลำดับแบบ Headline-first: ผู้ชมต้องรู้ภายใน 3 วินาทีว่าเรื่องอะไร สำคัญอย่างไร และควรทำอะไรต่อ จากนั้นจึงอ่านรายละเอียดรอง
-- ยกระดับงานด้วย typography hierarchy, layered depth, custom shapes, controlled lighting, purposeful illustration และ mobile-safe spacing โดยคงความเป็นงานประชาสัมพันธ์ไทยร่วมสมัย
+- ยกระดับงานด้วย typography hierarchy, layered depth เท่าที่จำเป็น, custom shapes, controlled lighting, purposeful illustration และ mobile-safe spacing โดยคงความเป็นงานประชาสัมพันธ์ไทยร่วมสมัย
 - สร้างงานต้นฉบับใหม่ทุกครั้ง ห้ามเลียนแบบ Layout ตรา ตัวละคร หรือองค์ประกอบเฉพาะจากผลงานของผู้อื่น
 ${productionProfile}
 
@@ -317,7 +335,7 @@ ${productionProfile}
 - คิดภายในแบบเงียบ ๆ แล้วเลือก Big Idea ที่แรงที่สุดเพียงหนึ่งแนว พร้อม Visual Metaphor ที่สื่อสารเรื่องนี้โดยเฉพาะ ห้ามรายงานขั้นตอนคิดก่อนสร้างภาพ
 - สร้างภาพให้มีจุดนำสายตาชัด ลำดับ foreground / midground / background มีมิติ ใช้ negative space อย่างตั้งใจ และครอปต่อเป็น 1:1 / 4:5 / 9:16 ได้โดยไม่เสียสารหลัก
 - ใช้แสง สี contrast texture และ scale เพื่อสร้าง emotional hook ให้ภาพหยุดสายตา แต่ยังน่าเชื่อถือและอ่านง่ายบนมือถือ
-- ระดับความกล้าทางครีเอทีฟ: ${clean(d.creativityLevel, "ครีเอทีฟเต็มที่ในองค์ประกอบภาพ แต่ห้ามแต่งข้อมูลจริง")}
+- ระดับความกล้าทางครีเอทีฟ: ${clean(d.creativityLevel, "คิดสร้างสรรค์ระดับกลาง — มี Big Idea แต่ไม่เว่อร์")}
 - สร้างรายละเอียดเชิงภาพที่ไม่ใช่ข้อเท็จจริงได้ เช่น วัสดุ พื้นผิว บรรยากาศ ลำแสง ฉากนามธรรม และองค์ประกอบเชิงสัญลักษณ์
 
 === ANTI-GENERIC QUALITY BAR ===
@@ -349,6 +367,7 @@ ${bullet(textLock, "- ไม่มีข้อความบังคับ ใ
 ${bullet(forbidden, "- ห้ามสร้างข้อมูลจริงที่ผู้ใช้ไม่ได้ให้มา")}
 - ห้ามโลโก้ปลอม QR Code ปลอม ลายน้ำ ข้อความเพี้ยน ตัวอักษรเกิน ภาพเบลอ องค์ประกอบรก และรายละเอียดที่อ่านไม่ได้บนมือถือ
 - ข้อควรระวังตามบริบท: ${context.org.guard}; ${context.task.guard}
+${attachmentHandoff}
 ${identityRules}
 
 STOP RULE: เรียกเครื่องมือสร้างภาพตอนนี้ และอย่าส่งคำอธิบายก่อนภาพ`;

@@ -166,8 +166,7 @@ TANJAI.resultShell = function(tool, recommended, desc, bodyId, buttons=""){
         <p id="${tool}ResultDesc">${desc}</p>
       </div>
       <div class="result-buttons stable-result-buttons">
-        ${buttons}
-        <button class="btn primary compact-action" data-copyopen="${bodyId}">คัดลอก + เปิด GPT</button>
+        ${buttons || `<button class="btn primary compact-action" data-copybox="${bodyId}">คัดลอกผลลัพธ์</button>`}
       </div>
     </div>
     <div id="${bodyId}" class="result-box stable-empty">กดปุ่มสร้าง แล้วผลลัพธ์จะแสดงตรงนี้</div>
@@ -192,7 +191,7 @@ TANJAI.getToolDestinations = function(tool){
 TANJAI.primaryActionButtons = function(tool, bodyId){
   const GPT = TANJAI.customGptUrl || TANJAI_CUSTOM_GPT_URL;
   const btn = (label, attrs, cls="secondary")=>`<button class="btn ${cls}" ${attrs}>${label}</button>`;
-  if(tool === "image") return btn("คัดลอกและเปิด ทันใจ GPT", `data-copyopen="${bodyId}"`, "primary");
+  if(tool === "image") return btn("1. คัดลอก Prompt", `data-copy-image="execute"`, "primary") + btn("2. เปิด ทันใจ GPT", `data-open="${GPT}"`);
   if(tool === "album") return btn("ดาวน์โหลดทั้งหมด", `id="albumDownloadAllTop"`, "primary") + btn("ล้างรูป", `id="albumClearTop"`);
   if(tool === "post") return btn("คัดลอก Prompt พร้อมใช้", `data-copybox="${bodyId}"`, "primary") + btn("เปิด ทันใจ GPT", `data-open="${GPT}"`);
   if(tool === "mc") return btn("คัดลอกสคริปต์พิธีกร", `data-copybox="${bodyId}"`, "primary") + btn("เปิด ทันใจ GPT", `data-open="${GPT}"`);
