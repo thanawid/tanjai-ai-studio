@@ -213,18 +213,18 @@ document.addEventListener("DOMContentLoaded", () => {
     <div class="form-section"><div class="section-title"><b>2</b><h4>ตั้งค่าการเรียบเรียงเนื้อหา</h4></div>
       <div class="form-grid">
         <label>ประเภทงาน<select id="post-workType">${opts((toolOptions.workTypes || ["นายกลงพื้นที่","กิจกรรมเทศบาล","อื่น ๆ"]).filter(x => !/พิธีกร|พิธีเปิด|พิธีปิด/.test(x)))}</select></label>
-        <label>ต้องการเรียบเรียงเป็น<select id="post-channel"><option>สรุปงาน</option><option>เรียบเรียงข้อมูล</option><option>ข่าวประชาสัมพันธ์</option><option>โพสต์ Facebook</option><option>ข้อความ Line</option><option>แคปชั่น</option></select></label>
+        <label>ต้องการเรียบเรียงเป็น<select id="post-channel"><option>สรุปงาน</option><option>เรียบเรียงข้อมูล</option><option>บทความ</option><option>ข่าวประชาสัมพันธ์</option><option>โพสต์ Facebook</option><option>ข้อความ Line</option><option>แคปชั่น</option></select></label>
         <label>ความยาว<select id="post-length">${opts(toolOptions.postLengths)}</select></label>
         <label>หมวดงาน<select id="post-mainCategory">${opts(toolOptions.mainCategories)}</select></label>
         <label class="full">แนบรูปประกอบ / รูปเอกสาร / รูปลงพื้นที่
           <input id="post-photos" type="file" accept="image/*" multiple>
-          <small>ถ้าเป็นภาพเอกสาร ให้นำ Prompt พร้อมรูปไปใช้กับ AI ที่วิเคราะห์ภาพได้ เช่น ChatGPT / Gemini แล้วให้ AI อ่านเอกสารก่อนสรุป</small>
+          <small>ระบบเขียนฟรีจะไม่เดาข้อมูลจากภาพ กรุณากรอกสาระสำคัญจากเอกสารในช่องรายละเอียด เพื่อป้องกันข้อมูลผิด</small>
           <div id="post-photoPreview" class="upload-preview-grid"></div>
         </label>
         <label class="full">สิ่งที่อยากให้เน้นเพิ่มเติม<textarea id="post-extra" placeholder="เช่น เน้นผลต่อประชาชน / เปิดเรื่องให้ตรงประเด็น / ลดภาษาราชการ / CTA ชัด"></textarea></label>
       </div>
     </div>
-    <div class="button-row"><button class="btn primary" id="makePost">เรียบเรียงเนื้อหา</button><button class="btn secondary" id="savePost">บันทึก</button></div>`;
+    <div class="button-row"><button class="btn primary" id="makePost">สร้างงานเขียนพร้อมใช้</button><button class="btn secondary" id="savePost">บันทึก</button></div>`;
 
   $("#mcForm").innerHTML = TANJAI.field("mc") + `
     <div class="form-note mc-note-v895">ใช้สำหรับสคริปต์พิธีกร คำเชิญประธาน คำเชิญผู้กล่าวรายงาน คำกล่าวรายงาน คำกล่าวประธาน คำเชื่อมช่วง สคริปต์เปิด / ปิดงาน และเวอร์ชันย่อถืออ่าน</div>
@@ -236,13 +236,13 @@ document.addEventListener("DOMContentLoaded", () => {
         <label>สไตล์พิธีกร<select id="mc-style"><option selected>ทางการ สุภาพ อ่านง่าย</option><option>กึ่งทางการ อบอุ่น</option><option>กระชับ เป็นพิธีการ</option><option>อบอุ่น เป็นกันเอง</option></select></label>
         <label class="full">แนบกำหนดการ / ภาพเอกสาร / รูปหน้างาน
           <input id="mc-photos" type="file" accept="image/*" multiple>
-          <small>แนบภาพกำหนดการหรือเอกสาร แล้วนำ Prompt พร้อมรูปไปใช้กับ AI ที่วิเคราะห์ภาพได้</small>
+          <small>ระบบจะไม่อ่านข้อความในภาพอัตโนมัติ กรุณากรอกลำดับพิธีจริงเพื่อป้องกันชื่อและกำหนดการผิด</small>
           <div id="mc-photoPreview" class="upload-preview-grid"></div>
         </label>
         <label class="full">ข้อมูลพิธี / สิ่งที่อยากให้เน้น<textarea id="mc-extra" placeholder="เช่น ประธานในพิธี / ผู้กล่าวรายงาน / ลำดับพิธี / ช่วงมอบรางวัล / ถ่ายภาพร่วมกัน / คำเรียกแขกผู้มีเกียรติ"></textarea></label>
       </div>
     </div>
-    <div class="button-row"><button class="btn primary" id="makeMC">สร้างสคริปต์พิธีกร</button><button class="btn secondary" id="saveMC">บันทึก</button></div>`;
+    <div class="button-row"><button class="btn primary" id="makeMC">สร้างสคริปต์พร้อมใช้</button><button class="btn secondary" id="saveMC">บันทึก</button></div>`;
   $("#videoForm").innerHTML = TANJAI.field("video") + `
     <div class="form-note">เมนูนี้ใช้วางแผนวิดีโอหรือคลิป สร้างประโยคเปิด ลำดับภาพ บทพากย์ และข้อความบนจอ</div>
     <div class="form-section"><div class="section-title"><b>2</b><h4>ตั้งค่าวิดีโอ / คลิป</h4></div>
@@ -252,7 +252,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <label>ช่องทาง<select id="video-channel">${opts(toolOptions.channels)}</select></label>
         <label>หมวดงาน<select id="video-mainCategory">${opts(toolOptions.mainCategories)}</select></label>
       </div>
-    </div><div class="button-row"><button class="btn primary" id="makeVideo">สร้าง Prompt วิดีโอทันที</button><button class="btn secondary" id="saveVideo">บันทึก</button></div>`;
+    </div><div class="button-row"><button class="btn primary" id="makeVideo">สร้างบทวิดีโอพร้อมผลิต</button><button class="btn secondary" id="saveVideo">บันทึก</button></div>`;
   $("#voiceForm").innerHTML = TANJAI.field("voice") + `
     <div class="form-section"><div class="section-title"><b>2</b><h4>ตั้งค่าเสียง</h4></div>
       <div class="form-grid">
@@ -261,7 +261,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <label>ช่องทางใช้งาน<select id="voice-channel">${opts(toolOptions.channels)}</select></label>
         <label>หมวดงาน<select id="voice-mainCategory">${opts(toolOptions.mainCategories)}</select></label>
       </div>
-    </div><div class="button-row"><button class="btn primary" id="makeVoice">สร้าง Prompt เสียงทันที</button><button class="btn secondary" id="saveVoice">บันทึก</button></div>`;
+    </div><div class="button-row"><button class="btn primary" id="makeVoice">สร้างสคริปต์เสียงพร้อมอ่าน</button><button class="btn secondary" id="saveVoice">บันทึก</button></div>`;
   $("#deckForm").innerHTML = TANJAI.field("deck") + `
     <div class="form-section"><div class="section-title"><b>2</b><h4>ตั้งค่าสไลด์</h4></div>
       <div class="form-grid">
@@ -269,7 +269,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <label>รูปแบบสไลด์<select id="deck-format">${opts(toolOptions.slideStyles)}</select></label>
         <label>หมวดงาน<select id="deck-mainCategory">${opts(toolOptions.mainCategories)}</select></label>
       </div>
-    </div><div class="button-row"><button class="btn primary" id="makeDeck">สร้าง Prompt สไลด์ทันที</button><button class="btn secondary" id="saveDeck">บันทึก</button></div>`;
+    </div><div class="button-row"><button class="btn primary" id="makeDeck">สร้างเนื้อหาสไลด์พร้อมใช้</button><button class="btn secondary" id="saveDeck">บันทึก</button></div>`;
   $("#kitForm").innerHTML = TANJAI.field("kit") + `
     <div class="form-section">
       <div class="section-title"><b>2</b><h4>ผู้กำกับชุดสื่อ</h4></div>
@@ -285,11 +285,11 @@ document.addEventListener("DOMContentLoaded", () => {
   // Results
   $("#imageResult").innerHTML = TANJAI.readyOutputShell("image", "ภาพพร้อมสร้าง — Creative Director", "ขั้นตอน: คัดลอก Prompt → เปิด ทันใจ GPT → แนบไฟล์จริง (ถ้ามี) → วาง Prompt", "imageOut");
 $("#albumResult").innerHTML = TANJAI.readyOutputShell("album", "ชุดภาพพร้อมโพสต์", "ปรับภาพจริง ใส่กรอบ และดาวน์โหลดเป็นภาพพร้อมลง Facebook", "albumOut");
-$("#postResult").innerHTML = TANJAI.readyOutputShell("post", "Prompt งานเขียนพร้อมใช้ — นักวางกลยุทธ์เนื้อหา", "ปรับผลลัพธ์ตามชนิดงานจริง เช่น สรุป ข่าว โพสต์ Facebook ข้อความ LINE หรือแคปชั่น", "postOut");
-$("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "Prompt พิธีกรพร้อมใช้ — ผู้กำกับงานเวที", "คุมลำดับพิธี ชื่อ ตำแหน่ง คำกำกับเวที และบัตรคำพูด", "mcOut");
-  $("#videoResult").innerHTML = TANJAI.readyOutputShell("video", "Prompt วิดีโอพร้อมใช้ — ผู้กำกับวิดีโอ", "คุมประโยคเปิด เส้นเรื่อง เวลารวม ลำดับภาพ บทพากย์ และรายการช็อต", "videoOut");
-  $("#voiceResult").innerHTML = TANJAI.readyOutputShell("voice", "Prompt เสียงพร้อมใช้ — ผู้กำกับเสียง", "คุมเวลาพูด ภาษาสำหรับการฟัง จังหวะ คำเน้น และคำอ่าน", "voiceOut");
-  $("#deckResult").innerHTML = TANJAI.readyOutputShell("deck", "Prompt สไลด์พร้อมใช้ — นักวางโครงนำเสนอ", "คุมเส้นเรื่อง หัวข้อสรุป แนวทางภาพ และบันทึกผู้พูด", "deckOut");
+$("#postResult").innerHTML = TANJAI.readyOutputShell("post", "งานเขียนพร้อมใช้ — Caption & Article Writer", "สร้างแคปชั่น บทความ ข่าว โพสต์ และข้อความ LINE จบในเว็บ", "postOut");
+$("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "สคริปต์พิธีกรพร้อมใช้ — MC Writer", "คุมลำดับพิธี ชื่อ ตำแหน่ง คำเชื่อม และบัตรเตือนพิธีกร", "mcOut");
+  $("#videoResult").innerHTML = TANJAI.readyOutputShell("video", "บทวิดีโอพร้อมผลิต — Video Script Writer", "ได้ Hook, Storyboard, บทพากย์ และข้อความบนจอทันที", "videoOut");
+  $("#voiceResult").innerHTML = TANJAI.readyOutputShell("voice", "สคริปต์เสียงพร้อมอ่าน — Voice Script Writer", "คุมเวลาพูด จังหวะ คำเน้น และคำอ่าน", "voiceOut");
+  $("#deckResult").innerHTML = TANJAI.readyOutputShell("deck", "เนื้อหาสไลด์พร้อมใช้ — Slide Writer", "ได้โครงเรื่อง เนื้อหาบนสไลด์ และ Speaker Notes", "deckOut");
   $("#kitResult").innerHTML = TANJAI.readyOutputShell("kit", "Prompt ชุดสื่อพร้อมใช้ — ผู้กำกับชุดสื่อ", "สร้างแกนเนื้อหาเดียว แล้วแยกบทบาทของแต่ละสื่อโดยไม่ใช้ข้อความซ้ำกัน", "kitOut");
 
   TANJAI.renderLibrary();
@@ -1116,91 +1116,91 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "Prompt พิธีก
   };
   $("#makePost").onclick = () => {
     const d=TANJAI.commonData("post");
-    const executeOut=TANJAI.executionPrompt("post", d);
-    const discussOut=TANJAI.discussPrompt("post", d);
+    const team=TANJAI.freeWritingTeam;
+    const executeOut=team.captionWriter(d);
     TANJAI.setReadyOutput("post", {
-      title:"Prompt งานเขียนพร้อมใช้ — นักวางกลยุทธ์เนื้อหา",
-      desc:"ผลลัพธ์จะยึดชนิดงานที่เลือก ไม่ปนสคริปต์เสียงหรือวิดีโอ",
+      title:"งานเขียนพร้อมใช้ — Caption & Article Writer",
+      desc:"สร้างจากข้อมูลที่กรอก พร้อมตรวจข้อเท็จจริงก่อนเผยแพร่",
       main:executeOut,
-      advancedTitle1:"Prompt สำหรับแก้ / คุยต่อ",
-      advanced1:discussOut,
-      advancedTitle2:"Brief Analysis + ตัวอย่างงานเขียน",
-      advanced2:`${TANJAI.promptBrainReport ? TANJAI.promptBrainReport(d, "post") : ""}\n\n---\nตัวอย่างสรุป / โพสต์จากระบบ:\n${TANJAI.postText(d)}`
+      advancedTitle1:"ตรวจข้อเท็จจริงก่อนเผยแพร่",
+      advanced1:team.factGuard(d),
+      advancedTitle2:"เวอร์ชันบทความ / ข่าว",
+      advanced2:team.articleWriter(d)
     });
     TANJAI.state.lastPost=executeOut;
-    TANJAI.toast("สร้าง Prompt งานเขียนแล้ว");
+    TANJAI.toast("สร้างงานเขียนพร้อมใช้แล้ว");
     window.TANJAI_AUTH?.trackUsage("post");
   };
   $("#makeMC").onclick = () => {
     const d=TANJAI.commonData("mc");
-    const executeOut=TANJAI.executionPrompt("mc", d);
-    const discussOut=TANJAI.discussPrompt("mc", d);
+    const team=TANJAI.freeWritingTeam;
+    const executeOut=team.mcWriter(d);
     TANJAI.setReadyOutput("mc", {
-      title:"Prompt พิธีกรพร้อมใช้ — ผู้กำกับงานเวที",
-      desc:"คุมลำดับพิธี คำกำกับเวที ชื่อ ตำแหน่ง และบัตรคำพูด",
+      title:"สคริปต์พิธีกรพร้อมใช้ — MC Writer",
+      desc:"ภาษาพูดพร้อมอ่าน มีคำเชื่อมและบัตรเตือน โดยไม่แต่งชื่อหรือตำแหน่ง",
       main:executeOut,
-      advancedTitle1:"Prompt สำหรับแก้ / คุยต่อ",
-      advanced1:discussOut,
-      advancedTitle2:"Brief Analysis + ตัวอย่างงานเวที",
-      advanced2:`${TANJAI.promptBrainReport ? TANJAI.promptBrainReport(d, "mc") : ""}\n\n---\nตัวอย่างสคริปต์พิธีกรจากระบบ:\n${TANJAI.mcScriptSample ? TANJAI.mcScriptSample(d) : executeOut}`
+      advancedTitle1:"ตรวจชื่อ ลำดับพิธี และข้อเท็จจริง",
+      advanced1:team.factGuard(d),
+      advancedTitle2:"บัตรย่อสำหรับตรวจหน้างาน",
+      advanced2:`หัวข้องาน: ${d.title || "[เติมหัวข้องาน]"}\nลำดับพิธีจริง: ${d.expertAgenda || "[เติมลำดับพิธีจริง]"}\nชื่อและตำแหน่ง: ${d.people || "[เติมชื่อและตำแหน่ง]"}\nคำอ่านชื่อเฉพาะ: ${d.expertPronunciation || "[เติมคำอ่านชื่อเฉพาะ]"}`
     });
     TANJAI.state.lastMC=executeOut;
-    TANJAI.toast("สร้าง Prompt พิธีกรแล้ว");
+    TANJAI.toast("สร้างสคริปต์พิธีกรพร้อมใช้แล้ว");
     window.TANJAI_AUTH?.trackUsage("mc");
   };
   $("#makeVideo").onclick = () => {
     const d=TANJAI.commonData("video");
     const length=$("#video-length").value;
-    const executeOut=TANJAI.executionPrompt("video", d, {length});
-    const discussOut=TANJAI.discussPrompt("video", d);
+    const team=TANJAI.freeWritingTeam;
+    const executeOut=team.videoWriter(d, length);
     TANJAI.setReadyOutput("video", {
-      title:"Prompt วิดีโอพร้อมใช้ — ผู้กำกับวิดีโอ",
-      desc:"คุมประโยคเปิด เส้นเรื่อง เวลารวม ลำดับภาพ บทพากย์ และรายการช็อต",
+      title:"บทวิดีโอพร้อมผลิต — Video Script Writer",
+      desc:"Hook, Storyboard, บทพากย์ และข้อความบนจอ พร้อมส่งต่อกองถ่ายหรือตัดต่อ",
       main:executeOut,
-      advancedTitle1:"Prompt สำหรับแก้ / คุยต่อ",
-      advanced1:discussOut,
-      advancedTitle2:"Brief Analysis + Storyboard ตัวอย่าง",
-      advanced2:`${TANJAI.promptBrainReport ? TANJAI.promptBrainReport(d, "video") : ""}\n\n---\nStoryboard ตัวอย่างจากระบบ:\n${TANJAI.videoStoryboard(d, length)}`
+      advancedTitle1:"ตรวจข้อเท็จจริงก่อนผลิต",
+      advanced1:team.factGuard(d),
+      advancedTitle2:"Prompt ผู้กำกับวิดีโอขั้นสูง (ทางเลือก)",
+      advanced2:TANJAI.executionPrompt("video", d, {length})
     });
     TANJAI.state.lastVideo=executeOut;
-    TANJAI.toast("สร้าง Prompt วิดีโอแล้ว");
+    TANJAI.toast("สร้างบทวิดีโอพร้อมผลิตแล้ว");
     window.TANJAI_AUTH?.trackUsage("video");
   };
   $("#makeVoice").onclick = () => {
     const d=TANJAI.commonData("voice");
     const length=$("#voice-length").value;
     const style=$("#voice-style").value;
-    const executeOut=TANJAI.executionPrompt("voice", d, {length, style});
-    const discussOut=TANJAI.discussPrompt("voice", d);
+    const team=TANJAI.freeWritingTeam;
+    const executeOut=team.voiceWriter(d, length, style);
     TANJAI.setReadyOutput("voice", {
-      title:"Prompt เสียงพร้อมใช้ — ผู้กำกับเสียง",
-      desc:"คุมเวลาพูด ภาษาสำหรับหู จังหวะ คำเน้น และคำอ่าน",
+      title:"สคริปต์เสียงพร้อมอ่าน — Voice Script Writer",
+      desc:"ภาษาพูดลื่น มีจังหวะ คำเน้น และตำแหน่งตรวจคำอ่าน",
       main:executeOut,
-      advancedTitle1:"Prompt สำหรับแก้ / คุยต่อ",
-      advanced1:discussOut,
-      advancedTitle2:"Brief Analysis + สคริปต์ตัวอย่าง",
-      advanced2:`${TANJAI.promptBrainReport ? TANJAI.promptBrainReport(d, "voice") : ""}\n\n---\nสคริปต์ตัวอย่างจากระบบ:\n${TANJAI.voiceScript(d, length, style)}`
+      advancedTitle1:"ตรวจข้อเท็จจริงและคำอ่าน",
+      advanced1:team.factGuard(d),
+      advancedTitle2:"Prompt ผู้กำกับเสียงขั้นสูง (ทางเลือก)",
+      advanced2:TANJAI.executionPrompt("voice", d, {length, style})
     });
     TANJAI.state.lastVoice=executeOut;
-    TANJAI.toast("สร้าง Prompt เสียงแล้ว");
+    TANJAI.toast("สร้างสคริปต์เสียงพร้อมอ่านแล้ว");
     window.TANJAI_AUTH?.trackUsage("voice");
   };
   $("#makeDeck").onclick = () => {
     const d=TANJAI.commonData("deck");
     const count=Number($("#deck-count").value);
-    const executeOut=TANJAI.executionPrompt("deck", d, {count});
-    const discussOut=TANJAI.discussPrompt("deck", d);
+    const team=TANJAI.freeWritingTeam;
+    const executeOut=team.slideWriter(d, count);
     TANJAI.setReadyOutput("deck", {
-      title:"Prompt สไลด์พร้อมใช้ — นักวางโครงนำเสนอ",
-      desc:"คุมเส้นเรื่อง หัวข้อสรุป แนวทางภาพ และบันทึกผู้พูด",
+      title:"เนื้อหาสไลด์พร้อมใช้ — Slide Writer",
+      desc:"ได้หัวข้อ เนื้อหาบนสไลด์ และ Speaker Notes ตามจำนวนหน้าที่เลือก",
       main:executeOut,
-      advancedTitle1:"Prompt สำหรับแก้ / คุยต่อ",
-      advanced1:discussOut,
-      advancedTitle2:"Brief Analysis + Outline ตัวอย่าง",
-      advanced2:`${TANJAI.promptBrainReport ? TANJAI.promptBrainReport(d, "deck") : ""}\n\n---\nOutline ตัวอย่างจากระบบ:\n${TANJAI.deckOutline(d, count)}`
+      advancedTitle1:"ตรวจข้อเท็จจริงก่อนนำเสนอ",
+      advanced1:team.factGuard(d),
+      advancedTitle2:"Prompt ออกแบบสไลด์ขั้นสูง (ทางเลือก)",
+      advanced2:TANJAI.executionPrompt("deck", d, {count})
     });
     TANJAI.state.lastDeck=executeOut;
-    TANJAI.toast("สร้าง Prompt สไลด์แล้ว");
+    TANJAI.toast("สร้างเนื้อหาสไลด์พร้อมใช้แล้ว");
     window.TANJAI_AUTH?.trackUsage("deck");
   };
   $("#makeKit").onclick = () => {
