@@ -7,7 +7,7 @@ window.TANJAI = window.TANJAI || {};
  */
 (function(){
   const T = window.TANJAI;
-  T.expertPromptVersion = "Expert Engine 1.6 — Smart Balanced Creative PR";
+  T.expertPromptVersion = "Expert Engine 1.7 — Compact Image Execute";
 
   const clean = (value = "", fallback = "") => {
     const result = String(value || "")
@@ -209,7 +209,7 @@ ${silentQualityGate([
 ])}`;
   };
 
-  T.buildImageExecutionPrompt = function(d = {}){
+  T.buildImageExecutionPromptLegacy = function(d = {}){
     const a = analyze(d, "image");
     const context = imageContextProfile(d);
     const selectedStyle = clean(d.style || a.design.style, "AI PR Creative Director — เลือกแนวให้อัตโนมัติ");
@@ -371,6 +371,123 @@ ${attachmentHandoff}
 ${identityRules}
 
 STOP RULE: เรียกเครื่องมือสร้างภาพตอนนี้ และอย่าส่งคำอธิบายก่อนภาพ`;
+  };
+
+  /**
+   * Compact execution prompt for Custom GPT / image tools.
+   * Permanent policy and the full creative review stay in the Expert Prompt;
+   * this handoff contains only the dynamic brief and one resolved direction.
+   */
+  T.buildImageExecutionPrompt = function(d = {}){
+    const a = analyze(d, "image");
+    const context = imageContextProfile(d);
+    const mode = clean(d.useMode, "สร้างภาพใหม่ด้วย AI");
+    const facts = unique(a.facts);
+    const textLock = unique(a.textOnImage);
+    const userAvoid = meaningful(d.brainNoInvent)
+      ? clean(d.brainNoInvent).split(/[,\n]/g)
+      : [];
+    const forbidden = unique(a.forbidden.concat(userAvoid));
+    const photoCount = Number(d.photoCount || 0);
+    const hasWebsiteFiles = photoCount > 0;
+    const selectedStyle = clean(d.style || a.design.style, "ให้ AI เลือกตามบริบท");
+    const signals = [
+      d.workContext, d.imageType, d.qualityLevel, d.layout, selectedStyle,
+      d.mainCategory, d.subCategory, d.title, d.detail, d.tone
+    ].filter(Boolean).join(" ");
+    const respectful = /ไว้อาลัย|ถวายความอาลัย|แสดงความอาลัย|ข่าวเศร้า|มรณ|สูญเสีย|ลดสี|พิธีการ.*อ่อนไหว/i.test(signals);
+    const premium = !respectful && /Thai PR Premium|Thai PR Poster Premium|High-Impact Thai PR Poster|โปสเตอร์ประชาสัมพันธ์ไทยสีสด|ภาพแน่นข้อมูล/i.test(signals);
+    const infographic = !respectful && /Infographic|อินโฟกราฟิก|ขั้นตอนบริการ|วิธีใช้งาน|FAQ|ให้ความรู้/i.test(signals);
+    const music = !respectful && /เพลง|ปกเพลง|ผลงานสร้างสรรค์|ศิลปิน/i.test(signals);
+    const realPhotoMode = hasWebsiteFiles || mode !== "สร้างภาพใหม่ด้วย AI";
+
+    let direction = [
+      "Balanced Creative PR — งานประชาสัมพันธ์ร่วมสมัย มี Big Idea หนึ่งแนวและจุดนำสายตาเดียว",
+      "ใช้โครงสร้าง 3–4 ชั้นพอดี อ่านง่ายบนมือถือ และเลือกสีจากเนื้อหาหรือแบรนด์",
+      "ไม่ทำเป็น stock photo แปะข้อความ และไม่ยัด ribbon, badge, mascot หรือเอฟเฟกต์โดยไม่จำเป็น"
+    ];
+    if(realPhotoMode){
+      direction = [
+        "Photo-led PR key visual — ใช้ภาพจริงเป็น hero visual แล้วเสริมกรอบ แถบหัวข้อ และ typography hierarchy เท่าที่จำเป็น",
+        "คงใบหน้า อัตลักษณ์ รูปร่าง ชุด บุคคล และสาระสำคัญของภาพเดิม ห้าม face swap หรือ facial reconstruction",
+        "ปรับได้เฉพาะแสง สี ความคมชัด ครอป และกราฟิกที่ไม่บังใบหน้าหรือสารสำคัญ"
+      ];
+    }else if(respectful){
+      direction = [
+        "Respectful Editorial PR — สุภาพ สงบ ให้เกียรติ ใช้พื้นที่ว่างและลำดับตัวอักษรชัด",
+        "ลด saturation และงด mascot, burst, speed line, sticker สนุก และเอฟเฟกต์ฉูดฉาด",
+        "ใช้สัญลักษณ์อย่างสำรวมเฉพาะที่สัมพันธ์กับข้อมูลจริง"
+      ];
+    }else if(premium){
+      direction = [
+        "Thai PR Premium — โปสเตอร์ประชาสัมพันธ์หลายชั้นที่หัวข้อเด่น อ่านเร็ว และพร้อมใช้จริง",
+        "จัด identity zone, hero visual, headline, supporting zone และ footer ตามปริมาณข้อมูลจริง",
+        "ใช้ 3D typography, ribbon, badge, custom card, glow หรือ burst เฉพาะสิ่งที่ช่วยสื่อสาร ห้ามใส่ครบจนรก"
+      ];
+    }else if(infographic){
+      direction = [
+        "Service Infographic — แบ่งข้อมูลเป็นกลุ่มและลำดับขั้นชัดเจน ใช้การ์ดหรือไอคอนเท่าที่ช่วยความเข้าใจ",
+        "หัวข้อหลักเด่นที่สุด รายละเอียดรองอ่านได้บนมือถือ และไม่ทำข้อมูลแน่นจนหายใจไม่ออก",
+        "ตัวเลข ขั้นตอน และสัญลักษณ์ต้องมาจากข้อมูลจริงเท่านั้น"
+      ];
+    }else if(music){
+      direction = [
+        "Music Campaign Key Visual — ใช้อารมณ์เพลง ชื่อเพลง และภาพฮีโร่เป็นแกนหลัก",
+        "สร้าง layered depth, controlled lighting และ signature visual ที่สัมพันธ์กับเพลง โดยไม่ยัดข้อมูลแบบอินโฟกราฟิก",
+        "องค์ประกอบดนตรีเป็นภาพเชิงสร้างสรรค์ได้ แต่ห้ามสร้างชื่อศิลปิน โลโก้ รางวัล ยอดวิว หรือตัวเลขขึ้นเอง"
+      ];
+    }
+
+    const attachmentLines = [
+      "ถ้ามีภาพแนบในข้อความนี้ ให้ตรวจและวิเคราะห์หน้าที่ของแต่ละภาพเองอัตโนมัติ: โลโก้/ตราใช้เป็น identity asset; ภาพบุคคลหรือกิจกรรมใช้เป็น hero/reference",
+      "ใช้เฉพาะไฟล์ที่มองเห็นจริงในแชท โลโก้ห้ามวาดใหม่ และภาพบุคคลต้องคงอัตลักษณ์เดิม",
+      "ถ้าไม่มีภาพแนบ ให้ทำงานต่อจากข้อความได้ทันที โดยตัดโลโก้หรือบุคคลจริงที่ไม่มีต้นฉบับออกและจัด Layout ใหม่ ห้ามสร้างของปลอม"
+    ];
+    if(hasWebsiteFiles){
+      attachmentLines.unshift(`เว็บไซต์ระบุภาพอ้างอิง ${photoCount} ไฟล์: ${clean(d.photoNames, "ไม่ระบุชื่อไฟล์")} — ใช้ได้เมื่อผู้ใช้แนบไฟล์จริงในแชทนี้แล้ว`);
+    }
+
+    const compactAvoid = forbidden.length
+      ? forbidden.join(", ")
+      : "ข้อมูลจริงที่ผู้ใช้ไม่ได้ให้มา";
+
+    return `[TANJAI_IMAGE_EXECUTE]
+เรียกเครื่องมือสร้างภาพทันทีและแสดงภาพจริงในแชท ไม่ต้องอธิบายขั้นตอน ไม่ต้องเขียน Prompt กลับมาก่อนภาพ
+
+งาน
+- ภารกิจ: สร้างภาพที่เข้าใจสารใน 3 วินาที อ่านง่ายบนมือถือ และพร้อมใช้จริง
+- โหมด: ${mode}
+- ประเภทภาพ: ${clean(d.imageType || d.workContext, context.task.name)}
+- ขนาด: ${clean(d.size, "4:5 Facebook / LINE 1080x1350")}
+- องค์กร/แบรนด์: ${clean(d.orgName, "ไม่ระบุ")}
+- กลุ่มเป้าหมาย: ${clean(d.audience, "ให้ AI วิเคราะห์จากรายละเอียด")}
+- จุดเน้น: ${clean(d.brainFocus || d.focus, a.design.hierarchy?.[0] || d.title || "สารหลัก")}
+
+ข้อมูลจริงที่ใช้ได้
+${bullet(facts, "- จากข้อมูลเบื้องต้น ให้ใช้เฉพาะข้อความที่ผู้ใช้ระบุ")}
+
+ทิศทางภาพที่เลือกแล้ว
+${bullet(direction)}
+- Style: ${selectedStyle}
+- Color: ${clean(d.colorTone || a.design.color, "ให้ AI เลือกตามอารมณ์และบริบท")}
+- Layout: ${clean(d.layout || a.design.layout, "ให้ AI เลือก Layout ที่เหมาะที่สุด")}
+- Density: ${clean(d.density, "สมดุล อ่านง่าย")}
+- Creative level: ${clean(d.creativityLevel, "คิดสร้างสรรค์ระดับกลาง มี Big Idea แต่ไม่เว่อร์")}
+
+ไฟล์แนบ — ไม่บังคับ
+${bullet(attachmentLines)}
+
+TEXT LOCK — ใส่เฉพาะข้อความเหล่านี้เท่านั้น
+${bullet(textLock, "- ไม่มีข้อความบังคับ ให้สร้างภาพแบบ text-safe โดยไม่ใส่ข้อความเพิ่ม")}
+- สะกดตามต้นฉบับทุกตัวอักษร ห้ามแปล ถอดความ หรือเพิ่มข้อความใหม่
+- ถ้าตัวอักษรไทยไม่แม่น ให้ลดข้อความรองและรักษาหัวข้อหลัก ห้ามปล่อยคำเพี้ยนโดยตั้งใจ
+
+ข้อห้ามและการตรวจสุดท้าย
+- ห้ามแต่งชื่อบุคคล หน่วยงาน สถานที่ วันที่ เวลา ราคา ตัวเลข เบอร์โทร ลิงก์ โลโก้ QR Code หรือข้อเท็จจริงใหม่
+- ข้อห้ามเฉพาะงาน: ${compactAvoid}
+- สร้างสรรค์ฉาก แสง สี อารมณ์ สไตล์ และ Layout ได้เต็มที่โดยไม่เปลี่ยนข้อเท็จจริงหรืออัตลักษณ์
+- ถ้าไม่มี CTA หรือข้อมูลรอง ห้ามสร้างกล่อง/แถบว่างและห้ามพิมพ์ placeholder ให้ใช้พื้นที่เป็น breathing space แทน
+- ตรวจคำไทย ใบหน้า โลโก้ ความอ่านง่าย และระยะขอบก่อนส่งภาพ`;
   };
 
   function postOutputContract(d){

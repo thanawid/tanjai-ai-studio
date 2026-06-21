@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <div class="form-grid">
         <label class="full">แนบภาพจริง / ภาพอ้างอิง
           <input id="image-photos" type="file" accept="image/*" multiple>
-          <small>ถ้าเป็นภาพบุคคลจริง ภาพกิจกรรม หรือภาพผู้บริหาร แนะนำใช้โหมดภาพจริงเพื่อคงหน้าคนและฉากเดิม</small>
+          <small>ไม่บังคับแนบไฟล์ — หากแนบ ระบบจะให้ AI วิเคราะห์เองว่าไฟล์ใดเป็นโลโก้ ภาพบุคคล หรือภาพอ้างอิง</small>
           <div id="image-photoPreview" class="upload-preview-grid"></div>
         </label>
       </div>
@@ -869,6 +869,8 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "Prompt พิธีก
     const selectedCtx = $("#image-workContext")?.value || ctx;
     const preset = v91CreativePresets[selectedCtx];
     if(preset){
+      const isThaiPrPremium = /Thai PR Premium|โปสเตอร์ประชาสัมพันธ์ไทยสีสด/.test(selectedCtx || "");
+      setSelectOptionValue("#image-qualityLevel", isThaiPrPremium ? toolOptions.qualityLevels[1] : toolOptions.qualityLevels[0]);
       setSelectOptionValue("#image-style", preset.style);
       setSelectOptionValue("#image-layout", preset.layout);
       setSelectOptionValue("#image-density", preset.density);
@@ -883,6 +885,10 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "Prompt พิธีก
   };
 
   const setupV91CreativeQuality = () => {
+    // Start every fresh form in balanced mode. Premium is emitted only after
+    // an explicit Premium context/preset selection.
+    setSelectOptionValue("#image-qualityLevel", toolOptions.qualityLevels[0]);
+    setSelectOptionValue("#image-density", toolOptions.densities[0]);
     $("#image-workContext")?.addEventListener("change", () => applyV91CreativePreset($("#image-workContext").value, null, false));
     $("#image-imageType")?.addEventListener("change", refreshV91QualityPreview);
     $("#image-qualityLevel")?.addEventListener("change", refreshV91QualityPreview);
@@ -1092,7 +1098,7 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "Prompt พิธีก
     TANJAI.state.lastImage = executeOut;
     TANJAI.state.lastImageCritic = critic;
     TANJAI.updateImageResultMode?.("gpt");
-    TANJAI.toast("สร้างคำสั่งภาพจริงและ Prompt มืออาชีพแล้ว");
+    TANJAI.toast("สร้าง Prompt แบบกระชับสำหรับสร้างภาพทันทีแล้ว");
     window.TANJAI_AUTH?.trackUsage("image");
   };
   $("#makePost").onclick = () => {
