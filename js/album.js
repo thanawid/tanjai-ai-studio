@@ -1,4 +1,4 @@
-/* v9.3.9 — Facebook Album Smart Slot Layout
+/* v9.3.10 — Balanced Ribbon Facebook Album Frame
    Safe photo processing for real uploaded images only.
    Cover Frame + Lite Frames + Additional Frame, face-aware crop when supported,
    smart theme selection, safe text, slot-based crop/frames, Facebook mock preview, and synced preview / download results.
@@ -110,12 +110,12 @@
     const role=slotRole(idx);
     const layout=previewLayoutFor(d.previewLayout,total,effectiveRatio(d));
     if(role==="cover"){
-      return {role, layout, label:"Cover Frame", frameWeight:"balanced-cover", textDensity:"full", logoScale:.92, targetY:layout==="cover-left"?.43:.41, bottomRatio:.20};
+      return {role, layout, label:"Cover Frame", frameWeight:"balanced-cover", textDensity:"full", logoScale:.84, targetY:layout==="cover-left"?.43:.41, bottomRatio:.17};
     }
     if(role==="lite"){
-      return {role, layout, label:`Lite Frame ${idx+1}`, frameWeight:"balanced-lite", textDensity:"short", logoScale:.64, targetY:.49, bottomRatio: d.mode.includes("ภาพกิจกรรมเน้นภาพ")?.075:.092};
+      return {role, layout, label:`Lite Frame ${idx+1}`, frameWeight:"balanced-lite", textDensity:"short", logoScale:.56, targetY:.49, bottomRatio: d.mode.includes("ภาพกิจกรรมเน้นภาพ")?.058:.072};
     }
-    return {role, layout, label:`Additional Frame ${idx+1}`, frameWeight:"balanced-minimal", textDensity:"minimal", logoScale:.46, targetY:.50, bottomRatio:.058};
+    return {role, layout, label:`Additional Frame ${idx+1}`, frameWeight:"balanced-minimal", textDensity:"minimal", logoScale:.42, targetY:.50, bottomRatio:.048};
   }
   function slotSize(idx,d=data(),total=state.files.length||4){
     const requested=d.ratio || "auto";
@@ -155,7 +155,7 @@
   }
 
   function theme(d=data()){
-    const proFrame = val("album-proFrame", "None");
+    const proFrame = val("album-proFrame", "Balanced Ribbon");
     let raw=(d.colorTone||"").toLowerCase();
     if(!raw || raw.includes("ai เลือก")){
       const cue=[d.frameStyle,d.categoryLabel,d.title,d.detail].filter(Boolean).join(" ").toLowerCase();
@@ -283,10 +283,10 @@
     g1.addColorStop(1,rgba(th.accent2,.42));
     ctx.fillStyle=g1;
     ctx.beginPath();
-    ctx.moveTo(w*.78,0);
+    ctx.moveTo(w*.84,0);
     ctx.lineTo(w,0);
-    ctx.lineTo(w,h*.32);
-    ctx.lineTo(w*.9,h*.22);
+    ctx.lineTo(w,h*.24);
+    ctx.lineTo(w*.93,h*.16);
     ctx.closePath();
     ctx.fill();
 
@@ -296,23 +296,34 @@
     g2.addColorStop(1,"rgba(255,255,255,0)");
     ctx.fillStyle=g2;
     ctx.beginPath();
-    ctx.moveTo(w*.82,h);
+    ctx.moveTo(w*.87,h);
     ctx.lineTo(w,h);
-    ctx.lineTo(w,h*.74);
-    ctx.lineTo(w*.92,h*.82);
+    ctx.lineTo(w,h*.80);
+    ctx.lineTo(w*.94,h*.86);
     ctx.closePath();
     ctx.fill();
     ctx.restore();
   }
   function drawBorderFrame(ctx,w,h,th){
     const min=Math.min(w,h);
-    const pad=Math.round(min*0.018);
-    const radius=Math.round(min*0.025);
+    const pad=Math.round(min*0.014);
+    const radius=Math.round(min*0.020);
     const pro=th.proFrame && th.proFrame !== "None";
-    const thickness=pro ? Math.max(8,Math.round(min*0.018)) : Math.max(3,Math.round(min*.0045));
+    const thickness=pro ? Math.max(6,Math.round(min*0.009)) : Math.max(3,Math.round(min*.0038));
     ctx.save();
 
-    if(th.proFrame === "Gold Luxury"){
+    if(th.proFrame === "Balanced Ribbon"){
+      const balanced=ctx.createLinearGradient(0,0,w,h);
+      balanced.addColorStop(0, th.accent2);
+      balanced.addColorStop(.52, th.accent);
+      balanced.addColorStop(1, th.border);
+      ctx.shadowColor=rgba(th.accent,.20);
+      ctx.shadowBlur=Math.round(min*.010);
+      fillRoundRect(ctx,pad,pad,w-pad*2,h-pad*2,radius,null,balanced,thickness);
+      ctx.shadowBlur=0;
+      fillRoundRect(ctx,pad+thickness*.90,pad+thickness*.90,w-pad*2-thickness*1.8,h-pad*2-thickness*1.8,Math.max(7,radius-thickness*.40),null,"rgba(255,255,255,.20)",1);
+    }
+    else if(th.proFrame === "Gold Luxury"){
       const gold=ctx.createLinearGradient(0,0,w,h);
       gold.addColorStop(0, "#C99719");
       gold.addColorStop(.18, "#FFF0A8");
@@ -321,11 +332,10 @@
       gold.addColorStop(.78, "#F8D66F");
       gold.addColorStop(1, "#B97908");
       ctx.shadowColor="rgba(212,175,55,.28)";
-      ctx.shadowBlur=Math.round(min*.018);
+      ctx.shadowBlur=Math.round(min*.010);
       fillRoundRect(ctx,pad,pad,w-pad*2,h-pad*2,radius,null,gold,thickness);
       ctx.shadowBlur=0;
-      fillRoundRect(ctx,pad+thickness*.72,pad+thickness*.72,w-pad*2-thickness*1.44,h-pad*2-thickness*1.44,Math.max(8,radius-thickness*.35),null,"rgba(255,255,255,.32)",Math.max(1,Math.round(thickness*.13)));
-      fillRoundRect(ctx,pad+thickness*1.28,pad+thickness*1.28,w-pad*2-thickness*2.56,h-pad*2-thickness*2.56,Math.max(6,radius-thickness*.55),null,rgba(th.deep,.30),Math.max(1,Math.round(thickness*.10)));
+      fillRoundRect(ctx,pad+thickness*.90,pad+thickness*.90,w-pad*2-thickness*1.8,h-pad*2-thickness*1.8,Math.max(8,radius-thickness*.40),null,"rgba(255,255,255,.28)",1);
     }
     else if(th.proFrame === "Modern Neon"){
       ctx.shadowColor=rgba(th.accent,.38);
@@ -350,11 +360,21 @@
 
   function drawSlotBorderFrame(ctx,w,h,th,weight="lite"){
     const min=Math.min(w,h);
-    const pad=Math.round(min*(weight==="minimal"?0.020:0.018));
-    const thickness = weight==="minimal" ? Math.max(2, Math.round(min*0.0035)) : Math.max(4, Math.round(min*0.0062));
-    const radius=Math.round(min*0.022);
+    const pad=Math.round(min*(weight==="minimal"?0.015:0.014));
+    const thickness = weight==="minimal" ? Math.max(2, Math.round(min*0.0025)) : Math.max(3, Math.round(min*0.0042));
+    const radius=Math.round(min*0.019);
     ctx.save();
-    if(th.proFrame === "Gold Luxury"){
+    if(th.proFrame === "Balanced Ribbon"){
+      const balanced=ctx.createLinearGradient(0,0,w,h);
+      balanced.addColorStop(0, th.accent2);
+      balanced.addColorStop(.55, th.accent);
+      balanced.addColorStop(1, th.border);
+      ctx.shadowColor=rgba(th.accent,.12);
+      ctx.shadowBlur=weight==="minimal" ? 4 : 7;
+      fillRoundRect(ctx,pad,pad,w-pad*2,h-pad*2,radius,null,balanced,thickness);
+      ctx.shadowBlur=0;
+      fillRoundRect(ctx,pad+thickness,pad+thickness,w-pad*2-thickness*2,h-pad*2-thickness*2,Math.max(6,radius-thickness*.45),null,"rgba(255,255,255,.16)",1);
+    }else if(th.proFrame === "Gold Luxury"){
       const gold=ctx.createLinearGradient(0,0,w,h);
       gold.addColorStop(0, "#C99719");
       gold.addColorStop(.22, "#FFF0A8");
@@ -524,52 +544,52 @@
     drawAccentSweep(ctx,w,h,th,pst);
     drawBorderFrame(ctx,w,h,th);
 
-    const brandW=Math.round(w*(land?0.46:0.78));
-    const brandH=Math.round(h*(land?0.092:0.072));
+    const brandW=Math.round(w*(land?0.42:0.70));
+    const brandH=Math.round(h*(land?0.074:0.062));
     const brandX=pad+Math.round(w*.014);
     const brandY=pad+Math.round(h*.012);
     const brandLabel=hasRealOrg(d.org) ? d.org : '';
     if(brandLabel || state.logo){
       drawRibbon(ctx,brandX,brandY,brandW,brandH,th,'dark');
-      const logoS=Math.round(brandH*.96);
+      const logoS=Math.round(brandH*.92);
       const logoX=brandX-Math.round(logoS*.18);
       const logoY=brandY-Math.round((logoS-brandH)/2);
       const hasLogo=drawLogo(ctx,logoX,logoY,logoS);
       const brandTextX=hasLogo ? logoX+logoS+Math.round(w*.012) : brandX+Math.round(w*.018);
-      if(brandLabel) drawText(ctx,brandLabel,brandTextX,brandY+Math.round(brandH*.18),brandW-(brandTextX-brandX)-Math.round(w*.025),2,`900 ${Math.round(Math.min(w,h)*0.025)}px "Prompt","Noto Sans Thai",sans-serif`,'#fff',Math.round(Math.min(w,h)*0.032));
+      if(brandLabel) drawText(ctx,brandLabel,brandTextX,brandY+Math.round(brandH*.18),brandW-(brandTextX-brandX)-Math.round(w*.025),2,`900 ${Math.round(Math.min(w,h)*0.022)}px "Prompt","Noto Sans Thai",sans-serif`,'#fff',Math.round(Math.min(w,h)*0.029));
       const orgSub=hasRealOrg(d.org) && d.categoryLabel ? smartShort(d.categoryLabel,26) : (d.place ? smartShort(d.place,24) : '');
-      if(orgSub) drawText(ctx,orgSub,brandTextX,brandY+Math.round(brandH*.62),brandW-(brandTextX-brandX)-Math.round(w*.025),1,`800 ${Math.round(Math.min(w,h)*0.018)}px "Noto Sans Thai","Prompt",sans-serif`,'rgba(255,255,255,.84)',Math.round(Math.min(w,h)*0.024));
+      if(orgSub) drawText(ctx,orgSub,brandTextX,brandY+Math.round(brandH*.61),brandW-(brandTextX-brandX)-Math.round(w*.025),1,`800 ${Math.round(Math.min(w,h)*0.015)}px "Noto Sans Thai","Prompt",sans-serif`,'rgba(255,255,255,.84)',Math.round(Math.min(w,h)*0.021));
     }
 
     const panelX=pad+Math.round(w*.015);
-    const panelY=Math.round(h*(land?0.645:0.58));
+    const panelY=Math.round(h*(land?0.69:0.64));
     const panelW=w-panelX*2;
-    const panelH=Math.round(h*(land?0.20:0.245));
+    const panelH=Math.round(h*(land?0.16:0.19));
     drawGlassPanel(ctx,panelX,panelY,panelW,panelH,Math.round(panelH*.12),th,pst.name==='minimal'?0.58:0.66);
     const panelAccent=ctx.createLinearGradient(panelX,panelY,panelX+panelW,panelY);
     panelAccent.addColorStop(0,th.accent2); panelAccent.addColorStop(.6,th.accent); panelAccent.addColorStop(1,'rgba(255,255,255,.12)');
     ctx.fillStyle=panelAccent;
-    fillRoundRect(ctx,panelX+Math.round(w*.012),panelY+Math.round(h*.014),panelW-Math.round(w*.024),Math.max(6,Math.round(h*.012)),Math.round(h*.008),panelAccent);
+    fillRoundRect(ctx,panelX+Math.round(w*.012),panelY+Math.round(h*.012),panelW-Math.round(w*.024),Math.max(4,Math.round(h*.007)),Math.round(h*.006),panelAccent);
 
     if(d.categoryLabel){
-      const catY=panelY-Math.round(h*.048);
-      const catW=Math.min(Math.round(w*.42), Math.round(w*.16)+Math.round(clean(d.categoryLabel).length*18));
-      drawRibbon(ctx,panelX+Math.round(w*.006),catY,catW,Math.round(h*.043),th,'accent');
-      drawText(ctx, smartShort(d.categoryLabel,32), panelX+Math.round(w*.028), catY+Math.round(h*.007), catW-Math.round(w*.045), 1, `900 ${Math.round(Math.min(w,h)*0.017)}px "Prompt","Noto Sans Thai",sans-serif`, '#fff', Math.round(Math.min(w,h)*0.024));
+      const catY=panelY-Math.round(h*.040);
+      const catW=Math.min(Math.round(w*.36), Math.round(w*.14)+Math.round(clean(d.categoryLabel).length*16));
+      drawRibbon(ctx,panelX+Math.round(w*.006),catY,catW,Math.round(h*.035),th,'accent');
+      drawText(ctx, smartShort(d.categoryLabel,32), panelX+Math.round(w*.024), catY+Math.round(h*.006), catW-Math.round(w*.040), 1, `900 ${Math.round(Math.min(w,h)*0.015)}px "Prompt","Noto Sans Thai",sans-serif`, '#fff', Math.round(Math.min(w,h)*0.021));
     }
 
     const titleX=panelX+Math.round(w*.03);
     const titleW=panelW-Math.round(w*.06);
-    const titleY=panelY+Math.round(panelH*.18);
-    const titleFont=Math.round(Math.min(w,h)*(land?0.043:0.038)*pst.titleScale);
+    const titleY=panelY+Math.round(panelH*.16);
+    const titleFont=Math.round(Math.min(w,h)*(land?0.037:0.034)*pst.titleScale);
     const titleLineH=Math.round(titleFont*1.11);
     drawText(ctx, smartShort(d.title,110), titleX, titleY, titleW, land?2:3, `900 ${titleFont}px "Prompt","Kanit","Noto Sans Thai",sans-serif`, '#fff', titleLineH);
 
     const subText = stripHashtags(d.detail) || stripHashtags(d.footer) || d.place || '';
-    const subY=titleY + titleLineH*(land?2:2.4);
+    const subY=titleY + titleLineH*(land?1.65:1.9);
     if(subText){
-      fillRoundRect(ctx,titleX,subY,titleW,Math.round(panelH*.18),Math.round(panelH*.09),rgba(th.accent,.82),'rgba(255,255,255,.12)',1);
-      drawText(ctx, smartShort(subText, land?72:52), titleX+Math.round(w*.018), subY+Math.round(panelH*.036), titleW-Math.round(w*.036), 1, `800 ${Math.round(Math.min(w,h)*0.020)}px "Prompt","Noto Sans Thai",sans-serif`, '#fff', Math.round(Math.min(w,h)*0.025));
+      fillRoundRect(ctx,titleX,subY,titleW,Math.round(panelH*.15),Math.round(panelH*.075),rgba(th.accent,.78),'rgba(255,255,255,.12)',1);
+      drawText(ctx, smartShort(subText, land?72:52), titleX+Math.round(w*.018), subY+Math.round(panelH*.026), titleW-Math.round(w*.036), 1, `800 ${Math.round(Math.min(w,h)*0.017)}px "Prompt","Noto Sans Thai",sans-serif`, '#fff', Math.round(Math.min(w,h)*0.022));
     }
 
     const metaY=panelY+panelH-Math.round(panelH*.18);
@@ -578,10 +598,10 @@
     if(d.place) metaX += drawInfoPill(ctx,metaX,metaY,d.place,th,'📍') + Math.round(w*.012);
 
     if(pst.showFooterBar && stripHashtags(d.footer)){
-      const barH=Math.round(h*(land?0.058:0.052));
+      const barH=Math.round(h*(land?0.046:0.043));
       const barY=h-pad-barH;
       drawGlassPanel(ctx,pad+Math.round(w*.012),barY,w-pad*2-Math.round(w*.024),barH,Math.round(barH*.45),th,.72);
-      drawText(ctx, smartShort(stripHashtags(d.footer), land?80:60), pad+Math.round(w*.035), barY+Math.round(barH*.24), w-pad*2-Math.round(w*.07), 1, `800 ${Math.round(Math.min(w,h)*0.021)}px "Prompt","Noto Sans Thai",sans-serif`, '#fff', Math.round(Math.min(w,h)*0.025));
+      drawText(ctx, smartShort(stripHashtags(d.footer), land?80:60), pad+Math.round(w*.035), barY+Math.round(barH*.22), w-pad*2-Math.round(w*.07), 1, `800 ${Math.round(Math.min(w,h)*0.017)}px "Prompt","Noto Sans Thai",sans-serif`, '#fff', Math.round(Math.min(w,h)*0.022));
     }
   }
 
@@ -605,50 +625,46 @@
     const min=Math.min(w,h);
     drawSlotBorderFrame(ctx,w,h,th,"lite");
 
-    // Accent corner to preserve the "album frame" feeling from the approved reference.
+    // Small accent corner keeps the album identity without covering the photo.
     ctx.save();
     const corner=ctx.createLinearGradient(w*.74,0,w*.98,h*.24);
     corner.addColorStop(0,rgba(th.accent,.26));
     corner.addColorStop(1,rgba(th.accent2,.18));
     ctx.fillStyle=corner;
     ctx.beginPath();
-    ctx.moveTo(w*.80,pad);
+    ctx.moveTo(w*.86,pad);
     ctx.lineTo(w-pad,pad);
-    ctx.lineTo(w-pad,h*.20);
-    ctx.lineTo(w*.90,h*.12);
+    ctx.lineTo(w-pad,h*.14);
+    ctx.lineTo(w*.94,h*.08);
     ctx.closePath();
     ctx.fill();
     ctx.restore();
 
-    // Number badge + logo = clearer frame identity like the sample.
-    const badgeSize=Math.round(min*.074);
-    drawLiteNumberBadge(ctx, idx, pad+Math.round(w*.01), pad+Math.round(h*.012), badgeSize, th);
-
     if(state.logo){
-      const ls=Math.round(min*.10*profile.logoScale);
+      const ls=Math.round(min*.09*profile.logoScale);
       drawLogo(ctx,w-pad-ls-Math.round(w*.006),pad+Math.round(h*.012),ls);
     }
 
     const bottomH=Math.round(h*profile.bottomRatio);
-    const x=pad+Math.round(w*.015);
+    const x=pad+Math.round(w*.012);
     const y=h-pad-bottomH-Math.round(h*.006);
-    const boxW=w-pad*2-Math.round(w*.03);
+    const boxW=w-pad*2-Math.round(w*.024);
 
     const g=ctx.createLinearGradient(x,y,x+boxW,y);
     g.addColorStop(0,rgba(th.deep,.70));
     g.addColorStop(.56,rgba(th.dark,.58));
     g.addColorStop(1,rgba(th.accent,.34));
-    fillRoundRect(ctx,x,y,boxW,bottomH,Math.round(bottomH*.34),g,"rgba(255,255,255,.14)",Math.max(1,Math.round(bottomH*.018)));
+    fillRoundRect(ctx,x,y,boxW,bottomH,Math.round(bottomH*.30),g,"rgba(255,255,255,.12)",1);
 
     const line=ctx.createLinearGradient(x,y,x+boxW,y);
     line.addColorStop(0,th.accent2);
     line.addColorStop(.58,rgba(th.accent,.76));
     line.addColorStop(1,"rgba(255,255,255,.10)");
-    fillRoundRect(ctx,x+Math.round(w*.018),y+Math.round(bottomH*.12),boxW-Math.round(w*.036),Math.max(3,Math.round(bottomH*.07)),Math.round(bottomH*.03),line,null,0);
+    fillRoundRect(ctx,x+Math.round(w*.018),y+Math.round(bottomH*.10),boxW-Math.round(w*.036),Math.max(2,Math.round(bottomH*.045)),Math.round(bottomH*.025),line,null,0);
 
     const leftPad=x+Math.round(w*.026);
-    const textY=y+Math.round(bottomH*.34);
-    drawText(ctx, liteText(d, idx), leftPad, textY, boxW-Math.round(w*.052), 1, `900 ${Math.round(min*0.020)}px "Prompt","Noto Sans Thai",sans-serif`, '#fff', Math.round(min*0.025));
+    const textY=y+Math.round(bottomH*.30);
+    drawText(ctx, liteText(d, idx), leftPad, textY, boxW-Math.round(w*.052), 1, `900 ${Math.round(min*0.0175)}px "Prompt","Noto Sans Thai",sans-serif`, '#fff', Math.round(min*0.022));
   }
 
   function drawAdditionalFrame(ctx,w,h,d,idx,th,profile=slotProfile(idx,d)){
