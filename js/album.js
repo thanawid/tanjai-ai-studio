@@ -1,4 +1,4 @@
-/* v9.3.7 — Facebook Album Smart Slot Layout
+/* v9.3.8 — Facebook Album Smart Slot Layout
    Safe photo processing for real uploaded images only.
    Cover Frame + Lite Frames + Additional Frame, face-aware crop when supported,
    smart theme selection, safe text, slot-based crop/frames, Facebook mock preview, and synced preview / download results.
@@ -357,6 +357,63 @@
     
     ctx.restore();
   }
+
+  function drawSlotBorderFrame(ctx,w,h,th,weight="lite"){
+    const min=Math.min(w,h);
+    const pad=Math.round(min*(weight==="minimal"?0.020:0.018));
+    const thickness = weight==="minimal" ? Math.max(2, Math.round(min*0.004)) : Math.max(4, Math.round(min*0.008));
+    const inner = weight==="minimal" ? 1 : 2;
+    ctx.save();
+    if(th.proFrame === "Gold Luxury"){
+      const gold=ctx.createLinearGradient(0,0,w,h);
+      gold.addColorStop(0, "#D4AF37");
+      gold.addColorStop(0.18, "#F9F295");
+      gold.addColorStop(0.42, "#E6BE8A");
+      gold.addColorStop(0.55, "#B8860B");
+      gold.addColorStop(0.72, "#E6BE8A");
+      gold.addColorStop(1, "#D4AF37");
+      ctx.shadowColor = weight==="minimal" ? "rgba(212,175,55,.18)" : "rgba(212,175,55,.34)";
+      ctx.shadowBlur = weight==="minimal" ? 10 : 18;
+      fillRoundRect(ctx,pad,pad,w-pad*2,h-pad*2,Math.round(min*0.022),null,gold,thickness);
+      ctx.shadowBlur=0;
+      fillRoundRect(ctx,pad+thickness*.8,pad+thickness*.8,w-pad*2-thickness*1.6,h-pad*2-thickness*1.6,Math.round(min*0.018),null,"rgba(255,255,255,.34)",inner);
+    }else if(th.proFrame === "Modern Neon"){
+      ctx.shadowColor = rgba(th.accent,.45);
+      ctx.shadowBlur = weight==="minimal" ? 10 : 18;
+      fillRoundRect(ctx,pad,pad,w-pad*2,h-pad*2,Math.round(min*0.022),null,th.accent,thickness);
+      ctx.shadowBlur = 0;
+      fillRoundRect(ctx,pad+thickness,pad+thickness,w-pad*2-thickness*2,h-pad*2-thickness*2,Math.round(min*0.018),null,rgba(th.accent2,.76),inner);
+    }else if(th.proFrame === "Bold Corporate"){
+      const corp=ctx.createLinearGradient(0,0,w,0);
+      corp.addColorStop(0, th.accent);
+      corp.addColorStop(1, th.accent2);
+      fillRoundRect(ctx,pad,pad,w-pad*2,h-pad*2,Math.round(min*0.022),null,corp,thickness);
+      fillRoundRect(ctx,pad+thickness,pad+thickness,w-pad*2-thickness*2,h-pad*2-thickness*2,Math.round(min*0.018),null,"rgba(255,255,255,.24)",inner);
+    }else{
+      fillRoundRect(ctx,pad,pad,w-pad*2,h-pad*2,Math.round(min*0.022),null,"rgba(255,255,255,.28)",thickness);
+      fillRoundRect(ctx,pad+thickness,pad+thickness,w-pad*2-thickness*2,h-pad*2-thickness*2,Math.round(min*0.018),null,rgba(th.accent2,.34),inner);
+    }
+    ctx.restore();
+  }
+
+  function drawLiteNumberBadge(ctx,idx,x,y,size,th){
+    const g=ctx.createLinearGradient(x,y,x+size,y+size);
+    g.addColorStop(0, th.accent);
+    g.addColorStop(1, th.accent2);
+    ctx.save();
+    ctx.shadowColor = "rgba(0,0,0,.24)";
+    ctx.shadowBlur = Math.round(size*.18);
+    fillRoundRect(ctx,x,y,size,size,Math.round(size*.34),g,"rgba(255,255,255,.28)",Math.max(1,Math.round(size*.05)));
+    ctx.restore();
+    ctx.save();
+    ctx.fillStyle = "#fff";
+    ctx.font = `900 ${Math.round(size*.44)}px "Prompt","Noto Sans Thai",sans-serif`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(String(idx+1), x+size/2, y+size/2+1);
+    ctx.restore();
+  }
+
   function drawLogo(ctx,x,y,s){
     if(!state.logo) return false;
     ctx.save();
@@ -555,79 +612,99 @@
     return footerShort || smartShort(d.categoryLabel,72) || smartShort(d.title,72);
   }
   function drawLiteFrame(ctx,w,h,d,idx,th,profile=slotProfile(idx,d)){
-    const pad=Math.round(Math.min(w,h)*0.026);
-    const r=Math.round(Math.min(w,h)*0.028);
+    const pad=Math.round(Math.min(w,h)*0.022);
+    const min=Math.min(w,h);
+    drawSlotBorderFrame(ctx,w,h,th,"lite");
 
-    // Lite Frame must stay lighter than Cover: thin border, small logo, short caption bar.
-    fillRoundRect(ctx,pad,pad,w-pad*2,h-pad*2,r,null,"rgba(255,255,255,.28)",Math.max(2,Math.round(Math.min(w,h)*.0022)));
-    fillRoundRect(ctx,pad+5,pad+5,w-pad*2-10,h-pad*2-10,Math.max(8,r-5),null,rgba(th.accent2,.30),Math.max(1,Math.round(Math.min(w,h)*.0014)));
-
+    // Accent corner to preserve the "album frame" feeling from the approved reference.
     ctx.save();
-    const corner=ctx.createLinearGradient(w*.78,0,w*.98,h*.22);
-    corner.addColorStop(0,rgba(th.accent,.34));
+    const corner=ctx.createLinearGradient(w*.74,0,w*.98,h*.24);
+    corner.addColorStop(0,rgba(th.accent,.26));
     corner.addColorStop(1,rgba(th.accent2,.18));
     ctx.fillStyle=corner;
     ctx.beginPath();
     ctx.moveTo(w*.80,pad);
     ctx.lineTo(w-pad,pad);
-    ctx.lineTo(w-pad,h*.24);
+    ctx.lineTo(w-pad,h*.20);
+    ctx.lineTo(w*.90,h*.12);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+
+    // Number badge + logo = clearer frame identity like the sample.
+    const badgeSize=Math.round(min*.09);
+    drawLiteNumberBadge(ctx, idx, pad+Math.round(w*.01), pad+Math.round(h*.012), badgeSize, th);
+
+    if(state.logo){
+      const ls=Math.round(min*.11*profile.logoScale);
+      drawLogo(ctx,w-pad-ls-Math.round(w*.006),pad+Math.round(h*.012),ls);
+    }
+
+    const bottomH=Math.round(h*profile.bottomRatio);
+    const x=pad+Math.round(w*.015);
+    const y=h-pad-bottomH-Math.round(h*.006);
+    const boxW=w-pad*2-Math.round(w*.03);
+
+    const g=ctx.createLinearGradient(x,y,x+boxW,y);
+    g.addColorStop(0,rgba(th.deep,.70));
+    g.addColorStop(.56,rgba(th.dark,.58));
+    g.addColorStop(1,rgba(th.accent,.34));
+    fillRoundRect(ctx,x,y,boxW,bottomH,Math.round(bottomH*.34),g,"rgba(255,255,255,.14)",Math.max(1,Math.round(bottomH*.018)));
+
+    const line=ctx.createLinearGradient(x,y,x+boxW,y);
+    line.addColorStop(0,th.accent2);
+    line.addColorStop(.58,rgba(th.accent,.76));
+    line.addColorStop(1,"rgba(255,255,255,.10)");
+    fillRoundRect(ctx,x+Math.round(w*.018),y+Math.round(bottomH*.12),boxW-Math.round(w*.036),Math.max(3,Math.round(bottomH*.07)),Math.round(bottomH*.03),line,null,0);
+
+    const leftPad=x+Math.round(w*.026);
+    const textY=y+Math.round(bottomH*.34);
+    drawText(ctx, liteText(d, idx), leftPad, textY, boxW-Math.round(w*.052), 1, `900 ${Math.round(min*0.022)}px "Prompt","Noto Sans Thai",sans-serif`, '#fff', Math.round(min*0.025));
+  }
+
+  function drawAdditionalFrame(ctx,w,h,d,idx,th,profile=slotProfile(idx,d)){
+    const pad=Math.round(Math.min(w,h)*0.022);
+    const min=Math.min(w,h);
+    drawSlotBorderFrame(ctx,w,h,th,"minimal");
+
+    ctx.save();
+    const corner=ctx.createLinearGradient(w*.80,0,w*.98,h*.20);
+    corner.addColorStop(0,rgba(th.accent,.18));
+    corner.addColorStop(1,rgba(th.accent2,.14));
+    ctx.fillStyle=corner;
+    ctx.beginPath();
+    ctx.moveTo(w*.86,pad);
+    ctx.lineTo(w-pad,pad);
+    ctx.lineTo(w-pad,h*.13);
+    ctx.lineTo(w*.92,h*.08);
     ctx.closePath();
     ctx.fill();
     ctx.restore();
 
     if(state.logo){
-      const ls=Math.round(Math.min(w,h)*.062*profile.logoScale);
+      const ls=Math.round(min*.095);
       drawLogo(ctx,w-pad-ls-Math.round(w*.006),pad+Math.round(h*.012),ls);
-    }
-
-    const bottomH=Math.round(h*profile.bottomRatio);
-    const y=h-pad-bottomH;
-    const x=pad+Math.round(w*.01);
-    const boxW=w-pad*2-Math.round(w*.02);
-
-    ctx.save();
-    const g=ctx.createLinearGradient(x,y,x+boxW,y);
-    g.addColorStop(0,rgba(th.deep,.64));
-    g.addColorStop(.58,rgba(th.dark,.48));
-    g.addColorStop(1,rgba(th.accent,.34));
-    fillRoundRect(ctx,x,y,boxW,bottomH,Math.round(bottomH*.36),g,"rgba(255,255,255,.13)",Math.max(1,Math.round(bottomH*.018)));
-    const line=ctx.createLinearGradient(x,y,x+boxW,y);
-    line.addColorStop(0,th.accent2);
-    line.addColorStop(.58,rgba(th.accent,.70));
-    line.addColorStop(1,"rgba(255,255,255,.12)");
-    fillRoundRect(ctx,x+Math.round(w*.018),y+Math.round(bottomH*.12),boxW-Math.round(w*.036),Math.max(3,Math.round(bottomH*.052)),Math.round(bottomH*.025),line,null,0);
-    ctx.restore();
-
-    const leftPad=x+Math.round(w*.024);
-    const textY=y+Math.round(bottomH*.34);
-    const textW=boxW-Math.round(w*.048);
-    drawText(ctx, liteText(d, idx), leftPad, textY, textW, 1, `900 ${Math.round(Math.min(w,h)*0.020)}px "Prompt","Noto Sans Thai",sans-serif`, '#fff', Math.round(Math.min(w,h)*0.025));
-  }
-
-  function drawAdditionalFrame(ctx,w,h,d,idx,th,profile=slotProfile(idx,d)){
-    const pad=Math.round(Math.min(w,h)*0.026);
-    const r=Math.round(Math.min(w,h)*0.024);
-    // Additional Frame is intentionally minimal: image-first, almost no overlay.
-    fillRoundRect(ctx,pad,pad,w-pad*2,h-pad*2,r,null,"rgba(255,255,255,.22)",Math.max(1,Math.round(Math.min(w,h)*.0018)));
-    fillRoundRect(ctx,pad+5,pad+5,w-pad*2-10,h-pad*2-10,Math.max(7,r-5),null,rgba(th.accent2,.18),1);
-
-    if(state.logo){
-      const ls=Math.round(Math.min(w,h)*.045);
-      drawLogo(ctx,w-pad-ls-Math.round(w*.004),pad+Math.round(h*.010),ls);
     }
 
     const label=liteText(d, idx);
     if(!label) return;
-    const boxW=Math.round(w*0.54);
-    const boxH=Math.round(h*profile.bottomRatio);
-    const x=pad+Math.round(w*.010);
+    const boxW=Math.round(w*0.58);
+    const boxH=Math.max(Math.round(h*profile.bottomRatio), Math.round(min*0.11));
+    const x=pad+Math.round(w*.012);
     const y=h-pad-boxH-Math.round(h*.006);
     const g=ctx.createLinearGradient(x,y,x+boxW,y);
-    g.addColorStop(0,rgba(th.deep,.50));
-    g.addColorStop(1,rgba(th.dark,.30));
+    g.addColorStop(0,rgba(th.deep,.56));
+    g.addColorStop(1,rgba(th.dark,.34));
     fillRoundRect(ctx,x,y,boxW,boxH,Math.round(boxH*.40),g,"rgba(255,255,255,.10)",1);
-    drawText(ctx, smartShort(label,48), x+Math.round(w*.018), y+Math.round(boxH*.24), boxW-Math.round(w*.04), 1, `800 ${Math.round(Math.min(w,h)*0.016)}px "Prompt","Noto Sans Thai",sans-serif`, '#fff', Math.round(Math.min(w,h)*0.020));
+
+    const line=ctx.createLinearGradient(x,y,x+boxW,y);
+    line.addColorStop(0,rgba(th.accent2,.88));
+    line.addColorStop(1,rgba(th.accent,.42));
+    fillRoundRect(ctx,x+Math.round(w*.018),y+Math.round(boxH*.12),boxW-Math.round(w*.036),Math.max(2,Math.round(boxH*.05)),Math.round(boxH*.025),line,null,0);
+
+    drawText(ctx, smartShort(label,48), x+Math.round(w*.022), y+Math.round(boxH*.30), boxW-Math.round(w*.044), 1, `800 ${Math.round(min*0.018)}px "Prompt","Noto Sans Thai",sans-serif`, '#fff', Math.round(min*0.020));
   }
+
 
   function makeImage(file){
     return new Promise((res,rej)=>{

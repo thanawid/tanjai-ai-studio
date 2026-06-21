@@ -1,4 +1,4 @@
-# V9.3.7 — Facebook Album Smart Slot Layout
+# V9.3.8 — Facebook Album Smart Slot Layout
 
 ฐาน: V9.3.6 Pro Album
 
