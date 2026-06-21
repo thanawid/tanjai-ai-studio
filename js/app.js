@@ -160,7 +160,7 @@ document.addEventListener("DOMContentLoaded", () => {
         </label>
         <label class="full">ภาพรอง 3–4 ภาพ
           <input id="album-supportFiles" type="file" accept="image/*" multiple>
-          <small>ภาพที่ 2–4 ใช้ Lite Frame เน้นภาพจริง ส่วนภาพที่ 5 ใช้ Additional Frame กรอบบาง</small>
+          <small>ภาพรองใช้กรอบบาง เน้นภาพจริง และไม่ใส่หมายเลขลำดับบนภาพ</small>
         </label>
       </div>
       <div id="album-preview" class="album-upload-preview"></div>
@@ -181,11 +181,13 @@ document.addEventListener("DOMContentLoaded", () => {
     </div>
     <div class="form-section"><div class="section-title"><b>3</b><h4>ตั้งค่าชุดภาพ</h4></div>
       <div class="form-grid">
-        <label>ขนาดภาพ<select id="album-ratio"><option value="16:9" selected>อัลบั้ม Facebook แนวนอน 16:9 — 1920x1080</option><option value="4:5">โพสต์แนวตั้ง 4:5 — 1080x1350</option><option value="1:1">โพสต์จัตุรัส 1:1 — 1080x1080</option><option value="9:16">Story / Reels 9:16 — 1080x1920</option></select></label>
+        <label>ขนาดภาพ<select id="album-ratio"><option value="auto" selected>อัตโนมัติ — เลือกจากภาพปกและการแสดงผล Facebook</option><option value="16:9">อัลบั้ม Facebook แนวนอน 16:9 — 1920x1080</option><option value="4:5">โพสต์แนวตั้ง 4:5 — 1080x1350</option><option value="1:1">โพสต์จัตุรัส 1:1 — 1080x1080</option><option value="9:16">Story / Reels 9:16 — 1080x1920</option></select></label>
+        <label>รูปแบบตัวอย่างโพสต์<select id="album-previewLayout"><option value="auto" selected>อัตโนมัติ — เลือกจากสัดส่วนและจำนวนภาพ</option><option value="cover-top">ภาพปกใหญ่ด้านบน + ภาพรองด้านล่าง</option><option value="cover-left">ภาพปกใหญ่ด้านซ้าย + ภาพรองด้านขวา</option><option value="grid">ตารางภาพสมดุล</option></select></label>
         <label>สไตล์กรอบ<select id="album-frameStyle"><option>ทั่วไป / หน่วยงาน / แบรนด์</option><option>ประชุม / เวทีรับฟัง / ประชาคม</option><option>ลงพื้นที่ / ภารกิจ / ติดตามงาน</option><option>ข่าวด่วน / ประกาศสำคัญ</option><option>กิจกรรม / อบรม / อีเวนต์</option><option>โรงเรียน / การศึกษา</option><option>สุขภาพ / รณรงค์ / ชุมชน</option><option>ธุรกิจ / สินค้า / โปรโมชัน</option><option>เพจ / ครีเอเตอร์ / แบรนด์ส่วนตัว</option><option>มินิมอล ขอบบาง</option></select></label>
         <label>Theme Cover Frame Preset<select id="album-themePreset"><option>Ribbon Civic Cover</option><option>Modern Glass Cover</option><option>Clean Civic Cover</option><option>Minimal Story Cover</option></select></label>
         <label>โทนสี<select id="album-colorTone"><option selected>AI เลือกโทนสีให้เข้ากับงาน</option><option>ม่วง–ทอง พรีเมียม</option><option>เขียว–เหลือง–ขาว</option><option>น้ำเงิน–ขาว ทางการ</option><option>ส้ม–ทอง สดเด่น</option><option>ดำ–ทอง หรูหรา</option></select></label>
         <label>โหมดอัตโนมัติ<select id="album-autoMode"><option>ปรับภาพ + ครอป + ใส่กรอบ</option><option>ภาพกิจกรรมเน้นภาพ / แถบเล็ก</option><option>ครอป + ใส่กรอบเท่านั้น</option><option>ปรับภาพเท่านั้น</option></select></label>
+        <div class="full album-smart-choice" id="album-smartChoice">ระบบจะสรุปขนาดและรูปแบบพรีวิวที่เลือกให้อีกครั้งหลังสร้างชุดภาพ</div>
         <input id="album-safeMode" type="checkbox" checked hidden>
         <input id="album-makeCover" type="checkbox" checked hidden>
       </div>

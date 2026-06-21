@@ -1,4 +1,4 @@
-/* v9.2.0 — Facebook Cover + Lite Album System
+/* v9.3.4 — Smart Facebook Cover + Lite Album System
    Safe photo processing for real uploaded images only.
    Cover Frame + Lite Frames + Additional Frame, face-aware crop when supported,
    smart theme selection, safe text, and synced preview / download results.
@@ -16,7 +16,10 @@
 
   const $ = (q,root=document)=>root.querySelector(q);
   const $$ = (q,root=document)=>Array.from(root.querySelectorAll(q));
-  const state = { coverFile: null, supportFiles: [], files: [], outputs: [], logo: null, caption: "" };
+  const state = {
+    coverFile: null, supportFiles: [], files: [], outputs: [], logo: null, caption: "",
+    resolvedRatio: "16:9", resolvedPreviewLayout: "cover-top"
+  };
 
   function val(id, fallback=""){
     const el = document.getElementById(id);
@@ -59,7 +62,8 @@
       lite2: val("album-lite2",""),
       lite3: val("album-lite3",""),
       lite4: val("album-lite4",""),
-      ratio: val("album-ratio","16:9"),
+      ratio: val("album-ratio","auto"),
+      previewLayout: val("album-previewLayout","auto"),
       colorTone: val("album-colorTone","AI เลือกโทนสีให้เข้ากับงาน"),
       mode: val("album-autoMode", val("album-mode","ปรับภาพ + ครอป + ใส่กรอบ")),
       layoutMode: val("album-layoutMode","Facebook Cover + Lite + Additional Frame System"),
@@ -67,15 +71,37 @@
     };
   }
 
+  function effectiveRatio(d=data()){
+    const requested=d.ratio || "auto";
+    return requested === "auto" ? (state.resolvedRatio || "16:9") : requested;
+  }
+  function resolveRatioFromDimensions(w,h){
+    const aspect=(Number(w)||16)/(Number(h)||9);
+    if(aspect>=1.30) return "16:9";
+    if(aspect<=0.86) return "4:5";
+    return "1:1";
+  }
+  function previewLayoutFor(requested="auto",count=4,ratio="16:9"){
+    if(requested && requested!=="auto") return requested;
+    if(count<=2) return "grid";
+    if(ratio==="4:5" || ratio==="9:16") return "cover-left";
+    if(count>=4) return "cover-top";
+    return "cover-left";
+  }
+  function previewLayoutLabel(layout){
+    if(layout==="cover-left") return "ปกใหญ่ซ้าย + ภาพรองขวา";
+    if(layout==="grid") return "ตารางภาพสมดุล";
+    return "ปกใหญ่ด้านบน + ภาพรองด้านล่าง";
+  }
   function size(d=data()){
-    const r = d.ratio || "";
+    const r = effectiveRatio(d);
     if(r.includes("1:1")) return {w:1080,h:1080};
     if(r.includes("9:16")) return {w:1080,h:1920};
     if(r.includes("4:5")) return {w:1080,h:1350};
     return {w:1920,h:1080};
   }
   function ratioValue(d=data()){
-    const r = d.ratio || "16:9";
+    const r = effectiveRatio(d);
     if(r.includes("1:1")) return "1 / 1";
     if(r.includes("9:16")) return "9 / 16";
     if(r.includes("4:5")) return "4 / 5";
@@ -367,7 +393,7 @@
     drawAccentSweep(ctx,w,h,th,pst);
     drawBorderFrame(ctx,w,h,th);
 
-    const brandW=Math.round(w*(land?0.36:0.78));
+    const brandW=Math.round(w*(land?0.48:0.82));
     const brandH=Math.round(h*(land?0.108:0.08));
     const brandX=pad+Math.round(w*.014);
     const brandY=pad+Math.round(h*.012);
@@ -385,10 +411,14 @@
     }
 
     const panelX=pad+Math.round(w*.015);
-    const panelY=Math.round(h*(land?0.55:0.5));
-    const panelW=Math.round(w*(land?0.62:0.9));
-    const panelH=Math.round(h*(land?0.27:0.29));
-    drawGlassPanel(ctx,panelX,panelY,panelW,panelH,Math.round(panelH*.14),th,pst.name==='minimal'?0.70:0.80);
+    const panelY=Math.round(h*(land?0.61:0.53));
+    const panelW=w-panelX*2;
+    const panelH=Math.round(h*(land?0.24:0.30));
+    drawGlassPanel(ctx,panelX,panelY,panelW,panelH,Math.round(panelH*.12),th,pst.name==='minimal'?0.62:0.72);
+    const panelAccent=ctx.createLinearGradient(panelX,panelY,panelX+panelW,panelY);
+    panelAccent.addColorStop(0,th.accent2); panelAccent.addColorStop(.6,th.accent); panelAccent.addColorStop(1,'rgba(255,255,255,.12)');
+    ctx.fillStyle=panelAccent;
+    fillRoundRect(ctx,panelX+Math.round(w*.012),panelY+Math.round(h*.014),panelW-Math.round(w*.024),Math.max(6,Math.round(h*.012)),Math.round(h*.008),panelAccent);
 
     if(d.categoryLabel){
       const catY=panelY-Math.round(h*.056);
@@ -399,16 +429,16 @@
 
     const titleX=panelX+Math.round(w*.03);
     const titleW=panelW-Math.round(w*.06);
-    const titleY=panelY+Math.round(panelH*.14);
-    const titleFont=Math.round(Math.min(w,h)*(land?0.05:0.042)*pst.titleScale);
+    const titleY=panelY+Math.round(panelH*.18);
+    const titleFont=Math.round(Math.min(w,h)*(land?0.047:0.042)*pst.titleScale);
     const titleLineH=Math.round(titleFont*1.11);
     drawText(ctx, smartShort(d.title,110), titleX, titleY, titleW, land?2:3, `900 ${titleFont}px "Prompt","Kanit","Noto Sans Thai",sans-serif`, '#fff', titleLineH);
 
     const subText = stripHashtags(d.detail) || stripHashtags(d.footer) || d.place || '';
     const subY=titleY + titleLineH*(land?2:2.4);
     if(subText){
-      fillRoundRect(ctx,titleX,subY,titleW,Math.round(panelH*.24),Math.round(panelH*.12),rgba(th.accent,.92),'rgba(255,255,255,.12)',1);
-      drawText(ctx, smartShort(subText, land?62:52), titleX+Math.round(w*.018), subY+Math.round(panelH*.05), titleW-Math.round(w*.036), 1, `800 ${Math.round(Math.min(w,h)*0.024)}px "Prompt","Noto Sans Thai",sans-serif`, '#fff', Math.round(Math.min(w,h)*0.03));
+      fillRoundRect(ctx,titleX,subY,titleW,Math.round(panelH*.22),Math.round(panelH*.11),rgba(th.accent,.88),'rgba(255,255,255,.14)',1);
+      drawText(ctx, smartShort(subText, land?72:52), titleX+Math.round(w*.018), subY+Math.round(panelH*.045), titleW-Math.round(w*.036), 1, `800 ${Math.round(Math.min(w,h)*0.022)}px "Prompt","Noto Sans Thai",sans-serif`, '#fff', Math.round(Math.min(w,h)*0.028));
     }
 
     const metaY=panelY+panelH-Math.round(panelH*.18);
@@ -439,21 +469,10 @@
     if(idx===3) return meta || detailShort || footerShort || smartShort(d.title,72);
     return footerShort || smartShort(d.categoryLabel,72) || smartShort(d.title,72);
   }
-  function drawSequenceBadge(ctx,w,h,idx,th){
-    const s=Math.round(Math.min(w,h)*.075);
-    const x=Math.round(Math.min(w,h)*.035), y=x;
-    ctx.save();
-    ctx.shadowColor=th.shadow; ctx.shadowBlur=Math.round(s*.22); ctx.shadowOffsetY=Math.round(s*.08);
-    fillRoundRect(ctx,x,y,s,s,Math.round(s*.28),th.chip,'rgba(255,255,255,.82)',Math.max(2,Math.round(s*.04)));
-    ctx.shadowBlur=0; ctx.fillStyle='#fff'; ctx.font=`900 ${Math.round(s*.48)}px "Prompt","Kanit",sans-serif`;
-    ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(String(idx+1),x+s/2,y+s/2+1);
-    ctx.restore();
-  }
   function drawLiteFrame(ctx,w,h,d,idx,th){
     const pst=preset(d);
     const pad=Math.round(Math.min(w,h)*0.024);
     drawBorderFrame(ctx,w,h,th);
-    drawSequenceBadge(ctx,w,h,idx,th);
     if(state.logo){
       const ls=Math.round(Math.min(w,h)*.082);
       drawLogo(ctx,w-pad-ls,pad,ls);
@@ -475,7 +494,6 @@
   function drawAdditionalFrame(ctx,w,h,d,idx,th){
     const pad=Math.round(Math.min(w,h)*0.025);
     drawBorderFrame(ctx,w,h,th);
-    drawSequenceBadge(ctx,w,h,idx,th);
     const boxW=Math.round(w*0.68);
     const boxH=Math.round(h*(w>=h?0.12:0.1));
     const x=pad;
@@ -491,7 +509,33 @@
   }
 
   function makeImage(file){
-    return new Promise((res,rej)=>{ const img=new Image(); img.onload=()=>res(img); img.onerror=rej; img.src=URL.createObjectURL(file); });
+    return new Promise((res,rej)=>{
+      const img=new Image();
+      const url=URL.createObjectURL(file);
+      img.onload=()=>{ URL.revokeObjectURL(url); res(img); };
+      img.onerror=(error)=>{ URL.revokeObjectURL(url); rej(error); };
+      img.src=url;
+    });
+  }
+  function renderSmartChoice(){
+    const d=data();
+    const note=$('#album-smartChoice');
+    if(!note) return;
+    const ratioSource=d.ratio==="auto"?'ระบบเลือกอัตโนมัติ':'ผู้ใช้เลือก';
+    const layoutSource=d.previewLayout==="auto"?'ระบบเลือกอัตโนมัติ':'ผู้ใช้เลือก';
+    note.innerHTML=`<b>การแสดงผลชุดนี้</b><span>ขนาด ${effectiveRatio(d)} (${ratioSource}) · ${previewLayoutLabel(state.resolvedPreviewLayout)} (${layoutSource})</span>`;
+    note.classList.add('resolved');
+  }
+  async function resolveSmartSettings(files){
+    const d=data();
+    if(d.ratio==="auto" && files[0]){
+      const coverImage=await makeImage(files[0]);
+      state.resolvedRatio=resolveRatioFromDimensions(coverImage.naturalWidth||coverImage.width,coverImage.naturalHeight||coverImage.height);
+    }else{
+      state.resolvedRatio=effectiveRatio(d);
+    }
+    state.resolvedPreviewLayout=previewLayoutFor(d.previewLayout,files.length,state.resolvedRatio);
+    renderSmartChoice();
   }
   function canvasToBlob(canvas){ return new Promise(res=>canvas.toBlob(b=>res(b),"image/jpeg",.92)); }
   async function waitFonts(){ try{ if(document.fonts && document.fonts.ready) await document.fonts.ready; }catch(e){} }
@@ -588,6 +632,8 @@
     const cover = state.outputs[0];
     const lites = state.outputs.slice(1,4);
     const additional = state.outputs.slice(4,5);
+    const resolvedRatio=effectiveRatio(data());
+    state.resolvedPreviewLayout=previewLayoutFor(data().previewLayout,state.outputs.length,resolvedRatio);
 
     const coverPreview = cover ? `
       <section class="album-preview-section">
@@ -641,7 +687,7 @@
               <b>ตัวอย่างโพสต์ Facebook</b>
               <p>ดูภาพรวมเหมือนโพสต์จริงก่อนดาวน์โหลด</p>
             </div>
-            <span class="album-ready-badge">พร้อมโพสต์ · ${state.outputs.length} ภาพ</span>
+            <span class="album-ready-badge">${state.outputs.length} ภาพ · ${resolvedRatio}</span>
           </div>
           <div class="album-post-actions">
             <button class="btn primary" id="albumCopyCaptionQuick">คัดลอกแคปชั่น</button>
@@ -680,7 +726,9 @@
   function renderFacebookPreview(){
     const host=$('#albumFacebookPreview'); if(!host) return;
     const imgs=state.outputs.slice(0,4); const total=state.outputs.length;
-    const cls=imgs.length<=1?'one':imgs.length===2?'two':imgs.length===3?'three':'four';
+    const countClass=imgs.length<=1?'one':imgs.length===2?'two':imgs.length===3?'three':'four';
+    const layout=previewLayoutFor(data().previewLayout,total,effectiveRatio(data()));
+    state.resolvedPreviewLayout=layout;
     const captionEl=$('#albumCaptionText'); const caption=captionEl?captionEl.value:state.caption;
     const pageName = hasRealOrg(data().org) ? data().org : 'ชื่อเพจของคุณ';
     const cells=imgs.map((o,i)=>`<div class="fb-preview-cell"><img src="${o.url}" alt="">${(total>4 && i===3)?`<span class="fb-preview-more">+${total-4}</span>`:''}</div>`).join('');
@@ -691,8 +739,8 @@
           <div><div class="fb-preview-name">${pageName.replace(/</g,'&lt;')}</div><div class="fb-preview-time">เมื่อสักครู่ · 🌐</div></div>
         </div>
         <div class="fb-preview-caption">${String(caption||'').replace(/</g,'&lt;').replace(/\n/g,'<br>')}</div>
-        <div class="fb-preview-grid ${cls}">${cells}</div>
-        <div class="fb-preview-foot">จำลองหน้าโพสต์ Facebook จากภาพที่สร้างจริง</div>
+        <div class="fb-preview-grid ${countClass} ${layout}">${cells}</div>
+        <div class="fb-preview-foot">จำลองจากภาพจริง · ${effectiveRatio(data())} · ${previewLayoutLabel(layout)}</div>
       </div>`;
   }
 
@@ -731,6 +779,7 @@
     const btn=$('#makeAlbum'); const old=btn?btn.textContent:''; if(btn){ btn.disabled=true; btn.textContent='กำลังสร้างชุดภาพ...'; }
     try{
       await waitFonts();
+      await resolveSmartSettings(files);
       const logoInput=$('#album-logoFile'); if(logoInput && logoInput.files && logoInput.files[0]) await loadLogo(logoInput.files[0]); else state.logo=null;
       for(let i=0;i<files.length;i++) state.outputs.push(await processImage(files[i],i,files.length));
       state.caption=captionText(data());
@@ -749,11 +798,12 @@
       if(id==='albumClear' || id==='albumClearTop'){
         e.preventDefault();
         state.outputs.forEach(o=>URL.revokeObjectURL(o.url));
-        state.outputs=[]; state.files=[]; state.coverFile=null; state.supportFiles=[]; state.logo=null;
+        state.outputs=[]; state.files=[]; state.coverFile=null; state.supportFiles=[]; state.logo=null; state.resolvedRatio='16:9'; state.resolvedPreviewLayout='cover-top';
         const coverInp=$('#album-coverFile'); if(coverInp) coverInp.value='';
         const supportInp=$('#album-supportFiles'); if(supportInp) supportInp.value='';
         const logoInp=$('#album-logoFile'); if(logoInp) logoInp.value='';
         renderUploadPreview();
+        const smart=$('#album-smartChoice'); if(smart){ smart.textContent='ระบบจะสรุปขนาดและรูปแบบพรีวิวที่เลือกให้อีกครั้งหลังสร้างชุดภาพ'; smart.classList.remove('resolved'); }
         const host=$('#albumResult .ready-main') || $('#albumResult'); if(host) host.innerHTML='';
       }
       if(id==='albumCopyCaption' || id==='albumCopyCaptionQuick'){ e.preventDefault(); const t=$('#albumCaptionText'); const value=t?t.value:state.caption; if(value){ navigator.clipboard?.writeText(value); const old=e.target.textContent; e.target.textContent='คัดลอกแล้ว'; setTimeout(()=>e.target.textContent=old || 'คัดลอกแคปชั่น',1200); } }
@@ -763,6 +813,8 @@
     });
     document.addEventListener('change',(e)=>{
       if(e.target && (e.target.id==='album-coverFile' || e.target.id==='album-supportFiles')){ collectFilesFromInputs(true); renderUploadPreview(); }
+      if(e.target && e.target.id==='album-previewLayout' && state.outputs.length){ state.resolvedPreviewLayout=previewLayoutFor(e.target.value,state.outputs.length,effectiveRatio(data())); renderSmartChoice(); renderFacebookPreview(); }
+      if(e.target && e.target.id==='album-ratio' && state.outputs.length) generate();
     });
     document.addEventListener('input',(e)=>{
       if(e.target && e.target.id==='albumCaptionText') renderFacebookPreview();
@@ -770,6 +822,6 @@
   });
   window.TANJAI_ALBUM_PRO={
     generate,downloadAll,renderFacebookPreview,renderUploadPreview,collectFilesFromInputs,
-    _test:{cropPlacement,liteText,theme,size}
+    _test:{cropPlacement,liteText,theme,size,resolveRatioFromDimensions,previewLayoutFor}
   };
 })();
