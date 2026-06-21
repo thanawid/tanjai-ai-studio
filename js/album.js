@@ -1,7 +1,7 @@
-/* v9.3.4 — Smart Facebook Cover + Lite Album System
+/* v9.3.7 — Facebook Album Smart Slot Layout
    Safe photo processing for real uploaded images only.
    Cover Frame + Lite Frames + Additional Frame, face-aware crop when supported,
-   smart theme selection, safe text, and synced preview / download results.
+   smart theme selection, safe text, slot-based crop/frames, Facebook mock preview, and synced preview / download results.
 */
 (function(){
   function ensureAlbumInputs(){
@@ -99,6 +99,43 @@
     if(r.includes("9:16")) return {w:1080,h:1920};
     if(r.includes("4:5")) return {w:1080,h:1350};
     return {w:1920,h:1080};
+  }
+
+  function slotRole(idx){
+    if(idx===0) return "cover";
+    if(idx<4) return "lite";
+    return "additional";
+  }
+  function slotProfile(idx,d=data(),total=state.files.length||4){
+    const role=slotRole(idx);
+    const layout=previewLayoutFor(d.previewLayout,total,effectiveRatio(d));
+    if(role==="cover"){
+      return {role, layout, label:"Cover Frame", frameWeight:"heavy", textDensity:"full", logoScale:1, targetY:layout==="cover-left"?.42:.40, bottomRatio:.24};
+    }
+    if(role==="lite"){
+      return {role, layout, label:`Lite Frame ${idx+1}`, frameWeight:"light", textDensity:"short", logoScale:.72, targetY:.48, bottomRatio: d.mode.includes("ภาพกิจกรรมเน้นภาพ")?.082:.102};
+    }
+    return {role, layout, label:`Additional Frame ${idx+1}`, frameWeight:"minimal", textDensity:"minimal", logoScale:.56, targetY:.50, bottomRatio:.07};
+  }
+  function slotSize(idx,d=data(),total=state.files.length||4){
+    const requested=d.ratio || "auto";
+    if(requested !== "auto") return size(d);
+    const role=slotRole(idx);
+    const layout=previewLayoutFor(d.previewLayout,total,effectiveRatio(d));
+    if(layout==="grid") return {w:1080,h:1080};
+    if(layout==="cover-left"){
+      if(role==="cover") return {w:1080,h:1350};
+      if(role==="lite") return {w:1080,h:1080};
+      return {w:1080,h:1080};
+    }
+    if(layout==="mobile-focus"){
+      if(role==="cover") return {w:1080,h:1350};
+      return {w:1080,h:1080};
+    }
+    // cover-top: first image is the wide story card, supporting images become clean square/lite cards for Facebook grid thumbnails.
+    if(role==="cover") return {w:1920,h:1080};
+    if(role==="lite") return {w:1080,h:1080};
+    return {w:1080,h:1080};
   }
   function ratioValue(d=data()){
     const r = effectiveRatio(d);
@@ -517,43 +554,79 @@
     if(idx===3) return meta || detailShort || footerShort || smartShort(d.title,72);
     return footerShort || smartShort(d.categoryLabel,72) || smartShort(d.title,72);
   }
-  function drawLiteFrame(ctx,w,h,d,idx,th){
-    const pst=preset(d);
-    const pad=Math.round(Math.min(w,h)*0.024);
-    drawBorderFrame(ctx,w,h,th);
+  function drawLiteFrame(ctx,w,h,d,idx,th,profile=slotProfile(idx,d)){
+    const pad=Math.round(Math.min(w,h)*0.026);
+    const r=Math.round(Math.min(w,h)*0.028);
+
+    // Lite Frame must stay lighter than Cover: thin border, small logo, short caption bar.
+    fillRoundRect(ctx,pad,pad,w-pad*2,h-pad*2,r,null,"rgba(255,255,255,.28)",Math.max(2,Math.round(Math.min(w,h)*.0022)));
+    fillRoundRect(ctx,pad+5,pad+5,w-pad*2-10,h-pad*2-10,Math.max(8,r-5),null,rgba(th.accent2,.30),Math.max(1,Math.round(Math.min(w,h)*.0014)));
+
+    ctx.save();
+    const corner=ctx.createLinearGradient(w*.78,0,w*.98,h*.22);
+    corner.addColorStop(0,rgba(th.accent,.34));
+    corner.addColorStop(1,rgba(th.accent2,.18));
+    ctx.fillStyle=corner;
+    ctx.beginPath();
+    ctx.moveTo(w*.80,pad);
+    ctx.lineTo(w-pad,pad);
+    ctx.lineTo(w-pad,h*.24);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+
     if(state.logo){
-      const ls=Math.round(Math.min(w,h)*.082);
-      drawLogo(ctx,w-pad-ls,pad,ls);
+      const ls=Math.round(Math.min(w,h)*.062*profile.logoScale);
+      drawLogo(ctx,w-pad-ls-Math.round(w*.006),pad+Math.round(h*.012),ls);
     }
-    const bottomH=Math.round(h*(w>=h?(pst.liteCompact?0.155:0.17):(pst.liteCompact?0.13:0.145)));
+
+    const bottomH=Math.round(h*profile.bottomRatio);
     const y=h-pad-bottomH;
-    const x=pad;
-    const boxW=w-pad*2;
-    drawGlassPanel(ctx,x,y,boxW,bottomH,Math.round(bottomH*.28),th,.68);
+    const x=pad+Math.round(w*.01);
+    const boxW=w-pad*2-Math.round(w*.02);
 
-    const leftPad=x+Math.round(w*.026);
-    const rightReserve=Math.round(w*.03);
+    ctx.save();
+    const g=ctx.createLinearGradient(x,y,x+boxW,y);
+    g.addColorStop(0,rgba(th.deep,.64));
+    g.addColorStop(.58,rgba(th.dark,.48));
+    g.addColorStop(1,rgba(th.accent,.34));
+    fillRoundRect(ctx,x,y,boxW,bottomH,Math.round(bottomH*.36),g,"rgba(255,255,255,.13)",Math.max(1,Math.round(bottomH*.018)));
+    const line=ctx.createLinearGradient(x,y,x+boxW,y);
+    line.addColorStop(0,th.accent2);
+    line.addColorStop(.58,rgba(th.accent,.70));
+    line.addColorStop(1,"rgba(255,255,255,.12)");
+    fillRoundRect(ctx,x+Math.round(w*.018),y+Math.round(bottomH*.12),boxW-Math.round(w*.036),Math.max(3,Math.round(bottomH*.052)),Math.round(bottomH*.025),line,null,0);
+    ctx.restore();
 
-    const textY=y+Math.round(bottomH*.24);
-    const textW=boxW-(leftPad-x)-rightReserve;
-    drawText(ctx, liteText(d, idx), leftPad, textY, textW, 2, `900 ${Math.round(Math.min(w,h)*0.025)}px "Prompt","Noto Sans Thai",sans-serif`, '#fff', Math.round(Math.min(w,h)*0.03));
+    const leftPad=x+Math.round(w*.024);
+    const textY=y+Math.round(bottomH*.34);
+    const textW=boxW-Math.round(w*.048);
+    drawText(ctx, liteText(d, idx), leftPad, textY, textW, 1, `900 ${Math.round(Math.min(w,h)*0.020)}px "Prompt","Noto Sans Thai",sans-serif`, '#fff', Math.round(Math.min(w,h)*0.025));
   }
 
-  function drawAdditionalFrame(ctx,w,h,d,idx,th){
-    const pad=Math.round(Math.min(w,h)*0.025);
-    drawBorderFrame(ctx,w,h,th);
-    const boxW=Math.round(w*0.68);
-    const boxH=Math.round(h*(w>=h?0.12:0.1));
-    const x=pad;
-    const y=h-pad-boxH;
-    drawGlassPanel(ctx,x,y,boxW,boxH,Math.round(boxH*.34),th,.60);
-    let textW=boxW-Math.round(w*.04);
+  function drawAdditionalFrame(ctx,w,h,d,idx,th,profile=slotProfile(idx,d)){
+    const pad=Math.round(Math.min(w,h)*0.026);
+    const r=Math.round(Math.min(w,h)*0.024);
+    // Additional Frame is intentionally minimal: image-first, almost no overlay.
+    fillRoundRect(ctx,pad,pad,w-pad*2,h-pad*2,r,null,"rgba(255,255,255,.22)",Math.max(1,Math.round(Math.min(w,h)*.0018)));
+    fillRoundRect(ctx,pad+5,pad+5,w-pad*2-10,h-pad*2-10,Math.max(7,r-5),null,rgba(th.accent2,.18),1);
+
     if(state.logo){
-      const ls=Math.round(boxH*.58);
-      drawLogo(ctx,x+boxW-ls-Math.round(w*.015), y+Math.round((boxH-ls)/2), ls);
-      textW -= ls + Math.round(w*.03);
+      const ls=Math.round(Math.min(w,h)*.045);
+      drawLogo(ctx,w-pad-ls-Math.round(w*.004),pad+Math.round(h*.010),ls);
     }
-    drawText(ctx, liteText(d, idx), x+Math.round(w*.02), y+Math.round(boxH*.21), textW, 2, `800 ${Math.round(Math.min(w,h)*0.022)}px "Prompt","Noto Sans Thai",sans-serif`, '#fff', Math.round(Math.min(w,h)*0.027));
+
+    const label=liteText(d, idx);
+    if(!label) return;
+    const boxW=Math.round(w*0.54);
+    const boxH=Math.round(h*profile.bottomRatio);
+    const x=pad+Math.round(w*.010);
+    const y=h-pad-boxH-Math.round(h*.006);
+    const g=ctx.createLinearGradient(x,y,x+boxW,y);
+    g.addColorStop(0,rgba(th.deep,.50));
+    g.addColorStop(1,rgba(th.dark,.30));
+    fillRoundRect(ctx,x,y,boxW,boxH,Math.round(boxH*.40),g,"rgba(255,255,255,.10)",1);
+    drawText(ctx, smartShort(label,48), x+Math.round(w*.018), y+Math.round(boxH*.24), boxW-Math.round(w*.04), 1, `800 ${Math.round(Math.min(w,h)*0.016)}px "Prompt","Noto Sans Thai",sans-serif`, '#fff', Math.round(Math.min(w,h)*0.020));
   }
 
   function makeImage(file){
@@ -571,7 +644,7 @@
     if(!note) return;
     const ratioSource=d.ratio==="auto"?'ระบบเลือกอัตโนมัติ':'ผู้ใช้เลือก';
     const layoutSource=d.previewLayout==="auto"?'ระบบเลือกอัตโนมัติ':'ผู้ใช้เลือก';
-    note.innerHTML=`<b>การแสดงผลชุดนี้</b><span>ขนาด ${effectiveRatio(d)} (${ratioSource}) · ${previewLayoutLabel(state.resolvedPreviewLayout)} (${layoutSource})</span>`;
+    note.innerHTML=`<b>การแสดงผลชุดนี้</b><span>${d.ratio==='auto'?'ขนาดตาม Slot: Cover / Lite / Additional':'ขนาดเดียวทั้งชุด '+effectiveRatio(d)} (${ratioSource}) · ${previewLayoutLabel(state.resolvedPreviewLayout)} (${layoutSource})</span>`;
     note.classList.add('resolved');
   }
   async function resolveSmartSettings(files){
@@ -589,21 +662,20 @@
   async function waitFonts(){ try{ if(document.fonts && document.fonts.ready) await document.fonts.ready; }catch(e){} }
 
   async function processImage(file,idx,total){
-    const d=data(), th=theme(d), sz=size(d);
+    const d=data(), th=theme(d), profile=slotProfile(idx,d,total), sz=slotSize(idx,d,total);
     const canvas=document.createElement('canvas'); canvas.width=sz.w; canvas.height=sz.h;
     const ctx=canvas.getContext('2d');
     const img=await makeImage(file);
     const enhance=!d.mode.includes('ครอป + ใส่กรอบเท่านั้น');
     const faceFocus=await detectFaceFocus(img);
-    coverDraw(img,ctx,sz.w,sz.h,enhance,faceFocus,idx===0?.38:.46);
+    coverDraw(img,ctx,sz.w,sz.h,enhance,faceFocus,profile.targetY);
     if(!d.mode.includes('ปรับภาพเท่านั้น')){
-      if(idx===0) drawCoverFrame(ctx,sz.w,sz.h,d,th);
-      else if(idx<4) drawLiteFrame(ctx,sz.w,sz.h,d,idx,th);
-      else drawAdditionalFrame(ctx,sz.w,sz.h,d,idx,th);
+      if(profile.role==="cover") drawCoverFrame(ctx,sz.w,sz.h,d,th,profile);
+      else if(profile.role==="lite") drawLiteFrame(ctx,sz.w,sz.h,d,idx,th,profile);
+      else drawAdditionalFrame(ctx,sz.w,sz.h,d,idx,th,profile);
     }
     const blob=await canvasToBlob(canvas); const url=URL.createObjectURL(blob);
-    const role=idx===0?'cover':idx<4?'lite':'additional';
-    return {blob,url,filename:`facebook_album_${String(idx+1).padStart(2,'0')}_${role}_${sz.w}x${sz.h}.jpg`};
+    return {blob,url,role:profile.role,label:profile.label,w:sz.w,h:sz.h,filename:`facebook_album_${String(idx+1).padStart(2,'0')}_${profile.role}_${sz.w}x${sz.h}.jpg`};
   }
 
   function normalizeFiles(fileList, warn=true, max=4){
@@ -676,7 +748,7 @@
   function renderOutputs(){
     const host=$('#albumResult .ready-main') || $('#albumResult') || $('#albumOutput') || $('#albumPreview'); if(!host) return;
     const caption = state.caption || captionText(data());
-    const aspect=ratioValue(data());
+    const aspectOf=o=>o&&o.w&&o.h?`${o.w} / ${o.h}`:ratioValue(data());
     const cover = state.outputs[0];
     const lites = state.outputs.slice(1,4);
     const additional = state.outputs.slice(4,5);
@@ -687,10 +759,10 @@
       <section class="album-preview-section">
         <div class="album-preview-title">
           <b>ภาพปกหลัก</b>
-          <span>Cover Frame — ภาพแรกที่ใช้เปิดเรื่อง</span>
+          <span>Cover Frame — ภาพแรกที่ใช้เปิดเรื่อง · ${cover?.w || ''}x${cover?.h || ''}</span>
         </div>
         <div class="album-cover-preview-card">
-          <img src="${cover.url}" alt="Cover Preview" style="aspect-ratio:${aspect}">
+          <img src="${cover.url}" alt="Cover Preview" style="aspect-ratio:${aspectOf(cover)}">
           <button class="btn secondary album-one-download" data-i="0">ดาวน์โหลดภาพปก</button>
         </div>
       </section>` : '';
@@ -704,8 +776,8 @@
         <div class="album-lite-preview-grid">
           ${lites.map((o,k)=>`
             <div class="album-lite-preview-card">
-              <img src="${o.url}" alt="Lite ${k+2}" style="aspect-ratio:${aspect}">
-              <b>Lite ${k+2}</b>
+              <img src="${o.url}" alt="Lite ${k+2}" style="aspect-ratio:${aspectOf(o)}">
+              <b>Lite ${k+2} · ${o.w || ''}x${o.h || ''}</b>
               <button class="btn secondary album-one-download" data-i="${k+1}">ดาวน์โหลด</button>
             </div>`).join('')}
         </div>
@@ -720,8 +792,8 @@
         <div class="album-lite-preview-grid album-additional-preview-grid">
           ${additional.map((o,k)=>`
             <div class="album-lite-preview-card">
-              <img src="${o.url}" alt="Additional" style="aspect-ratio:${aspect}">
-              <b>Additional ${k+5}</b>
+              <img src="${o.url}" alt="Additional" style="aspect-ratio:${aspectOf(o)}">
+              <b>Additional ${k+5} · ${o.w || ''}x${o.h || ''}</b>
               <button class="btn secondary album-one-download" data-i="${k+4}">ดาวน์โหลด</button>
             </div>`).join('')}
         </div>
@@ -779,7 +851,7 @@
     state.resolvedPreviewLayout=layout;
     const captionEl=$('#albumCaptionText'); const caption=captionEl?captionEl.value:state.caption;
     const pageName = hasRealOrg(data().org) ? data().org : 'ชื่อเพจของคุณ';
-    const cells=imgs.map((o,i)=>`<div class="fb-preview-cell"><img src="${o.url}" alt="">${(total>4 && i===3)?`<span class="fb-preview-more">+${total-4}</span>`:''}</div>`).join('');
+    const cells=imgs.map((o,i)=>`<div class="fb-preview-cell fb-slot-${o.role || slotRole(i)}"><img src="${o.url}" alt="">${(total>4 && i===3)?`<span class="fb-preview-more">+${total-4}</span>`:''}</div>`).join('');
     host.innerHTML=`
       <div class="fb-preview-card">
         <div class="fb-preview-head">
