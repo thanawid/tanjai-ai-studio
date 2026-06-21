@@ -1,4 +1,4 @@
-/* v9.3.8 — Facebook Album Smart Slot Layout
+/* v9.3.9 — Facebook Album Smart Slot Layout
    Safe photo processing for real uploaded images only.
    Cover Frame + Lite Frames + Additional Frame, face-aware crop when supported,
    smart theme selection, safe text, slot-based crop/frames, Facebook mock preview, and synced preview / download results.
@@ -110,12 +110,12 @@
     const role=slotRole(idx);
     const layout=previewLayoutFor(d.previewLayout,total,effectiveRatio(d));
     if(role==="cover"){
-      return {role, layout, label:"Cover Frame", frameWeight:"heavy", textDensity:"full", logoScale:1, targetY:layout==="cover-left"?.42:.40, bottomRatio:.24};
+      return {role, layout, label:"Cover Frame", frameWeight:"balanced-cover", textDensity:"full", logoScale:.92, targetY:layout==="cover-left"?.43:.41, bottomRatio:.20};
     }
     if(role==="lite"){
-      return {role, layout, label:`Lite Frame ${idx+1}`, frameWeight:"light", textDensity:"short", logoScale:.72, targetY:.48, bottomRatio: d.mode.includes("ภาพกิจกรรมเน้นภาพ")?.082:.102};
+      return {role, layout, label:`Lite Frame ${idx+1}`, frameWeight:"balanced-lite", textDensity:"short", logoScale:.64, targetY:.49, bottomRatio: d.mode.includes("ภาพกิจกรรมเน้นภาพ")?.075:.092};
     }
-    return {role, layout, label:`Additional Frame ${idx+1}`, frameWeight:"minimal", textDensity:"minimal", logoScale:.56, targetY:.50, bottomRatio:.07};
+    return {role, layout, label:`Additional Frame ${idx+1}`, frameWeight:"balanced-minimal", textDensity:"minimal", logoScale:.46, targetY:.50, bottomRatio:.058};
   }
   function slotSize(idx,d=data(),total=state.files.length||4){
     const requested=d.ratio || "auto";
@@ -305,93 +305,82 @@
     ctx.restore();
   }
   function drawBorderFrame(ctx,w,h,th){
-    const pad=Math.round(Math.min(w,h)*0.018);
+    const min=Math.min(w,h);
+    const pad=Math.round(min*0.018);
+    const radius=Math.round(min*0.025);
+    const pro=th.proFrame && th.proFrame !== "None";
+    const thickness=pro ? Math.max(8,Math.round(min*0.018)) : Math.max(3,Math.round(min*.0045));
     ctx.save();
-    
-    // Pro Frame Logic
-    if(th.proFrame && th.proFrame !== "None"){
-      const frameThickness = Math.max(15, Math.round(Math.min(w,h)*0.04));
-      
-      if(th.proFrame === "Gold Luxury"){
-        // Outer Glow
-        ctx.shadowColor = "rgba(212, 175, 55, 0.6)";
-        ctx.shadowBlur = 30;
-        
-        // Main Gold Frame
-        const goldGrad = ctx.createLinearGradient(0,0,w,h);
-        goldGrad.addColorStop(0, "#D4AF37");
-        goldGrad.addColorStop(0.2, "#F9F295");
-        goldGrad.addColorStop(0.4, "#E6BE8A");
-        goldGrad.addColorStop(0.5, "#B8860B");
-        goldGrad.addColorStop(0.6, "#E6BE8A");
-        goldGrad.addColorStop(0.8, "#F9F295");
-        goldGrad.addColorStop(1, "#D4AF37");
-        
-        fillRoundRect(ctx, pad, pad, w-pad*2, h-pad*2, Math.round(Math.min(w,h)*0.026), null, goldGrad, frameThickness);
-        
-        // Inner Shine
-        fillRoundRect(ctx, pad+frameThickness/2, pad+frameThickness/2, w-pad*2-frameThickness, h-pad*2-frameThickness, Math.round(Math.min(w,h)*0.02), null, "rgba(255,255,255,0.3)", 2);
-      } 
-      else if(th.proFrame === "Modern Neon"){
-        ctx.shadowColor = th.accent;
-        ctx.shadowBlur = 40;
-        fillRoundRect(ctx, pad, pad, w-pad*2, h-pad*2, Math.round(Math.min(w,h)*0.026), null, th.accent, frameThickness/2);
-        
-        ctx.shadowColor = th.accent2;
-        ctx.shadowBlur = 20;
-        fillRoundRect(ctx, pad+10, pad+10, w-pad*2-20, h-pad*2-20, Math.round(Math.min(w,h)*0.02), null, th.accent2, 4);
-      }
-      else if(th.proFrame === "Bold Corporate"){
-        const corpGrad = ctx.createLinearGradient(0,0,0,h);
-        corpGrad.addColorStop(0, th.accent);
-        corpGrad.addColorStop(1, th.dark);
-        
-        fillRoundRect(ctx, pad, pad, w-pad*2, h-pad*2, 0, null, corpGrad, frameThickness*1.5);
-        fillRoundRect(ctx, pad+frameThickness, pad+frameThickness, w-pad*2-frameThickness*2, h-pad*2-frameThickness*2, 0, null, "#FFFFFF", 2);
-      }
-    } else {
-      // Default Frame
-      fillRoundRect(ctx,pad,pad,w-pad*2,h-pad*2,Math.round(Math.min(w,h)*0.026),null,th.border,Math.max(2,Math.round(Math.min(w,h)*.0034)));
-      fillRoundRect(ctx,pad+7,pad+7,w-pad*2-14,h-pad*2-14,Math.round(Math.min(w,h)*0.022),null,"rgba(255,255,255,.10)",1);
+
+    if(th.proFrame === "Gold Luxury"){
+      const gold=ctx.createLinearGradient(0,0,w,h);
+      gold.addColorStop(0, "#C99719");
+      gold.addColorStop(.18, "#FFF0A8");
+      gold.addColorStop(.38, "#E2B85D");
+      gold.addColorStop(.58, "#A86E09");
+      gold.addColorStop(.78, "#F8D66F");
+      gold.addColorStop(1, "#B97908");
+      ctx.shadowColor="rgba(212,175,55,.28)";
+      ctx.shadowBlur=Math.round(min*.018);
+      fillRoundRect(ctx,pad,pad,w-pad*2,h-pad*2,radius,null,gold,thickness);
+      ctx.shadowBlur=0;
+      fillRoundRect(ctx,pad+thickness*.72,pad+thickness*.72,w-pad*2-thickness*1.44,h-pad*2-thickness*1.44,Math.max(8,radius-thickness*.35),null,"rgba(255,255,255,.32)",Math.max(1,Math.round(thickness*.13)));
+      fillRoundRect(ctx,pad+thickness*1.28,pad+thickness*1.28,w-pad*2-thickness*2.56,h-pad*2-thickness*2.56,Math.max(6,radius-thickness*.55),null,rgba(th.deep,.30),Math.max(1,Math.round(thickness*.10)));
     }
-    
+    else if(th.proFrame === "Modern Neon"){
+      ctx.shadowColor=rgba(th.accent,.38);
+      ctx.shadowBlur=Math.round(min*.022);
+      fillRoundRect(ctx,pad,pad,w-pad*2,h-pad*2,radius,null,th.accent,Math.max(5,Math.round(thickness*.75)));
+      ctx.shadowBlur=0;
+      fillRoundRect(ctx,pad+thickness,pad+thickness,w-pad*2-thickness*2,h-pad*2-thickness*2,Math.max(8,radius-thickness*.35),null,rgba(th.accent2,.72),Math.max(1,Math.round(thickness*.16)));
+    }
+    else if(th.proFrame === "Bold Corporate"){
+      const corp=ctx.createLinearGradient(0,0,w,0);
+      corp.addColorStop(0, th.accent);
+      corp.addColorStop(1, th.accent2);
+      fillRoundRect(ctx,pad,pad,w-pad*2,h-pad*2,radius,null,corp,thickness);
+      fillRoundRect(ctx,pad+thickness*.9,pad+thickness*.9,w-pad*2-thickness*1.8,h-pad*2-thickness*1.8,Math.max(8,radius-thickness*.35),null,"rgba(255,255,255,.24)",Math.max(1,Math.round(thickness*.13)));
+    }
+    else{
+      fillRoundRect(ctx,pad,pad,w-pad*2,h-pad*2,radius,null,th.border,thickness);
+      fillRoundRect(ctx,pad+7,pad+7,w-pad*2-14,h-pad*2-14,Math.max(8,radius-5),null,"rgba(255,255,255,.10)",1);
+    }
     ctx.restore();
   }
 
   function drawSlotBorderFrame(ctx,w,h,th,weight="lite"){
     const min=Math.min(w,h);
     const pad=Math.round(min*(weight==="minimal"?0.020:0.018));
-    const thickness = weight==="minimal" ? Math.max(2, Math.round(min*0.004)) : Math.max(4, Math.round(min*0.008));
-    const inner = weight==="minimal" ? 1 : 2;
+    const thickness = weight==="minimal" ? Math.max(2, Math.round(min*0.0035)) : Math.max(4, Math.round(min*0.0062));
+    const radius=Math.round(min*0.022);
     ctx.save();
     if(th.proFrame === "Gold Luxury"){
       const gold=ctx.createLinearGradient(0,0,w,h);
-      gold.addColorStop(0, "#D4AF37");
-      gold.addColorStop(0.18, "#F9F295");
-      gold.addColorStop(0.42, "#E6BE8A");
-      gold.addColorStop(0.55, "#B8860B");
-      gold.addColorStop(0.72, "#E6BE8A");
-      gold.addColorStop(1, "#D4AF37");
-      ctx.shadowColor = weight==="minimal" ? "rgba(212,175,55,.18)" : "rgba(212,175,55,.34)";
-      ctx.shadowBlur = weight==="minimal" ? 10 : 18;
-      fillRoundRect(ctx,pad,pad,w-pad*2,h-pad*2,Math.round(min*0.022),null,gold,thickness);
+      gold.addColorStop(0, "#C99719");
+      gold.addColorStop(.22, "#FFF0A8");
+      gold.addColorStop(.48, "#D6A73A");
+      gold.addColorStop(.72, "#F6D36C");
+      gold.addColorStop(1, "#A86E09");
+      ctx.shadowColor = weight==="minimal" ? "rgba(212,175,55,.12)" : "rgba(212,175,55,.22)";
+      ctx.shadowBlur = weight==="minimal" ? 6 : 10;
+      fillRoundRect(ctx,pad,pad,w-pad*2,h-pad*2,radius,null,gold,thickness);
       ctx.shadowBlur=0;
-      fillRoundRect(ctx,pad+thickness*.8,pad+thickness*.8,w-pad*2-thickness*1.6,h-pad*2-thickness*1.6,Math.round(min*0.018),null,"rgba(255,255,255,.34)",inner);
+      fillRoundRect(ctx,pad+thickness*.85,pad+thickness*.85,w-pad*2-thickness*1.7,h-pad*2-thickness*1.7,Math.max(6,radius-thickness*.45),null,"rgba(255,255,255,.22)",1);
     }else if(th.proFrame === "Modern Neon"){
-      ctx.shadowColor = rgba(th.accent,.45);
-      ctx.shadowBlur = weight==="minimal" ? 10 : 18;
-      fillRoundRect(ctx,pad,pad,w-pad*2,h-pad*2,Math.round(min*0.022),null,th.accent,thickness);
-      ctx.shadowBlur = 0;
-      fillRoundRect(ctx,pad+thickness,pad+thickness,w-pad*2-thickness*2,h-pad*2-thickness*2,Math.round(min*0.018),null,rgba(th.accent2,.76),inner);
+      ctx.shadowColor = rgba(th.accent,.28);
+      ctx.shadowBlur = weight==="minimal" ? 7 : 11;
+      fillRoundRect(ctx,pad,pad,w-pad*2,h-pad*2,radius,null,th.accent,thickness);
+      ctx.shadowBlur=0;
+      fillRoundRect(ctx,pad+thickness,pad+thickness,w-pad*2-thickness*2,h-pad*2-thickness*2,Math.max(6,radius-thickness*.45),null,rgba(th.accent2,.62),1);
     }else if(th.proFrame === "Bold Corporate"){
       const corp=ctx.createLinearGradient(0,0,w,0);
       corp.addColorStop(0, th.accent);
       corp.addColorStop(1, th.accent2);
-      fillRoundRect(ctx,pad,pad,w-pad*2,h-pad*2,Math.round(min*0.022),null,corp,thickness);
-      fillRoundRect(ctx,pad+thickness,pad+thickness,w-pad*2-thickness*2,h-pad*2-thickness*2,Math.round(min*0.018),null,"rgba(255,255,255,.24)",inner);
+      fillRoundRect(ctx,pad,pad,w-pad*2,h-pad*2,radius,null,corp,thickness);
+      fillRoundRect(ctx,pad+thickness,pad+thickness,w-pad*2-thickness*2,h-pad*2-thickness*2,Math.max(6,radius-thickness*.45),null,"rgba(255,255,255,.18)",1);
     }else{
-      fillRoundRect(ctx,pad,pad,w-pad*2,h-pad*2,Math.round(min*0.022),null,"rgba(255,255,255,.28)",thickness);
-      fillRoundRect(ctx,pad+thickness,pad+thickness,w-pad*2-thickness*2,h-pad*2-thickness*2,Math.round(min*0.018),null,rgba(th.accent2,.34),inner);
+      fillRoundRect(ctx,pad,pad,w-pad*2,h-pad*2,radius,null,"rgba(255,255,255,.24)",thickness);
+      fillRoundRect(ctx,pad+thickness,pad+thickness,w-pad*2-thickness*2,h-pad*2-thickness*2,Math.max(6,radius-thickness*.45),null,rgba(th.accent2,.25),1);
     }
     ctx.restore();
   }
@@ -535,52 +524,52 @@
     drawAccentSweep(ctx,w,h,th,pst);
     drawBorderFrame(ctx,w,h,th);
 
-    const brandW=Math.round(w*(land?0.48:0.82));
-    const brandH=Math.round(h*(land?0.108:0.08));
+    const brandW=Math.round(w*(land?0.46:0.78));
+    const brandH=Math.round(h*(land?0.092:0.072));
     const brandX=pad+Math.round(w*.014);
     const brandY=pad+Math.round(h*.012);
     const brandLabel=hasRealOrg(d.org) ? d.org : '';
     if(brandLabel || state.logo){
       drawRibbon(ctx,brandX,brandY,brandW,brandH,th,'dark');
-      const logoS=Math.round(brandH*1.05);
+      const logoS=Math.round(brandH*.96);
       const logoX=brandX-Math.round(logoS*.18);
       const logoY=brandY-Math.round((logoS-brandH)/2);
       const hasLogo=drawLogo(ctx,logoX,logoY,logoS);
       const brandTextX=hasLogo ? logoX+logoS+Math.round(w*.012) : brandX+Math.round(w*.018);
-      if(brandLabel) drawText(ctx,brandLabel,brandTextX,brandY+Math.round(brandH*.18),brandW-(brandTextX-brandX)-Math.round(w*.025),2,`900 ${Math.round(Math.min(w,h)*0.028)}px "Prompt","Noto Sans Thai",sans-serif`,'#fff',Math.round(Math.min(w,h)*0.032));
+      if(brandLabel) drawText(ctx,brandLabel,brandTextX,brandY+Math.round(brandH*.18),brandW-(brandTextX-brandX)-Math.round(w*.025),2,`900 ${Math.round(Math.min(w,h)*0.025)}px "Prompt","Noto Sans Thai",sans-serif`,'#fff',Math.round(Math.min(w,h)*0.032));
       const orgSub=hasRealOrg(d.org) && d.categoryLabel ? smartShort(d.categoryLabel,26) : (d.place ? smartShort(d.place,24) : '');
       if(orgSub) drawText(ctx,orgSub,brandTextX,brandY+Math.round(brandH*.62),brandW-(brandTextX-brandX)-Math.round(w*.025),1,`800 ${Math.round(Math.min(w,h)*0.018)}px "Noto Sans Thai","Prompt",sans-serif`,'rgba(255,255,255,.84)',Math.round(Math.min(w,h)*0.024));
     }
 
     const panelX=pad+Math.round(w*.015);
-    const panelY=Math.round(h*(land?0.61:0.53));
+    const panelY=Math.round(h*(land?0.645:0.58));
     const panelW=w-panelX*2;
-    const panelH=Math.round(h*(land?0.24:0.30));
-    drawGlassPanel(ctx,panelX,panelY,panelW,panelH,Math.round(panelH*.12),th,pst.name==='minimal'?0.62:0.72);
+    const panelH=Math.round(h*(land?0.20:0.245));
+    drawGlassPanel(ctx,panelX,panelY,panelW,panelH,Math.round(panelH*.12),th,pst.name==='minimal'?0.58:0.66);
     const panelAccent=ctx.createLinearGradient(panelX,panelY,panelX+panelW,panelY);
     panelAccent.addColorStop(0,th.accent2); panelAccent.addColorStop(.6,th.accent); panelAccent.addColorStop(1,'rgba(255,255,255,.12)');
     ctx.fillStyle=panelAccent;
     fillRoundRect(ctx,panelX+Math.round(w*.012),panelY+Math.round(h*.014),panelW-Math.round(w*.024),Math.max(6,Math.round(h*.012)),Math.round(h*.008),panelAccent);
 
     if(d.categoryLabel){
-      const catY=panelY-Math.round(h*.056);
+      const catY=panelY-Math.round(h*.048);
       const catW=Math.min(Math.round(w*.42), Math.round(w*.16)+Math.round(clean(d.categoryLabel).length*18));
-      drawRibbon(ctx,panelX+Math.round(w*.006),catY,catW,Math.round(h*.05),th,'accent');
-      drawText(ctx, smartShort(d.categoryLabel,32), panelX+Math.round(w*.028), catY+Math.round(h*.009), catW-Math.round(w*.045), 1, `900 ${Math.round(Math.min(w,h)*0.019)}px "Prompt","Noto Sans Thai",sans-serif`, '#fff', Math.round(Math.min(w,h)*0.024));
+      drawRibbon(ctx,panelX+Math.round(w*.006),catY,catW,Math.round(h*.043),th,'accent');
+      drawText(ctx, smartShort(d.categoryLabel,32), panelX+Math.round(w*.028), catY+Math.round(h*.007), catW-Math.round(w*.045), 1, `900 ${Math.round(Math.min(w,h)*0.017)}px "Prompt","Noto Sans Thai",sans-serif`, '#fff', Math.round(Math.min(w,h)*0.024));
     }
 
     const titleX=panelX+Math.round(w*.03);
     const titleW=panelW-Math.round(w*.06);
     const titleY=panelY+Math.round(panelH*.18);
-    const titleFont=Math.round(Math.min(w,h)*(land?0.047:0.042)*pst.titleScale);
+    const titleFont=Math.round(Math.min(w,h)*(land?0.043:0.038)*pst.titleScale);
     const titleLineH=Math.round(titleFont*1.11);
     drawText(ctx, smartShort(d.title,110), titleX, titleY, titleW, land?2:3, `900 ${titleFont}px "Prompt","Kanit","Noto Sans Thai",sans-serif`, '#fff', titleLineH);
 
     const subText = stripHashtags(d.detail) || stripHashtags(d.footer) || d.place || '';
     const subY=titleY + titleLineH*(land?2:2.4);
     if(subText){
-      fillRoundRect(ctx,titleX,subY,titleW,Math.round(panelH*.22),Math.round(panelH*.11),rgba(th.accent,.88),'rgba(255,255,255,.14)',1);
-      drawText(ctx, smartShort(subText, land?72:52), titleX+Math.round(w*.018), subY+Math.round(panelH*.045), titleW-Math.round(w*.036), 1, `800 ${Math.round(Math.min(w,h)*0.022)}px "Prompt","Noto Sans Thai",sans-serif`, '#fff', Math.round(Math.min(w,h)*0.028));
+      fillRoundRect(ctx,titleX,subY,titleW,Math.round(panelH*.18),Math.round(panelH*.09),rgba(th.accent,.82),'rgba(255,255,255,.12)',1);
+      drawText(ctx, smartShort(subText, land?72:52), titleX+Math.round(w*.018), subY+Math.round(panelH*.036), titleW-Math.round(w*.036), 1, `800 ${Math.round(Math.min(w,h)*0.020)}px "Prompt","Noto Sans Thai",sans-serif`, '#fff', Math.round(Math.min(w,h)*0.025));
     }
 
     const metaY=panelY+panelH-Math.round(panelH*.18);
@@ -589,7 +578,7 @@
     if(d.place) metaX += drawInfoPill(ctx,metaX,metaY,d.place,th,'📍') + Math.round(w*.012);
 
     if(pst.showFooterBar && stripHashtags(d.footer)){
-      const barH=Math.round(h*(land?0.074:0.062));
+      const barH=Math.round(h*(land?0.058:0.052));
       const barY=h-pad-barH;
       drawGlassPanel(ctx,pad+Math.round(w*.012),barY,w-pad*2-Math.round(w*.024),barH,Math.round(barH*.45),th,.72);
       drawText(ctx, smartShort(stripHashtags(d.footer), land?80:60), pad+Math.round(w*.035), barY+Math.round(barH*.24), w-pad*2-Math.round(w*.07), 1, `800 ${Math.round(Math.min(w,h)*0.021)}px "Prompt","Noto Sans Thai",sans-serif`, '#fff', Math.round(Math.min(w,h)*0.025));
@@ -612,7 +601,7 @@
     return footerShort || smartShort(d.categoryLabel,72) || smartShort(d.title,72);
   }
   function drawLiteFrame(ctx,w,h,d,idx,th,profile=slotProfile(idx,d)){
-    const pad=Math.round(Math.min(w,h)*0.022);
+    const pad=Math.round(Math.min(w,h)*0.020);
     const min=Math.min(w,h);
     drawSlotBorderFrame(ctx,w,h,th,"lite");
 
@@ -632,11 +621,11 @@
     ctx.restore();
 
     // Number badge + logo = clearer frame identity like the sample.
-    const badgeSize=Math.round(min*.09);
+    const badgeSize=Math.round(min*.074);
     drawLiteNumberBadge(ctx, idx, pad+Math.round(w*.01), pad+Math.round(h*.012), badgeSize, th);
 
     if(state.logo){
-      const ls=Math.round(min*.11*profile.logoScale);
+      const ls=Math.round(min*.10*profile.logoScale);
       drawLogo(ctx,w-pad-ls-Math.round(w*.006),pad+Math.round(h*.012),ls);
     }
 
@@ -659,11 +648,11 @@
 
     const leftPad=x+Math.round(w*.026);
     const textY=y+Math.round(bottomH*.34);
-    drawText(ctx, liteText(d, idx), leftPad, textY, boxW-Math.round(w*.052), 1, `900 ${Math.round(min*0.022)}px "Prompt","Noto Sans Thai",sans-serif`, '#fff', Math.round(min*0.025));
+    drawText(ctx, liteText(d, idx), leftPad, textY, boxW-Math.round(w*.052), 1, `900 ${Math.round(min*0.020)}px "Prompt","Noto Sans Thai",sans-serif`, '#fff', Math.round(min*0.025));
   }
 
   function drawAdditionalFrame(ctx,w,h,d,idx,th,profile=slotProfile(idx,d)){
-    const pad=Math.round(Math.min(w,h)*0.022);
+    const pad=Math.round(Math.min(w,h)*0.020);
     const min=Math.min(w,h);
     drawSlotBorderFrame(ctx,w,h,th,"minimal");
 
@@ -688,8 +677,8 @@
 
     const label=liteText(d, idx);
     if(!label) return;
-    const boxW=Math.round(w*0.58);
-    const boxH=Math.max(Math.round(h*profile.bottomRatio), Math.round(min*0.11));
+    const boxW=Math.round(w*0.52);
+    const boxH=Math.max(Math.round(h*profile.bottomRatio), Math.round(min*0.082));
     const x=pad+Math.round(w*.012);
     const y=h-pad-boxH-Math.round(h*.006);
     const g=ctx.createLinearGradient(x,y,x+boxW,y);
@@ -702,7 +691,7 @@
     line.addColorStop(1,rgba(th.accent,.42));
     fillRoundRect(ctx,x+Math.round(w*.018),y+Math.round(boxH*.12),boxW-Math.round(w*.036),Math.max(2,Math.round(boxH*.05)),Math.round(boxH*.025),line,null,0);
 
-    drawText(ctx, smartShort(label,48), x+Math.round(w*.022), y+Math.round(boxH*.30), boxW-Math.round(w*.044), 1, `800 ${Math.round(min*0.018)}px "Prompt","Noto Sans Thai",sans-serif`, '#fff', Math.round(min*0.020));
+    drawText(ctx, smartShort(label,48), x+Math.round(w*.022), y+Math.round(boxH*.30), boxW-Math.round(w*.044), 1, `800 ${Math.round(min*0.016)}px "Prompt","Noto Sans Thai",sans-serif`, '#fff', Math.round(min*0.020));
   }
 
 
@@ -777,34 +766,56 @@
     syncStateFiles();
     const hasCover=!!state.coverFile;
     const supports=state.supportFiles || [];
+    const esc=s=>String(s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+
     if(!hasCover && !supports.length){
-      host.innerHTML = `<p class="album-frame-note">เลือกภาพหน้าปก 1 ภาพ และภาพรอง 3–4 ภาพ แล้วระบบจะจัดทำ Cover + Lite Album ให้อัตโนมัติ</p>`;
+      host.innerHTML = `
+        <div class="album-slot-empty">
+          <b>โครงอัลบั้ม</b>
+          <span>ภาพ 1 = ปก · ภาพ 2–4 = ภาพรอง · ภาพ 5+ = เพิ่มเติม</span>
+        </div>`;
       return;
     }
+
+    const coverCard = hasCover ? `
+      <div class="album-slot-card is-cover">
+        <span class="slot-badge">ปก</span>
+        <div>
+          <b title="${esc(state.coverFile.name)}">${esc(state.coverFile.name)}</b>
+          <small>Cover</small>
+        </div>
+      </div>` : `
+      <div class="album-slot-card is-empty">
+        <span class="slot-badge">ปก</span>
+        <div><b>ยังไม่ได้เลือกภาพปก</b><small>จำเป็น</small></div>
+      </div>`;
+
+    const supportCards = supports.length ? supports.map((f,i)=>`
+      <div class="album-slot-card">
+        <span class="slot-badge">${i+2}</span>
+        <div>
+          <b title="${esc(f.name)}">${esc(f.name)}</b>
+          <small>${i<3?'Lite':'Additional'}</small>
+        </div>
+        <div class="album-order-actions">
+          <button type="button" class="album-order-btn" data-album-support-move="up" data-i="${i}" ${i===0?'disabled':''} aria-label="เลื่อนขึ้น">↑</button>
+          <button type="button" class="album-order-btn" data-album-support-move="down" data-i="${i}" ${i===supports.length-1?'disabled':''} aria-label="เลื่อนลง">↓</button>
+        </div>
+      </div>`).join('') : `
+      <div class="album-slot-card is-empty">
+        <span class="slot-badge">2–4</span>
+        <div><b>ยังไม่ได้เลือกภาพรอง</b><small>แนะนำ 3–4 ภาพ</small></div>
+      </div>`;
+
     host.innerHTML = `
-      <div class="album-order-note">โหมดใหม่: แยกภาพปกออกจากภาพรองชัดเจน เพื่อให้ภาพที่ใช้เป็นหน้าปก ตรงกับภาพปกใน Preview และไฟล์ดาวน์โหลด</div>
-      <div class="album-upload-group">
-        <div class="album-upload-group-title">ภาพหน้าปกหลัก</div>
-        ${hasCover ? `
-          <div class="album-file-chip album-cover-chip">
-            <span>ปก</span>
-            <b title="${state.coverFile.name.replace(/"/g,'&quot;')}">${state.coverFile.name}</b>
-            <small>Cover Frame</small>
-          </div>` : `<div class="album-empty-chip">ยังไม่ได้เลือกภาพปก</div>`}
+      <div class="album-slot-strip">
+        ${coverCard}
+        ${supportCards}
       </div>
-      <div class="album-upload-group">
-        <div class="album-upload-group-title">ภาพรอง</div>
-        ${supports.length ? supports.map((f,i)=>`
-          <div class="album-file-chip" data-support-i="${i}">
-            <span>${i+2}</span>
-            <b title="${f.name.replace(/"/g,'&quot;')}">${f.name}</b>
-            <small>${i<3?'Lite Frame':'Additional'}</small>
-            <div class="album-order-actions">
-              <button type="button" class="album-order-btn" data-album-support-move="up" data-i="${i}" ${i===0?'disabled':''}>↑</button>
-              <button type="button" class="album-order-btn" data-album-support-move="down" data-i="${i}" ${i===supports.length-1?'disabled':''}>↓</button>
-            </div>
-          </div>`).join('') : `<div class="album-empty-chip">ยังไม่ได้เลือกภาพรอง</div>`}
-      </div>
+      <details class="album-help-details">
+        <summary>โครงอัลบั้ม</summary>
+        <p>Cover ใช้เปิดเรื่อง · Lite ขยายบรรยากาศ · Additional เสริมภาพต่อเนื่อง โดยระบบจะครอปและใส่กรอบตามบทบาทภาพ</p>
+      </details>
     `;
   }
 

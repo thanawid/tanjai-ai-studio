@@ -1,4 +1,4 @@
-# V9.3.8 — Facebook Album Frame Fidelity Fix
+# V9.3.9 — Balanced Cover + Lite Album Frame System
 
 ฐาน: V9.3.7 Facebook Album Smart Slot Layout
 

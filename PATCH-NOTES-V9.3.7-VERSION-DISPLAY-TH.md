@@ -1,13 +1,13 @@
-# V9.3.8 — Proper Version Display
+# V9.3.9 — Proper Version Display
 
 ปรับเฉพาะการแสดงเวอร์ชันให้กลับมาอยู่ในตำแหน่งที่เหมาะสม
 
 สิ่งที่ปรับ:
 - แสดงเวอร์ชันบนหน้า Login ใต้ tagline แบบไม่รบกวนการใช้งาน
 - แสดงเวอร์ชันแบบ compact บน Topbar ข้างชื่อระบบ
-- คงเลขเวอร์ชัน V9.3.8 เพื่อให้รู้ว่าเป็นชุด Facebook Album Smart Slot Layout
+- คงเลขเวอร์ชัน V9.3.9 เพื่อให้รู้ว่าเป็นชุด Facebook Album Smart Slot Layout
 - ไม่แตะ logic ของเมนูอื่น
-- คงระบบอัลบั้ม V9.3.8 เดิม
+- คงระบบอัลบั้ม V9.3.9 เดิม
 
 ตรวจแล้ว:
 - มี version-badge ใน index.html

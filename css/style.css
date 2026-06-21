@@ -4422,7 +4422,7 @@ textarea:focus-visible{
 }
 
 
-/* V9.3.8 — Facebook Album Smart Slot Layout */
+/* V9.3.9 — Facebook Album Smart Slot Layout */
 .fb-preview-grid.mobile-focus{
   grid-template-columns:1.12fr .88fr;
 }
@@ -4468,7 +4468,7 @@ textarea:focus-visible{
 }
 
 
-/* V9.3.8 — Proper Version Display */
+/* V9.3.9 — Proper Version Display */
 .app-version-badge{
   opacity:.86;
   font-size:10px;
@@ -4486,4 +4486,96 @@ textarea:focus-visible{
 @media(max-width:720px){
   .app-version-badge{font-size:9px;padding:4px 8px}
   .login-version-badge{font-size:10px;line-height:1.35}
+}
+
+
+/* V9.3.9 — Balanced Cover + Lite Album Frame System */
+.album-slot-empty{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  border:1px dashed rgba(34,211,238,.24);
+  border-radius:16px;
+  padding:12px 14px;
+  background:rgba(34,211,238,.045);
+  color:var(--muted);
+}
+.album-slot-empty b{color:#e0f2fe}
+.album-slot-strip{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+.album-slot-card{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) auto;
+  gap:10px;
+  align-items:center;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:16px;
+  padding:10px 12px;
+  background:rgba(15,23,42,.52);
+  min-width:0;
+}
+.album-slot-card.is-cover{
+  border-color:rgba(250,204,21,.24);
+  background:linear-gradient(135deg,rgba(250,204,21,.09),rgba(139,92,246,.06));
+}
+.album-slot-card.is-empty{
+  opacity:.86;
+  border-style:dashed;
+}
+.album-slot-card b{
+  display:block;
+  color:#fff;
+  font-size:12px;
+  line-height:1.25;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:100%;
+}
+.album-slot-card small{
+  display:block;
+  margin-top:2px;
+  color:var(--muted);
+  font-size:10px;
+  line-height:1.2;
+}
+.slot-badge{
+  display:inline-grid;
+  place-items:center;
+  min-width:34px;
+  height:34px;
+  border-radius:12px;
+  color:#fff;
+  font-weight:1000;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  box-shadow:0 8px 22px rgba(124,58,237,.24);
+}
+.album-help-details{
+  margin-top:10px;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:14px;
+  background:rgba(255,255,255,.025);
+  overflow:hidden;
+}
+.album-help-details summary{
+  cursor:pointer;
+  padding:10px 12px;
+  color:#e0f2fe;
+  font-weight:900;
+  font-size:12px;
+}
+.album-help-details p{
+  margin:0;
+  padding:0 12px 12px;
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.55;
+}
+@media(max-width:840px){
+  .album-slot-strip{grid-template-columns:1fr}
+  .album-slot-empty{align-items:flex-start;flex-direction:column}
 }
