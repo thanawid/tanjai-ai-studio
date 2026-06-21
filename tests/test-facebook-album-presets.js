@@ -46,4 +46,17 @@ assert.strictEqual(api.presetLayout('square-grid'),'grid');
 assert.strictEqual(api.presetLayout('wide-top'),'cover-top');
 assert.strictEqual(api.presetLayout('portrait-left'),'cover-left');
 
-console.log(JSON.stringify({presets:3,autoSelection:true,slotSizes:true,status:'PASS'},null,2));
+const captionBrief = {
+  title:'ประชุมรับฟังความคิดเห็น', org:'เทศบาลตัวอย่าง',
+  detail:'รับฟังข้อมูลจากประชาชนในพื้นที่', dateTime:'21 มิถุนายน 2569',
+  place:'ห้องประชุม', footer:'#ข้อมูลจริง', categoryLabel:'ประชาสัมพันธ์', captionStyle:'official'
+};
+const officialCaption = api.captionWriter(captionBrief,'official');
+assert.match(officialCaption,/ประชุมรับฟังความคิดเห็น/);
+assert.match(officialCaption,/เทศบาลตัวอย่าง/);
+assert.match(officialCaption,/21 มิถุนายน 2569/);
+assert.match(officialCaption,/#ข้อมูลจริง/);
+assert.doesNotMatch(officialCaption,/undefined|null|placeholder/i);
+assert.strictEqual(api.factGuardCaption('ข้อมูลจริง\nPLACEHOLDER\nundefined'),'ข้อมูลจริง');
+
+console.log(JSON.stringify({presets:3,autoSelection:true,slotSizes:true,captionWriter:true,factGuard:true,status:'PASS'},null,2));

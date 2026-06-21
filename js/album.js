@@ -1,4 +1,4 @@
-/* v9.3.12 — Facebook Album Presets + Visible PR Frames
+/* v9.3.13 — Clean Civic Frames + Facebook Publishing Director
    Safe photo processing for real uploaded images only.
    Cover Frame + Lite Frames + Additional Frame, face-aware crop when supported,
    smart theme selection, safe text, slot-based crop/frames, Facebook mock preview, and synced preview / download results.
@@ -65,6 +65,7 @@
       ratio: val("album-ratio","auto"),
       previewLayout: val("album-previewLayout","auto"),
       facebookPreset: val("album-facebookPreset","auto"),
+      captionStyle: val("album-captionStyle","pr-ready"),
       colorTone: val("album-colorTone","AI เลือกโทนสีให้เข้ากับงาน"),
       mode: val("album-autoMode", val("album-mode","ปรับภาพ + ครอป + ใส่กรอบ")),
       layoutMode: val("album-layoutMode","Facebook Cover + Lite + Additional Frame System"),
@@ -302,49 +303,29 @@
   function drawAccentSweep(ctx,w,h,th,pst){
     if(!pst.showAccentSweep) return;
     ctx.save();
-    const min=Math.min(w,h);
-    const g1=ctx.createLinearGradient(w*.68,0,w,0);
-    g1.addColorStop(0,"rgba(255,255,255,0)");
-    g1.addColorStop(.55,rgba(th.accent,.72));
-    g1.addColorStop(1,rgba(th.accent2,.86));
+    const g1=ctx.createLinearGradient(w*.78,0,w,0);
+    g1.addColorStop(0,rgba(th.accent,.12));
+    g1.addColorStop(1,th.accent2);
     ctx.fillStyle=g1;
     ctx.beginPath();
-    ctx.moveTo(w*.80,0);
+    ctx.moveTo(w*.82,0);
     ctx.lineTo(w,0);
-    ctx.lineTo(w,h*.27);
-    ctx.lineTo(w*.92,h*.16);
+    ctx.lineTo(w,h*.16);
+    ctx.lineTo(w*.94,h*.09);
     ctx.closePath();
     ctx.fill();
 
-    const g2=ctx.createLinearGradient(w*.72,h,w,h*.6);
-    g2.addColorStop(0,rgba(th.accent2,.82));
-    g2.addColorStop(.65,rgba(th.accent,.56));
-    g2.addColorStop(1,"rgba(255,255,255,0)");
+    const g2=ctx.createLinearGradient(0,h,w*.24,h*.84);
+    g2.addColorStop(0,th.accent);
+    g2.addColorStop(1,rgba(th.accent2,.10));
     ctx.fillStyle=g2;
     ctx.beginPath();
-    ctx.moveTo(w*.87,h);
-    ctx.lineTo(w,h);
-    ctx.lineTo(w,h*.80);
-    ctx.lineTo(w*.94,h*.86);
+    ctx.moveTo(0,h*.88);
+    ctx.lineTo(w*.12,h*.94);
+    ctx.lineTo(w*.24,h);
+    ctx.lineTo(0,h);
     ctx.closePath();
     ctx.fill();
-
-    if(th.proFrame==="Balanced Ribbon"){
-      const side=ctx.createLinearGradient(0,h*.12,w*.10,h*.70);
-      side.addColorStop(0,th.accent2);
-      side.addColorStop(.55,th.accent);
-      side.addColorStop(1,rgba(th.accent2,.40));
-      ctx.strokeStyle=side;
-      ctx.lineCap="round";
-      ctx.lineWidth=Math.max(8,Math.round(min*.014));
-      ctx.beginPath();
-      ctx.moveTo(Math.round(min*.018),h*.12);
-      ctx.bezierCurveTo(w*.075,h*.26,w*.025,h*.49,Math.round(min*.018),h*.70);
-      ctx.stroke();
-      ctx.strokeStyle="rgba(255,255,255,.38)";
-      ctx.lineWidth=Math.max(2,Math.round(min*.003));
-      ctx.stroke();
-    }
     ctx.restore();
   }
   function drawBorderFrame(ctx,w,h,th){
@@ -352,19 +333,15 @@
     const pad=Math.round(min*0.014);
     const radius=Math.round(min*0.020);
     const pro=th.proFrame && th.proFrame !== "None";
-    const thickness=pro ? Math.max(8,Math.round(min*0.014)) : Math.max(3,Math.round(min*.0038));
+    const thickness=pro ? Math.max(6,Math.round(min*0.009)) : Math.max(3,Math.round(min*.0038));
     ctx.save();
 
     if(th.proFrame === "Balanced Ribbon"){
-      const balanced=ctx.createLinearGradient(0,0,w,h);
-      balanced.addColorStop(0, th.accent2);
-      balanced.addColorStop(.52, th.accent);
-      balanced.addColorStop(1, th.border);
-      ctx.shadowColor=rgba(th.accent,.30);
-      ctx.shadowBlur=Math.round(min*.014);
-      fillRoundRect(ctx,pad,pad,w-pad*2,h-pad*2,radius,null,balanced,thickness);
+      ctx.shadowColor=rgba(th.deep,.28);
+      ctx.shadowBlur=Math.round(min*.009);
+      fillRoundRect(ctx,pad,pad,w-pad*2,h-pad*2,radius,null,th.accent,thickness);
       ctx.shadowBlur=0;
-      fillRoundRect(ctx,pad+thickness*.90,pad+thickness*.90,w-pad*2-thickness*1.8,h-pad*2-thickness*1.8,Math.max(7,radius-thickness*.40),null,"rgba(255,255,255,.20)",1);
+      fillRoundRect(ctx,pad+thickness,pad+thickness,w-pad*2-thickness*2,h-pad*2-thickness*2,Math.max(7,radius-thickness*.40),null,"rgba(255,255,255,.34)",1);
     }
     else if(th.proFrame === "Gold Luxury"){
       const gold=ctx.createLinearGradient(0,0,w,h);
@@ -404,19 +381,15 @@
   function drawSlotBorderFrame(ctx,w,h,th,weight="lite"){
     const min=Math.min(w,h);
     const pad=Math.round(min*(weight==="minimal"?0.015:0.014));
-    const thickness = weight==="minimal" ? Math.max(2, Math.round(min*0.0035)) : Math.max(4, Math.round(min*0.0065));
+    const thickness = weight==="minimal" ? Math.max(2, Math.round(min*0.0028)) : Math.max(3, Math.round(min*0.0045));
     const radius=Math.round(min*0.019);
     ctx.save();
     if(th.proFrame === "Balanced Ribbon"){
-      const balanced=ctx.createLinearGradient(0,0,w,h);
-      balanced.addColorStop(0, th.accent2);
-      balanced.addColorStop(.55, th.accent);
-      balanced.addColorStop(1, th.border);
-      ctx.shadowColor=rgba(th.accent,.20);
-      ctx.shadowBlur=weight==="minimal" ? 5 : 9;
-      fillRoundRect(ctx,pad,pad,w-pad*2,h-pad*2,radius,null,balanced,thickness);
+      ctx.shadowColor=rgba(th.deep,.18);
+      ctx.shadowBlur=weight==="minimal" ? 3 : 6;
+      fillRoundRect(ctx,pad,pad,w-pad*2,h-pad*2,radius,null,th.accent,thickness);
       ctx.shadowBlur=0;
-      fillRoundRect(ctx,pad+thickness,pad+thickness,w-pad*2-thickness*2,h-pad*2-thickness*2,Math.max(6,radius-thickness*.45),null,"rgba(255,255,255,.16)",1);
+      fillRoundRect(ctx,pad+thickness,pad+thickness,w-pad*2-thickness*2,h-pad*2-thickness*2,Math.max(6,radius-thickness*.45),null,"rgba(255,255,255,.28)",1);
     }else if(th.proFrame === "Gold Luxury"){
       const gold=ctx.createLinearGradient(0,0,w,h);
       gold.addColorStop(0, "#C99719");
@@ -668,29 +641,17 @@
     const min=Math.min(w,h);
     drawSlotBorderFrame(ctx,w,h,th,"lite");
 
-    // Small accent corner keeps the album identity without covering the photo.
+    // Compact identity corner; one accent only to keep the photo clean.
     ctx.save();
-    const corner=ctx.createLinearGradient(w*.72,0,w*.98,h*.24);
-    corner.addColorStop(0,rgba(th.accent,.62));
-    corner.addColorStop(1,rgba(th.accent2,.52));
+    const corner=ctx.createLinearGradient(w*.82,0,w*.98,h*.12);
+    corner.addColorStop(0,rgba(th.accent,.18));
+    corner.addColorStop(1,th.accent2);
     ctx.fillStyle=corner;
     ctx.beginPath();
-    ctx.moveTo(w*.82,pad);
+    ctx.moveTo(w*.86,pad);
     ctx.lineTo(w-pad,pad);
-    ctx.lineTo(w-pad,h*.18);
-    ctx.lineTo(w*.92,h*.10);
-    ctx.closePath();
-    ctx.fill();
-
-    const lead=ctx.createLinearGradient(pad,pad,w*.24,pad+h*.10);
-    lead.addColorStop(0,rgba(th.accent2,.90));
-    lead.addColorStop(1,rgba(th.accent,.46));
-    ctx.fillStyle=lead;
-    ctx.beginPath();
-    ctx.moveTo(pad,pad);
-    ctx.lineTo(w*.24,pad);
-    ctx.lineTo(w*.19,pad+h*.055);
-    ctx.lineTo(pad,pad+h*.085);
+    ctx.lineTo(w-pad,h*.11);
+    ctx.lineTo(w*.95,h*.06);
     ctx.closePath();
     ctx.fill();
     ctx.restore();
@@ -726,20 +687,6 @@
     const pad=Math.round(Math.min(w,h)*0.020);
     const min=Math.min(w,h);
     drawSlotBorderFrame(ctx,w,h,th,"minimal");
-
-    ctx.save();
-    const corner=ctx.createLinearGradient(w*.80,0,w*.98,h*.20);
-    corner.addColorStop(0,rgba(th.accent,.18));
-    corner.addColorStop(1,rgba(th.accent2,.14));
-    ctx.fillStyle=corner;
-    ctx.beginPath();
-    ctx.moveTo(w*.86,pad);
-    ctx.lineTo(w-pad,pad);
-    ctx.lineTo(w-pad,h*.13);
-    ctx.lineTo(w*.92,h*.08);
-    ctx.closePath();
-    ctx.fill();
-    ctx.restore();
 
     if(state.logo){
       const ls=Math.round(min*.095);
@@ -779,6 +726,11 @@
     const d=data();
     const note=$('#album-smartChoice');
     if(!note) return;
+    if(d.facebookPreset==="auto" && !state.outputs.length){
+      note.innerHTML='<b>รูปแบบอัลบั้มอัตโนมัติ</b><span>ระบบจะวิเคราะห์สัดส่วนภาพปกและเลือก Layout เมื่อกดสร้างชุดภาพ</span>';
+      note.classList.remove('resolved');
+      return;
+    }
     const selected=effectiveFacebookPreset(d);
     const source=d.facebookPreset==="auto"?'ระบบวิเคราะห์จากภาพปก':'ผู้ใช้เลือก';
     note.innerHTML=`<b>รูปแบบอัลบั้มที่ใช้</b><span>${facebookPresetLabel(selected)} · ${previewLayoutLabel(presetLayout(selected))} (${source})</span>`;
@@ -844,9 +796,11 @@
     if(!hasCover && !supports.length){
       host.replaceChildren();
       host.hidden=true;
+      host.classList.remove('has-slot-strip');
       return;
     }
     host.hidden=false;
+    host.classList.add('has-slot-strip');
 
     const coverCard = hasCover ? `
       <div class="album-slot-card is-cover">
@@ -869,8 +823,8 @@
           <small>${i<3?'Lite':'Additional'}</small>
         </div>
         <div class="album-order-actions">
-          <button type="button" class="album-order-btn" data-album-support-move="up" data-i="${i}" ${i===0?'disabled':''} aria-label="เลื่อนขึ้น">↑</button>
-          <button type="button" class="album-order-btn" data-album-support-move="down" data-i="${i}" ${i===supports.length-1?'disabled':''} aria-label="เลื่อนลง">↓</button>
+          <button type="button" class="album-order-btn" data-album-support-move="up" data-i="${i}" ${i===0?'disabled':''} aria-label="เลื่อนไปก่อนหน้า">←</button>
+          <button type="button" class="album-order-btn" data-album-support-move="down" data-i="${i}" ${i===supports.length-1?'disabled':''} aria-label="เลื่อนไปถัดไป">→</button>
         </div>
       </div>`).join('') : `
       <div class="album-slot-card is-empty">
@@ -879,6 +833,7 @@
       </div>`;
 
     host.innerHTML = `
+      <div class="album-sequence-head"><b>ลำดับภาพก่อนสร้าง</b><small>ภาพปกอยู่ใบแรก · ใช้ลูกศรจัดลำดับภาพรอง</small></div>
       <div class="album-slot-strip">
         ${coverCard}
         ${supportCards}
@@ -886,19 +841,63 @@
     `;
   }
 
-  function captionText(d){
-    const org = hasRealOrg(d.org) ? d.org : '';
-    const title = d.title || 'กิจกรรม / ข่าวประชาสัมพันธ์';
-    const parts=[];
-    parts.push(`📌 ${title}`);
-    parts.push(org ? `${org} ขอประชาสัมพันธ์ข้อมูลให้ประชาชนและผู้ที่เกี่ยวข้องได้รับทราบ` : `ขอประชาสัมพันธ์ข้อมูลให้ผู้ที่เกี่ยวข้องได้รับทราบ`);
-    const meta=[d.dateTime && `📅 ${d.dateTime}`, d.place && `📍 ${d.place}`].filter(Boolean); if(meta.length) parts.push(meta.join('\n'));
-    if(d.detail) parts.push(smartShort(d.detail,220));
-    if(d.footer) parts.push(stripHashtags(d.footer));
-    const hashBase = org ? org.replace(/\s+/g,'') : 'ประชาสัมพันธ์';
-    parts.push(`#${hashBase} #กิจกรรม #ประชาสัมพันธ์`);
-    return parts.filter(Boolean).join('\n\n');
+  function captionFacts(d){
+    return {
+      title: clean(d.title),
+      org: hasRealOrg(d.org) ? clean(d.org) : '',
+      detail: clean(d.detail),
+      dateTime: clean(d.dateTime),
+      place: clean(d.place),
+      footer: stripHashtags(d.footer),
+      providedHashtags: (String(d.footer||'').match(/#[^\s#]+/g)||[]).join(' '),
+      category: clean(d.categoryLabel)
+    };
   }
+  function safeCaptionTag(value){
+    return clean(value).replace(/\s+/g,'').replace(/[^ก-๙a-zA-Z0-9_]/g,'').slice(0,42);
+  }
+  function factGuardCaption(text){
+    return String(text||'')
+      .split('\n')
+      .map(line=>line.trimEnd())
+      .filter(line=>line && !/undefined|null|placeholder|กรอกข้อมูล/i.test(line))
+      .join('\n')
+      .replace(/\n{3,}/g,'\n\n')
+      .trim();
+  }
+  function captionWriter(d,style=d.captionStyle||'pr-ready'){
+    const f=captionFacts(d);
+    const parts=[];
+    const icon=style==='friendly'?'✨':style==='story'?'📷':style==='announcement'?'📣':style==='official'?'📢':'📌';
+    if(f.title) parts.push(`${icon} ${f.title}`);
+
+    if(style==='official'){
+      if(f.org) parts.push(f.org);
+      if(f.detail) parts.push(smartShort(f.detail,260));
+    }else if(style==='friendly'){
+      if(f.detail) parts.push(smartShort(f.detail,220));
+      if(f.org) parts.push(`— ${f.org}`);
+    }else if(style==='story'){
+      if(f.detail) parts.push(smartShort(f.detail,280));
+      if(f.org) parts.push(f.org);
+    }else if(style==='announcement'){
+      if(f.org) parts.push(`${f.org} ขอแจ้งข้อมูลให้ผู้ที่เกี่ยวข้องทราบ`);
+      if(f.detail) parts.push(smartShort(f.detail,240));
+    }else{
+      if(f.org) parts.push(`${f.org} ขอประชาสัมพันธ์ข้อมูลให้ประชาชนและผู้ที่เกี่ยวข้องได้รับทราบ`);
+      if(f.detail) parts.push(smartShort(f.detail,220));
+    }
+
+    const meta=[f.dateTime && `📅 ${f.dateTime}`,f.place && `📍 ${f.place}`].filter(Boolean);
+    if(meta.length) parts.push(meta.join('\n'));
+    if(f.footer) parts.push(f.footer);
+
+    const derivedTags=[safeCaptionTag(f.org),safeCaptionTag(f.category)].filter(Boolean).map(x=>`#${x}`);
+    const tags=[f.providedHashtags,...derivedTags].filter(Boolean).join(' ');
+    if(tags) parts.push(tags);
+    return factGuardCaption(parts.filter(Boolean).join('\n\n'));
+  }
+  function captionText(d){ return captionWriter(d,d.captionStyle); }
 
   function renderOutputs(){
     const host=$('#albumResult .ready-main') || $('#albumResult') || $('#albumOutput') || $('#albumPreview'); if(!host) return;
@@ -974,7 +973,7 @@
 
         <details class="album-review-details album-caption-edit-details">
           <summary>
-            <span><b>แก้ไขแคปชั่นโพสต์</b><small>พิมพ์แล้วตัวอย่างด้านบนจะเปลี่ยนทันที</small></span>
+            <span><b>แก้ไขแคปชั่นโพสต์</b><small>Caption Writer + Fact Guard · พิมพ์แล้วตัวอย่างด้านบนจะเปลี่ยนทันที</small></span>
           </summary>
           <div class="album-caption-box">
             <textarea id="albumCaptionText" rows="7">${caption.replace(/</g,'&lt;')}</textarea>
@@ -1042,6 +1041,10 @@
   function downloadOne(i){ const o=state.outputs[i]; if(!o) return; const a=document.createElement('a'); a.href=o.url; a.download=o.filename; a.click(); }
   async function loadLogo(file){ if(!file){ state.logo=null; return; } const img=new Image(); await new Promise((res,rej)=>{ img.onload=res; img.onerror=rej; img.src=URL.createObjectURL(file); }); state.logo=img; }
   function moveSupport(i,dir){ const j=dir==='up'?i-1:i+1; if(j<0 || j>=state.supportFiles.length) return; const copy=state.supportFiles.slice(); [copy[i],copy[j]]=[copy[j],copy[i]]; state.supportFiles=copy; syncStateFiles(); renderUploadPreview(); }
+  function syncPresetButtons(){
+    const selected=val('album-facebookPreset','auto');
+    $$('[data-album-preset]').forEach(btn=>btn.classList.toggle('selected',btn.dataset.albumPreset===selected));
+  }
 
   async function generate(){
     if(window.TANJAI && TANJAI.proofread && typeof TANJAI.proofread.runActive === 'function') TANJAI.proofread.runActive(false);
@@ -1068,7 +1071,15 @@
     ensureAlbumInputs();
     collectFilesFromInputs(false);
     renderUploadPreview();
+    syncPresetButtons();
     document.addEventListener('click',(e)=>{
+      const presetButton=e.target && e.target.closest ? e.target.closest('[data-album-preset]') : null;
+      if(presetButton){
+        e.preventDefault();
+        const select=$('#album-facebookPreset');
+        if(select){ select.value=presetButton.dataset.albumPreset || 'auto'; syncPresetButtons(); select.dispatchEvent(new Event('change',{bubbles:true})); }
+        return;
+      }
       const id=e.target && e.target.id;
       if(id==='makeAlbum'){ e.preventDefault(); generate(); }
       if(id==='albumDownloadAll' || id==='albumDownloadAllTop' || id==='albumDownloadAllResult'){ e.preventDefault(); downloadAll(); }
@@ -1093,9 +1104,11 @@
       if(e.target && e.target.id==='album-facebookPreset'){
         state.resolvedFacebookPreset=resolveFacebookPreset(e.target.value);
         state.resolvedPreviewLayout=presetLayout(state.resolvedFacebookPreset);
+        syncPresetButtons();
         renderSmartChoice();
         if(state.outputs.length) generate();
       }
+      if(e.target && e.target.id==='album-captionStyle' && state.outputs.length){ state.caption=captionText(data()); renderOutputs(); }
     });
     document.addEventListener('input',(e)=>{
       if(e.target && e.target.id==='albumCaptionText') renderFacebookPreview();
@@ -1103,6 +1116,6 @@
   });
   window.TANJAI_ALBUM_PRO={
     generate,downloadAll,renderFacebookPreview,renderUploadPreview,collectFilesFromInputs,
-    _test:{cropPlacement,liteText,theme,size,resolveRatioFromDimensions,previewLayoutFor,resolveFacebookPreset,presetLayout,facebookPresetLabel,slotSize}
+    _test:{cropPlacement,liteText,theme,size,resolveRatioFromDimensions,previewLayoutFor,resolveFacebookPreset,presetLayout,facebookPresetLabel,slotSize,captionFacts,captionWriter,factGuardCaption}
   };
 })();

@@ -181,14 +181,25 @@ document.addEventListener("DOMContentLoaded", () => {
     </div>
     <div class="form-section"><div class="section-title"><b>3</b><h4>ตั้งค่าชุดภาพ</h4></div>
       <div class="form-grid">
-        <label class="full">รูปแบบอัลบั้ม Facebook<select id="album-facebookPreset"><option value="auto" selected>อัตโนมัติ — วิเคราะห์ภาพปกแล้วเลือก Layout ที่เหมาะสม</option><option value="square-grid">4 ภาพจัตุรัส — 1080x1080 ทุกภาพ</option><option value="wide-top">ปกกว้างด้านบน — ปก 1080x800 + ภาพรอง 1080x1080</option><option value="portrait-left">ปกตั้งด้านซ้าย — ปก 1280x1920 + ภาพรอง 1080x1080</option></select><small>ขนาดไฟล์และตัวอย่างโพสต์จะเปลี่ยนตาม Preset เดียวกันอัตโนมัติ</small></label>
+        <div class="full album-preset-picker">
+          <label>รูปแบบการโพสต์ Facebook</label>
+          <select id="album-facebookPreset" hidden><option value="auto" selected>อัตโนมัติ</option><option value="square-grid">4 ภาพจัตุรัส</option><option value="wide-top">ปกกว้างด้านบน</option><option value="portrait-left">ปกตั้งด้านซ้าย</option></select>
+          <div class="album-preset-cards" role="group" aria-label="เลือกรูปแบบการโพสต์ Facebook">
+            <button type="button" class="album-preset-card selected" data-album-preset="auto"><span class="preset-auto-mark">AI</span><b>อัตโนมัติ</b><small>วิเคราะห์ภาพปกให้</small></button>
+            <button type="button" class="album-preset-card" data-album-preset="square-grid"><span class="preset-diagram preset-square"><i></i><i></i><i></i><i></i></span><b>4 ภาพจัตุรัส</b><small>1080x1080 ทุกภาพ</small></button>
+            <button type="button" class="album-preset-card" data-album-preset="wide-top"><span class="preset-diagram preset-wide"><i></i><i></i><i></i><i></i></span><b>ปกกว้างด้านบน</b><small>1080x800 + ภาพรอง</small></button>
+            <button type="button" class="album-preset-card" data-album-preset="portrait-left"><span class="preset-diagram preset-portrait"><i></i><i></i><i></i><i></i></span><b>ปกตั้งด้านซ้าย</b><small>1280x1920 + ภาพรอง</small></button>
+          </div>
+          <small>ขนาดไฟล์และตัวอย่างโพสต์จะเปลี่ยนตามแบบที่เลือกอัตโนมัติ</small>
+        </div>
+        <label class="full">สไตล์แคปชั่น Facebook<select id="album-captionStyle"><option value="pr-ready" selected>พร้อมโพสต์ — กระชับและครบประเด็น</option><option value="official">ทางการสำหรับหน่วยงาน</option><option value="friendly">อบอุ่น เข้าถึงง่าย</option><option value="story">เล่าเรื่องกิจกรรม</option><option value="announcement">ประกาศ / แจ้งข่าว</option></select><small>Caption Writer จะใช้เฉพาะข้อมูลจริงที่กรอก และไม่แต่งชื่อ วันที่ สถานที่ หรือตัวเลขเพิ่ม</small></label>
         <input id="album-ratio" type="hidden" value="auto">
         <input id="album-previewLayout" type="hidden" value="auto">
         <label>สไตล์กรอบ<select id="album-frameStyle"><option>ทั่วไป / หน่วยงาน / แบรนด์</option><option>ประชุม / เวทีรับฟัง / ประชาคม</option><option>ลงพื้นที่ / ภารกิจ / ติดตามงาน</option><option>ข่าวด่วน / ประกาศสำคัญ</option><option>กิจกรรม / อบรม / อีเวนต์</option><option>โรงเรียน / การศึกษา</option><option>สุขภาพ / รณรงค์ / ชุมชน</option><option>ธุรกิจ / สินค้า / โปรโมชัน</option><option>เพจ / ครีเอเตอร์ / แบรนด์ส่วนตัว</option><option>มินิมอล ขอบบาง</option></select></label>
         <label>Theme Cover Frame Preset<select id="album-themePreset"><option>Ribbon Civic Cover</option><option>Modern Glass Cover</option><option>Clean Civic Cover</option><option>Minimal Story Cover</option></select></label>
         <label>โทนสี<select id="album-colorTone"><option selected>AI เลือกโทนสีให้เข้ากับงาน</option><option>ม่วง–ทอง พรีเมียม</option><option>เขียว–เหลือง–ขาว</option><option>น้ำเงิน–ขาว ทางการ</option><option>ส้ม–ทอง สดเด่น</option><option>ดำ–ทอง หรูหรา</option></select></label>
         <label>โหมดอัตโนมัติ<select id="album-autoMode"><option>ปรับภาพ + ครอป + ใส่กรอบ</option><option>ภาพกิจกรรมเน้นภาพ / แถบเล็ก</option><option>ครอป + ใส่กรอบเท่านั้น</option><option>ปรับภาพเท่านั้น</option></select></label>
-        <label>Pro Frame (กรอบตามตัวอย่าง)<select id="album-proFrame"><option value="Balanced Ribbon" selected>Balanced Ribbon (กรอบสีตามงาน แบบพอดี)</option><option value="Gold Luxury">Gold Luxury (ขอบทองหรูหรา)</option><option value="None">ไม่มีกรอบพิเศษ</option><option value="Modern Neon">Modern Neon (ขอบนีออนเรืองแสง)</option><option value="Bold Corporate">Bold Corporate (ขอบสีแบรนด์)</option></select><small>ภาพปกใช้กรอบขายเรื่องแบบพอดี ภาพรองใช้กรอบบางและเน้นภาพจริง</small></label>
+        <label>Pro Frame (กรอบตามตัวอย่าง)<select id="album-proFrame"><option value="Balanced Ribbon" selected>Clean Civic Frame (กรอบเรียบสำหรับงานประชาสัมพันธ์)</option><option value="Gold Luxury">Gold Luxury (ขอบทองหรูหรา)</option><option value="None">ไม่มีกรอบพิเศษ</option><option value="Modern Neon">Modern Neon (ขอบนีออนเรืองแสง)</option><option value="Bold Corporate">Bold Corporate (ขอบสีแบรนด์)</option></select><small>ภาพปกใช้กรอบหัวเรื่องแบบสะอาด ภาพรองใช้เพียงขอบบางและแถบคำอธิบาย</small></label>
         <div class="full album-smart-choice" id="album-smartChoice">ระบบจะสรุปขนาดและรูปแบบพรีวิวที่เลือกให้อีกครั้งหลังสร้างชุดภาพ</div>
         <input id="album-safeMode" type="checkbox" checked hidden>
         <input id="album-makeCover" type="checkbox" checked hidden>

@@ -12,13 +12,18 @@ assert.match(album, /val\("album-proFrame", "Balanced Ribbon"\)/);
 assert.match(album, /bottomRatio:\.17/);
 assert.match(album, /bottomRatio: d\.mode\.includes\("ภาพกิจกรรมเน้นภาพ"\)\?\.058:\.072/);
 assert.doesNotMatch(album, /drawLiteNumberBadge\(ctx, idx,/);
-assert.match(album, /const thickness=pro \? Math\.max\(8,Math\.round\(min\*0\.014\)\)/);
-assert.match(index, /V9\.3\.12 · Facebook Album Presets \+ Visible PR Frames/);
+assert.match(album, /const thickness=pro \? Math\.max\(6,Math\.round\(min\*0\.009\)\)/);
+assert.match(index, /V9\.3\.13 · Facebook Publishing Director/);
 assert.doesNotMatch(album, /<b>โครงอัลบั้ม<\/b>/);
 assert.doesNotMatch(album, /<summary>โครงอัลบั้ม<\/summary>/);
 assert.match(app, /value="square-grid"/);
 assert.match(app, /value="wide-top"/);
 assert.match(app, /value="portrait-left"/);
+assert.match(app, /class="album-preset-card selected"/);
+assert.match(app, /id="album-captionStyle"/);
+assert.match(album, /function captionWriter/);
+assert.match(album, /function factGuardCaption/);
+assert.match(album, /album-sequence-head/);
 assert.match(album, /preset==="portrait-left"\) return role==="cover" \? \{w:1280,h:1920\}/);
 assert.match(album, /preset==="wide-top"\) return role==="cover" \? \{w:1080,h:800\}/);
 
@@ -28,6 +33,7 @@ console.log(JSON.stringify({
   litePanelRatio: '0.058–0.072',
   liteSequenceBadge: false,
   facebookPresets: ['square-grid', 'wide-top', 'portrait-left'],
-  referenceFrameVisible: true,
+  referenceFrameClean: true,
+  specializedCaptionWriter: true,
   status: 'PASS'
 }, null, 2));

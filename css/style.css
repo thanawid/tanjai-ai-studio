@@ -4583,3 +4583,73 @@ textarea:focus-visible{
   .album-slot-strip{grid-template-columns:1fr}
   .album-slot-empty{align-items:flex-start;flex-direction:column}
 }
+
+/* V9.3.13 — Facebook publishing choices + compact review */
+.album-preset-picker{display:grid;gap:9px}
+.album-preset-picker > label{font-weight:900;color:#e2e8f0}
+.album-preset-cards{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:9px;
+}
+.album-preset-card{
+  display:grid;
+  justify-items:center;
+  align-content:start;
+  gap:5px;
+  min-height:116px;
+  padding:11px 8px;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:15px;
+  background:rgba(15,23,42,.58);
+  color:#e2e8f0;
+  cursor:pointer;
+  text-align:center;
+}
+.album-preset-card:hover{border-color:rgba(34,211,238,.38);transform:translateY(-1px)}
+.album-preset-card.selected{
+  border-color:rgba(34,211,238,.72);
+  background:linear-gradient(145deg,rgba(34,211,238,.12),rgba(139,92,246,.12));
+  box-shadow:0 10px 28px rgba(34,211,238,.10);
+}
+.album-preset-card b{font-size:11px;line-height:1.25}
+.album-preset-card small{font-size:9px;line-height:1.3;color:var(--muted)}
+.preset-auto-mark{
+  width:58px;height:42px;display:grid;place-items:center;border-radius:11px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:1000;
+}
+.preset-diagram{width:58px;height:42px;display:grid;gap:2px}
+.preset-diagram i{display:block;border-radius:3px;background:linear-gradient(135deg,#22d3ee,#8b5cf6)}
+.preset-square{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}
+.preset-wide{grid-template-columns:repeat(3,1fr);grid-template-rows:1.35fr 1fr}
+.preset-wide i:first-child{grid-column:1/-1}
+.preset-portrait{grid-template-columns:1.65fr 1fr;grid-template-rows:repeat(3,1fr)}
+.preset-portrait i:first-child{grid-row:1/-1}
+
+.album-upload-preview.has-slot-strip{display:block;margin-top:12px}
+.album-sequence-head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:8px}
+.album-sequence-head b{font-size:12px;color:#e0f2fe}
+.album-sequence-head small{font-size:10px;color:var(--muted);text-align:right}
+.album-upload-preview.has-slot-strip .album-slot-strip{grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:8px}
+.album-upload-preview.has-slot-strip .album-slot-card{min-height:58px;padding:8px 9px;border-radius:13px;gap:8px}
+.album-upload-preview.has-slot-strip .slot-badge{min-width:31px;height:31px;border-radius:10px;font-size:12px}
+.album-upload-preview.has-slot-strip .album-order-actions{display:flex;gap:4px}
+.album-upload-preview.has-slot-strip .album-order-btn{width:28px;height:28px;padding:0;border-radius:9px}
+
+.album-individual-review{max-height:70vh;overflow:auto;padding:0 12px 12px}
+.album-individual-review .album-cover-preview-card{max-width:640px;margin-inline:auto}
+.album-individual-review .album-cover-preview-card img{max-height:420px;object-fit:contain}
+.album-individual-review .album-additional-preview-grid{grid-template-columns:minmax(0,330px);justify-content:center}
+.album-individual-review .album-additional-preview-grid img{max-height:300px;object-fit:cover}
+.fb-preview-cell.fb-slot-cover::after,
+.fb-preview-cell.fb-slot-lite::after,
+.fb-preview-cell.fb-slot-additional::after{display:none}
+
+@media(max-width:900px){.album-preset-cards{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){
+  .album-preset-cards{grid-template-columns:1fr}
+  .album-preset-card{grid-template-columns:auto 1fr;justify-items:start;align-items:center;min-height:0;text-align:left}
+  .album-preset-card small{grid-column:2}
+  .album-sequence-head{align-items:flex-start;flex-direction:column}
+  .album-sequence-head small{text-align:left}
+}
