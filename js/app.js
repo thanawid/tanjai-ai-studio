@@ -187,6 +187,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <label>Theme Cover Frame Preset<select id="album-themePreset"><option>Ribbon Civic Cover</option><option>Modern Glass Cover</option><option>Clean Civic Cover</option><option>Minimal Story Cover</option></select></label>
         <label>โทนสี<select id="album-colorTone"><option selected>AI เลือกโทนสีให้เข้ากับงาน</option><option>ม่วง–ทอง พรีเมียม</option><option>เขียว–เหลือง–ขาว</option><option>น้ำเงิน–ขาว ทางการ</option><option>ส้ม–ทอง สดเด่น</option><option>ดำ–ทอง หรูหรา</option></select></label>
         <label>โหมดอัตโนมัติ<select id="album-autoMode"><option>ปรับภาพ + ครอป + ใส่กรอบ</option><option>ภาพกิจกรรมเน้นภาพ / แถบเล็ก</option><option>ครอป + ใส่กรอบเท่านั้น</option><option>ปรับภาพเท่านั้น</option></select></label>
+        <label>Pro Frame (กรอบรูปใหญ่พรีเมียม)<select id="album-proFrame"><option value="None">ไม่มีกรอบพิเศษ</option><option value="Gold Luxury">Gold Luxury (ขอบทองหรูหรา)</option><option value="Modern Neon">Modern Neon (ขอบนีออนเรืองแสง)</option><option value="Bold Corporate">Bold Corporate (ขอบหนาสีแบรนด์)</option></select></label>
         <div class="full album-smart-choice" id="album-smartChoice">ระบบจะสรุปขนาดและรูปแบบพรีวิวที่เลือกให้อีกครั้งหลังสร้างชุดภาพ</div>
         <input id="album-safeMode" type="checkbox" checked hidden>
         <input id="album-makeCover" type="checkbox" checked hidden>

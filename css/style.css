@@ -2316,7 +2316,9 @@ body:not(.auth-locked) .login-gate{
 
 
 /* v8.6.5 — Facebook Album Auto Frame & Smart Enhance */
-.album-upload-preview{display:grid;gap:10px;margin-top:12px}
+.album-upload-preview{display:grid;grid-template-columns:repeat(auto-fill, minmax(120px, 1fr));gap:12px;margin-top:15px}
+.album-upload-preview img { width: 100%; height: 120px; object-fit: cover; border-radius: 12px; border: 2px solid var(--line); transition: transform 0.2s; }
+.album-upload-preview img:hover { transform: scale(1.05); border-color: var(--primary); }
 .album-file-chip{display:grid;grid-template-columns:36px 1fr auto;align-items:center;gap:10px;border:1px solid rgba(255,255,255,.10);border-radius:14px;padding:10px 12px;background:rgba(255,255,255,.045)}
 .album-file-chip span{width:30px;height:30px;display:grid;place-items:center;border-radius:10px;background:linear-gradient(135deg,#6d5dfc,#e6b85b);color:#fff;font-weight:900}
 .album-file-chip b{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}

@@ -118,6 +118,7 @@
   }
 
   function theme(d=data()){
+    const proFrame = val("album-proFrame", "None");
     let raw=(d.colorTone||"").toLowerCase();
     if(!raw || raw.includes("ai เลือก")){
       const cue=[d.frameStyle,d.categoryLabel,d.title,d.detail].filter(Boolean).join(" ").toLowerCase();
@@ -160,6 +161,7 @@
     t.chip2=rgba(t.accent2,.96);
     t.ribbonDark=rgba(t.deep,.96);
     t.shadow="rgba(0,0,0,.25)";
+    t.proFrame = proFrame;
     return t;
   }
 
@@ -268,8 +270,54 @@
   function drawBorderFrame(ctx,w,h,th){
     const pad=Math.round(Math.min(w,h)*0.018);
     ctx.save();
-    fillRoundRect(ctx,pad,pad,w-pad*2,h-pad*2,Math.round(Math.min(w,h)*0.026),null,th.border,Math.max(2,Math.round(Math.min(w,h)*.0034)));
-    fillRoundRect(ctx,pad+7,pad+7,w-pad*2-14,h-pad*2-14,Math.round(Math.min(w,h)*0.022),null,"rgba(255,255,255,.10)",1);
+    
+    // Pro Frame Logic
+    if(th.proFrame && th.proFrame !== "None"){
+      const frameThickness = Math.max(15, Math.round(Math.min(w,h)*0.04));
+      
+      if(th.proFrame === "Gold Luxury"){
+        // Outer Glow
+        ctx.shadowColor = "rgba(212, 175, 55, 0.6)";
+        ctx.shadowBlur = 30;
+        
+        // Main Gold Frame
+        const goldGrad = ctx.createLinearGradient(0,0,w,h);
+        goldGrad.addColorStop(0, "#D4AF37");
+        goldGrad.addColorStop(0.2, "#F9F295");
+        goldGrad.addColorStop(0.4, "#E6BE8A");
+        goldGrad.addColorStop(0.5, "#B8860B");
+        goldGrad.addColorStop(0.6, "#E6BE8A");
+        goldGrad.addColorStop(0.8, "#F9F295");
+        goldGrad.addColorStop(1, "#D4AF37");
+        
+        fillRoundRect(ctx, pad, pad, w-pad*2, h-pad*2, Math.round(Math.min(w,h)*0.026), null, goldGrad, frameThickness);
+        
+        // Inner Shine
+        fillRoundRect(ctx, pad+frameThickness/2, pad+frameThickness/2, w-pad*2-frameThickness, h-pad*2-frameThickness, Math.round(Math.min(w,h)*0.02), null, "rgba(255,255,255,0.3)", 2);
+      } 
+      else if(th.proFrame === "Modern Neon"){
+        ctx.shadowColor = th.accent;
+        ctx.shadowBlur = 40;
+        fillRoundRect(ctx, pad, pad, w-pad*2, h-pad*2, Math.round(Math.min(w,h)*0.026), null, th.accent, frameThickness/2);
+        
+        ctx.shadowColor = th.accent2;
+        ctx.shadowBlur = 20;
+        fillRoundRect(ctx, pad+10, pad+10, w-pad*2-20, h-pad*2-20, Math.round(Math.min(w,h)*0.02), null, th.accent2, 4);
+      }
+      else if(th.proFrame === "Bold Corporate"){
+        const corpGrad = ctx.createLinearGradient(0,0,0,h);
+        corpGrad.addColorStop(0, th.accent);
+        corpGrad.addColorStop(1, th.dark);
+        
+        fillRoundRect(ctx, pad, pad, w-pad*2, h-pad*2, 0, null, corpGrad, frameThickness*1.5);
+        fillRoundRect(ctx, pad+frameThickness, pad+frameThickness, w-pad*2-frameThickness*2, h-pad*2-frameThickness*2, 0, null, "#FFFFFF", 2);
+      }
+    } else {
+      // Default Frame
+      fillRoundRect(ctx,pad,pad,w-pad*2,h-pad*2,Math.round(Math.min(w,h)*0.026),null,th.border,Math.max(2,Math.round(Math.min(w,h)*.0034)));
+      fillRoundRect(ctx,pad+7,pad+7,w-pad*2-14,h-pad*2-14,Math.round(Math.min(w,h)*0.022),null,"rgba(255,255,255,.10)",1);
+    }
+    
     ctx.restore();
   }
   function drawLogo(ctx,x,y,s){
