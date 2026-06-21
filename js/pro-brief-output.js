@@ -2,7 +2,7 @@ window.TANJAI = window.TANJAI || {};
 
 /**
  * ===================================================
- * TANJAI AI Studio v9.3.2 — Professional Brief-to-Prompt Output
+ * TANJAI AI Studio v9.3.3 — Professional Brief-to-Prompt Output
  * ===================================================
  * Purpose:
  * - Make the copy-ready output cleaner, stricter, and truly usable in ChatGPT/GPT tools.
@@ -11,7 +11,7 @@ window.TANJAI = window.TANJAI || {};
  */
 (function(){
   const T = window.TANJAI;
-  T.version = "v9.3.2";
+  T.version = "v9.3.3";
 
   const clean = (value = "", fallback = "") => {
     const out = String(value || "")
@@ -175,7 +175,7 @@ window.TANJAI = window.TANJAI || {};
 
   T.promptBrainReport = function(d = {}, tool = "image"){
     const a = T.proBriefAnalyze(d, tool);
-    return `Professional Brief-to-Prompt Output v9.3.2
+    return `Professional Brief-to-Prompt Output v9.3.3
 
 สถานะบรีฟ: ${a.readiness}
 คะแนนความพร้อม: ${a.score}/100
@@ -369,7 +369,7 @@ ${T.proOutputFormat(tool, d, extra)}`;
     return T.proPrompt("mc", d);
   };
   T.promptPack = function(d = {}){
-    return `Professional Brief-to-Prompt Pack v9.3.2
+    return `Professional Brief-to-Prompt Pack v9.3.3
 
 วิธีใช้: คัดลอกเฉพาะส่วนที่ต้องการไปวางใน AI ปลายทาง หรือใช้ทั้งชุดเมื่ออยากให้ AI ทำหลายสื่อจากบรีฟเดียว
 
@@ -410,7 +410,7 @@ ${T.promptBrainReport(d, type)}
   T.promptCritic = function(d = {}, tool = "image"){
     const a = T.proBriefAnalyze(d, tool);
     const level = a.score >= 85 ? "พร้อมมาก" : a.score >= 70 ? "ใช้ได้" : "ควรเติมข้อมูล";
-    return `Professional Output Check v9.3.2
+    return `Professional Output Check v9.3.3
 
 คะแนนความพร้อม: ${a.score}/100
 สถานะ: ${level}

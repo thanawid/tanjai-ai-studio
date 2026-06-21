@@ -592,8 +592,8 @@
     const coverPreview = cover ? `
       <section class="album-preview-section">
         <div class="album-preview-title">
-          <b>Cover Preview</b>
-          <span>ภาพปกหลักแบบเต็ม</span>
+          <b>ภาพปกหลัก</b>
+          <span>Cover Frame — ภาพแรกที่ใช้เปิดเรื่อง</span>
         </div>
         <div class="album-cover-preview-card">
           <img src="${cover.url}" alt="Cover Preview" style="aspect-ratio:${aspect}">
@@ -604,8 +604,8 @@
     const litePreview = lites.length ? `
       <section class="album-preview-section">
         <div class="album-preview-title">
-          <b>Lite Preview</b>
-          <span>ภาพรอง 2–4 แบบ Lite Frame</span>
+          <b>ภาพรอง 2–4</b>
+          <span>Lite Frame — ขยายเรื่องโดยไม่แย่งภาพหลัก</span>
         </div>
         <div class="album-lite-preview-grid">
           ${lites.map((o,k)=>`
@@ -620,7 +620,7 @@
     const addPreview = additional.length ? `
       <section class="album-preview-section">
         <div class="album-preview-title">
-          <b>Additional</b>
+          <b>ภาพเพิ่มเติม</b>
           <span>ภาพเสริมลำดับสุดท้าย</span>
         </div>
         <div class="album-lite-preview-grid album-additional-preview-grid">
@@ -633,37 +633,45 @@
         </div>
       </section>` : '';
 
-    const cards=state.outputs.map((o,i)=>`
-      <div class="album-output-card">
-        <img src="${o.url}" alt="ภาพที่ ${i+1}" style="aspect-ratio:${aspect}">
-        <b>${i===0?'รูปปก Cover Frame':i<4?`รูป Lite ${i+1}`:`รูป Additional ${i+1}`}</b>
-        <div class="album-caption-actions"><button class="btn secondary album-one-download" data-i="${i}">ดาวน์โหลดภาพนี้</button></div>
-      </div>`).join('');
-
     host.innerHTML = `
       <div class="album-pro-panel">
-        <div class="album-caption-box">
-          <h3>แคปชั่นพร้อมโพสต์</h3>
-          <textarea id="albumCaptionText" rows="7">${caption.replace(/</g,'&lt;')}</textarea>
-          <div class="album-caption-actions">
-            <button class="btn primary" id="albumCopyCaption">คัดลอกแคปชั่น</button>
-            <button class="btn secondary" id="albumRefreshPreview">อัปเดตพรีวิว Facebook</button>
-          </div>
-          <p class="album-pro-note">พรีวิวและไฟล์ดาวน์โหลดใช้ภาพชุดเดียวกัน</p>
-        </div>
-        ${coverPreview}
-        ${litePreview}
-        ${addPreview}
-        <section class="album-preview-section">
+        <section class="album-preview-section album-post-first">
           <div class="album-preview-title">
-            <b>Facebook Album Mockup</b>
-            <span>จำลองโพสต์ตามภาพที่สร้างจริง</span>
+            <div>
+              <b>ตัวอย่างโพสต์ Facebook</b>
+              <p>ดูภาพรวมเหมือนโพสต์จริงก่อนดาวน์โหลด</p>
+            </div>
+            <span class="album-ready-badge">พร้อมโพสต์ · ${state.outputs.length} ภาพ</span>
+          </div>
+          <div class="album-post-actions">
+            <button class="btn primary" id="albumCopyCaptionQuick">คัดลอกแคปชั่น</button>
+            <button class="btn secondary" id="albumDownloadAllResult">ดาวน์โหลด ZIP</button>
           </div>
           <div id="albumFacebookPreview"></div>
         </section>
-        <details class="album-all-files">
-          <summary>ไฟล์ทั้งหมด</summary>
-          <div class="album-output-grid">${cards}</div>
+
+        <details class="album-review-details album-caption-edit-details">
+          <summary>
+            <span><b>แก้ไขแคปชั่นโพสต์</b><small>พิมพ์แล้วตัวอย่างด้านบนจะเปลี่ยนทันที</small></span>
+          </summary>
+          <div class="album-caption-box">
+            <textarea id="albumCaptionText" rows="7">${caption.replace(/</g,'&lt;')}</textarea>
+            <div class="album-caption-actions">
+              <button class="btn primary" id="albumCopyCaption">คัดลอกแคปชั่น</button>
+              <button class="btn secondary" id="albumRefreshPreview">อัปเดตตัวอย่าง</button>
+            </div>
+          </div>
+        </details>
+
+        <details class="album-review-details">
+          <summary>
+            <span><b>ตรวจภาพรายใบและดาวน์โหลดแยก</b><small>ภาพปก 1 ภาพ · ภาพรอง ${lites.length} ภาพ${additional.length ? ` · ภาพเพิ่มเติม ${additional.length} ภาพ` : ''}</small></span>
+          </summary>
+          <div class="album-individual-review">
+            ${coverPreview}
+            ${litePreview}
+            ${addPreview}
+          </div>
         </details>
       </div>`;
     renderFacebookPreview();
@@ -737,7 +745,7 @@
     document.addEventListener('click',(e)=>{
       const id=e.target && e.target.id;
       if(id==='makeAlbum'){ e.preventDefault(); generate(); }
-      if(id==='albumDownloadAll' || id==='albumDownloadAllTop'){ e.preventDefault(); downloadAll(); }
+      if(id==='albumDownloadAll' || id==='albumDownloadAllTop' || id==='albumDownloadAllResult'){ e.preventDefault(); downloadAll(); }
       if(id==='albumClear' || id==='albumClearTop'){
         e.preventDefault();
         state.outputs.forEach(o=>URL.revokeObjectURL(o.url));
@@ -748,13 +756,16 @@
         renderUploadPreview();
         const host=$('#albumResult .ready-main') || $('#albumResult'); if(host) host.innerHTML='';
       }
-      if(id==='albumCopyCaption'){ e.preventDefault(); const t=$('#albumCaptionText'); if(t){ navigator.clipboard?.writeText(t.value); e.target.textContent='คัดลอกแล้ว'; setTimeout(()=>e.target.textContent='คัดลอกแคปชั่น',1200); } }
+      if(id==='albumCopyCaption' || id==='albumCopyCaptionQuick'){ e.preventDefault(); const t=$('#albumCaptionText'); const value=t?t.value:state.caption; if(value){ navigator.clipboard?.writeText(value); const old=e.target.textContent; e.target.textContent='คัดลอกแล้ว'; setTimeout(()=>e.target.textContent=old || 'คัดลอกแคปชั่น',1200); } }
       if(id==='albumRefreshPreview'){ e.preventDefault(); renderFacebookPreview(); }
       if(e.target && e.target.classList.contains('album-one-download')) downloadOne(Number(e.target.dataset.i||0));
       const move=e.target && e.target.dataset && e.target.dataset.albumSupportMove; if(move){ e.preventDefault(); moveSupport(Number(e.target.dataset.i||0), move); }
     });
     document.addEventListener('change',(e)=>{
       if(e.target && (e.target.id==='album-coverFile' || e.target.id==='album-supportFiles')){ collectFilesFromInputs(true); renderUploadPreview(); }
+    });
+    document.addEventListener('input',(e)=>{
+      if(e.target && e.target.id==='albumCaptionText') renderFacebookPreview();
     });
   });
   window.TANJAI_ALBUM_PRO={

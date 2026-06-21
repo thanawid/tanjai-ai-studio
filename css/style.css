@@ -2948,6 +2948,84 @@ body.auth-locked .owner-watermark{
   font-weight:900;
   color:#e0f2fe;
 }
+.album-post-first{
+  margin-top:0;
+  border-color:rgba(34,211,238,.26);
+  background:
+    radial-gradient(circle at top right,rgba(217,70,239,.11),transparent 34%),
+    linear-gradient(180deg,rgba(15,23,42,.72),rgba(15,23,42,.45));
+  box-shadow:0 18px 48px rgba(0,0,0,.18);
+}
+.album-post-first .album-preview-title{
+  align-items:center;
+  margin-bottom:8px;
+}
+.album-post-first .album-preview-title p{
+  margin:4px 0 0;
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.45;
+}
+.album-ready-badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:max-content;
+  border:1px solid rgba(34,211,238,.28);
+  border-radius:999px;
+  padding:7px 10px;
+  background:rgba(34,211,238,.10);
+  color:#a5f3fc !important;
+  font-weight:800;
+  white-space:nowrap;
+}
+.album-post-actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin:10px 0 14px;
+}
+.album-review-details{
+  border:1px solid rgba(255,255,255,.11);
+  border-radius:18px;
+  background:rgba(255,255,255,.03);
+  overflow:hidden;
+}
+.album-review-details > summary{
+  cursor:pointer;
+  list-style:none;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:15px 16px;
+  color:#e0f2fe;
+}
+.album-review-details > summary::-webkit-details-marker{display:none}
+.album-review-details > summary::after{
+  content:'＋';
+  flex:0 0 auto;
+  font-size:20px;
+  color:#67e8f9;
+}
+.album-review-details[open] > summary::after{content:'−'}
+.album-review-details > summary span{
+  display:grid;
+  gap:3px;
+}
+.album-review-details > summary b{font-size:14px}
+.album-review-details > summary small{
+  color:var(--muted);
+  font-size:11px;
+  font-weight:500;
+}
+.album-review-details .album-caption-box{
+  margin:0 12px 12px;
+}
+.album-individual-review{
+  padding:0 12px 12px;
+}
+.album-individual-review .album-preview-section:first-child{margin-top:0}
 .album-cover-btn{
   min-width:38px;
   width:auto !important;
@@ -2975,6 +3053,8 @@ body.auth-locked .owner-watermark{
   .album-lite-preview-card img{
     border-radius:12px;
   }
+  .album-post-actions .btn{flex:1 1 150px}
+  .album-review-details > summary{padding:13px 12px}
 }
 
 
