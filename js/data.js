@@ -38,6 +38,7 @@ TANJAI.categories = {
   ],
   "imageStyles": [
     "AI PR Creative Director — เลือกแนวให้อัตโนมัติ",
+    "Thai PR Premium — 3D text / burst / mascot / layered zones",
     "Thai PR Poster Premium — สีสด ตัวอักษรเด่น",
     "Modern Premium Clean",
     "ราชการพรีเมียม อ่านง่าย",

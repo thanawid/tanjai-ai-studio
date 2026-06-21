@@ -213,15 +213,17 @@ ${silentQualityGate([
     const a = analyze(d, "image");
     const context = imageContextProfile(d);
     const selectedStyle = clean(d.style || a.design.style, "AI PR Creative Director — เลือกแนวให้อัตโนมัติ");
-    const thaiPrPosterMode = /Thai PR Poster Premium|High-Impact Thai PR Poster|โปสเตอร์ประชาสัมพันธ์ไทยสีสด/i.test([
+    const thaiPrPosterMode = /Thai PR Premium|Thai PR Poster Premium|High-Impact Thai PR Poster|โปสเตอร์ประชาสัมพันธ์ไทยสีสด/i.test([
       selectedStyle, d.layout, d.workContext, d.imageType
     ].filter(Boolean).join(" "));
     const thaiPrPosterProfile = thaiPrPosterMode ? `
-=== THAI PR POSTER PREMIUM PROFILE ===
+=== THAI PR PREMIUM PROFILE ===
 - สร้างงานต้นฉบับใหม่ที่ได้ DNA จากโปสเตอร์ประชาสัมพันธ์ไทยคุณภาพสูง ห้ามคัดลอกองค์ประกอบ ตรา ตัวละคร หรือรูปแบบเฉพาะของผลงานอื่น
 - วางลำดับภาพ 5 ชั้น: (1) identity zone ด้านบนสำหรับโลโก้จริง (2) announcement ribbon (3) hero headline ใหญ่ 2–4 บรรทัด (4) action/deadline band (5) information cards และ footer
 - Hero headline ต้องเป็นจุดเด่นที่สุด ใช้ตัวอักษรไทยหนาแบบ dimensional 3D, bevel, ขอบขาวหนา, เงานุ่ม และ contrast สูง โดยคงข้อความจาก TEXT LOCK เท่านั้น
 - ใช้การ์ดมุมมน แถบริบบิ้น ป้ายทรง capsule หมายเลขขั้นตอน และ icon/ภาพประกอบแบบ sticker 3D ที่เกี่ยวข้องกับเรื่องจริง ทำให้ข้อมูลแน่นแต่แยกกลุ่มอ่านง่าย
+- อนุญาตให้ใช้ burst background, spotlight rays, speed accents และ layered zones เพื่อเร่งพลังงานของภาพได้ แต่ต้องคุม contrast และพื้นที่หายใจไม่ให้รกหรืออ่านยาก
+- อนุญาตให้ใช้ cartoon mascot หรือ character helper ได้เฉพาะเมื่อบริบทเหมาะ เช่น งานชุมชน งานเด็ก รณรงค์ หรือกิจกรรมที่ต้องการความเป็นมิตร ห้ามใช้กับงานไว้อาลัย ข่าวเศร้า หรือประกาศทางการที่อ่อนไหว
 - ใช้สีอิ่มสดแบบ premium campaign, highlight สีทอง, white breathing space, rim light, soft glow และเงาหลายระดับ เพื่อสร้างมิติ ห้ามใช้เอฟเฟกต์จนข้อความอ่านยาก
 - โลโก้ ตราหน่วยงาน ภาพบุคคล QR Code และ barcode ใช้ได้เฉพาะไฟล์จริงที่ผู้ใช้แนบมา และต้องคงรูปเดิม ห้ามวาดเลียนแบบหรือสร้างใหม่
 - หากไม่มีไฟล์จริง ให้ตัดองค์ประกอบนั้นออกและจัดสมดุล Layout ใหม่ ห้ามใส่โลโก้หรือ QR จำลอง ห้ามพิมพ์ placeholder บนภาพ

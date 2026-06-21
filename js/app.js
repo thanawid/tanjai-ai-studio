@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
     videoFormats: ["คลิปประชาสัมพันธ์","คลิปข่าวด่วน","คลิปกิจกรรม / โครงการ","คลิปรีวิว","คลิปโซเชียลไวรัล","คลิปแนวสารคดีสั้น"],
     slideStyles: ["ทางการสำหรับผู้บริหาร","สรุปประชุม","นำเสนอโครงการ","รายงานผล","Pitch Deck","สไลด์อบรม"],
     workTypes: ["นายกลงพื้นที่","ติดตามปัญหากลุ่มเป้าหมาย","ตรวจงานโครงการ","กิจกรรมเทศบาล","อบรม / ประชุม","งานพิธีกร / ผู้ดำเนินรายการ","พิธีเปิด / พิธีปิด","ลงพื้นที่ช่วยเหลือ","รณรงค์ / ประชาสัมพันธ์","อื่น ๆ"],
-    workContexts: ["ให้ AI ช่วยเลือกจากรายละเอียด","โปสเตอร์ประชาสัมพันธ์ไทยสีสด","แจ้งข่าว / ประกาศ","เชิญชวน / ประชาสัมพันธ์","โปรโมท / แคมเปญ / ขายผลงาน","โปรโมทเพลง / ผลงานสร้างสรรค์","ให้ความรู้ / Infographic","ขั้นตอนบริการ / วิธีใช้งาน","สรุปกิจกรรม / รายงานผล","งานพิธี / งานบุญ / งานชุมชน","อบรม / ประชุม / สัมมนา","ขอบคุณ / แสดงความยินดี / อวยพร","รณรงค์ / สร้างความตระหนัก","ไว้อาลัย / สุภาพ / ลดสี","อื่น ๆ"],
+    workContexts: ["ให้ AI ช่วยเลือกจากรายละเอียด","Thai PR Premium","โปสเตอร์ประชาสัมพันธ์ไทยสีสด","แจ้งข่าว / ประกาศ","เชิญชวน / ประชาสัมพันธ์","โปรโมท / แคมเปญ / ขายผลงาน","โปรโมทเพลง / ผลงานสร้างสรรค์","ให้ความรู้ / Infographic","ขั้นตอนบริการ / วิธีใช้งาน","สรุปกิจกรรม / รายงานผล","งานพิธี / งานบุญ / งานชุมชน","อบรม / ประชุม / สัมมนา","ขอบคุณ / แสดงความยินดี / อวยพร","รณรงค์ / สร้างความตระหนัก","ไว้อาลัย / สุภาพ / ลดสี","อื่น ๆ"],
     imageTypes: ["ให้ AI ช่วยเลือกตามบริบท","โพสต์โซเชียล","โปสเตอร์ประชาสัมพันธ์","อินโฟกราฟิก","ภาพแน่นข้อมูล","ภาพอ่านง่าย","ปก / Cover","ปกเพลง / โปรโมทเพลง","ภาพเชิญชวนกิจกรรม","ภาพแจ้งข่าว","ภาพสรุปกิจกรรม","ชุดภาพโพสต์ Facebook","ภาพแนวนอน / แบนเนอร์","ภาพไว้อาลัย / สุภาพ","อื่น ๆ"],
     qualityLevels: ["High-Production PR — งานกราฟิกหลายชั้น (แนะนำ)","Creative Quality สมดุล — สวย ใช้งานจริง ไม่เว่อร์","คุมข้อมูลเข้ม — เน้นความถูกต้องและอ่านง่าย","สวยพรีเมียม — ยกระดับงานให้ดูแพงแต่ไม่มั่ว","สดใสโซเชียล — ดึงดูดแต่ยังอ่านชัด","ทางการสะอาด — เหมาะกับหน่วยงานและประกาศ"],
     creativityLevels: ["ครีเอทีฟเต็มที่ในองค์ประกอบภาพ แต่ห้ามแต่งข้อมูลจริง","คิดต่อพอดีตามข้อมูลผู้ใช้","ตามผู้ใช้สั่งมากที่สุด ไม่ตีความเกิน","ลดความเว่อร์ เน้นงานใช้งานจริง"]
@@ -51,6 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="full preset-wrap">
           <small class="preset-label">ตัวเลือกเร็วตามงานจริง</small>
           <div class="preset-row creative-preset-row-v91">
+            <button type="button" class="chip-btn" data-v91-context="Thai PR Premium" data-v91-type="โปสเตอร์ประชาสัมพันธ์">Thai PR Premium</button>
             <button type="button" class="chip-btn" data-v91-context="โปสเตอร์ประชาสัมพันธ์ไทยสีสด" data-v91-type="โปสเตอร์ประชาสัมพันธ์">โปสเตอร์ PR สีสด</button>
             <button type="button" class="chip-btn" data-v91-context="โปรโมทเพลง / ผลงานสร้างสรรค์" data-v91-type="ปกเพลง / โปรโมทเพลง">โปรโมทเพลง</button>
             <button type="button" class="chip-btn" data-v91-context="แจ้งข่าว / ประกาศ" data-v91-type="ภาพแจ้งข่าว">แจ้งข่าว</button>
@@ -732,6 +733,17 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "Prompt พิธีก
   };
 
   const v91CreativePresets = {
+    "Thai PR Premium": {
+      style:"Thai PR Premium — 3D text / burst / mascot / layered zones",
+      layout:"High-Impact Thai PR Poster",
+      density:"ข้อมูลเยอะ แต่อ่านง่าย",
+      focus:"เน้นหัวข้อหลัก",
+      colorTone:"ม่วง–ทอง–ขาว สีสดแบบงานประชาสัมพันธ์",
+      tone:"น่าเชื่อถือแบบหน่วยงาน",
+      mainCategory:"รับสมัคร / เปิดลงทะเบียน / เชิญชวน",
+      subCategory:"เชิญร่วมกิจกรรม",
+      preview:"งาน Thai PR Premium เน้นหัวข้อ 3D เด่น มี burst background แบบคุมจังหวะ ใช้มาสคอตการ์ตูนเมื่อเหมาะ และจัดข้อมูลเป็น layered zones ที่อ่านง่ายบนมือถือ"
+    },
     "โปสเตอร์ประชาสัมพันธ์ไทยสีสด": {
       style:"Thai PR Poster Premium — สีสด ตัวอักษรเด่น",
       layout:"High-Impact Thai PR Poster",
@@ -1049,6 +1061,7 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "Prompt พิธีก
     TANJAI.state.lastImageCritic = critic;
     TANJAI.updateImageResultMode?.("gpt");
     TANJAI.toast("สร้างคำสั่งภาพจริงและ Prompt มืออาชีพแล้ว");
+    window.TANJAI_AUTH?.trackUsage("image");
   };
   $("#makePost").onclick = () => {
     const d=TANJAI.commonData("post");
@@ -1065,6 +1078,7 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "Prompt พิธีก
     });
     TANJAI.state.lastPost=executeOut;
     TANJAI.toast("สร้าง Prompt งานเขียนแล้ว");
+    window.TANJAI_AUTH?.trackUsage("post");
   };
   $("#makeMC").onclick = () => {
     const d=TANJAI.commonData("mc");
@@ -1081,6 +1095,7 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "Prompt พิธีก
     });
     TANJAI.state.lastMC=executeOut;
     TANJAI.toast("สร้าง Prompt พิธีกรแล้ว");
+    window.TANJAI_AUTH?.trackUsage("mc");
   };
   $("#makeVideo").onclick = () => {
     const d=TANJAI.commonData("video");
@@ -1098,6 +1113,7 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "Prompt พิธีก
     });
     TANJAI.state.lastVideo=executeOut;
     TANJAI.toast("สร้าง Prompt วิดีโอแล้ว");
+    window.TANJAI_AUTH?.trackUsage("video");
   };
   $("#makeVoice").onclick = () => {
     const d=TANJAI.commonData("voice");
@@ -1116,6 +1132,7 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "Prompt พิธีก
     });
     TANJAI.state.lastVoice=executeOut;
     TANJAI.toast("สร้าง Prompt เสียงแล้ว");
+    window.TANJAI_AUTH?.trackUsage("voice");
   };
   $("#makeDeck").onclick = () => {
     const d=TANJAI.commonData("deck");
@@ -1133,6 +1150,7 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "Prompt พิธีก
     });
     TANJAI.state.lastDeck=executeOut;
     TANJAI.toast("สร้าง Prompt สไลด์แล้ว");
+    window.TANJAI_AUTH?.trackUsage("deck");
   };
   $("#makeKit").onclick = () => {
     const d=TANJAI.commonData("kit");
@@ -1159,6 +1177,7 @@ ${TANJAI.outputDeliveryGuard("ชุดไฟล์สื่อ")}`;
     });
     TANJAI.state.lastKit=out;
     TANJAI.toast("สร้าง Prompt ชุดสื่อแล้ว");
+    window.TANJAI_AUTH?.trackUsage("kit");
   };
 
 
