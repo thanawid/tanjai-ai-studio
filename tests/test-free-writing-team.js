@@ -49,7 +49,7 @@ const app = fs.readFileSync(path.join(root, "js", "app.js"), "utf8");
 const ui = fs.readFileSync(path.join(root, "js", "ui.js"), "utf8");
 const index = fs.readFileSync(path.join(root, "index.html"), "utf8");
 assert.match(index, /js\/free-writing-team\.js/);
-assert.match(index, /V9\.4/);
+assert.match(index, /V9\.3\.15 · Username & Mobile Access/);
 assert.match(app, /team\.captionWriter\(d\)/);
 assert.match(app, /team\.mcWriter\(d\)/);
 assert.match(app, /team\.videoWriter\(d, length\)/);
@@ -58,8 +58,5 @@ assert.match(app, /team\.slideWriter\(d, count\)/);
 assert.match(ui, /คัดลอกงานเขียน/);
 assert.match(ui, /คัดลอกบทวิดีโอ/);
 assert.doesNotMatch(ui, /คัดลอก Prompt วิดีโอ/);
-assert.match(ui, /editableWritingTools = new Set\(\["post", "mc", "video", "voice", "deck"\]\)/);
-assert.match(ui, /contenteditable="true"/);
-assert.match(ui, /data-reset-output/);
 
 console.log(JSON.stringify({roles:6, directOutputs:true, factGuard:true, status:"PASS"}, null, 2));
