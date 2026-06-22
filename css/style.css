@@ -3125,10 +3125,55 @@ body.auth-locked .owner-watermark{
 .result-box{
   line-height:1.62;
 }
+.output-editor-wrap{
+  display:grid;
+  gap:10px;
+}
+.output-editor-bar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:10px 12px;
+  border:1px solid rgba(34,211,238,.22);
+  border-radius:14px;
+  background:rgba(34,211,238,.06);
+}
+.output-editor-status{
+  color:#b8f3fb;
+  font-size:13px;
+  font-weight:800;
+  line-height:1.45;
+}
+.output-reset-btn{
+  min-height:36px;
+  padding:8px 12px;
+  white-space:nowrap;
+}
+.editable-result-box{
+  cursor:text;
+  outline:none;
+  transition:border-color .18s, box-shadow .18s, background .18s;
+}
+.editable-result-box:hover{
+  border-color:rgba(34,211,238,.42);
+}
+.editable-result-box:focus{
+  border-color:#22d3ee;
+  background:#081224;
+  box-shadow:0 0 0 4px rgba(34,211,238,.12);
+}
+.editable-result-box[data-edited="true"]{
+  border-color:rgba(250,204,21,.48);
+}
 @media(max-width:720px){
   .result-box{
     font-size:13px;
     line-height:1.58;
+  }
+  .output-editor-bar{
+    align-items:flex-start;
+    flex-direction:column;
   }
 }
 

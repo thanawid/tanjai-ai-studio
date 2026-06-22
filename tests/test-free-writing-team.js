@@ -58,5 +58,8 @@ assert.match(app, /team\.slideWriter\(d, count\)/);
 assert.match(ui, /คัดลอกงานเขียน/);
 assert.match(ui, /คัดลอกบทวิดีโอ/);
 assert.doesNotMatch(ui, /คัดลอก Prompt วิดีโอ/);
+assert.match(ui, /editableWritingTools = new Set\(\["post", "mc", "video", "voice", "deck"\]\)/);
+assert.match(ui, /contenteditable="true"/);
+assert.match(ui, /data-reset-output/);
 
 console.log(JSON.stringify({roles:6, directOutputs:true, factGuard:true, status:"PASS"}, null, 2));
