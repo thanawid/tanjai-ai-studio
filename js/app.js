@@ -192,6 +192,7 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
           <small>ขนาดไฟล์และตัวอย่างโพสต์จะเปลี่ยนตามแบบที่เลือกอัตโนมัติ</small>
         </div>
+        <label class="full">การนำภาพลงช่อง<select id="album-storyMode"><option value="auto" selected>อัตโนมัติ — มีภาพเดียวให้ตัดต่อกัน มีหลายภาพให้ใช้แยก</option><option value="split-main">ตัดภาพหลักเป็น 4 ช่องต่อกัน</option><option value="separate">ใช้ภาพแต่ละไฟล์ ไม่ตัดต่อกัน</option></select><small>โหมดตัดภาพหลักจะสร้างไฟล์ 01–04 ตามตำแหน่ง ซ้ายบน ขวาบน ซ้ายล่าง ขวาล่าง สำหรับโพสต์แบบตาราง 4 ภาพ</small></label>
         <label class="full">สไตล์แคปชั่น Facebook<select id="album-captionStyle"><option value="pr-ready" selected>พร้อมโพสต์ — กระชับและครบประเด็น</option><option value="official">ทางการสำหรับหน่วยงาน</option><option value="friendly">อบอุ่น เข้าถึงง่าย</option><option value="story">เล่าเรื่องกิจกรรม</option><option value="announcement">ประกาศ / แจ้งข่าว</option></select><small>Caption Writer จะใช้เฉพาะข้อมูลจริงที่กรอก และไม่แต่งชื่อ วันที่ สถานที่ หรือตัวเลขเพิ่ม</small></label>
         <input id="album-ratio" type="hidden" value="auto">
         <input id="album-previewLayout" type="hidden" value="auto">
@@ -205,7 +206,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <input id="album-makeCover" type="checkbox" checked hidden>
       </div>
     </div>
-    <div class="button-row"><button class="btn primary" id="makeAlbum">สร้าง Cover + Lite Album</button><button class="btn secondary" id="albumDownloadAll">ดาวน์โหลด ZIP</button><button class="btn secondary" id="albumClear">ล้างรูป</button></div>
+    <div class="button-row"><button class="btn primary" id="makeAlbum">สร้างกรอบเล่าเรื่อง + ชุดภาพ</button><button class="btn secondary" id="albumDownloadAll">ดาวน์โหลด ZIP</button><button class="btn secondary" id="albumClear">ล้างรูป</button></div>
   `;
 
   $("#postForm").innerHTML = TANJAI.field("post") + `

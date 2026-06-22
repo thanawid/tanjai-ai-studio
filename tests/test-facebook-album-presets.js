@@ -6,6 +6,7 @@ const vm = require('vm');
 const source = fs.readFileSync(path.join(__dirname, '..', 'js', 'album.js'), 'utf8');
 const values = {
   'album-facebookPreset': 'square-grid',
+  'album-storyMode': 'auto',
   'album-ratio': 'auto',
   'album-previewLayout': 'auto'
 };
@@ -45,6 +46,12 @@ assert.strictEqual(api.resolveFacebookPreset('auto',900,1600),'portrait-left');
 assert.strictEqual(api.presetLayout('square-grid'),'grid');
 assert.strictEqual(api.presetLayout('wide-top'),'cover-top');
 assert.strictEqual(api.presetLayout('portrait-left'),'cover-left');
+assert.strictEqual(api.resolveStoryMode('auto','square-grid',1),'split-main');
+assert.strictEqual(api.resolveStoryMode('auto','square-grid',2),'separate');
+assert.strictEqual(api.resolveStoryMode('auto','square-grid',4),'separate');
+assert.strictEqual(api.resolveStoryMode('auto','wide-top',1),'separate');
+assert.strictEqual(api.resolveStoryMode('split-main','wide-top',4),'split-main');
+assert.strictEqual(api.resolveStoryMode('separate','square-grid',1),'separate');
 
 const captionBrief = {
   title:'ประชุมรับฟังความคิดเห็น', org:'เทศบาลตัวอย่าง',
