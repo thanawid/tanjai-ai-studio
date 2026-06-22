@@ -1,0 +1,8 @@
+name = "tanjai-ai"
+main = "src/index.js"
+compatibility_date = "2026-06-22"
+
+[vars]
+ALLOWED_ORIGINS = "https://thanawid.github.io"
+DAILY_LIMIT = "10"
+GEMINI_MODEL = "gemini-2.5-flash-lite"
