@@ -3166,6 +3166,23 @@ body.auth-locked .owner-watermark{
 .editable-result-box[data-edited="true"]{
   border-color:rgba(250,204,21,.48);
 }
+.btn.is-ai-loading{
+  cursor:wait;
+  opacity:.78;
+}
+.btn.is-ai-loading::before{
+  content:"";
+  display:inline-block;
+  width:13px;
+  height:13px;
+  margin-right:8px;
+  border:2px solid rgba(255,255,255,.35);
+  border-top-color:#fff;
+  border-radius:50%;
+  vertical-align:-2px;
+  animation:tanjai-ai-spin .8s linear infinite;
+}
+@keyframes tanjai-ai-spin{to{transform:rotate(360deg)}}
 @media(max-width:720px){
   .result-box{
     font-size:13px;
