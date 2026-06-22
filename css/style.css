@@ -3125,10 +3125,72 @@ body.auth-locked .owner-watermark{
 .result-box{
   line-height:1.62;
 }
+.output-editor-wrap{
+  display:grid;
+  gap:10px;
+}
+.output-editor-bar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:10px 12px;
+  border:1px solid rgba(34,211,238,.22);
+  border-radius:14px;
+  background:rgba(34,211,238,.06);
+}
+.output-editor-status{
+  color:#b8f3fb;
+  font-size:13px;
+  font-weight:800;
+  line-height:1.45;
+}
+.output-reset-btn{
+  min-height:36px;
+  padding:8px 12px;
+  white-space:nowrap;
+}
+.editable-result-box{
+  cursor:text;
+  outline:none;
+  transition:border-color .18s, box-shadow .18s, background .18s;
+}
+.editable-result-box:hover{
+  border-color:rgba(34,211,238,.42);
+}
+.editable-result-box:focus{
+  border-color:#22d3ee;
+  background:#081224;
+  box-shadow:0 0 0 4px rgba(34,211,238,.12);
+}
+.editable-result-box[data-edited="true"]{
+  border-color:rgba(250,204,21,.48);
+}
+.btn.is-ai-loading{
+  cursor:wait;
+  opacity:.78;
+}
+.btn.is-ai-loading::before{
+  content:"";
+  display:inline-block;
+  width:13px;
+  height:13px;
+  margin-right:8px;
+  border:2px solid rgba(255,255,255,.35);
+  border-top-color:#fff;
+  border-radius:50%;
+  vertical-align:-2px;
+  animation:tanjai-ai-spin .8s linear infinite;
+}
+@keyframes tanjai-ai-spin{to{transform:rotate(360deg)}}
 @media(max-width:720px){
   .result-box{
     font-size:13px;
     line-height:1.58;
+  }
+  .output-editor-bar{
+    align-items:flex-start;
+    flex-direction:column;
   }
 }
 
@@ -4652,116 +4714,4 @@ textarea:focus-visible{
   .album-preset-card small{grid-column:2}
   .album-sequence-head{align-items:flex-start;flex-direction:column}
   .album-sequence-head small{text-align:left}
-}
-
-/* V9.3.15 — Username access + focused mobile usability */
-.sidebar-logout{
-  margin-top:10px;
-  border-color:rgba(248,113,113,.20);
-  color:#fecaca;
-  background:rgba(127,29,29,.10);
-}
-.sidebar-logout:hover{
-  border-color:rgba(248,113,113,.38);
-  background:rgba(127,29,29,.20);
-  color:#fff;
-}
-.login-field-help{
-  display:block;
-  color:var(--muted);
-  font-size:11px;
-  font-weight:600;
-  line-height:1.45;
-}
-.login-form input[type="text"],
-.login-form input[type="email"],
-.login-form input[type="password"]{
-  width:100%;
-  margin-top:8px;
-  min-height:52px;
-  border-radius:16px;
-  border:1px solid rgba(255,255,255,.14);
-  background:rgba(255,255,255,.08);
-  color:#fff;
-  padding:0 16px;
-  outline:none;
-}
-.login-form input[type="text"]:focus,
-.login-form input[type="email"]:focus,
-.login-form input[type="password"]:focus{
-  border-color:rgba(34,211,238,.55);
-  box-shadow:0 0 0 4px rgba(34,211,238,.10);
-}
-
-@media(max-width:1180px){
-  .sidebar .nav{padding-bottom:8px}
-  .sidebar-logout{min-height:48px}
-  .studio-layout,.panel,.form-panel,.result-panel{min-width:0;max-width:100%}
-  .workspace img,.workspace canvas,.workspace video{max-width:100%}
-}
-
-@media(max-width:720px){
-  /* ใช้ mobile tabbar เพียงชุดเดียว ไม่ให้แถบ Back/Home ซ้อนด้านล่าง */
-  .mobile-quick-nav{display:none !important}
-  body{padding-bottom:calc(86px + env(safe-area-inset-bottom,0px)) !important}
-  .workspace{
-    overflow:visible !important;
-    padding:12px 10px calc(106px + env(safe-area-inset-bottom,0px)) !important;
-  }
-  .topbar{
-    margin:0 0 12px !important;
-    padding:10px 12px !important;
-    border-radius:18px !important;
-  }
-  .topbar h2{font-size:21px !important}
-  .topbar-kicker{gap:7px}
-  .app-version-badge{max-width:92px;overflow:hidden;text-overflow:ellipsis}
-  .panel{padding:14px !important;border-radius:18px !important}
-  .panel-head{margin-bottom:12px}
-  .panel h3{font-size:21px !important;line-height:1.25}
-  .panel p{font-size:13px;line-height:1.55}
-  .form-section{padding:13px !important;border-radius:17px !important}
-  .section-title{align-items:flex-start}
-  .section-title h4{font-size:17px;line-height:1.35}
-  .result-action{padding:13px;border-radius:17px}
-  .result-action h4{font-size:19px;line-height:1.3}
-  .result-box{min-height:300px;max-height:none;font-size:13px;padding:14px;border-radius:17px}
-  .ready-output-body,.advanced-result-box{max-width:100%;overflow-wrap:anywhere}
-  .sidebar{width:min(326px,92vw) !important;padding:18px 14px calc(26px + env(safe-area-inset-bottom,0px)) !important}
-  .sidebar .brand{position:sticky;top:-18px;z-index:2;background:var(--sidebar);padding:14px 4px 12px !important}
-  .nav-link{padding:11px 12px !important;border-radius:13px}
-  .sidebar-logout{margin-bottom:10px}
-
-  .login-gate{
-    min-height:100dvh;
-    align-items:flex-start;
-    overflow-y:auto;
-    padding:calc(14px + env(safe-area-inset-top,0px)) 12px calc(18px + env(safe-area-inset-bottom,0px));
-  }
-  .login-card{
-    width:100%;
-    max-width:430px;
-    margin:auto;
-    padding:24px 18px 22px;
-    border-radius:24px;
-  }
-  .login-logo-wrap{width:88px;height:88px;border-radius:23px;margin-bottom:12px}
-  .login-card h1{font-size:26px}
-  .login-subtitle{margin-bottom:15px;font-size:13px}
-  .login-form{gap:11px}
-  .login-form input[type="text"],
-  .login-form input[type="email"],
-  .login-form input[type="password"]{font-size:16px !important;min-height:50px;margin-top:6px}
-  .login-actions-v9{grid-template-columns:1fr !important;gap:9px}
-  .login-actions-v9 .btn{width:100%;min-height:48px}
-  .login-note{font-size:10px;line-height:1.45}
-}
-
-@media(max-width:360px){
-  .workspace{padding-inline:8px !important}
-  .topbar{padding:9px !important}
-  .topbar h2{font-size:19px !important}
-  .panel,.form-section{padding:12px !important}
-  .login-card{padding:20px 14px}
-  .login-logo-wrap{width:76px;height:76px}
 }

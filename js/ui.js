@@ -202,6 +202,22 @@ TANJAI.primaryActionButtons = function(tool, bodyId){
   return btn("คัดลอกผลลัพธ์", `data-copybox="${bodyId}"`, "primary");
 };
 
+TANJAI.editableWritingTools = new Set(["post", "mc", "video", "voice", "deck"]);
+
+TANJAI.outputEditor = function(tool, bodyId){
+  if(!TANJAI.editableWritingTools.has(tool)){
+    return `<div id="${bodyId}" class="result-box stable-empty">กดปุ่มสร้าง แล้วผลลัพธ์พร้อมใช้จะแสดงตรงนี้</div>`;
+  }
+  return `
+    <div class="output-editor-wrap" data-output-editor="${tool}">
+      <div class="output-editor-bar">
+        <span class="output-editor-status" id="${tool}EditStatus">✏️ แก้ไขข้อความในกล่องด้านล่างได้ทันที</span>
+        <button class="btn ghost output-reset-btn" type="button" data-reset-output="${bodyId}" hidden>คืนค่าฉบับที่สร้าง</button>
+      </div>
+      <div id="${bodyId}" class="result-box stable-empty editable-result-box" contenteditable="true" role="textbox" aria-multiline="true" aria-label="ผลลัพธ์ที่แก้ไขได้" spellcheck="true" data-editable-output="${tool}">กดปุ่มสร้าง แล้วแก้ไข เพิ่ม หรือตัดข้อความได้ตรงนี้</div>
+    </div>`;
+};
+
 TANJAI.readyOutputShell = function(tool, recommended, desc, bodyId){
   const destinations = TANJAI.getToolDestinations(tool).map(item => `<button class="btn ghost" data-open="${item.url}">${item.label}</button>`).join("");
   return `
@@ -215,7 +231,7 @@ TANJAI.readyOutputShell = function(tool, recommended, desc, bodyId){
         ${TANJAI.primaryActionButtons(tool, bodyId)}
       </div>
     </div>
-    <div id="${bodyId}" class="result-box stable-empty">กดปุ่มสร้าง แล้วผลลัพธ์พร้อมใช้จะแสดงตรงนี้</div>
+    ${TANJAI.outputEditor(tool, bodyId)}
     <details class="advanced-output-wrap" id="${tool}AdvancedWrap">
       <summary>ดูรายละเอียดเพิ่มเติม</summary>
       <div class="advanced-output-grid">
@@ -249,6 +265,14 @@ TANJAI.setReadyOutput = function(tool, options={}){
   if(mainEl){
     mainEl.textContent = options.main || "";
     mainEl.classList.toggle("stable-empty", !(options.main || "").trim());
+    if(mainEl.dataset.editableOutput){
+      mainEl.dataset.generatedText = options.main || "";
+      mainEl.dataset.edited = "false";
+      const resetButton = document.querySelector(`[data-reset-output="${mainEl.id}"]`);
+      const status = TANJAI.$(`#${tool}EditStatus`);
+      if(resetButton) resetButton.hidden = true;
+      if(status) status.textContent = "✏️ แก้ไข เพิ่ม หรือตัดข้อความในกล่องได้ทันที";
+    }
   }
   if(titleEl && options.title) titleEl.textContent = options.title;
   if(descEl && options.desc) descEl.textContent = options.desc;
@@ -266,6 +290,31 @@ TANJAI.setReadyOutput = function(tool, options={}){
     }
   });
 };
+
+document.addEventListener("input", function(event){
+  const output = event.target.closest?.("[data-editable-output]");
+  if(!output) return;
+  output.dataset.edited = "true";
+  const tool = output.dataset.editableOutput;
+  const resetButton = document.querySelector(`[data-reset-output="${output.id}"]`);
+  const status = TANJAI.$(`#${tool}EditStatus`);
+  if(resetButton) resetButton.hidden = output.textContent === (output.dataset.generatedText || "");
+  if(status) status.textContent = "บันทึกการแก้ไขในหน้าเว็บแล้ว — ปุ่มคัดลอกและบันทึกจะใช้ข้อความนี้";
+});
+
+document.addEventListener("click", function(event){
+  const resetButton = event.target.closest?.("[data-reset-output]");
+  if(!resetButton) return;
+  const output = TANJAI.$(`#${resetButton.dataset.resetOutput}`);
+  if(!output) return;
+  output.textContent = output.dataset.generatedText || "";
+  output.dataset.edited = "false";
+  resetButton.hidden = true;
+  const tool = output.dataset.editableOutput;
+  const status = TANJAI.$(`#${tool}EditStatus`);
+  if(status) status.textContent = "คืนค่าฉบับที่สร้างแล้ว — ยังแก้ไขต่อได้ทันที";
+  TANJAI.toast?.("คืนค่าฉบับที่สร้างแล้ว");
+});
 
 TANJAI.applyTemplate = function(key, targetView){
   const t = TANJAI.templates[key]; if(!t) return;

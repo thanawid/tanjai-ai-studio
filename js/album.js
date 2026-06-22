@@ -1,4 +1,4 @@
-/* v9.3.13 — Clean Civic Frames + Facebook Publishing Director
+/* v9.4.1 — Story Frames + Facebook Publishing Director
    Safe photo processing for real uploaded images only.
    Cover Frame + Lite Frames + Additional Frame, face-aware crop when supported,
    smart theme selection, safe text, slot-based crop/frames, Facebook mock preview, and synced preview / download results.
@@ -65,6 +65,7 @@
       ratio: val("album-ratio","auto"),
       previewLayout: val("album-previewLayout","auto"),
       facebookPreset: val("album-facebookPreset","auto"),
+      storyMode: val("album-storyMode","auto"),
       captionStyle: val("album-captionStyle","pr-ready"),
       colorTone: val("album-colorTone","AI เลือกโทนสีให้เข้ากับงาน"),
       mode: val("album-autoMode", val("album-mode","ปรับภาพ + ครอป + ใส่กรอบ")),
@@ -98,7 +99,12 @@
     return "square-grid";
   }
   function effectiveFacebookPreset(d=data()){
+    if(d.storyMode==="split-main") return "square-grid";
     return d.facebookPreset && d.facebookPreset!=="auto" ? d.facebookPreset : (state.resolvedFacebookPreset || "wide-top");
+  }
+  function resolveStoryMode(requested="auto", preset="wide-top", fileCount=1){
+    if(requested && requested!=="auto") return requested;
+    return preset==="square-grid" && fileCount===1 ? "split-main" : "separate";
   }
   function presetLayout(preset){
     if(preset==="square-grid") return "grid";
@@ -769,6 +775,33 @@
     return {blob,url,role:profile.role,label:profile.label,w:sz.w,h:sz.h,filename:`facebook_album_${String(idx+1).padStart(2,'0')}_${profile.role}_${sz.w}x${sz.h}.jpg`};
   }
 
+  async function processStoryGrid(file){
+    const d=data(), th=theme(d);
+    const master=document.createElement('canvas'); master.width=2160; master.height=2160;
+    const masterCtx=master.getContext('2d');
+    const img=await makeImage(file);
+    const enhance=!d.mode.includes('ครอป + ใส่กรอบเท่านั้น');
+    const faceFocus=await detectFaceFocus(img);
+    coverDraw(img,masterCtx,master.width,master.height,enhance,faceFocus,.45);
+    if(!d.mode.includes('ปรับภาพเท่านั้น')) drawCoverFrame(masterCtx,master.width,master.height,d,th);
+
+    const positions=[
+      {x:0,y:0,name:'top_left',label:'ช่อง 1 · ซ้ายบน'},
+      {x:1080,y:0,name:'top_right',label:'ช่อง 2 · ขวาบน'},
+      {x:0,y:1080,name:'bottom_left',label:'ช่อง 3 · ซ้ายล่าง'},
+      {x:1080,y:1080,name:'bottom_right',label:'ช่อง 4 · ขวาล่าง'}
+    ];
+    const outputs=[];
+    for(let idx=0;idx<positions.length;idx++){
+      const part=positions[idx];
+      const canvas=document.createElement('canvas'); canvas.width=1080; canvas.height=1080;
+      canvas.getContext('2d').drawImage(master,part.x,part.y,1080,1080,0,0,1080,1080);
+      const blob=await canvasToBlob(canvas); const url=URL.createObjectURL(blob);
+      outputs.push({blob,url,role:idx===0?'cover':'lite',label:part.label,w:1080,h:1080,filename:`facebook_story_grid_${String(idx+1).padStart(2,'0')}_${part.name}_1080x1080.jpg`,storyTile:true});
+    }
+    return outputs;
+  }
+
   function normalizeFiles(fileList, warn=true, max=4){
     let files=Array.from(fileList||[]).filter(f=>f.type.startsWith('image/'));
     if(files.length>max){ files=files.slice(0,max); if(warn) alert(`ระบบนี้รองรับภาพรองได้สูงสุด ${max} ภาพ จึงเลือกใช้ ${max} ภาพแรกให้โดยอัตโนมัติ`); }
@@ -1052,7 +1085,6 @@
     if(!files.length) files=collectFilesFromInputs(false);
     if(!val('album-title','')) return alert('กรุณากรอกหัวข้องานสำหรับ Cover Frame');
     if(!state.coverFile) return alert('กรุณาเลือกภาพหน้าปกหลัก 1 ภาพ');
-    if(files.length < 4) return alert('กรุณาอัปโหลดภาพหน้าปก 1 ภาพ และภาพรองอย่างน้อย 3 ภาพ');
     if(files.length > 5) files=files.slice(0,5);
     state.files=files;
     state.outputs.forEach(o=>URL.revokeObjectURL(o.url)); state.outputs=[];
@@ -1061,7 +1093,17 @@
       await waitFonts();
       await resolveSmartSettings(files);
       const logoInput=$('#album-logoFile'); if(logoInput && logoInput.files && logoInput.files[0]) await loadLogo(logoInput.files[0]); else state.logo=null;
-      for(let i=0;i<files.length;i++) state.outputs.push(await processImage(files[i],i,files.length));
+      const d=data();
+      const storyMode=resolveStoryMode(d.storyMode,effectiveFacebookPreset(d),files.length);
+      if(storyMode==='split-main'){
+        state.resolvedFacebookPreset='square-grid';
+        state.resolvedPreviewLayout='grid';
+        state.resolvedRatio='1080x1080';
+        state.outputs=await processStoryGrid(state.coverFile);
+        renderSmartChoice();
+      }else{
+        for(let i=0;i<files.length;i++) state.outputs.push(await processImage(files[i],i,files.length));
+      }
       state.caption=captionText(data());
       renderOutputs();
     } finally { if(btn){ btn.disabled=false; btn.textContent=old || 'สร้างชุดภาพ'; } }
@@ -1108,6 +1150,7 @@
         renderSmartChoice();
         if(state.outputs.length) generate();
       }
+      if(e.target && e.target.id==='album-storyMode' && state.outputs.length) generate();
       if(e.target && e.target.id==='album-captionStyle' && state.outputs.length){ state.caption=captionText(data()); renderOutputs(); }
     });
     document.addEventListener('input',(e)=>{
@@ -1116,6 +1159,6 @@
   });
   window.TANJAI_ALBUM_PRO={
     generate,downloadAll,renderFacebookPreview,renderUploadPreview,collectFilesFromInputs,
-    _test:{cropPlacement,liteText,theme,size,resolveRatioFromDimensions,previewLayoutFor,resolveFacebookPreset,presetLayout,facebookPresetLabel,slotSize,captionFacts,captionWriter,factGuardCaption}
+    _test:{cropPlacement,liteText,theme,size,resolveRatioFromDimensions,previewLayoutFor,resolveFacebookPreset,resolveStoryMode,presetLayout,facebookPresetLabel,slotSize,captionFacts,captionWriter,factGuardCaption}
   };
 })();

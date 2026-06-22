@@ -1,4 +1,4 @@
-/* Tanjai AI Studio V9.3.14 — Free Writing Team
+/* Tanjai AI Studio V9.4
  * Direct, zero-API writing outputs. Shared Content Brain + specialist writers + Fact Guard.
  */
 (function(root){
