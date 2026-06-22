@@ -5,7 +5,6 @@
   ห้ามใส่ Gemini API Key ในไฟล์นี้หรือไฟล์ใด ๆ บน GitHub Pages
 */
 window.TANJAI_AI_CONFIG = Object.assign({
-  endpoint: "",
+  endpoint: "https://tanjai-ai.thanawid.workers.dev",
   timeoutMs: 60000
 }, window.TANJAI_AI_CONFIG || {});
-
