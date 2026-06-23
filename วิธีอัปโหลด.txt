@@ -1,0 +1,12 @@
+วิธีใช้แพตช์นี้
+1) แตก ZIP นี้
+2) อัปโหลดทับไฟล์เดิมใน GitHub ตามโครงสร้างเดิม
+   - index.html
+   - js/album.js
+   - js/app.js
+   - js/auth-fallback.js
+   - js/firebase-auth.js
+   - js/firebase-config.js
+3) Commit changes
+
+แพตช์นี้มีเฉพาะไฟล์ที่เปลี่ยนจริง จึงไม่เกิน 100 ไฟล์

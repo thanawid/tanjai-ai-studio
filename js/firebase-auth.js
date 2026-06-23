@@ -11,35 +11,59 @@ const db = getFirestore(app);
 
 let currentUser = null;
 
+const NAME_SESSION_KEY = "tanjaiNameAccessV942";
+const normalizeLoginName = (name) => String(name || "").trim().toLowerCase().replace(/[^a-z0-9._-]/g, "");
+const namedUsers = () => window.TANJAI_USERNAME_USERS || {};
+const namedUid = (name) => `named_${normalizeLoginName(name)}`;
+function readNamedSession(){
+  try { return JSON.parse(localStorage.getItem(NAME_SESSION_KEY) || "null"); } catch(_) { return null; }
+}
+function writeNamedSession(profile){
+  localStorage.setItem(NAME_SESSION_KEY, JSON.stringify({ ...profile, savedAt: Date.now() }));
+}
+function clearNamedSession(){ localStorage.removeItem(NAME_SESSION_KEY); }
+function showAuthenticatedProfile(profile){
+  currentUser = profile;
+  document.body.classList.remove("auth-locked");
+  const loginGate = document.getElementById("loginGate");
+  if(loginGate) loginGate.style.display = "none";
+  const nameEl = document.getElementById("userDisplayName");
+  if(nameEl) nameEl.textContent = profile.displayName || profile.username || String(profile.email || "user").split("@")[0];
+}
+function showLoginGate(){
+  currentUser = null;
+  document.body.classList.add("auth-locked");
+  const loginGate = document.getElementById("loginGate");
+  if(loginGate) loginGate.style.display = "flex";
+}
+
 /* ─── AUTH STATE ─── */
 onAuthStateChanged(auth, async (user) => {
-  const loginGate = document.getElementById("loginGate");
   const loginError = document.getElementById("loginError");
   if(loginError) loginError.textContent = "";
 
+  const named = readNamedSession();
   if(user) {
-    currentUser = user;
-    document.body.classList.remove("auth-locked");
-    if(loginGate) loginGate.style.display = "none";
+    clearNamedSession();
+    const profile = { ...user, email: user.email, uid: user.uid, displayName: user.email.split("@")[0], mode: "firebase" };
+    showAuthenticatedProfile(profile);
 
-    const nameEl = document.getElementById("userDisplayName");
-    if(nameEl) nameEl.textContent = user.email.split("@")[0];
-
-    // บันทึก last login
     try {
       await setDoc(doc(db, "users", user.uid), {
         email: user.email,
         lastLogin: serverTimestamp(),
-        uid: user.uid
+        uid: user.uid,
+        mode: "firebase"
       }, { merge: true });
     } catch(_) {}
 
     if(window.TANJAI?.renderProjects) TANJAI.renderProjects();
     console.log("Logged in:", user.email);
+  } else if(named && named.username) {
+    showAuthenticatedProfile(named);
+    if(window.TANJAI?.renderProjects) TANJAI.renderProjects();
   } else {
-    currentUser = null;
-    document.body.classList.add("auth-locked");
-    if(loginGate) loginGate.style.display = "flex";
+    showLoginGate();
   }
 });
 
@@ -54,6 +78,33 @@ const checkWhitelist = async (email) => {
   } catch(_) {
     return false; // ถ้า Firestore rules บล็อก ก็ไม่อนุญาต
   }
+};
+
+/* ─── USERNAME-ONLY LOGIN ─── */
+const loginName = async (name) => {
+  const key = normalizeLoginName(name);
+  const profileBase = namedUsers()[key];
+  if(!profileBase) throw new Error("ไม่พบชื่อผู้ใช้งานนี้ในระบบ");
+  const profile = {
+    uid: profileBase.uid || namedUid(key),
+    username: key,
+    displayName: profileBase.displayName || key,
+    email: profileBase.email,
+    mode: "username-only"
+  };
+  writeNamedSession(profile);
+  showAuthenticatedProfile(profile);
+  try {
+    await setDoc(doc(db, "users", profile.uid), {
+      email: profile.email,
+      username: profile.username,
+      displayName: profile.displayName,
+      lastLogin: serverTimestamp(),
+      uid: profile.uid,
+      mode: "username-only"
+    }, { merge: true });
+  } catch(_) {}
+  TANJAI.toast?.("เข้าสู่ระบบสำเร็จ ยินดีต้อนรับ!");
 };
 
 /* ─── LOGIN ─── */
@@ -95,7 +146,9 @@ const register = async (email, password) => {
 /* ─── LOGOUT ─── */
 const logout = async () => {
   try {
+    clearNamedSession();
     await signOut(auth);
+    showLoginGate();
     TANJAI.toast?.("ออกจากระบบแล้ว");
   } catch(_) {}
 };
@@ -181,7 +234,7 @@ const addToWhitelist = async (email) => {
 };
 
 window.TANJAI_AUTH = {
-  login, register, logout,
+  login, loginName, register, logout,
   saveProjectToCloud, getProjectsFromCloud, deleteProjectFromCloud,
   getCurrentUser: () => currentUser,
   trackUsage, getUsageStats,

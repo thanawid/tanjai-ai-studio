@@ -1070,7 +1070,24 @@
     return new Blob([...chunks,...cdChunks,end],{type:'application/zip'});
   }
 
-  async function downloadAll(){ if(!state.outputs.length) return alert('กรุณาสร้างชุดภาพก่อน'); const blob=await makeZip(state.outputs); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`facebook_album_pack_${Date.now()}.zip`; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1000); }
+  async function downloadAll(){
+    if(!state.outputs.length) return alert('กรุณาสร้างชุดภาพก่อน');
+    const captionEl=$('#albumCaptionText');
+    const caption=(captionEl?captionEl.value:state.caption || '').trim();
+    const files=state.outputs.slice();
+    if(caption){
+      files.push({
+        blob:new Blob([caption],{type:'text/plain;charset=utf-8'}),
+        filename:'facebook_caption.txt'
+      });
+    }
+    const blob=await makeZip(files);
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download=`facebook_album_pack_${Date.now()}.zip`;
+    a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  }
   function downloadOne(i){ const o=state.outputs[i]; if(!o) return; const a=document.createElement('a'); a.href=o.url; a.download=o.filename; a.click(); }
   async function loadLogo(file){ if(!file){ state.logo=null; return; } const img=new Image(); await new Promise((res,rej)=>{ img.onload=res; img.onerror=rej; img.src=URL.createObjectURL(file); }); state.logo=img; }
   function moveSupport(i,dir){ const j=dir==='up'?i-1:i+1; if(j<0 || j>=state.supportFiles.length) return; const copy=state.supportFiles.slice(); [copy[i],copy[j]]=[copy[j],copy[i]]; state.supportFiles=copy; syncStateFiles(); renderUploadPreview(); }
