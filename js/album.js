@@ -1291,3 +1291,90 @@ function drawPremiumCover(ctx, img, canvasWidth, canvasHeight, titleText, subtit
         ctx.fillText(subtitleText, canvasWidth / 2, canvasHeight - Math.round(canvasHeight * 0.05));
     }
 }
+// ฟังก์ชันวาดหน้าปก Facebook แบบพรีเมียม (ครอบรูปอัตโนมัติ + กรอบกรม/ทอง)
+function drawPremiumFacebookCover(ctx, img, canvasWidth, canvasHeight, title1, title2, orgName) {
+    // ---------------------------------------------------------
+    // 1. ระบบ Smart Crop (ซูมและครอบภาพให้อยู่ตรงกลาง ไม่เบี้ยว)
+    // ---------------------------------------------------------
+    let iw = img.width, ih = img.height;
+    let r = Math.min(canvasWidth / iw, canvasHeight / ih);
+    let nw = iw * r, nh = ih * r;
+    let ar = 1;
+    
+    if (nw < canvasWidth) ar = canvasWidth / nw;
+    if (Math.abs(ar - 1) < 1e-14 && nh < canvasHeight) ar = canvasHeight / nh;
+    nw *= ar; nh *= ar;
+    
+    let cw = iw / (nw / canvasWidth), ch = ih / (nh / canvasHeight);
+    let cx = (iw - cw) * 0.5, cy = (ih - ch) * 0.5; // โฟกัสกึ่งกลางภาพ
+    
+    if (cx < 0) cx = 0; if (cy < 0) cy = 0;
+    if (cw > iw) cw = iw; if (ch > ih) ch = ih;
+    
+    // วาดรูปลง Canvas
+    ctx.drawImage(img, cx, cy, cw, ch, 0, 0, canvasWidth, canvasHeight);
+
+    // ---------------------------------------------------------
+    // 2. วาดพื้นหลังไล่สีสีกรมท่าเข้ม (เพื่อให้ตัวหนังสือเด่น)
+    // ---------------------------------------------------------
+    let grad = ctx.createLinearGradient(0, canvasHeight * 0.2, 0, canvasHeight);
+    grad.addColorStop(0, "rgba(4, 18, 43, 0)");      // ด้านบนโปร่งใสให้เห็นรูป
+    grad.addColorStop(0.6, "rgba(4, 18, 43, 0.85)"); // เริ่มเป็นสีกรมท่า
+    grad.addColorStop(1, "rgba(4, 18, 43, 0.95)");   // ด้านล่างทึบ
+    
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+    // ---------------------------------------------------------
+    // 3. วาดขอบสีทอง (Gold Border) คู่ซ้อนกันแบบตัวอย่าง
+    // ---------------------------------------------------------
+    let margin = 24; // ระยะห่างจากขอบรูป
+    let goldColor = "#E5C07B"; // โค้ดสีทองสว่าง
+    
+    // เส้นกรอบนอก (หนา)
+    ctx.strokeStyle = goldColor;
+    ctx.lineWidth = 4;
+    ctx.strokeRect(margin, margin, canvasWidth - (margin * 2), canvasHeight - (margin * 2));
+
+    // เส้นกรอบใน (บาง)
+    ctx.strokeStyle = "rgba(229, 192, 123, 0.5)"; // สีทองโปร่งแสง
+    ctx.lineWidth = 1;
+    ctx.strokeRect(margin + 8, margin + 8, canvasWidth - ((margin + 8) * 2), canvasHeight - ((margin + 8) * 2));
+
+    // ---------------------------------------------------------
+    // 4. จัดวางข้อความ (Typography) เหมือนรูปตัวอย่าง
+    // ---------------------------------------------------------
+    ctx.textAlign = "center";
+    let centerX = canvasWidth / 2;
+    let bottomY = canvasHeight - margin - 24; // จุดเริ่มเขียนข้อความจากล่างขึ้นบน
+
+    // ชื่อหน่วยงาน (เช่น เทศบาลเมืองบางรักน้อย) สีทอง ด้านล่างสุด
+    if(orgName) {
+        ctx.fillStyle = goldColor; 
+        ctx.font = `500 ${Math.round(canvasWidth * 0.035)}px Kanit, Prompt, sans-serif`;
+        ctx.fillText(orgName, centerX, bottomY);
+        bottomY -= Math.round(canvasWidth * 0.055); // ดันบรรทัดต่อไปขึ้น
+    }
+
+    // หัวข้อรอง (เช่น การใช้งานระบบสารบรรณอิเล็กทรอนิกส์) สีขาว
+    if(title2) {
+        ctx.fillStyle = "#FFFFFF";
+        ctx.font = `600 ${Math.round(canvasWidth * 0.05)}px Kanit, Prompt, sans-serif`;
+        ctx.fillText(title2, centerX, bottomY);
+        bottomY -= Math.round(canvasWidth * 0.065);
+    }
+
+    // หัวข้อหลัก (เช่น การอบรมเชิงปฏิบัติการ) สีทอง
+    if(title1) {
+        ctx.fillStyle = goldColor;
+        ctx.font = `bold ${Math.round(canvasWidth * 0.055)}px Kanit, Prompt, sans-serif`;
+        ctx.fillText(title1, centerX, bottomY);
+    }
+}
+// สมมติว่า d คือข้อมูลที่ดึงมาจาก Form ของคุณ
+let text1 = "การอบรมเชิงปฏิบัติการ";
+let text2 = "การใช้งานระบบสารบรรณอิเล็กทรอนิกส์";
+let orgText = d.org || "เทศบาลเมืองบางรักน้อย";
+
+// เรียกฟังก์ชันวาด (ctx คือ 2D context ของ Canvas)
+drawPremiumFacebookCover(ctx, coverImgElement, canvas.width, canvas.height, text1, text2, orgText);
