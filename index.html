@@ -32,11 +32,11 @@
       <form id="loginForm" class="login-form" autocomplete="on">
         <label>
           ชื่อผู้ใช้งาน
-          <input id="loginName" type="text" autocomplete="username" placeholder="กรอกชื่อผู้ใช้งาน" inputmode="text" required aria-describedby="loginHelp loginError">
+          <input id="loginName" type="text" autocomplete="off" placeholder="กรอกชื่อผู้ใช้งาน" inputmode="text" required aria-describedby="loginHelp loginError">
         </label>
         <label>
           รหัสผ่าน
-          <input id="loginPassword" type="password" autocomplete="current-password" placeholder="กรอกรหัสผ่าน" required aria-describedby="loginHelp loginError">
+          <input id="loginPassword" type="password" autocomplete="new-password" placeholder="กรอกรหัสผ่าน" required aria-describedby="loginHelp loginError">
         </label>
         <input id="loginEmail" type="hidden" value="">
         <div class="login-actions-v9 single-action">
@@ -393,5 +393,16 @@
   <script src="js/app.js"></script>
   <script src="js/album.js"></script>
   <script src="js/proofread.js"></script>
+
+<script>
+window.addEventListener('pageshow', function () {
+  var loginName = document.getElementById('loginName');
+  var loginPassword = document.getElementById('loginPassword');
+  var loginEmail = document.getElementById('loginEmail');
+  if (loginName) loginName.value = '';
+  if (loginPassword) loginPassword.value = '';
+  if (loginEmail) loginEmail.value = '';
+});
+</script>
 </body>
 </html>
