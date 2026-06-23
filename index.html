@@ -27,20 +27,23 @@
       <p class="eyebrow">สำหรับสมาชิก</p>
       <h1>ทันใจ AI Studio</h1>
       <p class="login-subtitle">สร้างสื่อไว ด้วยพลัง AI</p>
-      <span class="version-badge login-version-badge" aria-label="เวอร์ชันระบบ V9.4.2">V9.4.2</span>
+      <span class="version-badge login-version-badge" aria-label="เวอร์ชันระบบ V9.4.3">V9.4.3</span>
 
-      <form id="loginForm" class="login-form login-name-only" autocomplete="off">
+      <form id="loginForm" class="login-form" autocomplete="on">
         <label>
           ชื่อผู้ใช้งาน
-          <input id="loginName" type="text" autocomplete="username" placeholder="เช่น teamtanjai" inputmode="text" required aria-describedby="loginHelp loginError">
+          <input id="loginName" type="text" autocomplete="username" placeholder="เช่น thanawid หรือ teamtanjai" inputmode="text" required aria-describedby="loginHelp loginError">
+        </label>
+        <label>
+          รหัสผ่าน
+          <input id="loginPassword" type="password" autocomplete="current-password" placeholder="รหัสผ่าน Firebase" required aria-describedby="loginHelp loginError">
         </label>
         <input id="loginEmail" type="hidden" value="">
-        <input id="loginPassword" type="hidden" value="">
         <div class="login-actions-v9 single-action">
           <button class="btn primary" type="submit" id="signInBtn">เข้าสู่ระบบ</button>
           <button class="btn secondary" type="button" id="signUpBtn" hidden>สมัครสมาชิก</button>
         </div>
-        <p id="loginHelp" class="login-help">กรอกชื่อที่ได้รับสิทธิ์ เช่น teamtanjai</p>
+        <p id="loginHelp" class="login-help">กรอกชื่อผู้ใช้และรหัสผ่าน: thanawid หรือ teamtanjai</p>
         <p id="loginError" class="login-error" role="alert" aria-live="assertive"></p>
       </form>
 
@@ -98,7 +101,7 @@
         <div>
           <div class="topbar-kicker">
             <p class="eyebrow">ทันใจ AI Studio</p>
-            <span class="version-badge app-version-badge" aria-label="เวอร์ชันระบบ V9.4.2">V9.4.2</span>
+            <span class="version-badge app-version-badge" aria-label="เวอร์ชันระบบ V9.4.3">V9.4.3</span>
           </div>
           <h2 id="pageTitle" aria-live="polite">สวัสดีครับ! 👋</h2>
         </div>
