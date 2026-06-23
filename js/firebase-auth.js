@@ -11,7 +11,7 @@ const db = getFirestore(app);
 
 let currentUser = null;
 
-const NAME_SESSION_KEY = "tanjaiNameAccessV942";
+const NAME_SESSION_KEY = "tanjaiNameAccessV943";
 const normalizeLoginName = (name) => String(name || "").trim().toLowerCase().replace(/[^a-z0-9._-]/g, "");
 const namedUsers = () => window.TANJAI_USERNAME_USERS || {};
 const namedUid = (name) => `named_${normalizeLoginName(name)}`;
@@ -80,32 +80,36 @@ const checkWhitelist = async (email) => {
   }
 };
 
-/* ─── USERNAME-ONLY LOGIN ─── */
-const loginName = async (name) => {
-  const key = normalizeLoginName(name);
+/* ─── USERNAME LOGIN WITH FIREBASE PASSWORD ─── */
+const resolveUsernameEmail = (name) => {
+  const raw = String(name || "").trim();
+  if(!raw) throw new Error("กรุณากรอกชื่อผู้ใช้งาน");
+  if(raw.includes("@")) return raw.toLowerCase();
+  const key = normalizeLoginName(raw);
   const profileBase = namedUsers()[key];
-  if(!profileBase) throw new Error("ไม่พบชื่อผู้ใช้งานนี้ในระบบ");
-  const profile = {
-    uid: profileBase.uid || namedUid(key),
-    username: key,
-    displayName: profileBase.displayName || key,
-    email: profileBase.email,
-    mode: "username-only"
-  };
-  writeNamedSession(profile);
-  showAuthenticatedProfile(profile);
+  if(!profileBase || !profileBase.email) throw new Error("ไม่พบชื่อผู้ใช้งานนี้ในระบบ");
+  return String(profileBase.email).toLowerCase().trim();
+};
+
+const loginWithUsername = async (name, password) => {
+  const key = normalizeLoginName(name);
+  const email = resolveUsernameEmail(name);
+  if(!password) throw new Error("กรุณากรอกรหัสผ่าน");
+  await login(email, password);
   try {
-    await setDoc(doc(db, "users", profile.uid), {
-      email: profile.email,
-      username: profile.username,
-      displayName: profile.displayName,
+    const profileBase = namedUsers()[key] || {};
+    await setDoc(doc(db, "users", key || email), {
+      email,
+      username: key || email.split("@")[0],
+      displayName: profileBase.displayName || key || email.split("@")[0],
       lastLogin: serverTimestamp(),
-      uid: profile.uid,
-      mode: "username-only"
+      mode: "firebase-username-map"
     }, { merge: true });
   } catch(_) {}
-  TANJAI.toast?.("เข้าสู่ระบบสำเร็จ ยินดีต้อนรับ!");
 };
+
+// Backward-compatible alias: now requires password. Do not use for passwordless access.
+const loginName = async (name, password) => loginWithUsername(name, password);
 
 /* ─── LOGIN ─── */
 const login = async (email, password) => {
@@ -234,7 +238,7 @@ const addToWhitelist = async (email) => {
 };
 
 window.TANJAI_AUTH = {
-  login, loginName, register, logout,
+  login, loginName, loginWithUsername, resolveUsernameEmail, register, logout,
   saveProjectToCloud, getProjectsFromCloud, deleteProjectFromCloud,
   getCurrentUser: () => currentUser,
   trackUsage, getUsageStats,
