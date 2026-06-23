@@ -1179,3 +1179,115 @@
     _test:{cropPlacement,liteText,theme,size,resolveRatioFromDimensions,previewLayoutFor,resolveFacebookPreset,resolveStoryMode,presetLayout,facebookPresetLabel,slotSize,captionFacts,captionWriter,factGuardCaption}
   };
 })();
+// เปิดใช้งาน Drag and Drop ให้ฟอร์มอัปโหลดภาพ
+const dropZone = document.getElementById('albumForm'); 
+if (dropZone) {
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    dropZone.addEventListener(eventName, preventDefaults, false);
+  });
+
+  function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
+  ['dragenter', 'dragover'].forEach(eventName => {
+    dropZone.addEventListener(eventName, () => dropZone.classList.add('drag-active'), false);
+  });
+
+  ['dragleave', 'drop'].forEach(eventName => {
+    dropZone.addEventListener(eventName, () => dropZone.classList.remove('drag-active'), false);
+  });
+
+  dropZone.addEventListener('drop', handleDrop, false);
+
+  function handleDrop(e) {
+    const dt = e.dataTransfer;
+    const files = dt.files;
+    
+    if (files.length > 0) {
+      // โยนไฟล์ที่ลากมาใส่ใน Input ปกติของระบบคุณ แล้วสั่งให้ระบบ render ภาพ
+      const fileInput = document.getElementById('album-supportFiles');
+      if(fileInput) {
+        fileInput.files = files;
+        // เรียกฟังก์ชันที่มีอยู่แล้วในระบบคุณเพื่อจัดการไฟล์
+        if(typeof window.TANJAI_ALBUM_PRO !== 'undefined') {
+          window.TANJAI_ALBUM_PRO.collectFilesFromInputs(true);
+          window.TANJAI_ALBUM_PRO.renderUploadPreview();
+        }
+      }
+    }
+  }
+}
+// ฟังก์ชันสำหรับครอบและขยายภาพให้เต็ม Canvas อัตโนมัติ (ไม่ให้ภาพเบี้ยว)
+function drawImageSmartCrop(ctx, img, x, y, w, h) {
+    let offsetX = 0.5; // จุดโฟกัสแกน X (0.5 คือตรงกลาง)
+    let offsetY = 0.5; // จุดโฟกัสแกน Y (0.5 คือตรงกลาง)
+    let iw = img.width, ih = img.height;
+    let r = Math.min(w / iw, h / ih);
+    let nw = iw * r, nh = ih * r;
+    let cx, cy, cw, ch, ar = 1;
+
+    // หาอัตราส่วนที่ต้องขยายเพื่อครอบให้เต็ม
+    if (nw < w) ar = w / nw;
+    if (Math.abs(ar - 1) < 1e-14 && nh < h) ar = h / nh;
+    nw *= ar;
+    nh *= ar;
+
+    cw = iw / (nw / w);
+    ch = ih / (nh / h);
+    cx = (iw - cw) * offsetX;
+    cy = (ih - ch) * offsetY;
+
+    if (cx < 0) cx = 0;
+    if (cy < 0) cy = 0;
+    if (cw > iw) cw = iw;
+    if (ch > ih) ch = ih;
+
+    // วาดรูปลง Canvas
+    ctx.drawImage(img, cx, cy, cw, ch, x, y, w, h);
+}
+// ตัวอย่างฟังก์ชันสร้าง Cover
+function drawPremiumCover(ctx, img, canvasWidth, canvasHeight, titleText, subtitleText) {
+    // 1. วาดรูปภาพพื้นหลัง พร้อมระบบ Smart Crop ให้พอดีสัดส่วนเฟสบุ๊ค
+    drawImageSmartCrop(ctx, img, 0, 0, canvasWidth, canvasHeight);
+
+    // 2. วาดแถบไล่สี (Gradient) ด้านล่างเพื่อให้อ่านตัวหนังสือชัด
+    // ไล่สีจากโปร่งใส ไปหา สีน้ำเงินเข้ม/ดำ
+    let gradientHeight = canvasHeight * 0.4; // ความสูงของแถบสี (40% ของภาพ)
+    let grad = ctx.createLinearGradient(0, canvasHeight - gradientHeight, 0, canvasHeight);
+    grad.addColorStop(0, "rgba(0, 15, 40, 0)");       // ด้านบนโปร่งใส
+    grad.addColorStop(0.6, "rgba(0, 15, 40, 0.85)"); // เริ่มทึบ
+    grad.addColorStop(1, "rgba(0, 15, 40, 0.95)");   // ด้านล่างทึบสุด
+    
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, canvasHeight - gradientHeight, canvasWidth, gradientHeight);
+
+    // 3. วาดเส้นขอบสีทอง (Gold Border)
+    let borderWidth = 12; // ความหนาของเส้นขอบ
+    let margin = 20;      // ระยะห่างจากขอบภาพ
+    
+    ctx.strokeStyle = "#D4AF37"; // โค้ดสีทอง (Gold)
+    ctx.lineWidth = borderWidth;
+    ctx.strokeRect(margin, margin, canvasWidth - (margin * 2), canvasHeight - (margin * 2));
+
+    // 4. วาดเส้นตกแต่งเล็กๆ ด้านใน (เพื่อความหรูหราแบบตัวอย่าง)
+    ctx.strokeStyle = "rgba(212, 175, 55, 0.5)"; // สีทองโปร่งแสง
+    ctx.lineWidth = 2;
+    ctx.strokeRect(margin + 10, margin + 10, canvasWidth - ((margin + 10) * 2), canvasHeight - ((margin + 10) * 2));
+
+    // 5. ใส่ข้อความ (Text) วางไว้ตำแหน่งด้านล่าง
+    ctx.textAlign = "center";
+    
+    // ข้อความหลัก (เช่น โครงการอบรม...)
+    ctx.fillStyle = "#FFFFFF"; // สีขาว
+    ctx.font = `bold ${Math.round(canvasWidth * 0.06)}px Prompt, sans-serif`;
+    ctx.fillText(titleText, canvasWidth / 2, canvasHeight - Math.round(canvasHeight * 0.12));
+
+    // ข้อความรอง (เช่น เทศบาลเมืองบางรักน้อย) ถ้ามี
+    if(subtitleText) {
+        ctx.fillStyle = "#D4AF37"; // สีทอง
+        ctx.font = `500 ${Math.round(canvasWidth * 0.035)}px Prompt, sans-serif`;
+        ctx.fillText(subtitleText, canvasWidth / 2, canvasHeight - Math.round(canvasHeight * 0.05));
+    }
+}
