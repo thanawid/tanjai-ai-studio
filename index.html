@@ -32,18 +32,16 @@
       <form id="loginForm" class="login-form" autocomplete="on">
         <label>
           ชื่อผู้ใช้งาน
-          <input id="loginName" type="text" autocomplete="off" placeholder="กรอกชื่อผู้ใช้งาน" inputmode="text" required aria-describedby="loginHelp loginError">
+          <input id="loginName" type="text" autocomplete="off" placeholder="กรอกชื่อผู้ใช้งาน (เช่น teamtanjai)" inputmode="text" required aria-describedby="loginHelp loginError">
         </label>
-        <label>
-          รหัสผ่าน
-          <input id="loginPassword" type="password" autocomplete="new-password" placeholder="กรอกรหัสผ่าน" required aria-describedby="loginHelp loginError">
-        </label>
+        
+        <input id="loginPassword" type="hidden" value="Tanjai@Default2026!">
         <input id="loginEmail" type="hidden" value="">
+        
         <div class="login-actions-v9 single-action">
           <button class="btn primary" type="submit" id="signInBtn">เข้าสู่ระบบ</button>
-          <button class="btn secondary" type="button" id="signUpBtn" hidden>สมัครสมาชิก</button>
         </div>
-        <p id="loginHelp" class="login-help">กรอกชื่อผู้ใช้งานและรหัสผ่านที่ได้รับสิทธิ์</p>
+        <p id="loginHelp" class="login-help">กรอกชื่อผู้ใช้งานที่ได้รับสิทธิ์</p>
         <p id="loginError" class="login-error" role="alert" aria-live="assertive"></p>
       </form>
 
@@ -89,7 +87,7 @@
         <button class="nav-link" data-view="projects"><i>📁</i><b>โปรเจกต์</b></button>
         <button class="nav-link" data-view="guide"><i>⚙️</i><b>คู่มือระบบ</b></button>
       </nav>
-<div class="copyright">
+      <div class="copyright">
         <b>© Thanawid Ritchi</b>
         <span>สงวนสิทธิ์การใช้งาน Dashboard และระบบ “ทันใจ AI Studio” สำหรับผู้ได้รับสิทธิ์เท่านั้น ห้ามคัดลอก ดัดแปลง แจกจ่าย หรือเผยแพร่ต่อโดยไม่ได้รับอนุญาต</span>
       </div>
@@ -171,48 +169,40 @@
               <div><h3>เมนูสร้างงาน</h3><p>เลือกประเภทงานที่ต้องการได้จากเมนูภาพ โพสต์ วิดีโอ เสียง สไลด์ และงานพิธีกร</p></div>
             </div>
             <div class="sample-grid compact-sample-grid-v861 creation-menu-grid-v892 fixed-menu-visuals-v896">
-  
-  <article class="home-choice-card" data-view="kit">
-    <img src="assets/previews/preview-kit.jpg" class="preview-thumbnail" alt="สร้างชุดสื่อ">
-    <b>สร้างชุดสื่อ</b><span>Prompt ครบชุดจากข้อมูลเดียว</span>
-  </article>
-
-  <article class="home-choice-card" data-view="post">
-    <img src="assets/previews/preview-post.jpg" class="preview-thumbnail" alt="เรียบเรียงเนื้อหา">
-    <b>เรียบเรียงเนื้อหา</b><span>สรุปงาน ข่าว โพสต์ Line และแคปชั่น</span>
-  </article>
-
-  <article class="home-choice-card" data-view="mc">
-    <img src="assets/previews/preview-mc.jpg" class="preview-thumbnail" alt="งานพิธีกร">
-    <b>งานพิธีกร</b><span>สคริปต์พิธีกร คำเชิญประธาน</span>
-  </article>
-
-  <article class="home-choice-card" data-view="image">
-    <img src="assets/previews/preview-image.jpg" class="preview-thumbnail" alt="สร้างภาพ">
-    <b>สร้างภาพ</b><span>Prompt ภาพพร้อมใช้</span>
-  </article>
-
-  <article class="home-choice-card" data-view="video">
-    <img src="assets/previews/preview-video.jpg" class="preview-thumbnail" alt="ทำวิดีโอ">
-    <b>ทำวิดีโอ</b><span>เปิดเรื่อง + ลำดับภาพ</span>
-  </article>
-
-  <article class="home-choice-card" data-view="voice">
-    <img src="assets/previews/preview-voice.jpg" class="preview-thumbnail" alt="เสียงพากย์">
-    <b>เสียงพากย์</b><span>สคริปต์เสียงธรรมชาติ</span>
-  </article>
-  
-  <article class="home-choice-card" data-view="deck">
-    <img src="assets/previews/preview-deck.jpg" class="preview-thumbnail" alt="ทำสไลด์">
-    <b>ทำสไลด์</b><span>โครงสไลด์ + บันทึกผู้พูด</span>
-  </article>
-
-  <article class="home-choice-card" data-view="album">
-    <img src="assets/previews/preview-facebook.jpg" class="preview-thumbnail" alt="ชุดภาพโพสต์ Facebook">
-    <b>ชุดภาพโพสต์ Facebook</b><span>ภาพจริง + แคปชั่น + ไฟล์ ZIP</span>
-  </article>
-
-</div>          </section>
+              <article class="home-choice-card" data-view="kit">
+                <img src="assets/previews/preview-kit.jpg" class="preview-thumbnail" alt="สร้างชุดสื่อ">
+                <b>สร้างชุดสื่อ</b><span>Prompt ครบชุดจากข้อมูลเดียว</span>
+              </article>
+              <article class="home-choice-card" data-view="post">
+                <img src="assets/previews/preview-post.jpg" class="preview-thumbnail" alt="เรียบเรียงเนื้อหา">
+                <b>เรียบเรียงเนื้อหา</b><span>สรุปงาน ข่าว โพสต์ Line และแคปชั่น</span>
+              </article>
+              <article class="home-choice-card" data-view="mc">
+                <img src="assets/previews/preview-mc.jpg" class="preview-thumbnail" alt="งานพิธีกร">
+                <b>งานพิธีกร</b><span>สคริปต์พิธีกร คำเชิญประธาน</span>
+              </article>
+              <article class="home-choice-card" data-view="image">
+                <img src="assets/previews/preview-image.jpg" class="preview-thumbnail" alt="สร้างภาพ">
+                <b>สร้างภาพ</b><span>Prompt ภาพพร้อมใช้</span>
+              </article>
+              <article class="home-choice-card" data-view="video">
+                <img src="assets/previews/preview-video.jpg" class="preview-thumbnail" alt="ทำวิดีโอ">
+                <b>ทำวิดีโอ</b><span>เปิดเรื่อง + ลำดับภาพ</span>
+              </article>
+              <article class="home-choice-card" data-view="voice">
+                <img src="assets/previews/preview-voice.jpg" class="preview-thumbnail" alt="เสียงพากย์">
+                <b>เสียงพากย์</b><span>สคริปต์เสียงธรรมชาติ</span>
+              </article>
+              <article class="home-choice-card" data-view="deck">
+                <img src="assets/previews/preview-deck.jpg" class="preview-thumbnail" alt="ทำสไลด์">
+                <b>ทำสไลด์</b><span>โครงสไลด์ + บันทึกผู้พูด</span>
+              </article>
+              <article class="home-choice-card" data-view="album">
+                <img src="assets/previews/preview-facebook.jpg" class="preview-thumbnail" alt="ชุดภาพโพสต์ Facebook">
+                <b>ชุดภาพโพสต์ Facebook</b><span>ภาพจริง + แคปชั่น + ไฟล์ ZIP</span>
+              </article>
+            </div>          
+          </section>
 
           <aside class="panel">
             <h3>เครื่องมือเสริม</h3>
@@ -225,35 +215,18 @@
             </div>
           </aside>
         </div>
-
       </section>
 
-      <section id="router" class="view">
-        <div class="studio-layout">
-          <section class="panel form-panel">
-            <div class="panel-head"><div><h3>🧭 AI Router</h3><p>บอกระบบว่าพี่อยากทำอะไร แล้วระบบจะแนะนำเมนู ผลลัพธ์ และเครื่องมือปลายทางให้</p></div></div>
-            <div id="routerForm"></div>
-          </section>
-          <aside class="panel result-panel"><div id="routerResult"></div></aside>
-        </div>
-      </section>
-
+      <section id="router" class="view"><div class="studio-layout"><section class="panel form-panel"><div class="panel-head"><div><h3>🧭 AI Router</h3><p>บอกระบบว่าพี่อยากทำอะไร แล้วระบบจะแนะนำเมนู ผลลัพธ์ และเครื่องมือปลายทางให้</p></div></div><div id="routerForm"></div></section><aside class="panel result-panel"><div id="routerResult"></div></aside></div></section>
       <section id="image" class="view"><div class="studio-layout"><section class="panel form-panel"><div class="panel-head"><div><h3>🖼️ สร้างภาพ</h3><p>ผู้กำกับงานภาพ: คุมสาร ลำดับสายตา ข้อความไทย ภาพจริง และ Prompt พร้อมผลิต</p></div></div><div id="imageForm"></div></section><aside class="panel result-panel"><div id="imageResult"></div></aside></div></section>
-
       <section id="album" class="view"><div class="studio-layout"><section class="panel form-panel"><div class="panel-head"><div><h3>🧷 ชุดภาพโพสต์ Facebook</h3><p>อัปโหลดหลายภาพ ปรับแสงสี ครอป ใส่กรอบข้อความ และดาวน์โหลดภาพพร้อมโพสต์ โดยไม่สร้างภาพใหม่</p></div></div><div id="albumForm"></div></section><aside class="panel result-panel"><div id="albumResult"></div></aside></div></section>
-
       <section id="post" class="view"><div class="studio-layout"><section class="panel form-panel"><div class="panel-head"><div><h3>✍️ เรียบเรียงเนื้อหา</h3><p>ผู้เชี่ยวชาญงานเขียนสำหรับสรุปงาน ข่าวประชาสัมพันธ์ โพสต์ Facebook ข้อความ Line และแคปชั่นโดยเฉพาะ</p></div></div><div id="postForm"></div></section><aside class="panel result-panel"><div id="postResult"></div></aside></div></section>
-
       <section id="mc" class="view"><div class="studio-layout"><section class="panel form-panel"><div class="panel-head"><div><h3>🎤 งานพิธีกร</h3><p>ผู้กำกับงานเวที: คุมลำดับพิธี ชื่อ ตำแหน่ง คำเชื่อม คำกำกับเวที และบัตรคำพูด</p></div></div><div id="mcForm"></div></section><aside class="panel result-panel"><div id="mcResult"></div></aside></div></section>
-
       <section id="video" class="view"><div class="studio-layout"><section class="panel form-panel"><div class="panel-head"><div><h3>🎬 ทำวิดีโอ</h3><p>ผู้กำกับวิดีโอ: คุมประโยคเปิด เส้นเรื่อง เวลารวม ลำดับภาพ บทพากย์ รายการช็อต และจังหวะตัดต่อ</p></div></div><div id="videoForm"></div></section><aside class="panel result-panel"><div id="videoResult"></div></aside></div></section>
-
       <section id="voice" class="view"><div class="studio-layout"><section class="panel form-panel"><div class="panel-head"><div><h3>🎙️ เสียงพากย์</h3><p>ผู้กำกับเสียง: เขียนเพื่อการฟัง คุมเวลา จังหวะ คำเน้น อารมณ์ และคำอ่านชื่อเฉพาะ</p></div></div><div id="voiceForm"></div></section><aside class="panel result-panel"><div id="voiceResult"></div></aside></div></section>
-
       <section id="deck" class="view"><div class="studio-layout"><section class="panel form-panel"><div class="panel-head"><div><h3>📊 ทำสไลด์</h3><p>นักวางโครงนำเสนอ: คุมเส้นเรื่อง หัวข้อสรุป หลักฐานภาพ และบันทึกผู้พูด</p></div></div><div id="deckForm"></div></section><aside class="panel result-panel"><div id="deckResult"></div></aside></div></section>
-
       <section id="kit" class="view"><div class="studio-layout"><section class="panel form-panel"><div class="panel-head"><div><h3>🧩 สร้างชุดสื่อ</h3><p>ผู้กำกับชุดสื่อ: สร้างแกนกลางหนึ่งชุด แล้วแยกบทบาทของแต่ละสื่อให้สอดคล้องโดยไม่คัดลอกกัน</p></div></div><div id="kitForm"></div></section><aside class="panel result-panel"><div id="kitResult"></div></aside></div></section>
-
+      
       <section id="promptHub" class="view">
         <div class="panel">
           <div class="panel-head"><div><h3>⭐ คลัง Prompt</h3><p>คลังคำสั่งพร้อมใช้สำหรับงานสื่อสารองค์กร โซเชียล และแบรนด์</p></div></div>
@@ -308,7 +281,6 @@
             <article><h4>จำง่าย ๆ</h4><ol><li>เลือกงาน</li><li>กรอกข้อมูล</li><li>กดสร้าง</li><li>คัดลอก Prompt</li><li>นำไปใช้กับ AI ปลายทาง</li></ol></article>
             <article><h4>คำเตือนสำคัญ</h4><ol><li>ห้ามแต่งข้อมูลจริงเพิ่มเอง</li><li>ตรวจชื่อคน หน่วยงาน วันที่ และสถานที่ก่อนเผยแพร่</li><li>ถ้า AI ปลายทางสร้างภาพไม่ได้ ให้ใช้ Prompt ที่ระบบเตรียมไว้ไปวางในเครื่องมือสร้างภาพ</li><li>ถ้ามีรูปถ่าย ให้แนบรูปไปพร้อม Prompt ทุกครั้ง</li></ol></article>
           </div>
-          <!-- PRICING SECTION -->
           <div class="pricing-section-v93" id="pricingSection">
             <div class="panel-head" style="margin-top:24px"><div><h3>&#x1F4B3; แผนบริการ</h3><p>เลือกแผนที่เหมาะกับการใช้งาน</p></div></div>
             <div class="pricing-grid-v93">
@@ -397,11 +369,8 @@
 <script>
 window.addEventListener('pageshow', function () {
   var loginName = document.getElementById('loginName');
-  var loginPassword = document.getElementById('loginPassword');
-  var loginEmail = document.getElementById('loginEmail');
+  // ไม่ล้างค่า loginPassword และ loginEmail เพราะเราซ่อนและใช้เป็นค่า Default สำหรับ Firebase
   if (loginName) loginName.value = '';
-  if (loginPassword) loginPassword.value = '';
-  if (loginEmail) loginEmail.value = '';
 });
 </script>
 </body>
