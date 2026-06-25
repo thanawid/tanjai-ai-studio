@@ -821,6 +821,12 @@ TANJAI.videoStoryboard = function(d = {}, length="60 วินาที") {
 
 TANJAI.videoPrompt = function(d = {}, extra = {}) {
   const length = extra.length || d.length || "60 วินาที";
+  const ch = (d.channel || d.format || "").toLowerCase();
+  const isShortForm = /tiktok|reels|short|สั้น/.test(ch);
+
+  // ถ้าเป็น TikTok/Reels ใช้ short-form prompt เฉพาะทาง
+  if(isShortForm) return TANJAI.shortVideoPrompt(d, extra);
+
   return `${TANJAI.v9ExecutionHeader("ให้สร้างโครงคลิป / Storyboard / Voice Over / ข้อความบนจอทันที")}
 
 [1] ข้อมูลจริงของงาน:
@@ -844,6 +850,80 @@ ${TANJAI.v9ProtectedBlock(d, "video")}
 
 ${TANJAI.promptTaskGuard("โครงวิดีโอ")}`;
 };
+
+/* ═══════════════════════════════════════════════════════
+   TikTok / Reels Short-Form Video Prompt — v9.5
+   สำหรับคลิปสั้น 15–90 วินาที ที่ต้องหยุด scroll ได้ทันที
+═══════════════════════════════════════════════════════ */
+TANJAI.shortVideoPrompt = function(d = {}, extra = {}) {
+  const ch = d.channel || d.format || "TikTok / Reels";
+  const length = extra.length || d.length || "30–60 วินาที";
+  const isVertical = /tiktok|reels|short|9:16/.test((ch + (d.size || "")).toLowerCase());
+  const ratio = isVertical ? "9:16 แนวตั้ง (1080x1920)" : "1:1 หรือ 9:16";
+
+  return `${TANJAI.v9ExecutionHeader(`ให้สร้างโครงคลิปสั้น ${ch} พร้อม Hook + Script + Caption ทันที`)}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📱 SHORT-FORM VIDEO BRIEF
+━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ช่องทาง: ${ch}
+ขนาด / Ratio: ${ratio}
+ความยาวคลิป: ${length}
+กลุ่มเป้าหมาย: ${d.audience || "ผู้ใช้โซเชียลมีเดียทั่วไป"}
+โทน: ${d.tone || "เป็นกันเอง กระชับ ดูง่าย"}
+
+[1] ข้อมูลจริงของงาน:
+${TANJAI.compactFacts(d)}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎬 สิ่งที่ต้องส่งออก (ส่งครบทุกข้อ)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+**HOOK (0–3 วินาทีแรก — ต้องหยุด scroll ได้ทันที)**
+ให้เขียน Hook 3 แบบ:
+- Hook แบบ "คำถาม" (ดึงความสงสัย)
+- Hook แบบ "ตัวเลข / ข้อเท็จจริง" (น่าเชื่อถือทันที)
+- Hook แบบ "ปัญหา / Pain Point" (ทำให้รู้สึกว่าเกี่ยวกับตัวเอง)
+
+**SCRIPT ฉากต่อฉาก**
+แบ่งเป็นฉาก ระบุ:
+- เวลา (วินาที)
+- ภาพ / แอ็กชั่น / มุมกล้อง
+- เสียงพากย์ / บทพูด
+- Text Overlay บนจอ (สั้น ๆ อ่านได้ใน 2 วินาที)
+- ดนตรี / เสียงประกอบ (ถ้ามีทิศทาง)
+
+**CAPTION โพสต์**
+- Caption หลัก (2–3 บรรทัด กระชับ ดึงคนกด Like / Share)
+- Hashtag ที่เหมาะสม (10–15 อัน — รวมทั้ง Trending และ Niche)
+- Hook ใน Caption บรรทัดแรก (ต้องทำให้อยากกด "อ่านเพิ่ม")
+
+**THUMBNAIL / Cover Frame**
+- บอกว่าภาพ Cover ควรเป็นอะไร (คนหน้าไหน / ข้อความอะไร / สีอะไร)
+- ข้อความบน Thumbnail ไม่เกิน 5 คำ
+
+**CTA (Call to Action)**
+- บอกสิ่งที่ต้องการให้คนทำหลังดูจบ (กดติดตาม / แชร์ / คอมเมนต์ / ไปที่ลิงก์)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ กฎ Short-Form ที่ห้ามละเมิด
+━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- Hook ต้องอยู่ใน 3 วินาทีแรก — ถ้าเกินนี้คนจะ scroll ผ่าน
+- ข้อความบนจอต้องอ่านได้ใน 2 วินาที — ห้ามยาวเกิน 5–6 คำต่อ Frame
+- ทุกฉากต้องมีจุดประสงค์ — ห้ามมีฉากที่ "เพิ่มเพราะเติม"
+- เสียงพากย์ต้องฟังได้แม้ปิดเสียง (เพราะคนส่วนใหญ่ดูไม่มีเสียง)
+${TANJAI.v9ProtectedBlock(d, "video")}
+${TANJAI.promptTaskGuard("โครงคลิปสั้น")}`;
+};
+
+/* เพิ่ม TikTok/Reels เป็น channel option ใน video form */
+TANJAI.shortVideoChannels = [
+  "TikTok (9:16 · 15–60 วินาที)",
+  "Instagram Reels (9:16 · 15–90 วินาที)",
+  "Facebook Reels (9:16 · 15–60 วินาที)",
+  "YouTube Shorts (9:16 · สูงสุด 60 วินาที)",
+  "Line VOOM (9:16 หรือ 1:1)"
+];
 
 TANJAI.voiceScript = function(d = {}, length="60 วินาที", style="ทางการ สุภาพ") {
   const title = TANJAI.v9Clean(d.title, "หัวข้องาน");

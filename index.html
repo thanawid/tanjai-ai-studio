@@ -31,8 +31,10 @@
 
       <form id="loginForm" class="login-form">
         <label>
-          อีเมลผู้ใช้งาน
-          <input id="loginEmail" type="email" autocomplete="username" placeholder="example@email.com" required>
+          ชื่อผู้ใช้
+          <input id="loginEmail" type="text" autocomplete="username"
+            placeholder="เช่น  thanawid  หรือ  teamtanjai"
+            autocapitalize="none" autocorrect="off" spellcheck="false" required>
         </label>
         <label>
           รหัสผ่าน
@@ -43,9 +45,9 @@
         </label>
         <div class="login-actions-v9">
           <button class="btn primary" type="submit" id="signInBtn">เข้าสู่ระบบ</button>
-          <button class="btn secondary" type="button" id="signUpBtn">สมัครสมาชิก</button>
+          <button class="btn secondary" type="button" id="signUpBtn" hidden>สมัครสมาชิก</button>
         </div>
-        <p id="loginHelp" class="login-help">รหัสผ่านอย่างน้อย 6 ตัวอักษร</p>
+        <p id="loginHelp" class="login-help">พิมพ์ชื่อผู้ใช้ (ไม่ต้องใส่ @tanjai.local)</p>
         <p id="loginError" class="login-error" role="alert" aria-live="assertive"></p>
       </form>
 
