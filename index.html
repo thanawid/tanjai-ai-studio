@@ -33,7 +33,7 @@
         <label>
           ชื่อผู้ใช้
           <input id="loginEmail" type="text" autocomplete="username"
-            placeholder="เช่น  thanawid  หรือ  teamtanjai"
+            placeholder=""
             autocapitalize="none" autocorrect="off" spellcheck="false" required>
         </label>
         <label>
@@ -43,7 +43,7 @@
             <button class="password-toggle" id="togglePassword" type="button" aria-controls="loginPassword" aria-pressed="false">แสดง</button>
           </span>
         </label>
-        <div class="login-actions-v9">
+        <div class="login-actions-v9 login-actions-center">
           <button class="btn primary" type="submit" id="signInBtn">เข้าสู่ระบบ</button>
           <button class="btn secondary" type="button" id="signUpBtn" hidden>สมัครสมาชิก</button>
         </div>
@@ -93,6 +93,9 @@
         <button class="nav-link" data-view="projects"><i>📁</i><b>โปรเจกต์</b></button>
         <button class="nav-link" data-view="guide"><i>⚙️</i><b>คู่มือระบบ</b></button>
       </nav>
+      <div class="sidebar-logout-wrap">
+        <button class="btn secondary sidebar-logout-btn" id="sidebarLogoutBtn" type="button">🚪 ออกจากระบบ</button>
+      </div>
 <div class="copyright">
         <b>© Thanawid Ritchi</b>
         <span>สงวนสิทธิ์การใช้งาน Dashboard และระบบ “ทันใจ AI Studio” สำหรับผู้ได้รับสิทธิ์เท่านั้น ห้ามคัดลอก ดัดแปลง แจกจ่าย หรือเผยแพร่ต่อโดยไม่ได้รับอนุญาต</span>

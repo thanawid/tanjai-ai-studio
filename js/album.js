@@ -22,6 +22,7 @@
     coverFile: null, supportFiles: [], files: [], outputs: [], logo: null, caption: "",
     resolvedRatio: "1080x800", resolvedPreviewLayout: "cover-top", resolvedFacebookPreset: "wide-top"
   };
+  window.albumState = state; // expose สำหรับ adjust engine
 
   function val(id, fallback=""){
     const el = document.getElementById(id);
@@ -983,6 +984,25 @@
             <button class="btn secondary" id="albumDownloadAllResult">ดาวน์โหลด ZIP</button>
           </div>
           <div id="albumFacebookPreview"></div>
+
+          <!-- ── IMAGE ADJUST PANEL v9.5 ── -->
+          <details class="album-review-details" id="albumAdjustPanel">
+            <summary>
+              <span><b>🎨 ปรับแสง / สี / ความคมชัด</b><small>ปรับทุกภาพพร้อมกัน — ไม่เปลี่ยนหน้าตาหรือโครงสร้างภาพ</small></span>
+            </summary>
+            <div class="album-adjust-box">
+              <div class="adjust-row"><label>ความสว่าง<span id="brightnessVal">0</span></label><input type="range" id="adj-brightness" min="-100" max="100" value="0" class="adjust-slider"></div>
+              <div class="adjust-row"><label>คอนทราสต์<span id="contrastVal">0</span></label><input type="range" id="adj-contrast" min="-100" max="100" value="0" class="adjust-slider"></div>
+              <div class="adjust-row"><label>ความอิ่มสี<span id="saturationVal">0</span></label><input type="range" id="adj-saturation" min="-100" max="100" value="0" class="adjust-slider"></div>
+              <div class="adjust-row"><label>ความคมชัด<span id="sharpnessVal">0</span></label><input type="range" id="adj-sharpness" min="0" max="10" value="0" class="adjust-slider"></div>
+              <div class="adjust-row"><label>อุณหภูมิสี<span id="warmthVal">0</span></label><input type="range" id="adj-warmth" min="-50" max="50" value="0" class="adjust-slider"></div>
+              <div class="adjust-actions">
+                <button class="btn primary" id="applyAdjust">✓ ใช้การปรับ + ดาวน์โหลดใหม่</button>
+                <button class="btn secondary" id="resetAdjust">↺ รีเซ็ต</button>
+              </div>
+              <p class="adjust-note">การปรับนี้ไม่เปลี่ยนใบหน้า เนื้อหา หรือโครงสร้างภาพ — แค่ปรับค่าสีและแสงเท่านั้น</p>
+            </div>
+          </details>
         </section>
 
         <details class="album-review-details album-caption-edit-details">
@@ -1173,4 +1193,116 @@
     generate,downloadAll,renderFacebookPreview,renderUploadPreview,collectFilesFromInputs,
     _test:{cropPlacement,liteText,theme,size,resolveRatioFromDimensions,previewLayoutFor,resolveFacebookPreset,presetLayout,facebookPresetLabel,slotSize,captionFacts,captionWriter,factGuardCaption}
   };
+})();
+
+/* ── IMAGE ADJUST ENGINE v9.5 ──
+   ปรับแสง/สี/คมชัดด้วย Canvas — ไม่แตะโครงสร้างภาพเลย */
+(function initAdjust(){
+  let adjustHandlerReady=false;
+  function setupAdjust(){
+    if(adjustHandlerReady) return;
+    const sliders=['brightness','contrast','saturation','sharpness','warmth'];
+    sliders.forEach(s=>{
+      const el=document.getElementById('adj-'+s);
+      const val=document.getElementById(s+'Val');
+      if(el&&val){ el.addEventListener('input',()=>{ val.textContent=el.value; }); }
+    });
+    document.getElementById('resetAdjust')?.addEventListener('click',()=>{
+      sliders.forEach(s=>{ const el=document.getElementById('adj-'+s); if(el){ el.value=0; const v=document.getElementById(s+'Val'); if(v) v.textContent=0; } });
+    });
+    document.getElementById('applyAdjust')?.addEventListener('click',async()=>{
+      if(!window.albumState||!window.albumState.outputs||!window.albumState.outputs.length){
+        alert('กรุณาสร้างชุดภาพก่อนครับ'); return;
+      }
+      const btn=document.getElementById('applyAdjust');
+      if(btn){ btn.disabled=true; btn.textContent='กำลังปรับ...'; }
+      const brightness=Number(document.getElementById('adj-brightness')?.value||0);
+      const contrast=Number(document.getElementById('adj-contrast')?.value||0);
+      const saturation=Number(document.getElementById('adj-saturation')?.value||0);
+      const sharpness=Number(document.getElementById('adj-sharpness')?.value||0);
+      const warmth=Number(document.getElementById('adj-warmth')?.value||0);
+
+      const JSZip=window.JSZip;
+      const zip=JSZip?new JSZip():null;
+
+      for(let i=0;i<window.albumState.outputs.length;i++){
+        const out=window.albumState.outputs[i];
+        const img=new Image();
+        img.crossOrigin='anonymous';
+        await new Promise(res=>{ img.onload=res; img.onerror=res; img.src=out.url; });
+        const canvas=document.createElement('canvas');
+        canvas.width=img.width||1080; canvas.height=img.height||1080;
+        const ctx=canvas.getContext('2d');
+
+        // วาดภาพต้นฉบับ
+        ctx.drawImage(img,0,0);
+
+        // ดึง pixel data มาปรับ
+        const id=ctx.getImageData(0,0,canvas.width,canvas.height);
+        const d=id.data;
+        const bAdj=brightness/100; const cAdj=(contrast+100)/100;
+        const sAdj=(saturation+100)/100; const wAdj=warmth/100;
+
+        for(let p=0;p<d.length;p+=4){
+          let r=d[p],g=d[p+1],b=d[p+2];
+          // brightness
+          r+=brightness*2.55; g+=brightness*2.55; b+=brightness*2.55;
+          // warmth (เพิ่ม R ลด B)
+          r+=warmth*1.5; b-=warmth*1.5;
+          // contrast
+          r=((r/255-0.5)*cAdj+0.5)*255;
+          g=((g/255-0.5)*cAdj+0.5)*255;
+          b=((b/255-0.5)*cAdj+0.5)*255;
+          // saturation (HSL approximation)
+          const gray=0.299*r+0.587*g+0.114*b;
+          r=gray+(r-gray)*sAdj; g=gray+(g-gray)*sAdj; b=gray+(b-gray)*sAdj;
+          // clamp
+          d[p]=Math.min(255,Math.max(0,r));
+          d[p+1]=Math.min(255,Math.max(0,g));
+          d[p+2]=Math.min(255,Math.max(0,b));
+        }
+        ctx.putImageData(id,0,0);
+
+        // sharpness (unsharp mask เบา ๆ)
+        if(sharpness>0){
+          const tmp=document.createElement('canvas');
+          tmp.width=canvas.width; tmp.height=canvas.height;
+          const tCtx=tmp.getContext('2d');
+          tCtx.filter=`blur(${sharpness*0.3}px)`;
+          tCtx.drawImage(canvas,0,0);
+          const sharp=ctx.getImageData(0,0,canvas.width,canvas.height);
+          const blurData=tCtx.getImageData(0,0,canvas.width,canvas.height).data;
+          const sd=sharp.data; const amount=sharpness*0.15;
+          for(let p=0;p<sd.length;p+=4){
+            sd[p]=Math.min(255,Math.max(0,sd[p]+amount*(sd[p]-blurData[p])));
+            sd[p+1]=Math.min(255,Math.max(0,sd[p+1]+amount*(sd[p+1]-blurData[p+1])));
+            sd[p+2]=Math.min(255,Math.max(0,sd[p+2]+amount*(sd[p+2]-blurData[p+2])));
+          }
+          ctx.putImageData(sharp,0,0);
+        }
+
+        const blob=await new Promise(res=>canvas.toBlob(res,'image/jpeg',0.92));
+        const url=URL.createObjectURL(blob);
+        // ดาวน์โหลดทีละไฟล์ถ้าไม่มี JSZip
+        if(!zip){
+          const a=document.createElement('a'); a.href=url;
+          a.download=out.filename||`adjusted-${i+1}.jpg`; a.click();
+          await new Promise(r=>setTimeout(r,300));
+        } else {
+          const ab=await blob.arrayBuffer();
+          zip.file(out.filename||`adjusted-${i+1}.jpg`,ab);
+        }
+      }
+      if(zip){
+        const content=await zip.generateAsync({type:'blob'});
+        const a=document.createElement('a'); a.href=URL.createObjectURL(content);
+        a.download='adjusted-album.zip'; a.click();
+      }
+      if(btn){ btn.disabled=false; btn.textContent='✓ ใช้การปรับ + ดาวน์โหลดใหม่'; }
+    });
+    adjustHandlerReady=true;
+  }
+  // เรียกใช้เมื่อ album result แสดง
+  const obs=new MutationObserver(()=>{ if(document.getElementById('albumAdjustPanel')) setupAdjust(); });
+  obs.observe(document.body,{childList:true,subtree:true});
 })();

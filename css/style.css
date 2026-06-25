@@ -4781,3 +4781,28 @@ label > .field-hint + select{
 @keyframes spin{to{transform:rotate(360deg)}}
 .pollinations-spinner{width:20px;height:20px;border:2px solid var(--line,rgba(255,255,255,.15));border-top-color:var(--accent,#7c3aed);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
 @media(max-width:480px){.pollinations-controls{flex-direction:column}.pollinations-controls .btn,.pollinations-controls select{width:100%}}
+
+/* ═══ Q1: Login button center ═══ */
+.login-actions-center{justify-content:center!important}
+.login-actions-center .btn.primary{min-width:180px;text-align:center}
+
+/* ═══ Q2: Sidebar logout ═══ */
+.sidebar-logout-wrap{padding:12px 16px 8px;border-top:1px solid var(--line,rgba(255,255,255,.08));margin-top:8px}
+.sidebar-logout-btn{width:100%;justify-content:center;opacity:.8;font-size:13px}
+.sidebar-logout-btn:hover{opacity:1}
+
+/* ═══ Q4: Button flow hint ═══ */
+.image-btn-row{gap:10px}
+.btn-flow-hint{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5}
+.btn-flow-sep{margin:0 4px;opacity:.5}
+
+/* ═══ Q6: Image Adjust Panel ═══ */
+.album-adjust-box{padding:16px;display:flex;flex-direction:column;gap:12px}
+.adjust-row{display:flex;flex-direction:column;gap:4px}
+.adjust-row label{display:flex;justify-content:space-between;font-size:13px;color:var(--fg2)}
+.adjust-row label span{font-size:12px;color:var(--accent);font-weight:600;min-width:30px;text-align:right}
+.adjust-slider{width:100%;accent-color:var(--accent,#7c3aed);height:4px;cursor:pointer}
+.adjust-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.adjust-actions .btn{flex:1;min-width:120px}
+.adjust-note{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5}
+@media(max-width:480px){.adjust-actions{flex-direction:column}}
