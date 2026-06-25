@@ -4783,8 +4783,8 @@ label > .field-hint + select{
 @media(max-width:480px){.pollinations-controls{flex-direction:column}.pollinations-controls .btn,.pollinations-controls select{width:100%}}
 
 /* ═══ Q1: Login button center ═══ */
-.login-actions-center{justify-content:center!important}
-.login-actions-center .btn.primary{min-width:180px;text-align:center}
+.login-actions-center{display:flex!important;justify-content:center!important}
+.login-actions-center .btn.primary{min-width:200px;text-align:center}
 
 /* ═══ Q2: Sidebar logout ═══ */
 .sidebar-logout-wrap{padding:12px 16px 8px;border-top:1px solid var(--line,rgba(255,255,255,.08));margin-top:8px}
