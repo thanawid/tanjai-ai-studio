@@ -4750,3 +4750,19 @@ input,select,textarea{touch-action:manipulation;font-size:16px!important}
   input,select,textarea{font-size:16px!important}
   .album-one-download{padding:10px 14px;width:100%;margin-top:6px}
 }
+
+/* ═══ V9.5 FIELD HINT — คำอธิบายใต้ label ═══ */
+.field-hint{
+  display:block;
+  font-size:11px;
+  color:var(--muted,rgba(255,255,255,.52));
+  font-weight:400;
+  margin-top:1px;
+  margin-bottom:3px;
+  line-height:1.4;
+}
+label > .field-hint + input,
+label > .field-hint + textarea,
+label > .field-hint + select{
+  margin-top:4px;
+}
