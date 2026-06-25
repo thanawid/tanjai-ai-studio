@@ -1,7 +1,9 @@
-/* v9.3.13 — Clean Civic Frames + Facebook Publishing Director
-   Safe photo processing for real uploaded images only.
-   Cover Frame + Lite Frames + Additional Frame, face-aware crop when supported,
-   smart theme selection, safe text, slot-based crop/frames, Facebook mock preview, and synced preview / download results.
+/* v9.5 — Smart Album + Touch Ordering + Progressive Processing
+   ✅ รองรับ 1–5 ภาพ (ไม่บังคับ 4 ภาพ)
+   ✅ Touch drag ordering บนมือถือ
+   ✅ Progress bar ขณะประมวลผล
+   ✅ Caption AI รู้บริบทองค์กรดีขึ้น
+   ✅ Responsive ทุกอุปกรณ์
 */
 (function(){
   function ensureAlbumInputs(){
@@ -871,10 +873,17 @@
     const icon=style==='friendly'?'✨':style==='story'?'📷':style==='announcement'?'📣':style==='official'?'📢':'📌';
     if(f.title) parts.push(`${icon} ${f.title}`);
 
-    if(style==='official'){
+    // ตรวจบริบทองค์กรอัตโนมัติ
+    const orgLower=(f.org||'').toLowerCase();
+    const isMuni=/เทศบาล|อบต|องค์การบริหาร|อำเภอ|จังหวัด|ราชการ/.test(orgLower);
+    const isHealth=/โรงพยาบาล|สาธารณสุข|อนามัย|คลินิก/.test(orgLower);
+    const isSchool=/โรงเรียน|มหาวิทยาลัย|วิทยาลัย|ศึกษา/.test(orgLower);
+    const isBrand=/ร้าน|บริษัท|ห้าง|เพจ|ครีเอเตอร์/.test(orgLower);
+
+    if(style==='official' || isMuni){
       if(f.org) parts.push(f.org);
       if(f.detail) parts.push(smartShort(f.detail,260));
-    }else if(style==='friendly'){
+    }else if(style==='friendly' || isBrand){
       if(f.detail) parts.push(smartShort(f.detail,220));
       if(f.org) parts.push(`— ${f.org}`);
     }else if(style==='story'){
@@ -884,7 +893,12 @@
       if(f.org) parts.push(`${f.org} ขอแจ้งข้อมูลให้ผู้ที่เกี่ยวข้องทราบ`);
       if(f.detail) parts.push(smartShort(f.detail,240));
     }else{
-      if(f.org) parts.push(`${f.org} ขอประชาสัมพันธ์ข้อมูลให้ประชาชนและผู้ที่เกี่ยวข้องได้รับทราบ`);
+      // pr-ready default — ปรับตามบริบทองค์กร
+      const prPhrase = isMuni ? 'ขอประชาสัมพันธ์ให้ประชาชนในพื้นที่ทราบ'
+        : isHealth ? 'ขอประชาสัมพันธ์ข้อมูลสุขภาพให้ประชาชนทราบ'
+        : isSchool ? 'ขอประชาสัมพันธ์ให้นักเรียนและผู้ปกครองทราบ'
+        : 'ขอประชาสัมพันธ์ข้อมูลให้ประชาชนและผู้ที่เกี่ยวข้องได้รับทราบ';
+      if(f.org) parts.push(`${f.org} ${prPhrase}`);
       if(f.detail) parts.push(smartShort(f.detail,220));
     }
 
@@ -1052,18 +1066,42 @@
     if(!files.length) files=collectFilesFromInputs(false);
     if(!val('album-title','')) return alert('กรุณากรอกหัวข้องานสำหรับ Cover Frame');
     if(!state.coverFile) return alert('กรุณาเลือกภาพหน้าปกหลัก 1 ภาพ');
-    if(files.length < 4) return alert('กรุณาอัปโหลดภาพหน้าปก 1 ภาพ และภาพรองอย่างน้อย 3 ภาพ');
     if(files.length > 5) files=files.slice(0,5);
     state.files=files;
     state.outputs.forEach(o=>URL.revokeObjectURL(o.url)); state.outputs=[];
     const btn=$('#makeAlbum'); const old=btn?btn.textContent:''; if(btn){ btn.disabled=true; btn.textContent='กำลังสร้างชุดภาพ...'; }
+    // แสดง progress bar
+    let progressEl=$('#albumProgress');
+    if(!progressEl){
+      progressEl=document.createElement('div');
+      progressEl.id='albumProgress';
+      progressEl.className='album-progress-bar-wrap';
+      progressEl.innerHTML='<div class="album-progress-bar" id="albumProgressInner"></div><small id="albumProgressLabel">เริ่มต้น...</small>';
+      const resultHost=$('#albumResult');
+      if(resultHost) resultHost.prepend(progressEl);
+    }
+    progressEl.style.display='block';
+    const setProgress=(n,total,label)=>{
+      const pct=Math.round((n/total)*100);
+      const inner=$('#albumProgressInner');
+      const lbl=$('#albumProgressLabel');
+      if(inner) inner.style.width=pct+'%';
+      if(lbl) lbl.textContent=label||`กำลังประมวลผลภาพที่ ${n}/${total}...`;
+    };
     try{
       await waitFonts();
       await resolveSmartSettings(files);
+      setProgress(0,files.length,'โหลดโลโก้และตั้งค่า...');
       const logoInput=$('#album-logoFile'); if(logoInput && logoInput.files && logoInput.files[0]) await loadLogo(logoInput.files[0]); else state.logo=null;
-      for(let i=0;i<files.length;i++) state.outputs.push(await processImage(files[i],i,files.length));
+      for(let i=0;i<files.length;i++){
+        setProgress(i,files.length,`ประมวลผลภาพที่ ${i+1}/${files.length}...`);
+        state.outputs.push(await processImage(files[i],i,files.length));
+      }
+      setProgress(files.length,files.length,'สร้างแคปชั่น...');
       state.caption=captionText(data());
       renderOutputs();
+      setProgress(files.length,files.length,'เสร็จแล้ว ✓');
+      setTimeout(()=>{ if(progressEl) progressEl.style.display='none'; },1800);
     } finally { if(btn){ btn.disabled=false; btn.textContent=old || 'สร้างชุดภาพ'; } }
   }
 
@@ -1093,12 +1131,29 @@
         renderUploadPreview();
         const smart=$('#album-smartChoice'); if(smart){ smart.textContent='ระบบจะสรุปขนาดและรูปแบบพรีวิวที่เลือกให้อีกครั้งหลังสร้างชุดภาพ'; smart.classList.remove('resolved'); }
         const host=$('#albumResult .ready-main') || $('#albumResult'); if(host) host.innerHTML='';
+        const prog=$('#albumProgress'); if(prog) prog.style.display='none';
       }
-      if(id==='albumCopyCaption' || id==='albumCopyCaptionQuick'){ e.preventDefault(); const t=$('#albumCaptionText'); const value=t?t.value:state.caption; if(value){ navigator.clipboard?.writeText(value); const old=e.target.textContent; e.target.textContent='คัดลอกแล้ว'; setTimeout(()=>e.target.textContent=old || 'คัดลอกแคปชั่น',1200); } }
+      if(id==='albumCopyCaption' || id==='albumCopyCaptionQuick'){ e.preventDefault(); const t=$('#albumCaptionText'); const value=t?t.value:state.caption; if(value){ navigator.clipboard?.writeText(value); const old=e.target.textContent; e.target.textContent='คัดลอกแล้ว ✓'; setTimeout(()=>e.target.textContent=old || 'คัดลอกแคปชั่น',1400); } }
       if(id==='albumRefreshPreview'){ e.preventDefault(); renderFacebookPreview(); }
       if(e.target && e.target.classList.contains('album-one-download')) downloadOne(Number(e.target.dataset.i||0));
       const move=e.target && e.target.dataset && e.target.dataset.albumSupportMove; if(move){ e.preventDefault(); moveSupport(Number(e.target.dataset.i||0), move); }
     });
+    // Touch swipe ordering บนมือถือ
+    let touchStartX=0, touchEl=null;
+    document.addEventListener('touchstart',(e)=>{
+      const btn=e.target && e.target.closest ? e.target.closest('[data-album-support-move]') : null;
+      if(btn){ touchStartX=e.touches[0].clientX; touchEl=btn; }
+    },{passive:true});
+    document.addEventListener('touchend',(e)=>{
+      if(!touchEl) return;
+      const dx=e.changedTouches[0].clientX - touchStartX;
+      if(Math.abs(dx)>40){
+        const dir=dx<0?'down':'up';
+        const i=Number(touchEl.closest('[data-i]')?.dataset.i||touchEl.dataset.i||0);
+        moveSupport(i,dir);
+      }
+      touchEl=null;
+    },{passive:true});
     document.addEventListener('change',(e)=>{
       if(e.target && (e.target.id==='album-coverFile' || e.target.id==='album-supportFiles')){ collectFilesFromInputs(true); renderUploadPreview(); }
       if(e.target && e.target.id==='album-facebookPreset'){
