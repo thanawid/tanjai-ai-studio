@@ -4766,3 +4766,18 @@ label > .field-hint + textarea,
 label > .field-hint + select{
   margin-top:4px;
 }
+
+/* ═══ POLLINATIONS.AI SECTION v9.5 ═══ */
+.pollinations-section{margin-top:20px;padding:16px;background:var(--panel,rgba(15,23,42,.7));border:1px solid var(--line,rgba(255,255,255,.1));border-radius:14px}
+.pollinations-header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.pollinations-header span{font-size:22px}
+.pollinations-header b{display:block;font-size:14px;color:var(--fg)}
+.pollinations-header small{font-size:11px;color:var(--muted)}
+.pollinations-controls{display:flex;gap:8px;flex-wrap:wrap}
+.pollinations-controls select{flex:1;min-width:160px}
+.pollinations-controls .btn{white-space:nowrap}
+.pollinations-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.pollinations-actions .btn{flex:1;min-width:120px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pollinations-spinner{width:20px;height:20px;border:2px solid var(--line,rgba(255,255,255,.15));border-top-color:var(--accent,#7c3aed);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
+@media(max-width:480px){.pollinations-controls{flex-direction:column}.pollinations-controls .btn,.pollinations-controls select{width:100%}}
