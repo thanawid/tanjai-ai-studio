@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
 // Render forms
-  $("#routerForm").innerHTML = `<div class="form-section"><div class="section-title"><b>?</b><h4>อยากทำอะไรครับ?</h4></div><label class="full">พิมพ์โจทย์ของพี่<textarea id="router-query" placeholder="เช่น อยากทำโพสต์ประชาสัมพันธ์โครงการปลูกต้นไม้ / อยากทำเสียงพากย์คลิปแจ้งข่าว / อยากทำสไลด์นำเสนอ"></textarea></label></div><div class="button-row"><button class="btn primary" id="askRouter">ให้ Router แนะนำ</button><button class="btn secondary" id="goRecommended">ไปที่เมนูที่แนะนำ</button></div>`;
+  $("#routerForm").innerHTML = `<div class="form-section"><div class="section-title"><b>?</b><h4>บอกโจทย์ของคุณ</h4></div><label class="full">พิมพ์สิ่งที่ต้องการทำ — ระบบจะแนะนำเมนูและเครื่องมือที่เหมาะที่สุด<textarea id="router-query" placeholder="เช่น&#10;• อยากทำภาพโปสเตอร์ประชาสัมพันธ์งานประจำปี&#10;• อยากทำโพสต์แนะนำสินค้าใหม่ของร้าน&#10;• อยากทำสคริปต์เสียงพากย์คลิปโปรโมชั่น&#10;• อยากทำสไลด์นำเสนอโปรเจกต์ให้ลูกค้า&#10;• อยากทำชุดภาพโพสต์ Facebook สรุปกิจกรรม&#10;• อยากทำสคริปต์พิธีกรงานมอบรางวัล"></textarea></label></div><div class="button-row"><button class="btn primary" id="askRouter">ให้ Router แนะนำ</button><button class="btn secondary" id="goRecommended">ไปที่เมนูที่แนะนำ</button></div>`;
   $("#routerResult").innerHTML = TANJAI.resultShell("router", "คำแนะนำจาก AI Router", "ระบบจะแนะนำเมนูและปลายทางที่เหมาะกับโจทย์", "routerOut", `<button class="btn primary" data-copybox="routerOut">คัดลอกคำแนะนำ</button>`);
 
   $("#imageForm").innerHTML = TANJAI.field("image") + `
