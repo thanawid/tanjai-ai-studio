@@ -561,6 +561,17 @@
     const land=w>=h;
     const pad=Math.round(Math.min(w,h)*0.03);
     drawAccentSweep(ctx,w,h,th,pst);
+
+    // ─── Strong gradient overlay ที่ด้านล่าง (แบบตัวอย่าง) ───
+    const gradH = Math.round(h * (land ? 0.62 : 0.55));
+    const grad = ctx.createLinearGradient(0, h - gradH, 0, h);
+    grad.addColorStop(0, "rgba(0,0,0,0)");
+    grad.addColorStop(0.35, rgba(th.deep, 0.55));
+    grad.addColorStop(0.72, rgba(th.deep, 0.88));
+    grad.addColorStop(1, "rgba(0,0,0,0.96)");
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, h - gradH, w, gradH);
+
     drawBorderFrame(ctx,w,h,th);
 
     const brandW=Math.round(w*(land?0.46:0.74));
@@ -600,8 +611,8 @@
     const titleX=panelX+Math.round(w*.03);
     const titleW=panelW-Math.round(w*.06);
     const titleY=panelY+Math.round(panelH*.16);
-    const titleFont=Math.round(Math.min(w,h)*(land?0.037:0.034)*pst.titleScale);
-    const titleLineH=Math.round(titleFont*1.11);
+    const titleFont=Math.round(Math.min(w,h)*(land?0.048:0.044)*pst.titleScale);
+    const titleLineH=Math.round(titleFont*1.15);
     drawText(ctx, smartShort(d.title,110), titleX, titleY, titleW, land?2:3, `900 ${titleFont}px "Prompt","Kanit","Noto Sans Thai",sans-serif`, '#fff', titleLineH);
 
     const subText = stripHashtags(d.detail) || stripHashtags(d.footer) || d.place || '';
@@ -1508,5 +1519,220 @@
     if(document.querySelector(".album-cover-preview-card,.album-lite-preview-grid")) injectCollageBtn(); 
   });
   obs.observe(document.body,{childList:true,subtree:true});
+
+})();
+
+/* ══════════════════════════════════════════════════════════
+   PANORAMA SPLIT v9.5 — รูปเดียวตัดเป็น 4 ส่วน
+   อัปขึ้น Facebook เรียงตามลำดับ → ต่อเป็นภาพเดียวไร้รอยต่อ
+══════════════════════════════════════════════════════════ */
+(function initPanorama(){
+
+  function showPanoramaUI(){
+    if(document.getElementById("panoramaSection")) return;
+
+    const sec = document.createElement("div");
+    sec.id = "panoramaSection";
+    sec.className = "collage-section";
+    sec.style.marginTop = "12px";
+    sec.innerHTML = `
+      <div class="collage-header">
+        <span>🌅</span>
+        <div>
+          <b>Panorama Split — ตัดรูปเดียวเป็น 4 ส่วน</b>
+          <small>อัปทั้ง 4 ส่วนขึ้น Facebook ตามลำดับ → ต่อกันเป็นภาพเดียวไร้รอยต่อ</small>
+        </div>
+      </div>
+
+      <div class="pano-upload-wrap">
+        <label class="pano-upload-label" for="panoInput">
+          <span>📷 เลือกรูปภาพที่ต้องการตัด</span>
+          <small>รองรับทุกขนาด — แนะนำรูปแนวนอน (wide) เพื่อผลลัพธ์สวยที่สุด</small>
+          <input type="file" id="panoInput" accept="image/*" style="display:none">
+        </label>
+      </div>
+
+      <div class="pano-mode-wrap">
+        <p style="font-size:12px;color:var(--muted);margin-bottom:8px">เลือกแบบการตัด:</p>
+        <div class="pano-modes">
+          <button class="pano-mode-btn active" data-mode="h4" title="ตัดแนวนอน 4 ส่วน — เหมาะกับรูปกว้างมาก">
+            <span class="pano-mode-icon">▪▪▪▪</span>
+            <b>แนวนอน ×4</b><small>กว้างมาก → 4 ส่วนเรียงบน-ล่าง</small>
+          </button>
+          <button class="pano-mode-btn" data-mode="grid4" title="ตัด 2×2 — เหมาะกับรูปสี่เหลี่ยมจัตุรัส">
+            <span class="pano-mode-icon">▪▪<br>▪▪</span>
+            <b>ตาราง 2×2</b><small>ตัด 4 มุม → เรียง TL TR BL BR</small>
+          </button>
+          <button class="pano-mode-btn" data-mode="h2" title="ตัด 2 ส่วน — ซ้าย-ขวา">
+            <span class="pano-mode-icon">▪▪</span>
+            <b>แนวนอน ×2</b><small>ซ้าย-ขวา 2 ส่วน</small>
+          </button>
+        </div>
+      </div>
+
+      <div id="panoPreviewWrap" style="display:none">
+        <p style="font-size:12px;color:var(--muted);margin:10px 0 6px">
+          ตัวอย่าง — อัปไฟล์ขึ้น Facebook <b style="color:var(--accent)">ตามลำดับหมายเลข</b>:
+        </p>
+        <div id="panoPreviewGrid" class="pano-preview-grid"></div>
+        <button class="btn primary" id="panoDownloadAll" style="width:100%;margin-top:12px">
+          ⬇ ดาวน์โหลดทั้งหมด (ZIP พร้อมหมายเลข)
+        </button>
+        <div class="pano-tip">
+          💡 <b>วิธีโพสต์ Facebook:</b> กด "อัปโหลดรูปภาพ" แล้วเลือกทั้ง 4 ไฟล์พร้อมกัน Facebook จะเรียงตาม<b>ชื่อไฟล์</b> (1→2→3→4) ภาพจะต่อกันสวยงาม
+        </div>
+      </div>
+
+      <div id="panoStatus" style="font-size:12px;color:var(--muted);margin-top:8px"></div>
+    `;
+
+    const host = document.getElementById("albumResult") || document.body;
+    host.appendChild(sec);
+
+    let currentMode = "h4";
+    let currentImg = null;
+
+    // mode select
+    sec.querySelectorAll(".pano-mode-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        sec.querySelectorAll(".pano-mode-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        currentMode = btn.dataset.mode;
+        if(currentImg) splitAndPreview(currentImg);
+      });
+    });
+
+    // file input
+    const label = sec.querySelector(".pano-upload-label");
+    const inp = sec.querySelector("#panoInput");
+    label.addEventListener("click", () => inp.click());
+    inp.addEventListener("change", e => {
+      const file = e.target.files[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        const img = new Image();
+        img.onload = () => { currentImg = img; splitAndPreview(img); };
+        img.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    function splitAndPreview(img){
+      const status = document.getElementById("panoStatus");
+      status.textContent = "กำลังตัดภาพ...";
+      const parts = splitImage(img, currentMode);
+      const grid = document.getElementById("panoPreviewGrid");
+      grid.innerHTML = "";
+      grid.className = `pano-preview-grid pano-grid-${parts.length}`;
+      parts.forEach((canvas, i) => {
+        const wrap = document.createElement("div");
+        wrap.className = "pano-part";
+        const num = document.createElement("span");
+        num.className = "pano-num";
+        num.textContent = i + 1;
+        const preview = document.createElement("img");
+        preview.src = canvas.toDataURL("image/jpeg", 0.9);
+        preview.style.cssText = "width:100%;border-radius:6px;display:block";
+        wrap.appendChild(num);
+        wrap.appendChild(preview);
+        grid.appendChild(wrap);
+      });
+      document.getElementById("panoPreviewWrap").style.display = "block";
+      status.textContent = `ตัดเสร็จ ${parts.length} ส่วน — พร้อมดาวน์โหลด`;
+
+      // download handler
+      document.getElementById("panoDownloadAll").onclick = async () => {
+        const parts2 = splitImage(img, currentMode);
+        if(window.JSZip){
+          const zip = new window.JSZip();
+          for(let i=0;i<parts2.length;i++){
+            const blob = await new Promise(res => parts2[i].toBlob(res,"image/jpeg",0.92));
+            zip.file(`panorama-${i+1}-of-${parts2.length}.jpg`, await blob.arrayBuffer());
+          }
+          const content = await zip.generateAsync({type:"blob"});
+          const a = document.createElement("a"); a.href = URL.createObjectURL(content);
+          a.download = "panorama-split.zip"; a.click();
+        } else {
+          // ดาวน์โหลดทีละไฟล์
+          for(let i=0;i<parts2.length;i++){
+            const a = document.createElement("a");
+            a.href = parts2[i].toDataURL("image/jpeg",0.92);
+            a.download = `panorama-${i+1}-of-${parts2.length}.jpg`;
+            a.click();
+            await new Promise(r=>setTimeout(r,300));
+          }
+        }
+      };
+    }
+
+    function splitImage(img, mode){
+      const parts = [];
+      if(mode === "h4"){
+        // ตัดแนวนอน 4 ส่วน (Facebook 4 photos → 1 wide top + 3 bottom)
+        // ส่วนที่ 1: บน (แนวนอน 1080x608), ส่วน 2-4: ล่าง 3 ช่อง (1080x360 แต่ละช่อง)
+        const W = 1080, H1 = 608, H2 = 360;
+        const total = H1 + H2;
+        // Scale img ให้กว้าง W
+        const scale = W / img.width;
+        const srcH = total / scale;
+        const srcY = Math.max(0,(img.height - srcH)/2);
+
+        // Part 1 — wide top
+        const c1 = document.createElement("canvas"); c1.width=W; c1.height=H1;
+        const ctx1 = c1.getContext("2d");
+        ctx1.drawImage(img, 0, srcY, img.width, srcH*(H1/total), 0, 0, W, H1);
+        parts.push(c1);
+
+        // Parts 2-4 — bottom 3 equal
+        const bW = Math.round((W-4)/3);
+        for(let i=0;i<3;i++){
+          const c = document.createElement("canvas"); c.width=bW; c.height=H2;
+          const ctx = c.getContext("2d");
+          const srcX = (img.width/3)*i;
+          const srcBotH = srcH*(H2/total);
+          const srcBotY = srcY + srcH*(H1/total);
+          ctx.drawImage(img, srcX, srcBotY, img.width/3, srcBotH, 0, 0, bW, H2);
+          parts.push(c);
+        }
+      } else if(mode === "grid4"){
+        // 2×2 grid — TL TR BL BR
+        const size = 1080;
+        const hw = img.width/2, hh = img.height/2;
+        [[0,0],[hw,0],[0,hh],[hw,hh]].forEach(([sx,sy])=>{
+          const c = document.createElement("canvas"); c.width=size; c.height=size;
+          const ctx = c.getContext("2d");
+          // cover crop
+          const ratio = size/Math.min(hw,hh);
+          ctx.drawImage(img, sx, sy, hw, hh, 0, 0, hw*ratio, hh*ratio);
+          parts.push(c);
+        });
+      } else {
+        // h2 — ซ้าย ขวา
+        const W=1080, H=Math.round(W*(img.height/img.width)*0.5);
+        const hw = img.width/2;
+        [0,hw].forEach(sx=>{
+          const c=document.createElement("canvas"); c.width=W; c.height=H||600;
+          const ctx=c.getContext("2d");
+          ctx.drawImage(img,sx,0,hw,img.height,0,0,W,H||600);
+          parts.push(c);
+        });
+      }
+      return parts;
+    }
+  }
+
+  // inject ปุ่ม Panorama หลัง Collage
+  const obs2 = new MutationObserver(()=>{
+    const collage = document.getElementById("openCollageBtn");
+    if(collage && !document.getElementById("openPanoBtn")){
+      const wrap = document.createElement("div");
+      wrap.style.cssText = "margin-top:8px;text-align:center";
+      wrap.innerHTML = `<button class="btn secondary" id="openPanoBtn" style="width:100%">🌅 Panorama Split — ตัดรูปเดียวเป็น 4 ส่วน</button>`;
+      collage.closest("div").after(wrap);
+      document.getElementById("openPanoBtn")?.addEventListener("click", showPanoramaUI);
+    }
+  });
+  obs2.observe(document.body,{childList:true,subtree:true});
 
 })();

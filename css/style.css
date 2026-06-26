@@ -4844,3 +4844,27 @@ label > .field-hint + select{
 /* No frame */
 .fd-none{display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--muted);border:1px dashed var(--line)}
 @media(max-width:480px){.frame-picker-cards{gap:6px}.frame-card{min-width:65px}}
+
+/* ══════════════════════════════════
+   PANORAMA SPLIT v9.5
+══════════════════════════════════ */
+.pano-upload-label{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;border:2px dashed var(--line,rgba(255,255,255,.2));border-radius:12px;cursor:pointer;transition:border-color .15s;text-align:center;gap:4px}
+.pano-upload-label:hover{border-color:var(--accent,#7c3aed)}
+.pano-upload-label span{font-size:14px;color:var(--fg)}
+.pano-upload-label small{font-size:11px;color:var(--muted)}
+.pano-mode-wrap{margin-top:12px}
+.pano-modes{display:flex;gap:8px;flex-wrap:wrap}
+.pano-mode-btn{flex:1;min-width:80px;padding:10px 6px;background:var(--background,rgba(30,41,59,.6));border:1.5px solid var(--line,rgba(255,255,255,.1));border-radius:10px;cursor:pointer;text-align:center;transition:all .15s;color:var(--fg)}
+.pano-mode-btn.active,.pano-mode-btn:hover{border-color:var(--accent,#7c3aed);background:rgba(124,58,237,.12)}
+.pano-mode-icon{display:block;font-family:monospace;font-size:14px;line-height:1.3;color:var(--muted);margin-bottom:4px}
+.pano-mode-btn b{display:block;font-size:12px}
+.pano-mode-btn small{display:block;font-size:10px;color:var(--muted)}
+.pano-preview-grid{display:grid;gap:4px}
+.pano-grid-4{grid-template-columns:1fr 1fr}
+.pano-grid-2{grid-template-columns:1fr 1fr}
+.pano-grid-3{grid-template-columns:1fr 1fr 1fr}
+.pano-part{position:relative}
+.pano-num{position:absolute;top:6px;left:6px;background:var(--accent,#7c3aed);color:#fff;font-size:11px;font-weight:700;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;z-index:1}
+.pano-tip{margin-top:10px;padding:10px 12px;background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.3);border-radius:8px;font-size:12px;color:var(--fg2);line-height:1.5}
+.pano-upload-wrap{margin-bottom:12px}
+@media(max-width:480px){.pano-modes{flex-direction:column}}
