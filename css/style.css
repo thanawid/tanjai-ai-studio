@@ -4870,32 +4870,19 @@ label > .field-hint + select{
 @media(max-width:480px){.pano-modes{flex-direction:column}}
 
 /* ══ VIDEO LOGO v9.5.6 ══ */
-.logo-video{
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: inherit;
-  display: block;
-}
-/* login logo — กรอบยังอยู่ที่ .login-logo-wrap ไม่เปลี่ยน */
-.login-logo-wrap video.logo-video{
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 22px;
-}
-/* home media-orb — ให้วิดีโออยู่ตรงกลางแบบเดิม */
+/* login — กลับเป็นรูปนิ่งเดิม (ไม่ใช้ video) */
+/* home media-orb — วิดีโอใหญ่ขึ้น */
 .media-orb video.logo-video{
   position: relative;
-  width: 160px;
-  height: 160px;
+  width: 240px;
+  height: 240px;
   object-fit: cover;
-  border-radius: 40px;
-  border: 2px solid rgba(255,255,255,0.2);
-  box-shadow: 0 0 50px rgba(236,72,153,0.4);
+  border-radius: 50%;
+  border: 3px solid rgba(255,255,255,0.25);
+  box-shadow: 0 0 60px rgba(236,72,153,0.5);
   z-index: 2;
   transition: transform 0.5s cubic-bezier(0.175,0.885,0.32,1.275);
 }
 .media-orb:hover video.logo-video{
-  transform: scale(1.1) rotate(5deg);
+  transform: scale(1.07);
 }
