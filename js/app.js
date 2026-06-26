@@ -223,7 +223,38 @@ document.addEventListener("DOMContentLoaded", () => {
         <label>Theme Cover Frame Preset<select id="album-themePreset"><option>Ribbon Civic Cover</option><option>Modern Glass Cover</option><option>Clean Civic Cover</option><option>Minimal Story Cover</option></select></label>
         <label>โทนสี<select id="album-colorTone"><option selected>AI เลือกโทนสีให้เข้ากับงาน</option><option>ม่วง–ทอง พรีเมียม</option><option>เขียว–เหลือง–ขาว</option><option>น้ำเงิน–ขาว ทางการ</option><option>ส้ม–ทอง สดเด่น</option><option>ดำ–ทอง หรูหรา</option></select></label>
         <label>โหมดอัตโนมัติ<select id="album-autoMode"><option>ปรับภาพ + ครอป + ใส่กรอบ</option><option>ภาพกิจกรรมเน้นภาพ / แถบเล็ก</option><option>ครอป + ใส่กรอบเท่านั้น</option><option>ปรับภาพเท่านั้น</option></select></label>
-        <label>Pro Frame (กรอบตามตัวอย่าง)<select id="album-proFrame"><option value="Balanced Ribbon" selected>Clean Civic Frame (กรอบเรียบสำหรับงานประชาสัมพันธ์)</option><option value="Gold Luxury">Gold Luxury (ขอบทองหรูหรา)</option><option value="None">ไม่มีกรอบพิเศษ</option><option value="Modern Neon">Modern Neon (ขอบนีออนเรืองแสง)</option><option value="Bold Corporate">Bold Corporate (ขอบสีแบรนด์)</option></select><small>ภาพปกใช้กรอบหัวเรื่องแบบสะอาด ภาพรองใช้เพียงขอบบางและแถบคำอธิบาย</small></label>
+        <label class="full">เลือกสไตล์กรอบ (Pro Frame)
+          <small>คลิกเลือก — ภาพปกจะใช้กรอบเต็ม ภาพรองใช้กรอบบาง</small>
+          <select id="album-proFrame" hidden>
+            <option value="Balanced Ribbon" selected>Clean Civic Frame</option>
+            <option value="Gold Luxury">Gold Luxury</option>
+            <option value="None">ไม่มีกรอบ</option>
+            <option value="Modern Neon">Modern Neon</option>
+            <option value="Bold Corporate">Bold Corporate</option>
+          </select>
+          <div class="frame-picker-cards" role="group">
+            <button type="button" class="frame-card selected" data-frame="Balanced Ribbon">
+              <div class="frame-demo frame-demo-civic"><div class="fd-inner"><div class="fd-bar"></div><div class="fd-line"></div></div></div>
+              <b>Civic Clean</b><small>ขอบเรียบ แถบโลโก้</small>
+            </button>
+            <button type="button" class="frame-card" data-frame="Gold Luxury">
+              <div class="frame-demo frame-demo-gold"><div class="fd-inner fd-gold"><div class="fd-bar fd-bar-gold"></div></div></div>
+              <b>Gold Luxury</b><small>ขอบทองหรูหรา</small>
+            </button>
+            <button type="button" class="frame-card" data-frame="Bold Corporate">
+              <div class="frame-demo frame-demo-corp"><div class="fd-inner"><div class="fd-corner tl"></div><div class="fd-corner tr"></div><div class="fd-corner bl"></div><div class="fd-corner br"></div></div></div>
+              <b>Bold Brand</b><small>ขอบสีแบรนด์ มุมเน้น</small>
+            </button>
+            <button type="button" class="frame-card" data-frame="Modern Neon">
+              <div class="frame-demo frame-demo-neon"><div class="fd-inner fd-neon"></div></div>
+              <b>Modern Neon</b><small>ขอบเรืองแสง</small>
+            </button>
+            <button type="button" class="frame-card" data-frame="None">
+              <div class="frame-demo frame-demo-none"><div class="fd-inner fd-none">☑</div></div>
+              <b>ไม่มีกรอบ</b><small>ภาพล้วน</small>
+            </button>
+          </div>
+        </label>
         <div class="full album-smart-choice" id="album-smartChoice">ระบบจะสรุปขนาดและรูปแบบพรีวิวที่เลือกให้อีกครั้งหลังสร้างชุดภาพ</div>
         <input id="album-safeMode" type="checkbox" checked hidden>
         <input id="album-makeCover" type="checkbox" checked hidden>

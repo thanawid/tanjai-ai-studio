@@ -1138,6 +1138,16 @@
         if(select){ select.value=presetButton.dataset.albumPreset || 'auto'; syncPresetButtons(); select.dispatchEvent(new Event('change',{bubbles:true})); }
         return;
       }
+      // Frame picker cards
+      const frameCard=e.target && e.target.closest ? e.target.closest('.frame-card') : null;
+      if(frameCard){
+        e.preventDefault();
+        $$('.frame-card').forEach(b=>b.classList.remove('selected'));
+        frameCard.classList.add('selected');
+        const sel=$('#album-proFrame');
+        if(sel) sel.value=frameCard.dataset.frame||'Balanced Ribbon';
+        return;
+      }
       const id=e.target && e.target.id;
       if(id==='makeAlbum'){ e.preventDefault(); generate(); }
       if(id==='albumDownloadAll' || id==='albumDownloadAllTop' || id==='albumDownloadAllResult'){ e.preventDefault(); downloadAll(); }
@@ -1305,4 +1315,198 @@
   // เรียกใช้เมื่อ album result แสดง
   const obs=new MutationObserver(()=>{ if(document.getElementById('albumAdjustPanel')) setupAdjust(); });
   obs.observe(document.body,{childList:true,subtree:true});
+})();
+
+/* ══════════════════════════════════════════════════════
+   COLLAGE BUILDER v9.5 — รวมภาพเป็นไฟล์เดียว
+   รองรับ: 2x2 | 1+3 | 1+2 | แถบยาว | 2 แนวนอน
+══════════════════════════════════════════════════════ */
+(function initCollage(){
+
+  const LAYOUTS = [
+    { id:"grid2x2",  label:"2×2",         icon:"▪▪\n▪▪", desc:"ตาราง 4 ช่อง เท่ากัน",   min:4, max:4, fn:buildGrid2x2  },
+    { id:"big1+3",   label:"ใหญ่+3เล็ก",  icon:"█▪\n█▪\n█▪",desc:"ปกใหญ่ซ้าย เล็ก 3 ขวา", min:2, max:4, fn:buildBig1Plus3 },
+    { id:"big1top3", label:"บน+3ล่าง",    icon:"████\n▪▪▪",  desc:"ปกบน เล็ก 3 ล่าง",      min:2, max:4, fn:buildTop1Bot3  },
+    { id:"pair",     label:"คู่",          icon:"▪▪",         desc:"2 รูปเคียงกัน",          min:2, max:2, fn:buildPair      },
+    { id:"strip",    label:"แถบยาว",       icon:"▪▪▪▪",       desc:"3–5 รูปแนวนอน",         min:2, max:5, fn:buildStrip     },
+  ];
+
+  function gap(){ return 8; }
+
+  async function loadImg(url){
+    return new Promise((res,rej)=>{
+      const i=new Image(); i.crossOrigin="anonymous";
+      i.onload=()=>res(i); i.onerror=rej; i.src=url;
+    });
+  }
+
+  function cover(ctx, img, x, y, w, h){
+    const ir=img.width/img.height, fr=w/h;
+    let sw,sh,sx,sy;
+    if(ir>fr){ sh=img.height; sw=sh*fr; sx=(img.width-sw)/2; sy=0; }
+    else{ sw=img.width; sh=sw/fr; sx=0; sy=(img.height-sh)/2; }
+    ctx.drawImage(img,sx,sy,sw,sh,x,y,w,h);
+  }
+
+  function buildGrid2x2(imgs, size=1080){
+    const c=document.createElement("canvas"); c.width=size; c.height=size;
+    const ctx=c.getContext("2d"); const g=gap(), half=(size-g*3)/2;
+    const pos=[[g,g],[g*2+half,g],[g,g*2+half],[g*2+half,g*2+half]];
+    imgs.slice(0,4).forEach((img,i)=>{ cover(ctx,img,pos[i][0],pos[i][1],half,half); });
+    return c;
+  }
+
+  function buildBig1Plus3(imgs, size=1080){
+    const c=document.createElement("canvas"); c.width=size; c.height=size;
+    const ctx=c.getContext("2d"); const g=gap();
+    const bigW=Math.round(size*0.62), smallW=size-bigW-g*2;
+    const smallH=Math.round((size-g*4)/3);
+    cover(ctx,imgs[0],g,g,bigW-g,size-g*2);
+    [1,2,3].forEach((n,i)=>{ if(imgs[n]) cover(ctx,imgs[n],bigW+g,g+i*(smallH+g),smallW,smallH); });
+    return c;
+  }
+
+  function buildTop1Bot3(imgs, size=1080){
+    const c=document.createElement("canvas"); c.width=size; c.height=size;
+    const ctx=c.getContext("2d"); const g=gap();
+    const topH=Math.round(size*0.58), botH=size-topH-g*2;
+    const botW=Math.round((size-g*4)/3);
+    cover(ctx,imgs[0],g,g,size-g*2,topH-g);
+    [1,2,3].forEach((n,i)=>{ if(imgs[n]) cover(ctx,imgs[n],g+i*(botW+g),topH+g,botW,botH); });
+    return c;
+  }
+
+  function buildPair(imgs, size=1080){
+    const c=document.createElement("canvas"); c.width=size; c.height=Math.round(size*0.52);
+    const ctx=c.getContext("2d"); const g=gap(), half=(size-g*3)/2;
+    cover(ctx,imgs[0],g,g,half,c.height-g*2);
+    if(imgs[1]) cover(ctx,imgs[1],g*2+half,g,half,c.height-g*2);
+    return c;
+  }
+
+  function buildStrip(imgs, size=1080){
+    const n=Math.min(imgs.length,5); const g=gap();
+    const w=Math.round((size-g*(n+1))/n), h=Math.round(w*0.72);
+    const c=document.createElement("canvas"); c.width=size; c.height=h+g*2;
+    const ctx=c.getContext("2d");
+    imgs.slice(0,n).forEach((img,i)=>cover(ctx,img,g+i*(w+g),g,w,h));
+    return c;
+  }
+
+  function addLogoOverlay(canvas, logo, pos="br"){
+    if(!logo) return;
+    const ctx=canvas.getContext("2d");
+    const s=Math.round(Math.min(canvas.width,canvas.height)*0.09);
+    const pad=Math.round(s*0.3);
+    let x,y;
+    if(pos==="br"){ x=canvas.width-s-pad; y=canvas.height-s-pad; }
+    else if(pos==="bl"){ x=pad; y=canvas.height-s-pad; }
+    else if(pos==="tr"){ x=canvas.width-s-pad; y=pad; }
+    else{ x=pad; y=pad; }
+    ctx.save();
+    ctx.globalAlpha=0.82;
+    ctx.drawImage(logo,x,y,s,s);
+    ctx.restore();
+  }
+
+  /* UI */
+  function showCollageUI(){
+    if(document.getElementById("collageSection")) return;
+    const outputs=window.albumState?.outputs||[];
+    if(!outputs.length){ alert("กรุณาสร้างชุดภาพก่อนครับ"); return; }
+
+    const sec=document.createElement("div");
+    sec.id="collageSection";
+    sec.className="collage-section";
+    sec.innerHTML=`
+      <div class="collage-header">
+        <span>🖼️</span>
+        <div><b>สร้าง Collage — รวมภาพเป็น 1 ไฟล์</b><small>เลือก Layout แล้วกดสร้าง</small></div>
+      </div>
+      <div class="collage-layouts">
+        ${LAYOUTS.map(l=>`
+          <button class="collage-layout-btn" data-layout="${l.id}" title="${l.desc}">
+            <span class="collage-icon">${l.icon}</span>
+            <b>${l.label}</b>
+            <small>${l.desc}</small>
+          </button>`).join("")}
+      </div>
+      <div class="collage-options">
+        <label><input type="checkbox" id="collage-logo" checked> ใส่โลโก้มุมภาพ</label>
+        <select id="collage-logo-pos">
+          <option value="br">มุมขวาล่าง</option>
+          <option value="bl">มุมซ้ายล่าง</option>
+          <option value="tr">มุมขวาบน</option>
+          <option value="tl">มุมซ้ายบน</option>
+        </select>
+      </div>
+      <div id="collagePreview" class="collage-preview" style="display:none">
+        <img id="collagePreviewImg" style="width:100%;border-radius:10px" alt="Collage preview">
+        <div class="collage-dl-row">
+          <button class="btn primary" id="collageDownload">⬇ ดาวน์โหลด Collage</button>
+          <button class="btn secondary" id="collageClear">✕ ปิด</button>
+        </div>
+      </div>`;
+
+    const host=document.getElementById("albumResult")||document.body;
+    host.appendChild(sec);
+
+    let activeLayout=null, activeCanvas=null;
+
+    sec.querySelectorAll(".collage-layout-btn").forEach(btn=>{
+      btn.addEventListener("click", async()=>{
+        sec.querySelectorAll(".collage-layout-btn").forEach(b=>b.classList.remove("active"));
+        btn.classList.add("active");
+        activeLayout=btn.dataset.layout;
+        await renderCollage();
+      });
+    });
+
+    document.getElementById("collage-logo")?.addEventListener("change", async()=>{ if(activeLayout) await renderCollage(); });
+    document.getElementById("collage-logo-pos")?.addEventListener("change", async()=>{ if(activeLayout) await renderCollage(); });
+
+    async function renderCollage(){
+      const layDef=LAYOUTS.find(l=>l.id===activeLayout);
+      if(!layDef) return;
+      const imgs=[];
+      for(const o of outputs.slice(0,layDef.max)){
+        try{ imgs.push(await loadImg(o.url)); }catch(_){}
+      }
+      if(imgs.length<layDef.min){
+        alert(`Layout นี้ต้องการภาพอย่างน้อย ${layDef.min} รูปครับ`); return;
+      }
+      const canvas=layDef.fn(imgs);
+      const useLogo=document.getElementById("collage-logo")?.checked;
+      const logoPos=document.getElementById("collage-logo-pos")?.value||"br";
+      if(useLogo && window.albumState?.logo) addLogoOverlay(canvas,window.albumState.logo,logoPos);
+      activeCanvas=canvas;
+      const preview=document.getElementById("collagePreview");
+      const img=document.getElementById("collagePreviewImg");
+      img.src=canvas.toDataURL("image/jpeg",0.92);
+      preview.style.display="block";
+      document.getElementById("collageDownload").onclick=()=>{
+        canvas.toBlob(blob=>{ const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="collage.jpg"; a.click(); },"image/jpeg",0.92);
+      };
+      document.getElementById("collageClear").onclick=()=>{ sec.remove(); };
+    }
+  }
+
+  // ปุ่มเรียก Collage — inject หลัง renderOutputs
+  const origRender=window.TANJAI_ALBUM_RENDER;
+  function injectCollageBtn(){
+    if(document.getElementById("openCollageBtn")) return;
+    const host=document.getElementById("albumResult");
+    if(!host) return;
+    const wrap=document.createElement("div");
+    wrap.style.cssText="margin-top:12px;text-align:center";
+    wrap.innerHTML=`<button class="btn secondary" id="openCollageBtn" style="width:100%">🖼️ สร้าง Collage — รวมภาพเป็น 1 ไฟล์</button>`;
+    host.appendChild(wrap);
+    document.getElementById("openCollageBtn")?.addEventListener("click",showCollageUI);
+  }
+
+  const obs=new MutationObserver(()=>{ 
+    if(document.querySelector(".album-cover-preview-card,.album-lite-preview-grid")) injectCollageBtn(); 
+  });
+  obs.observe(document.body,{childList:true,subtree:true});
+
 })();

@@ -4767,20 +4767,6 @@ label > .field-hint + select{
   margin-top:4px;
 }
 
-/* ═══ POLLINATIONS.AI SECTION v9.5 ═══ */
-.pollinations-section{margin-top:20px;padding:16px;background:var(--panel,rgba(15,23,42,.7));border:1px solid var(--line,rgba(255,255,255,.1));border-radius:14px}
-.pollinations-header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
-.pollinations-header span{font-size:22px}
-.pollinations-header b{display:block;font-size:14px;color:var(--fg)}
-.pollinations-header small{font-size:11px;color:var(--muted)}
-.pollinations-controls{display:flex;gap:8px;flex-wrap:wrap}
-.pollinations-controls select{flex:1;min-width:160px}
-.pollinations-controls .btn{white-space:nowrap}
-.pollinations-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-.pollinations-actions .btn{flex:1;min-width:120px}
-@keyframes spin{to{transform:rotate(360deg)}}
-.pollinations-spinner{width:20px;height:20px;border:2px solid var(--line,rgba(255,255,255,.15));border-top-color:var(--accent,#7c3aed);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
-@media(max-width:480px){.pollinations-controls{flex-direction:column}.pollinations-controls .btn,.pollinations-controls select{width:100%}}
 
 /* ═══ Q1: Login button center ═══ */
 .login-actions-center{display:flex!important;justify-content:center!important}
@@ -4806,3 +4792,55 @@ label > .field-hint + select{
 .adjust-actions .btn{flex:1;min-width:120px}
 .adjust-note{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5}
 @media(max-width:480px){.adjust-actions{flex-direction:column}}
+
+/* ══════════════════════════════════
+   COLLAGE BUILDER v9.5
+══════════════════════════════════ */
+.collage-section{margin-top:16px;padding:16px;background:var(--panel,rgba(15,23,42,.7));border:1px solid var(--line,rgba(255,255,255,.1));border-radius:14px}
+.collage-header{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.collage-header span{font-size:22px}
+.collage-header b{display:block;font-size:14px;color:var(--fg)}
+.collage-header small{font-size:11px;color:var(--muted)}
+.collage-layouts{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.collage-layout-btn{flex:1;min-width:90px;padding:10px 8px;background:var(--background,rgba(30,41,59,.6));border:1.5px solid var(--line,rgba(255,255,255,.1));border-radius:10px;cursor:pointer;text-align:center;transition:all .15s;color:var(--fg)}
+.collage-layout-btn .collage-icon{display:block;font-family:monospace;font-size:11px;line-height:1.3;color:var(--muted);margin-bottom:4px;white-space:pre}
+.collage-layout-btn b{display:block;font-size:12px;color:var(--fg)}
+.collage-layout-btn small{font-size:10px;color:var(--muted)}
+.collage-layout-btn.active,.collage-layout-btn:hover{border-color:var(--accent,#7c3aed);background:var(--accent-subtle,rgba(124,58,237,.15))}
+.collage-options{display:flex;align-items:center;gap:10px;margin-bottom:12px;font-size:13px;color:var(--fg2)}
+.collage-options select{font-size:12px}
+.collage-preview{margin-top:12px}
+.collage-dl-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.collage-dl-row .btn{flex:1;min-width:120px}
+@media(max-width:480px){.collage-layouts{gap:6px}.collage-layout-btn{min-width:70px;padding:8px 4px}}
+
+/* ══════════════════════════════════
+   FRAME VISUAL PICKER v9.5
+══════════════════════════════════ */
+.frame-picker-cards{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.frame-card{flex:1;min-width:80px;padding:8px 6px;background:var(--background,rgba(30,41,59,.6));border:1.5px solid var(--line,rgba(255,255,255,.1));border-radius:10px;cursor:pointer;text-align:center;transition:all .15s;color:var(--fg)}
+.frame-card.selected,.frame-card:hover{border-color:var(--accent,#7c3aed);background:var(--accent-subtle,rgba(124,58,237,.12))}
+.frame-card b{display:block;font-size:12px;color:var(--fg);margin-top:4px}
+.frame-card small{display:block;font-size:10px;color:var(--muted);line-height:1.3}
+/* Frame demo previews */
+.frame-demo{width:100%;aspect-ratio:1;border-radius:6px;overflow:hidden;background:#1e293b;margin-bottom:2px;position:relative}
+.fd-inner{position:absolute;inset:5px;border-radius:4px;background:#0f172a}
+/* Civic Clean */
+.frame-demo-civic .fd-inner{border:2px solid rgba(99,102,241,.6)}
+.fd-bar{position:absolute;bottom:0;left:0;right:0;height:22%;background:rgba(99,102,241,.5);border-radius:0 0 3px 3px}
+.fd-line{position:absolute;bottom:22%;left:0;right:0;height:1px;background:rgba(255,255,255,.2)}
+/* Gold Luxury */
+.frame-demo-gold .fd-inner.fd-gold{border:2px solid #FFD700;background:#0a0805}
+.fd-bar-gold{background:linear-gradient(90deg,#B8860B,#FFD700,#B8860B)!important}
+/* Bold Corporate */
+.frame-demo-corp .fd-inner{border:2px solid rgba(99,102,241,.4)}
+.fd-corner{position:absolute;width:10px;height:10px;background:var(--accent,#7c3aed)}
+.fd-corner.tl{top:0;left:0;border-radius:0 0 3px 0}
+.fd-corner.tr{top:0;right:0;border-radius:0 0 0 3px}
+.fd-corner.bl{bottom:0;left:0;border-radius:0 3px 0 0}
+.fd-corner.br{bottom:0;right:0;border-radius:3px 0 0 0}
+/* Modern Neon */
+.frame-demo-neon .fd-inner.fd-neon{border:2px solid #a78bfa;box-shadow:0 0 8px #7c3aed}
+/* No frame */
+.fd-none{display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--muted);border:1px dashed var(--line)}
+@media(max-width:480px){.frame-picker-cards{gap:6px}.frame-card{min-width:65px}}
