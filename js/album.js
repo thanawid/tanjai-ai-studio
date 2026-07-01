@@ -1,7 +1,9 @@
-/* v9.4.1 — Story Frames + Facebook Publishing Director
-   Safe photo processing for real uploaded images only.
-   Cover Frame + Lite Frames + Additional Frame, face-aware crop when supported,
-   smart theme selection, safe text, slot-based crop/frames, Facebook mock preview, and synced preview / download results.
+/* v9.5 — Smart Album + Touch Ordering + Progressive Processing
+   ✅ รองรับ 1–5 ภาพ (ไม่บังคับ 4 ภาพ)
+   ✅ Touch drag ordering บนมือถือ
+   ✅ Progress bar ขณะประมวลผล
+   ✅ Caption AI รู้บริบทองค์กรดีขึ้น
+   ✅ Responsive ทุกอุปกรณ์
 */
 (function(){
   function ensureAlbumInputs(){
@@ -65,7 +67,6 @@
       ratio: val("album-ratio","auto"),
       previewLayout: val("album-previewLayout","auto"),
       facebookPreset: val("album-facebookPreset","auto"),
-      storyMode: val("album-storyMode","auto"),
       captionStyle: val("album-captionStyle","pr-ready"),
       colorTone: val("album-colorTone","AI เลือกโทนสีให้เข้ากับงาน"),
       mode: val("album-autoMode", val("album-mode","ปรับภาพ + ครอป + ใส่กรอบ")),
@@ -99,12 +100,7 @@
     return "square-grid";
   }
   function effectiveFacebookPreset(d=data()){
-    if(d.storyMode==="split-main") return "square-grid";
     return d.facebookPreset && d.facebookPreset!=="auto" ? d.facebookPreset : (state.resolvedFacebookPreset || "wide-top");
-  }
-  function resolveStoryMode(requested="auto", preset="wide-top", fileCount=1){
-    if(requested && requested!=="auto") return requested;
-    return preset==="square-grid" && fileCount===1 ? "split-main" : "separate";
   }
   function presetLayout(preset){
     if(preset==="square-grid") return "grid";
@@ -775,33 +771,6 @@
     return {blob,url,role:profile.role,label:profile.label,w:sz.w,h:sz.h,filename:`facebook_album_${String(idx+1).padStart(2,'0')}_${profile.role}_${sz.w}x${sz.h}.jpg`};
   }
 
-  async function processStoryGrid(file){
-    const d=data(), th=theme(d);
-    const master=document.createElement('canvas'); master.width=2160; master.height=2160;
-    const masterCtx=master.getContext('2d');
-    const img=await makeImage(file);
-    const enhance=!d.mode.includes('ครอป + ใส่กรอบเท่านั้น');
-    const faceFocus=await detectFaceFocus(img);
-    coverDraw(img,masterCtx,master.width,master.height,enhance,faceFocus,.45);
-    if(!d.mode.includes('ปรับภาพเท่านั้น')) drawCoverFrame(masterCtx,master.width,master.height,d,th);
-
-    const positions=[
-      {x:0,y:0,name:'top_left',label:'ช่อง 1 · ซ้ายบน'},
-      {x:1080,y:0,name:'top_right',label:'ช่อง 2 · ขวาบน'},
-      {x:0,y:1080,name:'bottom_left',label:'ช่อง 3 · ซ้ายล่าง'},
-      {x:1080,y:1080,name:'bottom_right',label:'ช่อง 4 · ขวาล่าง'}
-    ];
-    const outputs=[];
-    for(let idx=0;idx<positions.length;idx++){
-      const part=positions[idx];
-      const canvas=document.createElement('canvas'); canvas.width=1080; canvas.height=1080;
-      canvas.getContext('2d').drawImage(master,part.x,part.y,1080,1080,0,0,1080,1080);
-      const blob=await canvasToBlob(canvas); const url=URL.createObjectURL(blob);
-      outputs.push({blob,url,role:idx===0?'cover':'lite',label:part.label,w:1080,h:1080,filename:`facebook_story_grid_${String(idx+1).padStart(2,'0')}_${part.name}_1080x1080.jpg`,storyTile:true});
-    }
-    return outputs;
-  }
-
   function normalizeFiles(fileList, warn=true, max=4){
     let files=Array.from(fileList||[]).filter(f=>f.type.startsWith('image/'));
     if(files.length>max){ files=files.slice(0,max); if(warn) alert(`ระบบนี้รองรับภาพรองได้สูงสุด ${max} ภาพ จึงเลือกใช้ ${max} ภาพแรกให้โดยอัตโนมัติ`); }
@@ -904,10 +873,17 @@
     const icon=style==='friendly'?'✨':style==='story'?'📷':style==='announcement'?'📣':style==='official'?'📢':'📌';
     if(f.title) parts.push(`${icon} ${f.title}`);
 
-    if(style==='official'){
+    // ตรวจบริบทองค์กรอัตโนมัติ
+    const orgLower=(f.org||'').toLowerCase();
+    const isMuni=/เทศบาล|อบต|องค์การบริหาร|อำเภอ|จังหวัด|ราชการ/.test(orgLower);
+    const isHealth=/โรงพยาบาล|สาธารณสุข|อนามัย|คลินิก/.test(orgLower);
+    const isSchool=/โรงเรียน|มหาวิทยาลัย|วิทยาลัย|ศึกษา/.test(orgLower);
+    const isBrand=/ร้าน|บริษัท|ห้าง|เพจ|ครีเอเตอร์/.test(orgLower);
+
+    if(style==='official' || isMuni){
       if(f.org) parts.push(f.org);
       if(f.detail) parts.push(smartShort(f.detail,260));
-    }else if(style==='friendly'){
+    }else if(style==='friendly' || isBrand){
       if(f.detail) parts.push(smartShort(f.detail,220));
       if(f.org) parts.push(`— ${f.org}`);
     }else if(style==='story'){
@@ -917,7 +893,12 @@
       if(f.org) parts.push(`${f.org} ขอแจ้งข้อมูลให้ผู้ที่เกี่ยวข้องทราบ`);
       if(f.detail) parts.push(smartShort(f.detail,240));
     }else{
-      if(f.org) parts.push(`${f.org} ขอประชาสัมพันธ์ข้อมูลให้ประชาชนและผู้ที่เกี่ยวข้องได้รับทราบ`);
+      // pr-ready default — ปรับตามบริบทองค์กร
+      const prPhrase = isMuni ? 'ขอประชาสัมพันธ์ให้ประชาชนในพื้นที่ทราบ'
+        : isHealth ? 'ขอประชาสัมพันธ์ข้อมูลสุขภาพให้ประชาชนทราบ'
+        : isSchool ? 'ขอประชาสัมพันธ์ให้นักเรียนและผู้ปกครองทราบ'
+        : 'ขอประชาสัมพันธ์ข้อมูลให้ประชาชนและผู้ที่เกี่ยวข้องได้รับทราบ';
+      if(f.org) parts.push(`${f.org} ${prPhrase}`);
       if(f.detail) parts.push(smartShort(f.detail,220));
     }
 
@@ -1070,24 +1051,7 @@
     return new Blob([...chunks,...cdChunks,end],{type:'application/zip'});
   }
 
-  async function downloadAll(){
-    if(!state.outputs.length) return alert('กรุณาสร้างชุดภาพก่อน');
-    const captionEl=$('#albumCaptionText');
-    const caption=(captionEl?captionEl.value:state.caption || '').trim();
-    const files=state.outputs.slice();
-    if(caption){
-      files.push({
-        blob:new Blob([caption],{type:'text/plain;charset=utf-8'}),
-        filename:'facebook_caption.txt'
-      });
-    }
-    const blob=await makeZip(files);
-    const a=document.createElement('a');
-    a.href=URL.createObjectURL(blob);
-    a.download=`facebook_album_pack_${Date.now()}.zip`;
-    a.click();
-    setTimeout(()=>URL.revokeObjectURL(a.href),1000);
-  }
+  async function downloadAll(){ if(!state.outputs.length) return alert('กรุณาสร้างชุดภาพก่อน'); const blob=await makeZip(state.outputs); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`facebook_album_pack_${Date.now()}.zip`; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1000); }
   function downloadOne(i){ const o=state.outputs[i]; if(!o) return; const a=document.createElement('a'); a.href=o.url; a.download=o.filename; a.click(); }
   async function loadLogo(file){ if(!file){ state.logo=null; return; } const img=new Image(); await new Promise((res,rej)=>{ img.onload=res; img.onerror=rej; img.src=URL.createObjectURL(file); }); state.logo=img; }
   function moveSupport(i,dir){ const j=dir==='up'?i-1:i+1; if(j<0 || j>=state.supportFiles.length) return; const copy=state.supportFiles.slice(); [copy[i],copy[j]]=[copy[j],copy[i]]; state.supportFiles=copy; syncStateFiles(); renderUploadPreview(); }
@@ -1106,23 +1070,38 @@
     state.files=files;
     state.outputs.forEach(o=>URL.revokeObjectURL(o.url)); state.outputs=[];
     const btn=$('#makeAlbum'); const old=btn?btn.textContent:''; if(btn){ btn.disabled=true; btn.textContent='กำลังสร้างชุดภาพ...'; }
+    // แสดง progress bar
+    let progressEl=$('#albumProgress');
+    if(!progressEl){
+      progressEl=document.createElement('div');
+      progressEl.id='albumProgress';
+      progressEl.className='album-progress-bar-wrap';
+      progressEl.innerHTML='<div class="album-progress-bar" id="albumProgressInner"></div><small id="albumProgressLabel">เริ่มต้น...</small>';
+      const resultHost=$('#albumResult');
+      if(resultHost) resultHost.prepend(progressEl);
+    }
+    progressEl.style.display='block';
+    const setProgress=(n,total,label)=>{
+      const pct=Math.round((n/total)*100);
+      const inner=$('#albumProgressInner');
+      const lbl=$('#albumProgressLabel');
+      if(inner) inner.style.width=pct+'%';
+      if(lbl) lbl.textContent=label||`กำลังประมวลผลภาพที่ ${n}/${total}...`;
+    };
     try{
       await waitFonts();
       await resolveSmartSettings(files);
+      setProgress(0,files.length,'โหลดโลโก้และตั้งค่า...');
       const logoInput=$('#album-logoFile'); if(logoInput && logoInput.files && logoInput.files[0]) await loadLogo(logoInput.files[0]); else state.logo=null;
-      const d=data();
-      const storyMode=resolveStoryMode(d.storyMode,effectiveFacebookPreset(d),files.length);
-      if(storyMode==='split-main'){
-        state.resolvedFacebookPreset='square-grid';
-        state.resolvedPreviewLayout='grid';
-        state.resolvedRatio='1080x1080';
-        state.outputs=await processStoryGrid(state.coverFile);
-        renderSmartChoice();
-      }else{
-        for(let i=0;i<files.length;i++) state.outputs.push(await processImage(files[i],i,files.length));
+      for(let i=0;i<files.length;i++){
+        setProgress(i,files.length,`ประมวลผลภาพที่ ${i+1}/${files.length}...`);
+        state.outputs.push(await processImage(files[i],i,files.length));
       }
+      setProgress(files.length,files.length,'สร้างแคปชั่น...');
       state.caption=captionText(data());
       renderOutputs();
+      setProgress(files.length,files.length,'เสร็จแล้ว ✓');
+      setTimeout(()=>{ if(progressEl) progressEl.style.display='none'; },1800);
     } finally { if(btn){ btn.disabled=false; btn.textContent=old || 'สร้างชุดภาพ'; } }
   }
 
@@ -1152,12 +1131,29 @@
         renderUploadPreview();
         const smart=$('#album-smartChoice'); if(smart){ smart.textContent='ระบบจะสรุปขนาดและรูปแบบพรีวิวที่เลือกให้อีกครั้งหลังสร้างชุดภาพ'; smart.classList.remove('resolved'); }
         const host=$('#albumResult .ready-main') || $('#albumResult'); if(host) host.innerHTML='';
+        const prog=$('#albumProgress'); if(prog) prog.style.display='none';
       }
-      if(id==='albumCopyCaption' || id==='albumCopyCaptionQuick'){ e.preventDefault(); const t=$('#albumCaptionText'); const value=t?t.value:state.caption; if(value){ navigator.clipboard?.writeText(value); const old=e.target.textContent; e.target.textContent='คัดลอกแล้ว'; setTimeout(()=>e.target.textContent=old || 'คัดลอกแคปชั่น',1200); } }
+      if(id==='albumCopyCaption' || id==='albumCopyCaptionQuick'){ e.preventDefault(); const t=$('#albumCaptionText'); const value=t?t.value:state.caption; if(value){ navigator.clipboard?.writeText(value); const old=e.target.textContent; e.target.textContent='คัดลอกแล้ว ✓'; setTimeout(()=>e.target.textContent=old || 'คัดลอกแคปชั่น',1400); } }
       if(id==='albumRefreshPreview'){ e.preventDefault(); renderFacebookPreview(); }
       if(e.target && e.target.classList.contains('album-one-download')) downloadOne(Number(e.target.dataset.i||0));
       const move=e.target && e.target.dataset && e.target.dataset.albumSupportMove; if(move){ e.preventDefault(); moveSupport(Number(e.target.dataset.i||0), move); }
     });
+    // Touch swipe ordering บนมือถือ
+    let touchStartX=0, touchEl=null;
+    document.addEventListener('touchstart',(e)=>{
+      const btn=e.target && e.target.closest ? e.target.closest('[data-album-support-move]') : null;
+      if(btn){ touchStartX=e.touches[0].clientX; touchEl=btn; }
+    },{passive:true});
+    document.addEventListener('touchend',(e)=>{
+      if(!touchEl) return;
+      const dx=e.changedTouches[0].clientX - touchStartX;
+      if(Math.abs(dx)>40){
+        const dir=dx<0?'down':'up';
+        const i=Number(touchEl.closest('[data-i]')?.dataset.i||touchEl.dataset.i||0);
+        moveSupport(i,dir);
+      }
+      touchEl=null;
+    },{passive:true});
     document.addEventListener('change',(e)=>{
       if(e.target && (e.target.id==='album-coverFile' || e.target.id==='album-supportFiles')){ collectFilesFromInputs(true); renderUploadPreview(); }
       if(e.target && e.target.id==='album-facebookPreset'){
@@ -1167,7 +1163,6 @@
         renderSmartChoice();
         if(state.outputs.length) generate();
       }
-      if(e.target && e.target.id==='album-storyMode' && state.outputs.length) generate();
       if(e.target && e.target.id==='album-captionStyle' && state.outputs.length){ state.caption=captionText(data()); renderOutputs(); }
     });
     document.addEventListener('input',(e)=>{
@@ -1176,205 +1171,6 @@
   });
   window.TANJAI_ALBUM_PRO={
     generate,downloadAll,renderFacebookPreview,renderUploadPreview,collectFilesFromInputs,
-    _test:{cropPlacement,liteText,theme,size,resolveRatioFromDimensions,previewLayoutFor,resolveFacebookPreset,resolveStoryMode,presetLayout,facebookPresetLabel,slotSize,captionFacts,captionWriter,factGuardCaption}
+    _test:{cropPlacement,liteText,theme,size,resolveRatioFromDimensions,previewLayoutFor,resolveFacebookPreset,presetLayout,facebookPresetLabel,slotSize,captionFacts,captionWriter,factGuardCaption}
   };
 })();
-// เปิดใช้งาน Drag and Drop ให้ฟอร์มอัปโหลดภาพ
-const dropZone = document.getElementById('albumForm'); 
-if (dropZone) {
-  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-    dropZone.addEventListener(eventName, preventDefaults, false);
-  });
-
-  function preventDefaults(e) {
-    e.preventDefault();
-    e.stopPropagation();
-  }
-
-  ['dragenter', 'dragover'].forEach(eventName => {
-    dropZone.addEventListener(eventName, () => dropZone.classList.add('drag-active'), false);
-  });
-
-  ['dragleave', 'drop'].forEach(eventName => {
-    dropZone.addEventListener(eventName, () => dropZone.classList.remove('drag-active'), false);
-  });
-
-  dropZone.addEventListener('drop', handleDrop, false);
-
-  function handleDrop(e) {
-    const dt = e.dataTransfer;
-    const files = dt.files;
-    
-    if (files.length > 0) {
-      // โยนไฟล์ที่ลากมาใส่ใน Input ปกติของระบบคุณ แล้วสั่งให้ระบบ render ภาพ
-      const fileInput = document.getElementById('album-supportFiles');
-      if(fileInput) {
-        fileInput.files = files;
-        // เรียกฟังก์ชันที่มีอยู่แล้วในระบบคุณเพื่อจัดการไฟล์
-        if(typeof window.TANJAI_ALBUM_PRO !== 'undefined') {
-          window.TANJAI_ALBUM_PRO.collectFilesFromInputs(true);
-          window.TANJAI_ALBUM_PRO.renderUploadPreview();
-        }
-      }
-    }
-  }
-}
-// ฟังก์ชันสำหรับครอบและขยายภาพให้เต็ม Canvas อัตโนมัติ (ไม่ให้ภาพเบี้ยว)
-function drawImageSmartCrop(ctx, img, x, y, w, h) {
-    let offsetX = 0.5; // จุดโฟกัสแกน X (0.5 คือตรงกลาง)
-    let offsetY = 0.5; // จุดโฟกัสแกน Y (0.5 คือตรงกลาง)
-    let iw = img.width, ih = img.height;
-    let r = Math.min(w / iw, h / ih);
-    let nw = iw * r, nh = ih * r;
-    let cx, cy, cw, ch, ar = 1;
-
-    // หาอัตราส่วนที่ต้องขยายเพื่อครอบให้เต็ม
-    if (nw < w) ar = w / nw;
-    if (Math.abs(ar - 1) < 1e-14 && nh < h) ar = h / nh;
-    nw *= ar;
-    nh *= ar;
-
-    cw = iw / (nw / w);
-    ch = ih / (nh / h);
-    cx = (iw - cw) * offsetX;
-    cy = (ih - ch) * offsetY;
-
-    if (cx < 0) cx = 0;
-    if (cy < 0) cy = 0;
-    if (cw > iw) cw = iw;
-    if (ch > ih) ch = ih;
-
-    // วาดรูปลง Canvas
-    ctx.drawImage(img, cx, cy, cw, ch, x, y, w, h);
-}
-// ตัวอย่างฟังก์ชันสร้าง Cover
-function drawPremiumCover(ctx, img, canvasWidth, canvasHeight, titleText, subtitleText) {
-    // 1. วาดรูปภาพพื้นหลัง พร้อมระบบ Smart Crop ให้พอดีสัดส่วนเฟสบุ๊ค
-    drawImageSmartCrop(ctx, img, 0, 0, canvasWidth, canvasHeight);
-
-    // 2. วาดแถบไล่สี (Gradient) ด้านล่างเพื่อให้อ่านตัวหนังสือชัด
-    // ไล่สีจากโปร่งใส ไปหา สีน้ำเงินเข้ม/ดำ
-    let gradientHeight = canvasHeight * 0.4; // ความสูงของแถบสี (40% ของภาพ)
-    let grad = ctx.createLinearGradient(0, canvasHeight - gradientHeight, 0, canvasHeight);
-    grad.addColorStop(0, "rgba(0, 15, 40, 0)");       // ด้านบนโปร่งใส
-    grad.addColorStop(0.6, "rgba(0, 15, 40, 0.85)"); // เริ่มทึบ
-    grad.addColorStop(1, "rgba(0, 15, 40, 0.95)");   // ด้านล่างทึบสุด
-    
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, canvasHeight - gradientHeight, canvasWidth, gradientHeight);
-
-    // 3. วาดเส้นขอบสีทอง (Gold Border)
-    let borderWidth = 12; // ความหนาของเส้นขอบ
-    let margin = 20;      // ระยะห่างจากขอบภาพ
-    
-    ctx.strokeStyle = "#D4AF37"; // โค้ดสีทอง (Gold)
-    ctx.lineWidth = borderWidth;
-    ctx.strokeRect(margin, margin, canvasWidth - (margin * 2), canvasHeight - (margin * 2));
-
-    // 4. วาดเส้นตกแต่งเล็กๆ ด้านใน (เพื่อความหรูหราแบบตัวอย่าง)
-    ctx.strokeStyle = "rgba(212, 175, 55, 0.5)"; // สีทองโปร่งแสง
-    ctx.lineWidth = 2;
-    ctx.strokeRect(margin + 10, margin + 10, canvasWidth - ((margin + 10) * 2), canvasHeight - ((margin + 10) * 2));
-
-    // 5. ใส่ข้อความ (Text) วางไว้ตำแหน่งด้านล่าง
-    ctx.textAlign = "center";
-    
-    // ข้อความหลัก (เช่น โครงการอบรม...)
-    ctx.fillStyle = "#FFFFFF"; // สีขาว
-    ctx.font = `bold ${Math.round(canvasWidth * 0.06)}px Prompt, sans-serif`;
-    ctx.fillText(titleText, canvasWidth / 2, canvasHeight - Math.round(canvasHeight * 0.12));
-
-    // ข้อความรอง (เช่น เทศบาลเมืองบางรักน้อย) ถ้ามี
-    if(subtitleText) {
-        ctx.fillStyle = "#D4AF37"; // สีทอง
-        ctx.font = `500 ${Math.round(canvasWidth * 0.035)}px Prompt, sans-serif`;
-        ctx.fillText(subtitleText, canvasWidth / 2, canvasHeight - Math.round(canvasHeight * 0.05));
-    }
-}
-// ฟังก์ชันวาดหน้าปก Facebook แบบพรีเมียม (ครอบรูปอัตโนมัติ + กรอบกรม/ทอง)
-function drawPremiumFacebookCover(ctx, img, canvasWidth, canvasHeight, title1, title2, orgName) {
-    // ---------------------------------------------------------
-    // 1. ระบบ Smart Crop (ซูมและครอบภาพให้อยู่ตรงกลาง ไม่เบี้ยว)
-    // ---------------------------------------------------------
-    let iw = img.width, ih = img.height;
-    let r = Math.min(canvasWidth / iw, canvasHeight / ih);
-    let nw = iw * r, nh = ih * r;
-    let ar = 1;
-    
-    if (nw < canvasWidth) ar = canvasWidth / nw;
-    if (Math.abs(ar - 1) < 1e-14 && nh < canvasHeight) ar = canvasHeight / nh;
-    nw *= ar; nh *= ar;
-    
-    let cw = iw / (nw / canvasWidth), ch = ih / (nh / canvasHeight);
-    let cx = (iw - cw) * 0.5, cy = (ih - ch) * 0.5; // โฟกัสกึ่งกลางภาพ
-    
-    if (cx < 0) cx = 0; if (cy < 0) cy = 0;
-    if (cw > iw) cw = iw; if (ch > ih) ch = ih;
-    
-    // วาดรูปลง Canvas
-    ctx.drawImage(img, cx, cy, cw, ch, 0, 0, canvasWidth, canvasHeight);
-
-    // ---------------------------------------------------------
-    // 2. วาดพื้นหลังไล่สีสีกรมท่าเข้ม (เพื่อให้ตัวหนังสือเด่น)
-    // ---------------------------------------------------------
-    let grad = ctx.createLinearGradient(0, canvasHeight * 0.2, 0, canvasHeight);
-    grad.addColorStop(0, "rgba(4, 18, 43, 0)");      // ด้านบนโปร่งใสให้เห็นรูป
-    grad.addColorStop(0.6, "rgba(4, 18, 43, 0.85)"); // เริ่มเป็นสีกรมท่า
-    grad.addColorStop(1, "rgba(4, 18, 43, 0.95)");   // ด้านล่างทึบ
-    
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
-
-    // ---------------------------------------------------------
-    // 3. วาดขอบสีทอง (Gold Border) คู่ซ้อนกันแบบตัวอย่าง
-    // ---------------------------------------------------------
-    let margin = 24; // ระยะห่างจากขอบรูป
-    let goldColor = "#E5C07B"; // โค้ดสีทองสว่าง
-    
-    // เส้นกรอบนอก (หนา)
-    ctx.strokeStyle = goldColor;
-    ctx.lineWidth = 4;
-    ctx.strokeRect(margin, margin, canvasWidth - (margin * 2), canvasHeight - (margin * 2));
-
-    // เส้นกรอบใน (บาง)
-    ctx.strokeStyle = "rgba(229, 192, 123, 0.5)"; // สีทองโปร่งแสง
-    ctx.lineWidth = 1;
-    ctx.strokeRect(margin + 8, margin + 8, canvasWidth - ((margin + 8) * 2), canvasHeight - ((margin + 8) * 2));
-
-    // ---------------------------------------------------------
-    // 4. จัดวางข้อความ (Typography) เหมือนรูปตัวอย่าง
-    // ---------------------------------------------------------
-    ctx.textAlign = "center";
-    let centerX = canvasWidth / 2;
-    let bottomY = canvasHeight - margin - 24; // จุดเริ่มเขียนข้อความจากล่างขึ้นบน
-
-    // ชื่อหน่วยงาน (เช่น เทศบาลเมืองบางรักน้อย) สีทอง ด้านล่างสุด
-    if(orgName) {
-        ctx.fillStyle = goldColor; 
-        ctx.font = `500 ${Math.round(canvasWidth * 0.035)}px Kanit, Prompt, sans-serif`;
-        ctx.fillText(orgName, centerX, bottomY);
-        bottomY -= Math.round(canvasWidth * 0.055); // ดันบรรทัดต่อไปขึ้น
-    }
-
-    // หัวข้อรอง (เช่น การใช้งานระบบสารบรรณอิเล็กทรอนิกส์) สีขาว
-    if(title2) {
-        ctx.fillStyle = "#FFFFFF";
-        ctx.font = `600 ${Math.round(canvasWidth * 0.05)}px Kanit, Prompt, sans-serif`;
-        ctx.fillText(title2, centerX, bottomY);
-        bottomY -= Math.round(canvasWidth * 0.065);
-    }
-
-    // หัวข้อหลัก (เช่น การอบรมเชิงปฏิบัติการ) สีทอง
-    if(title1) {
-        ctx.fillStyle = goldColor;
-        ctx.font = `bold ${Math.round(canvasWidth * 0.055)}px Kanit, Prompt, sans-serif`;
-        ctx.fillText(title1, centerX, bottomY);
-    }
-}
-// สมมติว่า d คือข้อมูลที่ดึงมาจาก Form ของคุณ
-let text1 = "การอบรมเชิงปฏิบัติการ";
-let text2 = "การใช้งานระบบสารบรรณอิเล็กทรอนิกส์";
-let orgText = d.org || "เทศบาลเมืองบางรักน้อย";
-
-// เรียกฟังก์ชันวาด (ctx คือ 2D context ของ Canvas)
-drawPremiumFacebookCover(ctx, coverImgElement, canvas.width, canvas.height, text1, text2, orgText);

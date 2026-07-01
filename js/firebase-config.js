@@ -4,13 +4,6 @@ window.TANJAI_ENABLE_LOCAL_FALLBACK = false;
 // Private Access: accounts should be created by the owner in Firebase Console.
 window.TANJAI_ALLOW_PUBLIC_REGISTRATION = false;
 
-// Username-only access used by the simplified login screen.
-// The owner should keep the matching account/permission in Firebase.
-window.TANJAI_USERNAME_USERS = {
-  thanawid: { email: "thanawid@gmail.com", displayName: "thanawid" },
-  teamtanjai: { email: "teamtanjai@tanjai.local", displayName: "teamtanjai" }
-};
-
 const firebaseConfig = {
   apiKey: "AIzaSyCuuJLUXNaEQTolNwZk5JXl5DpQIEDo6io",
   authDomain: "tanjai-ai-studio.firebaseapp.com",

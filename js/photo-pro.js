@@ -307,7 +307,9 @@
     if(e.target.closest('#photoPro-download-top')){ e.preventDefault(); downloadZip(); }
   });
 
-  document.addEventListener('DOMContentLoaded', ()=>{
+  function initPhotoPro(){
     renderForm(); bindForm(); setPreset('auto'); setResultIdle();
-  });
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initPhotoPro);
+  else initPhotoPro();
 })();

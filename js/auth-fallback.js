@@ -8,7 +8,6 @@ window.TANJAI = window.TANJAI || {};
 (function(){
   const KEY = "tanjaiLocalAuthV913";
   const allowLocalFallback = window.TANJAI_ENABLE_LOCAL_FALLBACK === true;
-  const normalizeLoginName = (name) => String(name || "").trim().toLowerCase().replace(/[^a-z0-9._-]/g, "");
 
   function showUnavailable(){
     const error = document.getElementById("loginError");
@@ -35,8 +34,8 @@ window.TANJAI = window.TANJAI || {};
     try{ return JSON.parse(localStorage.getItem(KEY) || "null"); }catch(e){ return null; }
   }
 
-  function writeLocalUser(email, name){
-    const user = { email: email || "local@tanjai", uid: name ? `named_${name}` : "local", username: name || "local", displayName: name || String(email || "local").split("@")[0], mode: "local-fallback", savedAt: Date.now() };
+  function writeLocalUser(email){
+    const user = { email: email || "local@tanjai", uid: "local", mode: "local-fallback", savedAt: Date.now() };
     localStorage.setItem(KEY, JSON.stringify(user));
     return user;
   }
@@ -49,16 +48,6 @@ window.TANJAI = window.TANJAI || {};
     }
     console.warn("TANJAI: Firebase Auth unavailable, local fallback enabled.");
     window.TANJAI_AUTH = {
-      loginName: async (name, password) => {
-        if(!password || String(password).trim().length < 6) throw new Error("กรุณากรอกรหัสผ่านอย่างน้อย 6 ตัวอักษร");
-        const key = normalizeLoginName(name);
-        const profile = (window.TANJAI_USERNAME_USERS || {})[key];
-        if(!profile) throw new Error("ไม่พบชื่อผู้ใช้งานนี้ในระบบ");
-        const user = writeLocalUser(profile.email, key);
-        showApp(user.displayName || key);
-        TANJAI.toast?.("เข้าสู่ระบบแล้ว");
-      },
-      loginWithUsername: async (name, password) => window.TANJAI_AUTH.loginName(name, password),
       login: async (email, password) => {
         if(!password || String(password).trim().length < 6) throw new Error("กรุณากรอกรหัสผ่านอย่างน้อย 6 ตัวอักษร");
         const user = writeLocalUser(email || "local@tanjai");
