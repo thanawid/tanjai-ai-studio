@@ -85,6 +85,9 @@ window.TANJAI = window.TANJAI || {};
     return [
       valueLine("ประเภทองค์กร / กลุ่มผู้ใช้งาน", d.orgType),
       valueLine("ชื่อองค์กร / แบรนด์ / หน่วยงาน", d.orgName),
+      valueLine("ประเภทเนื้อหา", d.contentType),
+      valueLine("แนวภาพหลัก / Visual Preset", d.visualPreset),
+      valueLine("ตัวเสริมภาพ / Style Modifier", d.styleModifiers),
       valueLine("หมวดงานหลัก", d.mainCategory),
       valueLine("หัวข้องาน / ประเภทงาน", d.title),
       valueLine("รายละเอียดจริงที่ผู้ใช้ให้มา", d.detail),
@@ -178,7 +181,6 @@ window.TANJAI = window.TANJAI || {};
     return `Professional Brief-to-Prompt Output v9.3.9
 
 สถานะบรีฟ: ${a.readiness}
-คะแนนความพร้อม: ${a.score}/100
 ประเภทงานที่ระบบอ่านได้: ${a.label}
 ชนิดผลลัพธ์: ${toolLabels[tool] || toolLabels.image}
 
@@ -412,7 +414,6 @@ ${T.promptBrainReport(d, type)}
     const level = a.score >= 85 ? "พร้อมมาก" : a.score >= 70 ? "ใช้ได้" : "ควรเติมข้อมูล";
     return `Professional Output Check v9.3.9
 
-คะแนนความพร้อม: ${a.score}/100
 สถานะ: ${level}
 คำแนะนำ: ${a.readiness}
 

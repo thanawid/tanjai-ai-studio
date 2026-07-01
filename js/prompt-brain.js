@@ -87,30 +87,34 @@ window.TANJAI = window.TANJAI || {};
   T.brainMissing = function(d = {}, kind = "general-publicity", tool = "image"){
     const missing = [];
     const add = (label, value) => { if(!hasMeaning(value)) missing.push(label); };
-    if(!hasMeaning(d.title)) missing.push("หัวข้องานหลัก");
-    if(!hasMeaning(d.orgName)) missing.push("ชื่อหน่วยงาน / แบรนด์เจ้าของงาน");
+    const text = `${d.contentType || ""} ${d.title || ""} ${d.detail || ""} ${d.mainCategory || ""} ${d.subCategory || ""} ${d.workContext || ""}`;
+    const eventLike = /ประกาศ|แจ้งข่าว|เชิญ|กิจกรรม|ประชุม|พิธี|โครงการ|อบรม|ลงพื้นที่|รับสมัคร|เปิดลงทะเบียน|กำหนดการ|รายงานผล|รณรงค์/i.test(text);
+    const conceptLike = /เพลง|ศิลปิน|สินค้า|บริการ|คำคม|แคปชั่น|คอนเซ็ปต์|ศิลป์|มาสคอต|คาแรกเตอร์|โลโก้|แบรนด์|Cover Art/i.test(text);
+
+    if(!hasMeaning(d.title)) missing.push(tool === "image" ? "หัวข้อ / ข้อความหลักบนภาพ" : "หัวข้องานหลัก");
+    if(!hasMeaning(d.orgName)) missing.push("ชื่อหน่วยงาน / แบรนด์เจ้าของงาน ถ้าต้องการให้แสดง");
     if(!hasMeaning(d.detail)) missing.push("รายละเอียดหลักของงาน");
 
-    if(["charity-run", "civic-meeting", "education-campaign"].includes(kind)){
-      add("วันที่", d.dateTime);
-      add("เวลา", d.dateTime);
-      add("สถานที่", d.place);
+    if(eventLike && !conceptLike){
+      if(["charity-run", "civic-meeting", "education-campaign"].includes(kind) || /กิจกรรม|ประชุม|พิธี|โครงการ|อบรม|เชิญ|รับสมัคร|ประกาศ/.test(text)){
+        add("วันที่ / เวลา ถ้างานนี้ต้องแสดงกำหนดการ", d.dateTime);
+        add("สถานที่ ถ้างานนี้มีสถานที่จริง", d.place);
+      }
       if(kind === "charity-run"){
         missing.push("ระยะทาง / ประเภทการวิ่ง ถ้ามี");
         missing.push("ค่าสมัคร / วิธีสมัคร / ช่องทางติดต่อ ถ้ามี");
       }
     }
+
     if(kind === "activity-report"){
-      add("วันเวลาที่จัดกิจกรรม", d.dateTime);
-      add("สถานที่จัดกิจกรรม", d.place);
-      if(!hasMeaning(d.people)) missing.push("ผู้เข้าร่วม / ผู้บริหาร / หน่วยงานที่เกี่ยวข้อง");
+      add("วันเวลาที่จัดกิจกรรม ถ้าต้องอ้างอิงข่าว", d.dateTime);
+      add("สถานที่จัดกิจกรรม ถ้าต้องอ้างอิงข่าว", d.place);
+      if(!hasMeaning(d.people)) missing.push("ผู้เข้าร่วม / ผู้บริหาร / หน่วยงานที่เกี่ยวข้อง ถ้าต้องกล่าวถึง");
     }
-    if(kind === "announcement"){
-      if(!hasMeaning(d.dateTime)) missing.push("ช่วงเวลาที่ประกาศมีผล / วันที่เกี่ยวข้อง");
-      if(!hasMeaning(d.place)) missing.push("พื้นที่หรือสถานที่ที่เกี่ยวข้อง");
-    }
+
     if(tool === "image"){
       if(!hasMeaning(d.size)) missing.push("ขนาดภาพปลายทาง");
+      if(!hasMeaning(d.visualPreset)) missing.push("แนวภาพหลัก / Visual Preset ถ้าต้องการล็อกทิศทางภาพ");
       if(/เทศบาล|อบต|หน่วยงาน|ราชการ/.test(`${d.orgType || ""} ${d.orgName || ""}`)) missing.push("โลโก้จริงของหน่วยงาน ถ้าต้องใส่");
     }
     return uniq(missing);

@@ -43,6 +43,12 @@ TANJAI.commonData = function(prefix) {
     const el = TANJAI.$(`#${prefix}-${id}`);
     return !!(el && (el.checked || el.value === "on" || el.value === "true"));
   };
+  const multi = id => {
+    const el = TANJAI.$(`#${prefix}-${id}`);
+    if(!el) return "";
+    if(el.multiple) return Array.from(el.selectedOptions || []).map(o => o.value || o.textContent).filter(Boolean).join(", ");
+    return (el.value || "").trim();
+  };
 
   const baseData = {
     title: v("title") || "หัวข้องาน",
@@ -60,7 +66,10 @@ TANJAI.commonData = function(prefix) {
     dateTime: v("dateTime") || "",
     place: v("place") || "",
     people: v("people") || "",
-    style: v("style") || "Modern Premium Clean",
+    contentType: v("contentType") || "ให้ AI วิเคราะห์เอง",
+    visualPreset: v("visualPreset") || "",
+    styleModifiers: multi("styleModifiers") || "",
+    style: v("style") || v("visualPreset") || "Modern Premium Clean",
     layout: v("layout") || "Split Layout ซ้ายข้อความ ขวาภาพ",
     density: v("density") || "สมดุล อ่านง่าย",
     focus: v("focus") || "เน้นหัวข้อหลัก",
@@ -97,59 +106,78 @@ TANJAI.commonData = function(prefix) {
  * Prompt Critic - evaluates data completeness
  */
 TANJAI.promptCritic = function(d) {
-  const mode = d.useMode || "สร้างภาพใหม่ด้วย AI";
-  const photoCount = Number(d.photoCount || 0);
-  const isRealMode = mode !== "สร้างภาพใหม่ด้วย AI";
-  const hasPhotos = photoCount > 0;
-  const titleOk = !!(d.title && d.title !== "หัวข้องาน");
-  const orgOk = !!(d.orgName && d.orgName !== "ทันใจ AI Studio" && d.orgName !== "ยังไม่ได้ระบุ");
-  const detailOk = !!(d.detail && d.detail !== "ยังไม่ได้ระบุรายละเอียดเพิ่มเติม" && d.detail.length >= 20);
+  const hasMeaning = value => {
+    const text = String(value || "").trim();
+    return !!text && !/^(ไม่ระบุ|ยังไม่ได้ระบุ|หัวข้องาน|ให้ AI วิเคราะห์เอง|ให้ AI เลือก.*|กำหนดเอง)$/i.test(text);
+  };
+  const titleOk = hasMeaning(d.title);
+  const detailOk = hasMeaning(d.detail) && String(d.detail || "").trim().length >= 12;
+  const orgOk = hasMeaning(d.orgName);
+  const typeText = `${d.contentType || ""} ${d.mainCategory || ""} ${d.subCategory || ""} ${d.workContext || ""} ${d.title || ""} ${d.detail || ""}`;
+  const eventLike = /ประกาศ|แจ้งข่าว|เชิญ|กิจกรรม|ประชุม|พิธี|โครงการ|อบรม|ลงพื้นที่|รับสมัคร|เปิดลงทะเบียน|กำหนดการ|รณรงค์|รายงานผล/i.test(typeText);
+  const conceptLike = /เพลง|ศิลปิน|สินค้า|บริการ|คำคม|แคปชั่น|คอนเซ็ปต์|ศิลป์|มาสคอต|คาแรกเตอร์|โลโก้|แบรนด์|Cover Art/i.test(typeText);
+  const realMode = (d.useMode || "") !== "สร้างภาพใหม่ด้วย AI";
+  const hasPhotos = Number(d.photoCount || 0) > 0;
 
-  let score = 35;
   const good = [];
   const missing = [];
-  const risks = [];
   const suggestions = [];
+  const risks = [];
 
-  if (titleOk) { score += 10; good.push("มีหัวข้องานชัดเจน"); } else { missing.push("หัวข้องานยังไม่ชัด ควรระบุชื่อเรื่องหลัก"); }
-  if (orgOk) { score += 8; good.push("มีชื่อองค์กร/แบรนด์"); } else { missing.push("ชื่อองค์กรยังไม่ชัด ควรระบุหน่วยงานเจ้าของงาน"); }
-  if (detailOk) { score += 14; good.push("มีรายละเอียดงานเพียงพอ"); } else { missing.push("รายละเอียดงานยังน้อย ควรเพิ่มข้อมูลเพิ่มเติม"); }
-  if (d.dateTime) { score += 6; good.push("มีวัน/เวลา"); } else { suggestions.push("ถ้างานมีเส้นตาย ควรเพิ่มวัน/เวลา"); }
-  if (d.place) { score += 5; good.push("มีสถานที่"); } else { suggestions.push("ถ้างานมีสถานที่จริง ควรเพิ่มสถานที่"); }
-  if (d.people) { score += 4; good.push("มีบุคคลที่เกี่ยวข้อง"); }
+  if(titleOk) good.push("มีหัวข้อ / ข้อความหลักชัดเจน");
+  else missing.push("ควรใส่หัวข้อหรือข้อความหลักที่จะใช้บนภาพ");
 
-  if (isRealMode) {
-    if (hasPhotos) { score += 8; good.push("เลือกโหมดภาพจริงและมีภาพแนบ"); }
-    else { risks.push("เลือกโหมดภาพจริง แต่ยังไม่มีภาพแนบ"); score -= 5; }
-    if (d.safeFace && d.safeNewPerson && d.safeNoCover) { score += 8; good.push("เปิดระบบกันหน้าเพี้ยนครบถ้วน"); }
-    else { risks.push("ระบบกันหน้าเพี้ยนยังไม่ครบ"); }
-  } else {
-    if (hasPhotos) { risks.push("มีภาพแนบแต่เลือกสร้างภาพใหม่"); score -= 7; }
-    else { score += 3; good.push("โหมดสร้างใหม่เหมาะกับงาน"); }
+  if(detailOk) good.push("มีรายละเอียดจริงให้ระบบใช้ต่อ");
+  else suggestions.push("เพิ่มรายละเอียดจริงเท่าที่มี เช่น ใคร ทำอะไร เพื่อใคร หรือสารที่ต้องการสื่อ");
+
+  if(orgOk) good.push("มีชื่อองค์กร / แบรนด์");
+  else suggestions.push("ใส่ชื่อองค์กรหรือแบรนด์ ถ้าต้องการให้ปรากฏในงาน");
+
+  if(hasMeaning(d.contentType)) good.push(`ระบุประเภทเนื้อหา: ${d.contentType}`);
+  else suggestions.push("เลือกประเภทเนื้อหา เพื่อให้ระบบเช็กข้อมูลจำเป็นได้แม่นขึ้น");
+
+  if(hasMeaning(d.visualPreset)) good.push(`เลือกแนวภาพหลัก: ${d.visualPreset}`);
+  else suggestions.push("เลือกแนวภาพหลัก หรือปล่อยให้ AI เลือกตามงาน");
+
+  if(d.styleModifiers) good.push(`มีตัวเสริมภาพ: ${d.styleModifiers}`);
+
+  if(eventLike && !conceptLike){
+    if(hasMeaning(d.dateTime)) good.push("มีวัน/เวลาสำหรับงานที่เกี่ยวกับกิจกรรมหรือประกาศ");
+    else suggestions.push("งานลักษณะนี้อาจควรเพิ่มวัน/เวลา หากต้องการให้แสดงในภาพ");
+    if(hasMeaning(d.place)) good.push("มีสถานที่หรือพื้นที่เกี่ยวข้อง");
+    else suggestions.push("งานลักษณะนี้อาจควรเพิ่มสถานที่ หากต้องการให้แสดงในภาพ");
+  }else{
+    good.push("งานประเภทนี้ไม่จำเป็นต้องบังคับวัน เวลา หรือสถานที่");
   }
 
-  score = Math.max(0, Math.min(100, score));
-  const level = score >= 90 ? "พร้อมมาก" : score >= 75 ? "พร้อมใช้งาน" : score >= 60 ? "พอใช้ แต่ควรเติมข้อมูล" : "ยังควรปรับก่อนส่ง";
-  const verdict = score >= 85 ? "ใช้ส่งเข้า GPT ได้เลย" : score >= 70 ? "ใช้ได้ แต่เติมข้อมูลอีกนิดจะดีขึ้น" : "ควรเติมข้อมูลก่อนส่ง";
-  const scoreIcon = score >= 90 ? "🟢" : score >= 75 ? "🟡" : score >= 60 ? "🟠" : "🔴";
+  if(realMode){
+    if(hasPhotos) good.push("เลือกใช้ภาพจริงและมีไฟล์แนบในเว็บ");
+    else risks.push("เลือกโหมดใช้ภาพจริง แต่ยังไม่ได้เลือกไฟล์ในเว็บ");
+  }else if(hasPhotos){
+    suggestions.push("มีภาพแนบอยู่ หากต้องการคงภาพจริงให้เลือกโหมดใช้ภาพจริงเป็นต้นฉบับ");
+  }
 
+  let status = "พร้อมใช้";
+  if(!titleOk) status = "ยังขาดข้อมูลสำคัญ";
+  else if(missing.length || suggestions.length >= 3 || risks.length) status = "ควรเพิ่มข้อมูล";
+
+  const icon = status === "พร้อมใช้" ? "✅" : status === "ควรเพิ่มข้อมูล" ? "⚠️" : "❌";
   const list = (arr, fallback) => arr.length ? arr.map(x => `- ${x.replace(/^- /, "")}`).join("\n") : `- ${fallback}`;
 
-  return `${scoreIcon} คะแนนความพร้อม: ${score}/100
-สถานะ: ${level}
-คำแนะนำ: ${verdict}
+  return `${icon} สถานะ Prompt: ${status}
 
 ข้อมูลที่ครบแล้ว:
-${list(good, "ยังไม่มีข้อมูลเด่นชัดมากพอ")}
+${list(good, "มีข้อมูลตั้งต้นพอสำหรับให้ AI ช่วยจัดโครง")}
 
-ข้อมูลที่ยังควรเพิ่ม:
-${list(missing, "ไม่มีข้อมูลจำเป็นที่ขาดชัดเจน")}
+ข้อมูลที่ควรเพิ่ม:
+${list(missing.concat(suggestions), "ไม่มีข้อมูลจำเป็นที่ต้องบังคับเพิ่ม")}
 
 ความเสี่ยง:
 ${list(risks, "ไม่พบความเสี่ยงสำคัญ")}
 
-ข้อเสนอแนะ:
-${list(suggestions, "โครง Prompt พร้อมใช้งาน")}`;
+หมายเหตุ:
+- ระบบไม่บังคับวัน เวลา หรือสถานที่กับงานที่เป็นเพลง สินค้า คำคม คอนเซ็ปต์ มาสคอต โลโก้ หรือภาพศิลป์
+- หากเป็นประกาศ กิจกรรม งานประชุม โครงการ หรืออบรม ระบบจะแนะนำวัน เวลา สถานที่แบบไม่บังคับ`;
 };
 
 /**

@@ -5014,3 +5014,26 @@ label > .field-hint + select{
     grid-template-columns:1fr !important;
   }
 }
+
+
+/* V9.7.4 — Smart Role Context + Market Visual Presets */
+.style-modifier-select-v974{
+  min-height:128px;
+  line-height:1.45;
+}
+.form-grid label small{
+  display:block;
+  margin-top:6px;
+  color:var(--muted,#94a3b8);
+  line-height:1.45;
+}
+.quick-mode-banner b::after{
+  content:" · Smart Brief";
+  color:var(--gold,#facc15);
+  font-weight:800;
+}
+@media (max-width:720px){
+  .style-modifier-select-v974{
+    min-height:150px;
+  }
+}
