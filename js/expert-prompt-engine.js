@@ -7,7 +7,7 @@ window.TANJAI = window.TANJAI || {};
  */
 (function(){
   const T = window.TANJAI;
-  T.expertPromptVersion = "Expert Engine 1.8 — Smart Role Context + Market Visual Presets";
+  T.expertPromptVersion = "Expert Engine 1.9 — Simple Smart Form UX";
 
   const clean = (value = "", fallback = "") => {
     const result = String(value || "")

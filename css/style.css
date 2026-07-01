@@ -5037,3 +5037,68 @@ label > .field-hint + select{
     min-height:150px;
   }
 }
+
+
+/* V9.8 — Simple Smart Form UX */
+.simple-smart-section-v98{
+  border-color:rgba(34,211,238,.30);
+}
+.compact-preset-wrap-v98{
+  margin-top:2px;
+}
+.market-preset-row-v98{
+  gap:8px;
+}
+.market-preset-row-v98 .chip-btn{
+  padding:9px 12px;
+  border-radius:999px;
+}
+.v98-advanced-control{
+  margin-top:14px;
+  border:1px solid rgba(148,163,184,.18);
+  border-radius:18px;
+  background:rgba(15,23,42,.32);
+  overflow:hidden;
+}
+.v98-advanced-control summary{
+  list-style:none;
+  cursor:pointer;
+  padding:14px 16px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+.v98-advanced-control summary::-webkit-details-marker{display:none}
+.v98-advanced-control summary span{
+  font-weight:800;
+}
+.v98-advanced-control summary small{
+  color:var(--muted,#94a3b8);
+  font-size:12px;
+}
+.v98-advanced-control summary::after{
+  content:"+";
+  font-weight:900;
+  color:#7dd3fc;
+}
+.v98-advanced-control[open] summary::after{
+  content:"–";
+}
+.v98-advanced-control .quick-advanced-body{
+  border-top:1px solid rgba(148,163,184,.12);
+  padding:14px 16px 16px;
+}
+.image-reference-v98{
+  margin-bottom:14px;
+}
+@media (max-width:720px){
+  .market-preset-row-v98 .chip-btn{
+    width:100%;
+    justify-content:center;
+  }
+  .v98-advanced-control summary{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+}
