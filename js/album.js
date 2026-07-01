@@ -1,9 +1,7 @@
-/* v9.5 — Smart Album + Touch Ordering + Progressive Processing
-   ✅ รองรับ 1–5 ภาพ (ไม่บังคับ 4 ภาพ)
-   ✅ Touch drag ordering บนมือถือ
-   ✅ Progress bar ขณะประมวลผล
-   ✅ Caption AI รู้บริบทองค์กรดีขึ้น
-   ✅ Responsive ทุกอุปกรณ์
+/* v9.4.1 — Story Frames + Facebook Publishing Director
+   Safe photo processing for real uploaded images only.
+   Cover Frame + Lite Frames + Additional Frame, face-aware crop when supported,
+   smart theme selection, safe text, slot-based crop/frames, Facebook mock preview, and synced preview / download results.
 */
 (function(){
   function ensureAlbumInputs(){
@@ -22,7 +20,6 @@
     coverFile: null, supportFiles: [], files: [], outputs: [], logo: null, caption: "",
     resolvedRatio: "1080x800", resolvedPreviewLayout: "cover-top", resolvedFacebookPreset: "wide-top"
   };
-  window.albumState = state; // expose สำหรับ adjust engine
 
   function val(id, fallback=""){
     const el = document.getElementById(id);
@@ -68,6 +65,7 @@
       ratio: val("album-ratio","auto"),
       previewLayout: val("album-previewLayout","auto"),
       facebookPreset: val("album-facebookPreset","auto"),
+      storyMode: val("album-storyMode","auto"),
       captionStyle: val("album-captionStyle","pr-ready"),
       colorTone: val("album-colorTone","AI เลือกโทนสีให้เข้ากับงาน"),
       mode: val("album-autoMode", val("album-mode","ปรับภาพ + ครอป + ใส่กรอบ")),
@@ -101,7 +99,12 @@
     return "square-grid";
   }
   function effectiveFacebookPreset(d=data()){
+    if(d.storyMode==="split-main") return "square-grid";
     return d.facebookPreset && d.facebookPreset!=="auto" ? d.facebookPreset : (state.resolvedFacebookPreset || "wide-top");
+  }
+  function resolveStoryMode(requested="auto", preset="wide-top", fileCount=1){
+    if(requested && requested!=="auto") return requested;
+    return preset==="square-grid" && fileCount===1 ? "split-main" : "separate";
   }
   function presetLayout(preset){
     if(preset==="square-grid") return "grid";
@@ -561,17 +564,6 @@
     const land=w>=h;
     const pad=Math.round(Math.min(w,h)*0.03);
     drawAccentSweep(ctx,w,h,th,pst);
-
-    // ─── Strong gradient overlay ที่ด้านล่าง (แบบตัวอย่าง) ───
-    const gradH = Math.round(h * (land ? 0.62 : 0.55));
-    const grad = ctx.createLinearGradient(0, h - gradH, 0, h);
-    grad.addColorStop(0, "rgba(0,0,0,0)");
-    grad.addColorStop(0.35, rgba(th.deep, 0.55));
-    grad.addColorStop(0.72, rgba(th.deep, 0.88));
-    grad.addColorStop(1, "rgba(0,0,0,0.96)");
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, h - gradH, w, gradH);
-
     drawBorderFrame(ctx,w,h,th);
 
     const brandW=Math.round(w*(land?0.46:0.74));
@@ -611,8 +603,8 @@
     const titleX=panelX+Math.round(w*.03);
     const titleW=panelW-Math.round(w*.06);
     const titleY=panelY+Math.round(panelH*.16);
-    const titleFont=Math.round(Math.min(w,h)*(land?0.048:0.044)*pst.titleScale);
-    const titleLineH=Math.round(titleFont*1.15);
+    const titleFont=Math.round(Math.min(w,h)*(land?0.037:0.034)*pst.titleScale);
+    const titleLineH=Math.round(titleFont*1.11);
     drawText(ctx, smartShort(d.title,110), titleX, titleY, titleW, land?2:3, `900 ${titleFont}px "Prompt","Kanit","Noto Sans Thai",sans-serif`, '#fff', titleLineH);
 
     const subText = stripHashtags(d.detail) || stripHashtags(d.footer) || d.place || '';
@@ -783,6 +775,33 @@
     return {blob,url,role:profile.role,label:profile.label,w:sz.w,h:sz.h,filename:`facebook_album_${String(idx+1).padStart(2,'0')}_${profile.role}_${sz.w}x${sz.h}.jpg`};
   }
 
+  async function processStoryGrid(file){
+    const d=data(), th=theme(d);
+    const master=document.createElement('canvas'); master.width=2160; master.height=2160;
+    const masterCtx=master.getContext('2d');
+    const img=await makeImage(file);
+    const enhance=!d.mode.includes('ครอป + ใส่กรอบเท่านั้น');
+    const faceFocus=await detectFaceFocus(img);
+    coverDraw(img,masterCtx,master.width,master.height,enhance,faceFocus,.45);
+    if(!d.mode.includes('ปรับภาพเท่านั้น')) drawCoverFrame(masterCtx,master.width,master.height,d,th);
+
+    const positions=[
+      {x:0,y:0,name:'top_left',label:'ช่อง 1 · ซ้ายบน'},
+      {x:1080,y:0,name:'top_right',label:'ช่อง 2 · ขวาบน'},
+      {x:0,y:1080,name:'bottom_left',label:'ช่อง 3 · ซ้ายล่าง'},
+      {x:1080,y:1080,name:'bottom_right',label:'ช่อง 4 · ขวาล่าง'}
+    ];
+    const outputs=[];
+    for(let idx=0;idx<positions.length;idx++){
+      const part=positions[idx];
+      const canvas=document.createElement('canvas'); canvas.width=1080; canvas.height=1080;
+      canvas.getContext('2d').drawImage(master,part.x,part.y,1080,1080,0,0,1080,1080);
+      const blob=await canvasToBlob(canvas); const url=URL.createObjectURL(blob);
+      outputs.push({blob,url,role:idx===0?'cover':'lite',label:part.label,w:1080,h:1080,filename:`facebook_story_grid_${String(idx+1).padStart(2,'0')}_${part.name}_1080x1080.jpg`,storyTile:true});
+    }
+    return outputs;
+  }
+
   function normalizeFiles(fileList, warn=true, max=4){
     let files=Array.from(fileList||[]).filter(f=>f.type.startsWith('image/'));
     if(files.length>max){ files=files.slice(0,max); if(warn) alert(`ระบบนี้รองรับภาพรองได้สูงสุด ${max} ภาพ จึงเลือกใช้ ${max} ภาพแรกให้โดยอัตโนมัติ`); }
@@ -885,17 +904,10 @@
     const icon=style==='friendly'?'✨':style==='story'?'📷':style==='announcement'?'📣':style==='official'?'📢':'📌';
     if(f.title) parts.push(`${icon} ${f.title}`);
 
-    // ตรวจบริบทองค์กรอัตโนมัติ
-    const orgLower=(f.org||'').toLowerCase();
-    const isMuni=/เทศบาล|อบต|องค์การบริหาร|อำเภอ|จังหวัด|ราชการ/.test(orgLower);
-    const isHealth=/โรงพยาบาล|สาธารณสุข|อนามัย|คลินิก/.test(orgLower);
-    const isSchool=/โรงเรียน|มหาวิทยาลัย|วิทยาลัย|ศึกษา/.test(orgLower);
-    const isBrand=/ร้าน|บริษัท|ห้าง|เพจ|ครีเอเตอร์/.test(orgLower);
-
-    if(style==='official' || isMuni){
+    if(style==='official'){
       if(f.org) parts.push(f.org);
       if(f.detail) parts.push(smartShort(f.detail,260));
-    }else if(style==='friendly' || isBrand){
+    }else if(style==='friendly'){
       if(f.detail) parts.push(smartShort(f.detail,220));
       if(f.org) parts.push(`— ${f.org}`);
     }else if(style==='story'){
@@ -905,12 +917,7 @@
       if(f.org) parts.push(`${f.org} ขอแจ้งข้อมูลให้ผู้ที่เกี่ยวข้องทราบ`);
       if(f.detail) parts.push(smartShort(f.detail,240));
     }else{
-      // pr-ready default — ปรับตามบริบทองค์กร
-      const prPhrase = isMuni ? 'ขอประชาสัมพันธ์ให้ประชาชนในพื้นที่ทราบ'
-        : isHealth ? 'ขอประชาสัมพันธ์ข้อมูลสุขภาพให้ประชาชนทราบ'
-        : isSchool ? 'ขอประชาสัมพันธ์ให้นักเรียนและผู้ปกครองทราบ'
-        : 'ขอประชาสัมพันธ์ข้อมูลให้ประชาชนและผู้ที่เกี่ยวข้องได้รับทราบ';
-      if(f.org) parts.push(`${f.org} ${prPhrase}`);
+      if(f.org) parts.push(`${f.org} ขอประชาสัมพันธ์ข้อมูลให้ประชาชนและผู้ที่เกี่ยวข้องได้รับทราบ`);
       if(f.detail) parts.push(smartShort(f.detail,220));
     }
 
@@ -995,25 +1002,6 @@
             <button class="btn secondary" id="albumDownloadAllResult">ดาวน์โหลด ZIP</button>
           </div>
           <div id="albumFacebookPreview"></div>
-
-          <!-- ── IMAGE ADJUST PANEL v9.5 ── -->
-          <details class="album-review-details" id="albumAdjustPanel">
-            <summary>
-              <span><b>🎨 ปรับแสง / สี / ความคมชัด</b><small>ปรับทุกภาพพร้อมกัน — ไม่เปลี่ยนหน้าตาหรือโครงสร้างภาพ</small></span>
-            </summary>
-            <div class="album-adjust-box">
-              <div class="adjust-row"><label>ความสว่าง<span id="brightnessVal">0</span></label><input type="range" id="adj-brightness" min="-100" max="100" value="0" class="adjust-slider"></div>
-              <div class="adjust-row"><label>คอนทราสต์<span id="contrastVal">0</span></label><input type="range" id="adj-contrast" min="-100" max="100" value="0" class="adjust-slider"></div>
-              <div class="adjust-row"><label>ความอิ่มสี<span id="saturationVal">0</span></label><input type="range" id="adj-saturation" min="-100" max="100" value="0" class="adjust-slider"></div>
-              <div class="adjust-row"><label>ความคมชัด<span id="sharpnessVal">0</span></label><input type="range" id="adj-sharpness" min="0" max="10" value="0" class="adjust-slider"></div>
-              <div class="adjust-row"><label>อุณหภูมิสี<span id="warmthVal">0</span></label><input type="range" id="adj-warmth" min="-50" max="50" value="0" class="adjust-slider"></div>
-              <div class="adjust-actions">
-                <button class="btn primary" id="applyAdjust">✓ ใช้การปรับ + ดาวน์โหลดใหม่</button>
-                <button class="btn secondary" id="resetAdjust">↺ รีเซ็ต</button>
-              </div>
-              <p class="adjust-note">การปรับนี้ไม่เปลี่ยนใบหน้า เนื้อหา หรือโครงสร้างภาพ — แค่ปรับค่าสีและแสงเท่านั้น</p>
-            </div>
-          </details>
         </section>
 
         <details class="album-review-details album-caption-edit-details">
@@ -1082,7 +1070,24 @@
     return new Blob([...chunks,...cdChunks,end],{type:'application/zip'});
   }
 
-  async function downloadAll(){ if(!state.outputs.length) return alert('กรุณาสร้างชุดภาพก่อน'); const blob=await makeZip(state.outputs); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`facebook_album_pack_${Date.now()}.zip`; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1000); }
+  async function downloadAll(){
+    if(!state.outputs.length) return alert('กรุณาสร้างชุดภาพก่อน');
+    const captionEl=$('#albumCaptionText');
+    const caption=(captionEl?captionEl.value:state.caption || '').trim();
+    const files=state.outputs.slice();
+    if(caption){
+      files.push({
+        blob:new Blob([caption],{type:'text/plain;charset=utf-8'}),
+        filename:'facebook_caption.txt'
+      });
+    }
+    const blob=await makeZip(files);
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download=`facebook_album_pack_${Date.now()}.zip`;
+    a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  }
   function downloadOne(i){ const o=state.outputs[i]; if(!o) return; const a=document.createElement('a'); a.href=o.url; a.download=o.filename; a.click(); }
   async function loadLogo(file){ if(!file){ state.logo=null; return; } const img=new Image(); await new Promise((res,rej)=>{ img.onload=res; img.onerror=rej; img.src=URL.createObjectURL(file); }); state.logo=img; }
   function moveSupport(i,dir){ const j=dir==='up'?i-1:i+1; if(j<0 || j>=state.supportFiles.length) return; const copy=state.supportFiles.slice(); [copy[i],copy[j]]=[copy[j],copy[i]]; state.supportFiles=copy; syncStateFiles(); renderUploadPreview(); }
@@ -1101,38 +1106,23 @@
     state.files=files;
     state.outputs.forEach(o=>URL.revokeObjectURL(o.url)); state.outputs=[];
     const btn=$('#makeAlbum'); const old=btn?btn.textContent:''; if(btn){ btn.disabled=true; btn.textContent='กำลังสร้างชุดภาพ...'; }
-    // แสดง progress bar
-    let progressEl=$('#albumProgress');
-    if(!progressEl){
-      progressEl=document.createElement('div');
-      progressEl.id='albumProgress';
-      progressEl.className='album-progress-bar-wrap';
-      progressEl.innerHTML='<div class="album-progress-bar" id="albumProgressInner"></div><small id="albumProgressLabel">เริ่มต้น...</small>';
-      const resultHost=$('#albumResult');
-      if(resultHost) resultHost.prepend(progressEl);
-    }
-    progressEl.style.display='block';
-    const setProgress=(n,total,label)=>{
-      const pct=Math.round((n/total)*100);
-      const inner=$('#albumProgressInner');
-      const lbl=$('#albumProgressLabel');
-      if(inner) inner.style.width=pct+'%';
-      if(lbl) lbl.textContent=label||`กำลังประมวลผลภาพที่ ${n}/${total}...`;
-    };
     try{
       await waitFonts();
       await resolveSmartSettings(files);
-      setProgress(0,files.length,'โหลดโลโก้และตั้งค่า...');
       const logoInput=$('#album-logoFile'); if(logoInput && logoInput.files && logoInput.files[0]) await loadLogo(logoInput.files[0]); else state.logo=null;
-      for(let i=0;i<files.length;i++){
-        setProgress(i,files.length,`ประมวลผลภาพที่ ${i+1}/${files.length}...`);
-        state.outputs.push(await processImage(files[i],i,files.length));
+      const d=data();
+      const storyMode=resolveStoryMode(d.storyMode,effectiveFacebookPreset(d),files.length);
+      if(storyMode==='split-main'){
+        state.resolvedFacebookPreset='square-grid';
+        state.resolvedPreviewLayout='grid';
+        state.resolvedRatio='1080x1080';
+        state.outputs=await processStoryGrid(state.coverFile);
+        renderSmartChoice();
+      }else{
+        for(let i=0;i<files.length;i++) state.outputs.push(await processImage(files[i],i,files.length));
       }
-      setProgress(files.length,files.length,'สร้างแคปชั่น...');
       state.caption=captionText(data());
       renderOutputs();
-      setProgress(files.length,files.length,'เสร็จแล้ว ✓');
-      setTimeout(()=>{ if(progressEl) progressEl.style.display='none'; },1800);
     } finally { if(btn){ btn.disabled=false; btn.textContent=old || 'สร้างชุดภาพ'; } }
   }
 
@@ -1149,16 +1139,6 @@
         if(select){ select.value=presetButton.dataset.albumPreset || 'auto'; syncPresetButtons(); select.dispatchEvent(new Event('change',{bubbles:true})); }
         return;
       }
-      // Frame picker cards
-      const frameCard=e.target && e.target.closest ? e.target.closest('.frame-card') : null;
-      if(frameCard){
-        e.preventDefault();
-        $$('.frame-card').forEach(b=>b.classList.remove('selected'));
-        frameCard.classList.add('selected');
-        const sel=$('#album-proFrame');
-        if(sel) sel.value=frameCard.dataset.frame||'Balanced Ribbon';
-        return;
-      }
       const id=e.target && e.target.id;
       if(id==='makeAlbum'){ e.preventDefault(); generate(); }
       if(id==='albumDownloadAll' || id==='albumDownloadAllTop' || id==='albumDownloadAllResult'){ e.preventDefault(); downloadAll(); }
@@ -1172,29 +1152,12 @@
         renderUploadPreview();
         const smart=$('#album-smartChoice'); if(smart){ smart.textContent='ระบบจะสรุปขนาดและรูปแบบพรีวิวที่เลือกให้อีกครั้งหลังสร้างชุดภาพ'; smart.classList.remove('resolved'); }
         const host=$('#albumResult .ready-main') || $('#albumResult'); if(host) host.innerHTML='';
-        const prog=$('#albumProgress'); if(prog) prog.style.display='none';
       }
-      if(id==='albumCopyCaption' || id==='albumCopyCaptionQuick'){ e.preventDefault(); const t=$('#albumCaptionText'); const value=t?t.value:state.caption; if(value){ navigator.clipboard?.writeText(value); const old=e.target.textContent; e.target.textContent='คัดลอกแล้ว ✓'; setTimeout(()=>e.target.textContent=old || 'คัดลอกแคปชั่น',1400); } }
+      if(id==='albumCopyCaption' || id==='albumCopyCaptionQuick'){ e.preventDefault(); const t=$('#albumCaptionText'); const value=t?t.value:state.caption; if(value){ navigator.clipboard?.writeText(value); const old=e.target.textContent; e.target.textContent='คัดลอกแล้ว'; setTimeout(()=>e.target.textContent=old || 'คัดลอกแคปชั่น',1200); } }
       if(id==='albumRefreshPreview'){ e.preventDefault(); renderFacebookPreview(); }
       if(e.target && e.target.classList.contains('album-one-download')) downloadOne(Number(e.target.dataset.i||0));
       const move=e.target && e.target.dataset && e.target.dataset.albumSupportMove; if(move){ e.preventDefault(); moveSupport(Number(e.target.dataset.i||0), move); }
     });
-    // Touch swipe ordering บนมือถือ
-    let touchStartX=0, touchEl=null;
-    document.addEventListener('touchstart',(e)=>{
-      const btn=e.target && e.target.closest ? e.target.closest('[data-album-support-move]') : null;
-      if(btn){ touchStartX=e.touches[0].clientX; touchEl=btn; }
-    },{passive:true});
-    document.addEventListener('touchend',(e)=>{
-      if(!touchEl) return;
-      const dx=e.changedTouches[0].clientX - touchStartX;
-      if(Math.abs(dx)>40){
-        const dir=dx<0?'down':'up';
-        const i=Number(touchEl.closest('[data-i]')?.dataset.i||touchEl.dataset.i||0);
-        moveSupport(i,dir);
-      }
-      touchEl=null;
-    },{passive:true});
     document.addEventListener('change',(e)=>{
       if(e.target && (e.target.id==='album-coverFile' || e.target.id==='album-supportFiles')){ collectFilesFromInputs(true); renderUploadPreview(); }
       if(e.target && e.target.id==='album-facebookPreset'){
@@ -1204,6 +1167,7 @@
         renderSmartChoice();
         if(state.outputs.length) generate();
       }
+      if(e.target && e.target.id==='album-storyMode' && state.outputs.length) generate();
       if(e.target && e.target.id==='album-captionStyle' && state.outputs.length){ state.caption=captionText(data()); renderOutputs(); }
     });
     document.addEventListener('input',(e)=>{
@@ -1212,527 +1176,205 @@
   });
   window.TANJAI_ALBUM_PRO={
     generate,downloadAll,renderFacebookPreview,renderUploadPreview,collectFilesFromInputs,
-    _test:{cropPlacement,liteText,theme,size,resolveRatioFromDimensions,previewLayoutFor,resolveFacebookPreset,presetLayout,facebookPresetLabel,slotSize,captionFacts,captionWriter,factGuardCaption}
+    _test:{cropPlacement,liteText,theme,size,resolveRatioFromDimensions,previewLayoutFor,resolveFacebookPreset,resolveStoryMode,presetLayout,facebookPresetLabel,slotSize,captionFacts,captionWriter,factGuardCaption}
   };
 })();
-
-/* ── IMAGE ADJUST ENGINE v9.5 ──
-   ปรับแสง/สี/คมชัดด้วย Canvas — ไม่แตะโครงสร้างภาพเลย */
-(function initAdjust(){
-  let adjustHandlerReady=false;
-  function setupAdjust(){
-    if(adjustHandlerReady) return;
-    const sliders=['brightness','contrast','saturation','sharpness','warmth'];
-    sliders.forEach(s=>{
-      const el=document.getElementById('adj-'+s);
-      const val=document.getElementById(s+'Val');
-      if(el&&val){ el.addEventListener('input',()=>{ val.textContent=el.value; }); }
-    });
-    document.getElementById('resetAdjust')?.addEventListener('click',()=>{
-      sliders.forEach(s=>{ const el=document.getElementById('adj-'+s); if(el){ el.value=0; const v=document.getElementById(s+'Val'); if(v) v.textContent=0; } });
-    });
-    document.getElementById('applyAdjust')?.addEventListener('click',async()=>{
-      if(!window.albumState||!window.albumState.outputs||!window.albumState.outputs.length){
-        alert('กรุณาสร้างชุดภาพก่อนครับ'); return;
-      }
-      const btn=document.getElementById('applyAdjust');
-      if(btn){ btn.disabled=true; btn.textContent='กำลังปรับ...'; }
-      const brightness=Number(document.getElementById('adj-brightness')?.value||0);
-      const contrast=Number(document.getElementById('adj-contrast')?.value||0);
-      const saturation=Number(document.getElementById('adj-saturation')?.value||0);
-      const sharpness=Number(document.getElementById('adj-sharpness')?.value||0);
-      const warmth=Number(document.getElementById('adj-warmth')?.value||0);
-
-      const JSZip=window.JSZip;
-      const zip=JSZip?new JSZip():null;
-
-      for(let i=0;i<window.albumState.outputs.length;i++){
-        const out=window.albumState.outputs[i];
-        const img=new Image();
-        img.crossOrigin='anonymous';
-        await new Promise(res=>{ img.onload=res; img.onerror=res; img.src=out.url; });
-        const canvas=document.createElement('canvas');
-        canvas.width=img.width||1080; canvas.height=img.height||1080;
-        const ctx=canvas.getContext('2d');
-
-        // วาดภาพต้นฉบับ
-        ctx.drawImage(img,0,0);
-
-        // ดึง pixel data มาปรับ
-        const id=ctx.getImageData(0,0,canvas.width,canvas.height);
-        const d=id.data;
-        const bAdj=brightness/100; const cAdj=(contrast+100)/100;
-        const sAdj=(saturation+100)/100; const wAdj=warmth/100;
-
-        for(let p=0;p<d.length;p+=4){
-          let r=d[p],g=d[p+1],b=d[p+2];
-          // brightness
-          r+=brightness*2.55; g+=brightness*2.55; b+=brightness*2.55;
-          // warmth (เพิ่ม R ลด B)
-          r+=warmth*1.5; b-=warmth*1.5;
-          // contrast
-          r=((r/255-0.5)*cAdj+0.5)*255;
-          g=((g/255-0.5)*cAdj+0.5)*255;
-          b=((b/255-0.5)*cAdj+0.5)*255;
-          // saturation (HSL approximation)
-          const gray=0.299*r+0.587*g+0.114*b;
-          r=gray+(r-gray)*sAdj; g=gray+(g-gray)*sAdj; b=gray+(b-gray)*sAdj;
-          // clamp
-          d[p]=Math.min(255,Math.max(0,r));
-          d[p+1]=Math.min(255,Math.max(0,g));
-          d[p+2]=Math.min(255,Math.max(0,b));
-        }
-        ctx.putImageData(id,0,0);
-
-        // sharpness (unsharp mask เบา ๆ)
-        if(sharpness>0){
-          const tmp=document.createElement('canvas');
-          tmp.width=canvas.width; tmp.height=canvas.height;
-          const tCtx=tmp.getContext('2d');
-          tCtx.filter=`blur(${sharpness*0.3}px)`;
-          tCtx.drawImage(canvas,0,0);
-          const sharp=ctx.getImageData(0,0,canvas.width,canvas.height);
-          const blurData=tCtx.getImageData(0,0,canvas.width,canvas.height).data;
-          const sd=sharp.data; const amount=sharpness*0.15;
-          for(let p=0;p<sd.length;p+=4){
-            sd[p]=Math.min(255,Math.max(0,sd[p]+amount*(sd[p]-blurData[p])));
-            sd[p+1]=Math.min(255,Math.max(0,sd[p+1]+amount*(sd[p+1]-blurData[p+1])));
-            sd[p+2]=Math.min(255,Math.max(0,sd[p+2]+amount*(sd[p+2]-blurData[p+2])));
-          }
-          ctx.putImageData(sharp,0,0);
-        }
-
-        const blob=await new Promise(res=>canvas.toBlob(res,'image/jpeg',0.92));
-        const url=URL.createObjectURL(blob);
-        // ดาวน์โหลดทีละไฟล์ถ้าไม่มี JSZip
-        if(!zip){
-          const a=document.createElement('a'); a.href=url;
-          a.download=out.filename||`adjusted-${i+1}.jpg`; a.click();
-          await new Promise(r=>setTimeout(r,300));
-        } else {
-          const ab=await blob.arrayBuffer();
-          zip.file(out.filename||`adjusted-${i+1}.jpg`,ab);
-        }
-      }
-      if(zip){
-        const content=await zip.generateAsync({type:'blob'});
-        const a=document.createElement('a'); a.href=URL.createObjectURL(content);
-        a.download='adjusted-album.zip'; a.click();
-      }
-      if(btn){ btn.disabled=false; btn.textContent='✓ ใช้การปรับ + ดาวน์โหลดใหม่'; }
-    });
-    adjustHandlerReady=true;
-  }
-  // เรียกใช้เมื่อ album result แสดง
-  const obs=new MutationObserver(()=>{ if(document.getElementById('albumAdjustPanel')) setupAdjust(); });
-  obs.observe(document.body,{childList:true,subtree:true});
-})();
-
-/* ══════════════════════════════════════════════════════
-   COLLAGE BUILDER v9.5 — รวมภาพเป็นไฟล์เดียว
-   รองรับ: 2x2 | 1+3 | 1+2 | แถบยาว | 2 แนวนอน
-══════════════════════════════════════════════════════ */
-(function initCollage(){
-
-  const LAYOUTS = [
-    { id:"grid2x2",  label:"2×2",         icon:"▪▪\n▪▪", desc:"ตาราง 4 ช่อง เท่ากัน",   min:4, max:4, fn:buildGrid2x2  },
-    { id:"big1+3",   label:"ใหญ่+3เล็ก",  icon:"█▪\n█▪\n█▪",desc:"ปกใหญ่ซ้าย เล็ก 3 ขวา", min:2, max:4, fn:buildBig1Plus3 },
-    { id:"big1top3", label:"บน+3ล่าง",    icon:"████\n▪▪▪",  desc:"ปกบน เล็ก 3 ล่าง",      min:2, max:4, fn:buildTop1Bot3  },
-    { id:"pair",     label:"คู่",          icon:"▪▪",         desc:"2 รูปเคียงกัน",          min:2, max:2, fn:buildPair      },
-    { id:"strip",    label:"แถบยาว",       icon:"▪▪▪▪",       desc:"3–5 รูปแนวนอน",         min:2, max:5, fn:buildStrip     },
-  ];
-
-  function gap(){ return 8; }
-
-  async function loadImg(url){
-    return new Promise((res,rej)=>{
-      const i=new Image(); i.crossOrigin="anonymous";
-      i.onload=()=>res(i); i.onerror=rej; i.src=url;
-    });
-  }
-
-  function cover(ctx, img, x, y, w, h){
-    const ir=img.width/img.height, fr=w/h;
-    let sw,sh,sx,sy;
-    if(ir>fr){ sh=img.height; sw=sh*fr; sx=(img.width-sw)/2; sy=0; }
-    else{ sw=img.width; sh=sw/fr; sx=0; sy=(img.height-sh)/2; }
-    ctx.drawImage(img,sx,sy,sw,sh,x,y,w,h);
-  }
-
-  function buildGrid2x2(imgs, size=1080){
-    const c=document.createElement("canvas"); c.width=size; c.height=size;
-    const ctx=c.getContext("2d"); const g=gap(), half=(size-g*3)/2;
-    const pos=[[g,g],[g*2+half,g],[g,g*2+half],[g*2+half,g*2+half]];
-    imgs.slice(0,4).forEach((img,i)=>{ cover(ctx,img,pos[i][0],pos[i][1],half,half); });
-    return c;
-  }
-
-  function buildBig1Plus3(imgs, size=1080){
-    const c=document.createElement("canvas"); c.width=size; c.height=size;
-    const ctx=c.getContext("2d"); const g=gap();
-    const bigW=Math.round(size*0.62), smallW=size-bigW-g*2;
-    const smallH=Math.round((size-g*4)/3);
-    cover(ctx,imgs[0],g,g,bigW-g,size-g*2);
-    [1,2,3].forEach((n,i)=>{ if(imgs[n]) cover(ctx,imgs[n],bigW+g,g+i*(smallH+g),smallW,smallH); });
-    return c;
-  }
-
-  function buildTop1Bot3(imgs, size=1080){
-    const c=document.createElement("canvas"); c.width=size; c.height=size;
-    const ctx=c.getContext("2d"); const g=gap();
-    const topH=Math.round(size*0.58), botH=size-topH-g*2;
-    const botW=Math.round((size-g*4)/3);
-    cover(ctx,imgs[0],g,g,size-g*2,topH-g);
-    [1,2,3].forEach((n,i)=>{ if(imgs[n]) cover(ctx,imgs[n],g+i*(botW+g),topH+g,botW,botH); });
-    return c;
-  }
-
-  function buildPair(imgs, size=1080){
-    const c=document.createElement("canvas"); c.width=size; c.height=Math.round(size*0.52);
-    const ctx=c.getContext("2d"); const g=gap(), half=(size-g*3)/2;
-    cover(ctx,imgs[0],g,g,half,c.height-g*2);
-    if(imgs[1]) cover(ctx,imgs[1],g*2+half,g,half,c.height-g*2);
-    return c;
-  }
-
-  function buildStrip(imgs, size=1080){
-    const n=Math.min(imgs.length,5); const g=gap();
-    const w=Math.round((size-g*(n+1))/n), h=Math.round(w*0.72);
-    const c=document.createElement("canvas"); c.width=size; c.height=h+g*2;
-    const ctx=c.getContext("2d");
-    imgs.slice(0,n).forEach((img,i)=>cover(ctx,img,g+i*(w+g),g,w,h));
-    return c;
-  }
-
-  function addLogoOverlay(canvas, logo, pos="br"){
-    if(!logo) return;
-    const ctx=canvas.getContext("2d");
-    const s=Math.round(Math.min(canvas.width,canvas.height)*0.09);
-    const pad=Math.round(s*0.3);
-    let x,y;
-    if(pos==="br"){ x=canvas.width-s-pad; y=canvas.height-s-pad; }
-    else if(pos==="bl"){ x=pad; y=canvas.height-s-pad; }
-    else if(pos==="tr"){ x=canvas.width-s-pad; y=pad; }
-    else{ x=pad; y=pad; }
-    ctx.save();
-    ctx.globalAlpha=0.82;
-    ctx.drawImage(logo,x,y,s,s);
-    ctx.restore();
-  }
-
-  /* UI */
-  function showCollageUI(){
-    if(document.getElementById("collageSection")) return;
-    const outputs=window.albumState?.outputs||[];
-    if(!outputs.length){ alert("กรุณาสร้างชุดภาพก่อนครับ"); return; }
-
-    const sec=document.createElement("div");
-    sec.id="collageSection";
-    sec.className="collage-section";
-    sec.innerHTML=`
-      <div class="collage-header">
-        <span>🖼️</span>
-        <div><b>สร้าง Collage — รวมภาพเป็น 1 ไฟล์</b><small>เลือก Layout แล้วกดสร้าง</small></div>
-      </div>
-      <div class="collage-layouts">
-        ${LAYOUTS.map(l=>`
-          <button class="collage-layout-btn" data-layout="${l.id}" title="${l.desc}">
-            <span class="collage-icon">${l.icon}</span>
-            <b>${l.label}</b>
-            <small>${l.desc}</small>
-          </button>`).join("")}
-      </div>
-      <div class="collage-options">
-        <label><input type="checkbox" id="collage-logo" checked> ใส่โลโก้มุมภาพ</label>
-        <select id="collage-logo-pos">
-          <option value="br">มุมขวาล่าง</option>
-          <option value="bl">มุมซ้ายล่าง</option>
-          <option value="tr">มุมขวาบน</option>
-          <option value="tl">มุมซ้ายบน</option>
-        </select>
-      </div>
-      <div id="collagePreview" class="collage-preview" style="display:none">
-        <img id="collagePreviewImg" style="width:100%;border-radius:10px" alt="Collage preview">
-        <div class="collage-dl-row">
-          <button class="btn primary" id="collageDownload">⬇ ดาวน์โหลด Collage</button>
-          <button class="btn secondary" id="collageClear">✕ ปิด</button>
-        </div>
-      </div>`;
-
-    const host=document.getElementById("albumResult")||document.body;
-    host.appendChild(sec);
-
-    let activeLayout=null, activeCanvas=null;
-
-    sec.querySelectorAll(".collage-layout-btn").forEach(btn=>{
-      btn.addEventListener("click", async()=>{
-        sec.querySelectorAll(".collage-layout-btn").forEach(b=>b.classList.remove("active"));
-        btn.classList.add("active");
-        activeLayout=btn.dataset.layout;
-        await renderCollage();
-      });
-    });
-
-    document.getElementById("collage-logo")?.addEventListener("change", async()=>{ if(activeLayout) await renderCollage(); });
-    document.getElementById("collage-logo-pos")?.addEventListener("change", async()=>{ if(activeLayout) await renderCollage(); });
-
-    async function renderCollage(){
-      const layDef=LAYOUTS.find(l=>l.id===activeLayout);
-      if(!layDef) return;
-      const imgs=[];
-      for(const o of outputs.slice(0,layDef.max)){
-        try{ imgs.push(await loadImg(o.url)); }catch(_){}
-      }
-      if(imgs.length<layDef.min){
-        alert(`Layout นี้ต้องการภาพอย่างน้อย ${layDef.min} รูปครับ`); return;
-      }
-      const canvas=layDef.fn(imgs);
-      const useLogo=document.getElementById("collage-logo")?.checked;
-      const logoPos=document.getElementById("collage-logo-pos")?.value||"br";
-      if(useLogo && window.albumState?.logo) addLogoOverlay(canvas,window.albumState.logo,logoPos);
-      activeCanvas=canvas;
-      const preview=document.getElementById("collagePreview");
-      const img=document.getElementById("collagePreviewImg");
-      img.src=canvas.toDataURL("image/jpeg",0.92);
-      preview.style.display="block";
-      document.getElementById("collageDownload").onclick=()=>{
-        canvas.toBlob(blob=>{ const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="collage.jpg"; a.click(); },"image/jpeg",0.92);
-      };
-      document.getElementById("collageClear").onclick=()=>{ sec.remove(); };
-    }
-  }
-
-  // ปุ่มเรียก Collage — inject หลัง renderOutputs
-  const origRender=window.TANJAI_ALBUM_RENDER;
-  function injectCollageBtn(){
-    if(document.getElementById("openCollageBtn")) return;
-    const host=document.getElementById("albumResult");
-    if(!host) return;
-    const wrap=document.createElement("div");
-    wrap.style.cssText="margin-top:12px;text-align:center";
-    wrap.innerHTML=`<button class="btn secondary" id="openCollageBtn" style="width:100%">🖼️ สร้าง Collage — รวมภาพเป็น 1 ไฟล์</button>`;
-    host.appendChild(wrap);
-    document.getElementById("openCollageBtn")?.addEventListener("click",showCollageUI);
-  }
-
-  const obs=new MutationObserver(()=>{ 
-    if(document.querySelector(".album-cover-preview-card,.album-lite-preview-grid")) injectCollageBtn(); 
+// เปิดใช้งาน Drag and Drop ให้ฟอร์มอัปโหลดภาพ
+const dropZone = document.getElementById('albumForm'); 
+if (dropZone) {
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    dropZone.addEventListener(eventName, preventDefaults, false);
   });
-  obs.observe(document.body,{childList:true,subtree:true});
 
-})();
-
-/* ══════════════════════════════════════════════════════════
-   PANORAMA SPLIT v9.5 — รูปเดียวตัดเป็น 4 ส่วน
-   อัปขึ้น Facebook เรียงตามลำดับ → ต่อเป็นภาพเดียวไร้รอยต่อ
-══════════════════════════════════════════════════════════ */
-(function initPanorama(){
-
-  function showPanoramaUI(){
-    if(document.getElementById("panoramaSection")) return;
-
-    const sec = document.createElement("div");
-    sec.id = "panoramaSection";
-    sec.className = "collage-section";
-    sec.style.marginTop = "12px";
-    sec.innerHTML = `
-      <div class="collage-header">
-        <span>🌅</span>
-        <div>
-          <b>Panorama Split — ตัดรูปเดียวเป็น 4 ส่วน</b>
-          <small>อัปทั้ง 4 ส่วนขึ้น Facebook ตามลำดับ → ต่อกันเป็นภาพเดียวไร้รอยต่อ</small>
-        </div>
-      </div>
-
-      <div class="pano-upload-wrap">
-        <label class="pano-upload-label" for="panoInput">
-          <span>📷 เลือกรูปภาพที่ต้องการตัด</span>
-          <small>รองรับทุกขนาด — แนะนำรูปแนวนอน (wide) เพื่อผลลัพธ์สวยที่สุด</small>
-          <input type="file" id="panoInput" accept="image/*" style="display:none">
-        </label>
-      </div>
-
-      <div class="pano-mode-wrap">
-        <p style="font-size:12px;color:var(--muted);margin-bottom:8px">เลือกแบบการตัด:</p>
-        <div class="pano-modes">
-          <button class="pano-mode-btn active" data-mode="h4" title="ตัดแนวนอน 4 ส่วน — เหมาะกับรูปกว้างมาก">
-            <span class="pano-mode-icon">▪▪▪▪</span>
-            <b>แนวนอน ×4</b><small>กว้างมาก → 4 ส่วนเรียงบน-ล่าง</small>
-          </button>
-          <button class="pano-mode-btn" data-mode="grid4" title="ตัด 2×2 — เหมาะกับรูปสี่เหลี่ยมจัตุรัส">
-            <span class="pano-mode-icon">▪▪<br>▪▪</span>
-            <b>ตาราง 2×2</b><small>ตัด 4 มุม → เรียง TL TR BL BR</small>
-          </button>
-          <button class="pano-mode-btn" data-mode="h2" title="ตัด 2 ส่วน — ซ้าย-ขวา">
-            <span class="pano-mode-icon">▪▪</span>
-            <b>แนวนอน ×2</b><small>ซ้าย-ขวา 2 ส่วน</small>
-          </button>
-        </div>
-      </div>
-
-      <div id="panoPreviewWrap" style="display:none">
-        <p style="font-size:12px;color:var(--muted);margin:10px 0 6px">
-          ตัวอย่าง — อัปไฟล์ขึ้น Facebook <b style="color:var(--accent)">ตามลำดับหมายเลข</b>:
-        </p>
-        <div id="panoPreviewGrid" class="pano-preview-grid"></div>
-        <button class="btn primary" id="panoDownloadAll" style="width:100%;margin-top:12px">
-          ⬇ ดาวน์โหลดทั้งหมด (ZIP พร้อมหมายเลข)
-        </button>
-        <div class="pano-tip">
-          💡 <b>วิธีโพสต์ Facebook:</b> กด "อัปโหลดรูปภาพ" แล้วเลือกทั้ง 4 ไฟล์พร้อมกัน Facebook จะเรียงตาม<b>ชื่อไฟล์</b> (1→2→3→4) ภาพจะต่อกันสวยงาม
-        </div>
-      </div>
-
-      <div id="panoStatus" style="font-size:12px;color:var(--muted);margin-top:8px"></div>
-    `;
-
-    const host = document.getElementById("albumResult") || document.body;
-    host.appendChild(sec);
-
-    let currentMode = "h4";
-    let currentImg = null;
-
-    // mode select
-    sec.querySelectorAll(".pano-mode-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        sec.querySelectorAll(".pano-mode-btn").forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-        currentMode = btn.dataset.mode;
-        if(currentImg) splitAndPreview(currentImg);
-      });
-    });
-
-    // file input
-    const label = sec.querySelector(".pano-upload-label");
-    const inp = sec.querySelector("#panoInput");
-    label.addEventListener("click", () => inp.click());
-    inp.addEventListener("change", e => {
-      const file = e.target.files[0];
-      if(!file) return;
-      const reader = new FileReader();
-      reader.onload = ev => {
-        const img = new Image();
-        img.onload = () => { currentImg = img; splitAndPreview(img); };
-        img.src = ev.target.result;
-      };
-      reader.readAsDataURL(file);
-    });
-
-    function splitAndPreview(img){
-      const status = document.getElementById("panoStatus");
-      status.textContent = "กำลังตัดภาพ...";
-      const parts = splitImage(img, currentMode);
-      const grid = document.getElementById("panoPreviewGrid");
-      grid.innerHTML = "";
-      grid.className = `pano-preview-grid pano-grid-${parts.length}`;
-      parts.forEach((canvas, i) => {
-        const wrap = document.createElement("div");
-        wrap.className = "pano-part";
-        const num = document.createElement("span");
-        num.className = "pano-num";
-        num.textContent = i + 1;
-        const preview = document.createElement("img");
-        preview.src = canvas.toDataURL("image/jpeg", 0.9);
-        preview.style.cssText = "width:100%;border-radius:6px;display:block";
-        wrap.appendChild(num);
-        wrap.appendChild(preview);
-        grid.appendChild(wrap);
-      });
-      document.getElementById("panoPreviewWrap").style.display = "block";
-      status.textContent = `ตัดเสร็จ ${parts.length} ส่วน — พร้อมดาวน์โหลด`;
-
-      // download handler
-      document.getElementById("panoDownloadAll").onclick = async () => {
-        const parts2 = splitImage(img, currentMode);
-        if(window.JSZip){
-          const zip = new window.JSZip();
-          for(let i=0;i<parts2.length;i++){
-            const blob = await new Promise(res => parts2[i].toBlob(res,"image/jpeg",0.92));
-            zip.file(`panorama-${i+1}-of-${parts2.length}.jpg`, await blob.arrayBuffer());
-          }
-          const content = await zip.generateAsync({type:"blob"});
-          const a = document.createElement("a"); a.href = URL.createObjectURL(content);
-          a.download = "panorama-split.zip"; a.click();
-        } else {
-          // ดาวน์โหลดทีละไฟล์
-          for(let i=0;i<parts2.length;i++){
-            const a = document.createElement("a");
-            a.href = parts2[i].toDataURL("image/jpeg",0.92);
-            a.download = `panorama-${i+1}-of-${parts2.length}.jpg`;
-            a.click();
-            await new Promise(r=>setTimeout(r,300));
-          }
-        }
-      };
-    }
-
-    function splitImage(img, mode){
-      const parts = [];
-      if(mode === "h4"){
-        // ตัดแนวนอน 4 ส่วน (Facebook 4 photos → 1 wide top + 3 bottom)
-        // ส่วนที่ 1: บน (แนวนอน 1080x608), ส่วน 2-4: ล่าง 3 ช่อง (1080x360 แต่ละช่อง)
-        const W = 1080, H1 = 608, H2 = 360;
-        const total = H1 + H2;
-        // Scale img ให้กว้าง W
-        const scale = W / img.width;
-        const srcH = total / scale;
-        const srcY = Math.max(0,(img.height - srcH)/2);
-
-        // Part 1 — wide top
-        const c1 = document.createElement("canvas"); c1.width=W; c1.height=H1;
-        const ctx1 = c1.getContext("2d");
-        ctx1.drawImage(img, 0, srcY, img.width, srcH*(H1/total), 0, 0, W, H1);
-        parts.push(c1);
-
-        // Parts 2-4 — bottom 3 equal
-        const bW = Math.round((W-4)/3);
-        for(let i=0;i<3;i++){
-          const c = document.createElement("canvas"); c.width=bW; c.height=H2;
-          const ctx = c.getContext("2d");
-          const srcX = (img.width/3)*i;
-          const srcBotH = srcH*(H2/total);
-          const srcBotY = srcY + srcH*(H1/total);
-          ctx.drawImage(img, srcX, srcBotY, img.width/3, srcBotH, 0, 0, bW, H2);
-          parts.push(c);
-        }
-      } else if(mode === "grid4"){
-        // 2×2 grid — TL TR BL BR
-        const size = 1080;
-        const hw = img.width/2, hh = img.height/2;
-        [[0,0],[hw,0],[0,hh],[hw,hh]].forEach(([sx,sy])=>{
-          const c = document.createElement("canvas"); c.width=size; c.height=size;
-          const ctx = c.getContext("2d");
-          // cover crop
-          const ratio = size/Math.min(hw,hh);
-          ctx.drawImage(img, sx, sy, hw, hh, 0, 0, hw*ratio, hh*ratio);
-          parts.push(c);
-        });
-      } else {
-        // h2 — ซ้าย ขวา
-        const W=1080, H=Math.round(W*(img.height/img.width)*0.5);
-        const hw = img.width/2;
-        [0,hw].forEach(sx=>{
-          const c=document.createElement("canvas"); c.width=W; c.height=H||600;
-          const ctx=c.getContext("2d");
-          ctx.drawImage(img,sx,0,hw,img.height,0,0,W,H||600);
-          parts.push(c);
-        });
-      }
-      return parts;
-    }
+  function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
   }
 
-  // inject ปุ่ม Panorama หลัง Collage
-  const obs2 = new MutationObserver(()=>{
-    const collage = document.getElementById("openCollageBtn");
-    if(collage && !document.getElementById("openPanoBtn")){
-      const wrap = document.createElement("div");
-      wrap.style.cssText = "margin-top:8px;text-align:center";
-      wrap.innerHTML = `<button class="btn secondary" id="openPanoBtn" style="width:100%">🌅 Panorama Split — ตัดรูปเดียวเป็น 4 ส่วน</button>`;
-      collage.closest("div").after(wrap);
-      document.getElementById("openPanoBtn")?.addEventListener("click", showPanoramaUI);
-    }
+  ['dragenter', 'dragover'].forEach(eventName => {
+    dropZone.addEventListener(eventName, () => dropZone.classList.add('drag-active'), false);
   });
-  obs2.observe(document.body,{childList:true,subtree:true});
 
-})();
+  ['dragleave', 'drop'].forEach(eventName => {
+    dropZone.addEventListener(eventName, () => dropZone.classList.remove('drag-active'), false);
+  });
+
+  dropZone.addEventListener('drop', handleDrop, false);
+
+  function handleDrop(e) {
+    const dt = e.dataTransfer;
+    const files = dt.files;
+    
+    if (files.length > 0) {
+      // โยนไฟล์ที่ลากมาใส่ใน Input ปกติของระบบคุณ แล้วสั่งให้ระบบ render ภาพ
+      const fileInput = document.getElementById('album-supportFiles');
+      if(fileInput) {
+        fileInput.files = files;
+        // เรียกฟังก์ชันที่มีอยู่แล้วในระบบคุณเพื่อจัดการไฟล์
+        if(typeof window.TANJAI_ALBUM_PRO !== 'undefined') {
+          window.TANJAI_ALBUM_PRO.collectFilesFromInputs(true);
+          window.TANJAI_ALBUM_PRO.renderUploadPreview();
+        }
+      }
+    }
+  }
+}
+// ฟังก์ชันสำหรับครอบและขยายภาพให้เต็ม Canvas อัตโนมัติ (ไม่ให้ภาพเบี้ยว)
+function drawImageSmartCrop(ctx, img, x, y, w, h) {
+    let offsetX = 0.5; // จุดโฟกัสแกน X (0.5 คือตรงกลาง)
+    let offsetY = 0.5; // จุดโฟกัสแกน Y (0.5 คือตรงกลาง)
+    let iw = img.width, ih = img.height;
+    let r = Math.min(w / iw, h / ih);
+    let nw = iw * r, nh = ih * r;
+    let cx, cy, cw, ch, ar = 1;
+
+    // หาอัตราส่วนที่ต้องขยายเพื่อครอบให้เต็ม
+    if (nw < w) ar = w / nw;
+    if (Math.abs(ar - 1) < 1e-14 && nh < h) ar = h / nh;
+    nw *= ar;
+    nh *= ar;
+
+    cw = iw / (nw / w);
+    ch = ih / (nh / h);
+    cx = (iw - cw) * offsetX;
+    cy = (ih - ch) * offsetY;
+
+    if (cx < 0) cx = 0;
+    if (cy < 0) cy = 0;
+    if (cw > iw) cw = iw;
+    if (ch > ih) ch = ih;
+
+    // วาดรูปลง Canvas
+    ctx.drawImage(img, cx, cy, cw, ch, x, y, w, h);
+}
+// ตัวอย่างฟังก์ชันสร้าง Cover
+function drawPremiumCover(ctx, img, canvasWidth, canvasHeight, titleText, subtitleText) {
+    // 1. วาดรูปภาพพื้นหลัง พร้อมระบบ Smart Crop ให้พอดีสัดส่วนเฟสบุ๊ค
+    drawImageSmartCrop(ctx, img, 0, 0, canvasWidth, canvasHeight);
+
+    // 2. วาดแถบไล่สี (Gradient) ด้านล่างเพื่อให้อ่านตัวหนังสือชัด
+    // ไล่สีจากโปร่งใส ไปหา สีน้ำเงินเข้ม/ดำ
+    let gradientHeight = canvasHeight * 0.4; // ความสูงของแถบสี (40% ของภาพ)
+    let grad = ctx.createLinearGradient(0, canvasHeight - gradientHeight, 0, canvasHeight);
+    grad.addColorStop(0, "rgba(0, 15, 40, 0)");       // ด้านบนโปร่งใส
+    grad.addColorStop(0.6, "rgba(0, 15, 40, 0.85)"); // เริ่มทึบ
+    grad.addColorStop(1, "rgba(0, 15, 40, 0.95)");   // ด้านล่างทึบสุด
+    
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, canvasHeight - gradientHeight, canvasWidth, gradientHeight);
+
+    // 3. วาดเส้นขอบสีทอง (Gold Border)
+    let borderWidth = 12; // ความหนาของเส้นขอบ
+    let margin = 20;      // ระยะห่างจากขอบภาพ
+    
+    ctx.strokeStyle = "#D4AF37"; // โค้ดสีทอง (Gold)
+    ctx.lineWidth = borderWidth;
+    ctx.strokeRect(margin, margin, canvasWidth - (margin * 2), canvasHeight - (margin * 2));
+
+    // 4. วาดเส้นตกแต่งเล็กๆ ด้านใน (เพื่อความหรูหราแบบตัวอย่าง)
+    ctx.strokeStyle = "rgba(212, 175, 55, 0.5)"; // สีทองโปร่งแสง
+    ctx.lineWidth = 2;
+    ctx.strokeRect(margin + 10, margin + 10, canvasWidth - ((margin + 10) * 2), canvasHeight - ((margin + 10) * 2));
+
+    // 5. ใส่ข้อความ (Text) วางไว้ตำแหน่งด้านล่าง
+    ctx.textAlign = "center";
+    
+    // ข้อความหลัก (เช่น โครงการอบรม...)
+    ctx.fillStyle = "#FFFFFF"; // สีขาว
+    ctx.font = `bold ${Math.round(canvasWidth * 0.06)}px Prompt, sans-serif`;
+    ctx.fillText(titleText, canvasWidth / 2, canvasHeight - Math.round(canvasHeight * 0.12));
+
+    // ข้อความรอง (เช่น เทศบาลเมืองบางรักน้อย) ถ้ามี
+    if(subtitleText) {
+        ctx.fillStyle = "#D4AF37"; // สีทอง
+        ctx.font = `500 ${Math.round(canvasWidth * 0.035)}px Prompt, sans-serif`;
+        ctx.fillText(subtitleText, canvasWidth / 2, canvasHeight - Math.round(canvasHeight * 0.05));
+    }
+}
+// ฟังก์ชันวาดหน้าปก Facebook แบบพรีเมียม (ครอบรูปอัตโนมัติ + กรอบกรม/ทอง)
+function drawPremiumFacebookCover(ctx, img, canvasWidth, canvasHeight, title1, title2, orgName) {
+    // ---------------------------------------------------------
+    // 1. ระบบ Smart Crop (ซูมและครอบภาพให้อยู่ตรงกลาง ไม่เบี้ยว)
+    // ---------------------------------------------------------
+    let iw = img.width, ih = img.height;
+    let r = Math.min(canvasWidth / iw, canvasHeight / ih);
+    let nw = iw * r, nh = ih * r;
+    let ar = 1;
+    
+    if (nw < canvasWidth) ar = canvasWidth / nw;
+    if (Math.abs(ar - 1) < 1e-14 && nh < canvasHeight) ar = canvasHeight / nh;
+    nw *= ar; nh *= ar;
+    
+    let cw = iw / (nw / canvasWidth), ch = ih / (nh / canvasHeight);
+    let cx = (iw - cw) * 0.5, cy = (ih - ch) * 0.5; // โฟกัสกึ่งกลางภาพ
+    
+    if (cx < 0) cx = 0; if (cy < 0) cy = 0;
+    if (cw > iw) cw = iw; if (ch > ih) ch = ih;
+    
+    // วาดรูปลง Canvas
+    ctx.drawImage(img, cx, cy, cw, ch, 0, 0, canvasWidth, canvasHeight);
+
+    // ---------------------------------------------------------
+    // 2. วาดพื้นหลังไล่สีสีกรมท่าเข้ม (เพื่อให้ตัวหนังสือเด่น)
+    // ---------------------------------------------------------
+    let grad = ctx.createLinearGradient(0, canvasHeight * 0.2, 0, canvasHeight);
+    grad.addColorStop(0, "rgba(4, 18, 43, 0)");      // ด้านบนโปร่งใสให้เห็นรูป
+    grad.addColorStop(0.6, "rgba(4, 18, 43, 0.85)"); // เริ่มเป็นสีกรมท่า
+    grad.addColorStop(1, "rgba(4, 18, 43, 0.95)");   // ด้านล่างทึบ
+    
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+    // ---------------------------------------------------------
+    // 3. วาดขอบสีทอง (Gold Border) คู่ซ้อนกันแบบตัวอย่าง
+    // ---------------------------------------------------------
+    let margin = 24; // ระยะห่างจากขอบรูป
+    let goldColor = "#E5C07B"; // โค้ดสีทองสว่าง
+    
+    // เส้นกรอบนอก (หนา)
+    ctx.strokeStyle = goldColor;
+    ctx.lineWidth = 4;
+    ctx.strokeRect(margin, margin, canvasWidth - (margin * 2), canvasHeight - (margin * 2));
+
+    // เส้นกรอบใน (บาง)
+    ctx.strokeStyle = "rgba(229, 192, 123, 0.5)"; // สีทองโปร่งแสง
+    ctx.lineWidth = 1;
+    ctx.strokeRect(margin + 8, margin + 8, canvasWidth - ((margin + 8) * 2), canvasHeight - ((margin + 8) * 2));
+
+    // ---------------------------------------------------------
+    // 4. จัดวางข้อความ (Typography) เหมือนรูปตัวอย่าง
+    // ---------------------------------------------------------
+    ctx.textAlign = "center";
+    let centerX = canvasWidth / 2;
+    let bottomY = canvasHeight - margin - 24; // จุดเริ่มเขียนข้อความจากล่างขึ้นบน
+
+    // ชื่อหน่วยงาน (เช่น เทศบาลเมืองบางรักน้อย) สีทอง ด้านล่างสุด
+    if(orgName) {
+        ctx.fillStyle = goldColor; 
+        ctx.font = `500 ${Math.round(canvasWidth * 0.035)}px Kanit, Prompt, sans-serif`;
+        ctx.fillText(orgName, centerX, bottomY);
+        bottomY -= Math.round(canvasWidth * 0.055); // ดันบรรทัดต่อไปขึ้น
+    }
+
+    // หัวข้อรอง (เช่น การใช้งานระบบสารบรรณอิเล็กทรอนิกส์) สีขาว
+    if(title2) {
+        ctx.fillStyle = "#FFFFFF";
+        ctx.font = `600 ${Math.round(canvasWidth * 0.05)}px Kanit, Prompt, sans-serif`;
+        ctx.fillText(title2, centerX, bottomY);
+        bottomY -= Math.round(canvasWidth * 0.065);
+    }
+
+    // หัวข้อหลัก (เช่น การอบรมเชิงปฏิบัติการ) สีทอง
+    if(title1) {
+        ctx.fillStyle = goldColor;
+        ctx.font = `bold ${Math.round(canvasWidth * 0.055)}px Kanit, Prompt, sans-serif`;
+        ctx.fillText(title1, centerX, bottomY);
+    }
+}
+// สมมติว่า d คือข้อมูลที่ดึงมาจาก Form ของคุณ
+let text1 = "การอบรมเชิงปฏิบัติการ";
+let text2 = "การใช้งานระบบสารบรรณอิเล็กทรอนิกส์";
+let orgText = d.org || "เทศบาลเมืองบางรักน้อย";
+
+// เรียกฟังก์ชันวาด (ctx คือ 2D context ของ Canvas)
+drawPremiumFacebookCover(ctx, coverImgElement, canvas.width, canvas.height, text1, text2, orgText);

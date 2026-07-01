@@ -50,7 +50,7 @@ TANJAI.downloadText = function(text, filename){
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 };
 
-TANJAI.validViews = ["dashboard","router","image","album","post","mc","video","voice","deck","kit","promptHub","destinationHub","projects","library","guide"];
+TANJAI.validViews = ["dashboard","router","image","photoPro","album","post","mc","video","voice","deck","kit","promptHub","destinationHub","projects","library","guide"];
 
 TANJAI.switchView = function(id, options = {}){
   if(!TANJAI.validViews.includes(id)) id = "dashboard";
@@ -74,6 +74,7 @@ TANJAI.switchView = function(id, options = {}){
     dashboard:"สวัสดีครับ! 👋",
     router:"AI Router",
     image:"สร้างภาพ",
+    photoPro:"AI Photo Pro",
     album:"ชุดภาพโพสต์ Facebook",
     post:"เรียบเรียงเนื้อหา",
     mc:"งานพิธีกร",
@@ -141,63 +142,18 @@ TANJAI.setupNavigationHistory = function(){
 TANJAI.field = function(prefix, data){
   const c = TANJAI.categories;
   const opts = arr => arr.map(x=>`<option>${x}</option>`).join("");
-
-  // label ต่างกันตาม tool เพื่อไม่ให้งง
-  const titleLabels = {
-    image: "หัวข้องาน / ชื่อเรื่อง",
-    post:  "หัวข้องาน / ชื่อเรื่อง",
-    mc:    "ชื่องาน / พิธี / กิจกรรม",
-    video: "หัวข้อคลิป / ชื่อเรื่อง",
-    voice: "หัวข้อเสียงพากย์",
-    deck:  "ชื่อ Presentation / หัวข้อสไลด์",
-    kit:   "หัวข้องาน / ชื่อโปรเจกต์"
-  };
-  const titleHints = {
-    image: "(ข้อความนี้จะปรากฏบนภาพ — ใส่ชื่องานจริง)",
-    post:  "(หัวข้อหลักที่ต้องการสื่อสาร)",
-    mc:    "(ชื่องานที่พิธีกรจะใช้อ้างอิงตลอดงาน)",
-    video: "(ใช้ตั้ง Hook และ Thumbnail คลิป)",
-    voice: "(ใช้เป็นจุดเริ่มต้นสคริปต์)",
-    deck:  "(จะเป็นชื่อ Slide แรกและชื่อไฟล์)",
-    kit:   "(ใช้สร้าง Prompt ครบชุดทุกสื่อ)"
-  };
-  const titlePlaceholders = {
-    image: "เช่น  ประชาสัมพันธ์กิจกรรมประจำปี / เชิญร่วมงานเปิดตัวสินค้า / แจ้งข่าวสารสำคัญ / โปรโมทผลงานใหม่",
-    post:  "เช่น  สรุปผลงานไตรมาสนี้ / ประกาศรับสมัครพนักงาน / แจ้งข่าวสารสำคัญ / โพสต์แนะนำสินค้า",
-    mc:    "เช่น  พิธีเปิดงาน... / งานมอบรางวัล... / สัมมนา / งานประชุมประจำปี...",
-    video: "เช่น  แนะนำบริการงานทะเบียน / สรุปกิจกรรมวันเด็ก / ขั้นตอนการชำระภาษี",
-    voice: "เช่น  ประชาสัมพันธ์กิจกรรม / แนะนำสินค้าและบริการ / เชิญร่วมงาน...",
-    deck:  "เช่น  รายงานผลการดำเนินงานปี 2568 / แผนพัฒนา 5 ปี / สรุปโครงการ...",
-    kit:   "เช่น  งานวันเด็กแห่งชาติ 2569 / โครงการปลูกต้นไม้ / กิจกรรมประจำปี..."
-  };
-
-  const titleLabel    = titleLabels[prefix]    || "หัวข้องาน / ชื่อเรื่อง";
-  const titleHint     = titleHints[prefix]     || "(จะใช้เป็นหัวข้อหลักใน Prompt)";
-  const titlePh       = titlePlaceholders[prefix] || "เช่น ชื่องาน / ประกาศ / กิจกรรม / แคมเปญ";
-
   return `
     <div class="form-section">
-      <div class="section-title"><b>1</b><h4>บอกงานให้ชัด</h4></div>
+      <div class="section-title"><b>1</b><h4>ข้อมูลพื้นฐาน</h4></div>
       <div class="form-grid">
-        <label class="full">
-          ${titleLabel}
-          <small class="field-hint">${titleHint}</small>
-          <input id="${prefix}-title" placeholder="${titlePh}">
-        </label>
-        <label>
-          ชื่อหน่วยงาน / องค์กร / แบรนด์
-          <input id="${prefix}-orgName" placeholder="เช่น  องค์กร / หน่วยงาน / ร้านค้า / บริษัท / เพจ / แบรนด์ / โรงเรียน">
-        </label>
+        <label>หัวข้องาน<input id="${prefix}-title" placeholder="เช่น ชื่องาน / ประกาศ / กิจกรรม / แคมเปญ / โปรโมชัน"></label>
+        <label>ชื่อองค์กร / แบรนด์<input id="${prefix}-orgName" placeholder="เช่น ชื่อหน่วยงาน / องค์กร / ร้านค้า / เพจ / แบรนด์"></label>
         <label>กลุ่มเป้าหมาย<select id="${prefix}-audience">${opts(c.audiences)}</select></label>
         <label>โทนภาษา<select id="${prefix}-tone">${opts(c.tones)}</select></label>
-        <label class="full">
-          รายละเอียดงาน
-          <small class="field-hint">(ใส่ข้อมูลจริงเท่าที่มี — ระบบจะไม่แต่งข้อมูลเพิ่มเอง)</small>
-          <textarea id="${prefix}-detail" placeholder="เช่น  ใคร ทำอะไร ที่ไหน เมื่อไหร่ มีวัตถุประสงค์อะไร / ข้อความที่ต้องการสื่อ / ขั้นตอน / ช่องทางติดต่อ"></textarea>
-        </label>
-        <label>วัน / เวลา<input id="${prefix}-dateTime" placeholder="เช่น  30 มิถุนายน 2569 / ทุกวันจันทร์–ศุกร์ 08.30–16.30 น."></label>
-        <label>สถานที่<input id="${prefix}-place" placeholder="เช่น  ห้องประชุม / สถานที่จัดงาน / ออนไลน์ผ่าน Zoom / ไม่ระบุสถานที่"></label>
-        <label class="full">บุคคล / หน่วยงานที่เกี่ยวข้อง<input id="${prefix}-people" placeholder="เช่น  ผู้บริหาร / วิทยากร / แขกรับเชิญ / ผู้ประสานงาน (ถ้ามี)"></label>
+        <label class="full">รายละเอียด<textarea id="${prefix}-detail" placeholder="ใส่ข้อมูลจริงของงาน เช่น ใคร / ทำอะไร / ที่ไหน / เมื่อไหร่ / ต้องการสื่อสารอะไร"></textarea></label>
+        <label>วัน / เวลา<input id="${prefix}-dateTime" placeholder="ถ้ามี"></label>
+        <label>สถานที่<input id="${prefix}-place" placeholder="ถ้ามี"></label>
+        <label class="full">บุคคล / หน่วยงานที่เกี่ยวข้อง<input id="${prefix}-people" placeholder="ถ้ามี"></label>
       </div>
     </div>`;
 };
@@ -222,6 +178,7 @@ TANJAI.getToolDestinations = function(tool){
   const GPT = TANJAI.customGptUrl || TANJAI_CUSTOM_GPT_URL;
   const map = {
     image:[{label:"เปิด ทันใจ GPT", url:GPT},{label:"เปิด Canva", url:"https://www.canva.com/"}],
+    photoPro:[{label:"แต่งภาพในเว็บ", url:"#photoPro"}],
     album:[{label:"เปิด Canva", url:"https://www.canva.com/"},{label:"เปิด ทันใจ GPT", url:GPT}],
     mc:[{label:"เปิด ทันใจ GPT", url:GPT},{label:"เปิด Notebook Tool", url:"https://notebooklm.google.com/"},{label:"เปิด Canva", url:"https://www.canva.com/"}],
     post:[{label:"เปิด ทันใจ GPT", url:GPT},{label:"เปิด Notebook Tool", url:"https://notebooklm.google.com/"},{label:"เปิด Canva", url:"https://www.canva.com/"},{label:"เปิด CapCut", url:"https://www.capcut.com/"}],

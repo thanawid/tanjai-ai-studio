@@ -335,7 +335,7 @@ window.TANJAI = window.TANJAI || {};
     else if(has(/สไลด์|powerpoint|ppt|นำเสนอ|deck/)){ view = "deck"; reason = "โจทย์ต้องจัดโครงสไลด์และ Speaker Notes"; }
     else if(has(/อัลบั้ม|หลายภาพ|facebook album|zip|กรอบภาพ/)){ view = "album"; reason = "โจทย์เน้นชุดภาพหลายใบพร้อมกรอบและแคปชั่น"; }
     else if(has(/ภาพ|โปสเตอร์|อินโฟกราฟิก|infographic|ป้าย|ประชาสัมพันธ์|เดินวิ่ง|วิ่ง/)){ view = "image"; reason = "โจทย์เหมาะกับภาพประชาสัมพันธ์ ต้องจัดข้อความและ Visual Direction ให้ชัด"; }
-    const labels = {image:"สร้างภาพ", kit:"สร้างชุดสื่อ", post:"เรียบเรียงเนื้อหา", mc:"งานพิธีกร", video:"ทำวิดีโอ", voice:"เสียงพากย์", deck:"ทำสไลด์", album:"ชุดภาพโพสต์ Facebook"};
+    const labels = {image:"สร้างภาพ", kit:"สร้างชุดสื่อ", post:"เรียบเรียงเนื้อหา", mc:"งานพิธีกร", video:"ทำวิดีโอ", voice:"เสียงพากย์", deck:"ทำสไลด์", photoPro:"AI Photo Pro", album:"ชุดภาพโพสต์ Facebook"};
     const pseudoData = {title: query, detail: query, orgType:"", orgName:""};
     const report = T.promptBrainReport(pseudoData, view);
     const text = `เมนูที่แนะนำ: ${labels[view] || "สร้างภาพ"}\n\nเหตุผล:\n${reason}\n\nBrain อ่านโจทย์ได้ว่า:\n${report}\n\nขั้นตอนต่อไป:\n1. กด “ไปที่เมนูที่แนะนำ”\n2. กรอกข้อมูลจริงเท่าที่มี\n3. กดสร้าง Prompt\n4. ตรวจชื่อคน หน่วยงาน วันที่ สถานที่ก่อนเผยแพร่\n\nหมายเหตุ: ระบบจะไม่แต่งข้อมูลจริงเพิ่มเอง ถ้าข้อมูลไม่ครบจะใช้คำว่า “จากข้อมูลเบื้องต้น”`;

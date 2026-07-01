@@ -11,35 +11,59 @@ const db = getFirestore(app);
 
 let currentUser = null;
 
+const NAME_SESSION_KEY = "tanjaiNameAccessV943";
+const normalizeLoginName = (name) => String(name || "").trim().toLowerCase().replace(/[^a-z0-9._-]/g, "");
+const namedUsers = () => window.TANJAI_USERNAME_USERS || {};
+const namedUid = (name) => `named_${normalizeLoginName(name)}`;
+function readNamedSession(){
+  try { return JSON.parse(localStorage.getItem(NAME_SESSION_KEY) || "null"); } catch(_) { return null; }
+}
+function writeNamedSession(profile){
+  localStorage.setItem(NAME_SESSION_KEY, JSON.stringify({ ...profile, savedAt: Date.now() }));
+}
+function clearNamedSession(){ localStorage.removeItem(NAME_SESSION_KEY); }
+function showAuthenticatedProfile(profile){
+  currentUser = profile;
+  document.body.classList.remove("auth-locked");
+  const loginGate = document.getElementById("loginGate");
+  if(loginGate) loginGate.style.display = "none";
+  const nameEl = document.getElementById("userDisplayName");
+  if(nameEl) nameEl.textContent = profile.displayName || profile.username || String(profile.email || "user").split("@")[0];
+}
+function showLoginGate(){
+  currentUser = null;
+  document.body.classList.add("auth-locked");
+  const loginGate = document.getElementById("loginGate");
+  if(loginGate) loginGate.style.display = "flex";
+}
+
 /* ─── AUTH STATE ─── */
 onAuthStateChanged(auth, async (user) => {
-  const loginGate = document.getElementById("loginGate");
   const loginError = document.getElementById("loginError");
   if(loginError) loginError.textContent = "";
 
+  const named = readNamedSession();
   if(user) {
-    currentUser = user;
-    document.body.classList.remove("auth-locked");
-    if(loginGate) loginGate.style.display = "none";
+    clearNamedSession();
+    const profile = { ...user, email: user.email, uid: user.uid, displayName: user.email.split("@")[0], mode: "firebase" };
+    showAuthenticatedProfile(profile);
 
-    const nameEl = document.getElementById("userDisplayName");
-    if(nameEl) nameEl.textContent = user.email.split("@")[0];
-
-    // บันทึก last login
     try {
       await setDoc(doc(db, "users", user.uid), {
         email: user.email,
         lastLogin: serverTimestamp(),
-        uid: user.uid
+        uid: user.uid,
+        mode: "firebase"
       }, { merge: true });
     } catch(_) {}
 
     if(window.TANJAI?.renderProjects) TANJAI.renderProjects();
     console.log("Logged in:", user.email);
+  } else if(named && named.username) {
+    showAuthenticatedProfile(named);
+    if(window.TANJAI?.renderProjects) TANJAI.renderProjects();
   } else {
-    currentUser = null;
-    document.body.classList.add("auth-locked");
-    if(loginGate) loginGate.style.display = "flex";
+    showLoginGate();
   }
 });
 
@@ -55,6 +79,37 @@ const checkWhitelist = async (email) => {
     return false; // ถ้า Firestore rules บล็อก ก็ไม่อนุญาต
   }
 };
+
+/* ─── USERNAME LOGIN WITH FIREBASE PASSWORD ─── */
+const resolveUsernameEmail = (name) => {
+  const raw = String(name || "").trim();
+  if(!raw) throw new Error("กรุณากรอกชื่อผู้ใช้งาน");
+  if(raw.includes("@")) return raw.toLowerCase();
+  const key = normalizeLoginName(raw);
+  const profileBase = namedUsers()[key];
+  if(!profileBase || !profileBase.email) throw new Error("ไม่พบชื่อผู้ใช้งานนี้ในระบบ");
+  return String(profileBase.email).toLowerCase().trim();
+};
+
+const loginWithUsername = async (name, password) => {
+  const key = normalizeLoginName(name);
+  const email = resolveUsernameEmail(name);
+  if(!password) throw new Error("กรุณากรอกรหัสผ่าน");
+  await login(email, password);
+  try {
+    const profileBase = namedUsers()[key] || {};
+    await setDoc(doc(db, "users", key || email), {
+      email,
+      username: key || email.split("@")[0],
+      displayName: profileBase.displayName || key || email.split("@")[0],
+      lastLogin: serverTimestamp(),
+      mode: "firebase-username-map"
+    }, { merge: true });
+  } catch(_) {}
+};
+
+// Backward-compatible alias: now requires password. Do not use for passwordless access.
+const loginName = async (name, password) => loginWithUsername(name, password);
 
 /* ─── LOGIN ─── */
 const login = async (email, password) => {
@@ -95,7 +150,9 @@ const register = async (email, password) => {
 /* ─── LOGOUT ─── */
 const logout = async () => {
   try {
+    clearNamedSession();
     await signOut(auth);
+    showLoginGate();
     TANJAI.toast?.("ออกจากระบบแล้ว");
   } catch(_) {}
 };
@@ -181,7 +238,7 @@ const addToWhitelist = async (email) => {
 };
 
 window.TANJAI_AUTH = {
-  login, register, logout,
+  login, loginName, loginWithUsername, resolveUsernameEmail, register, logout,
   saveProjectToCloud, getProjectsFromCloud, deleteProjectFromCloud,
   getCurrentUser: () => currentUser,
   trackUsage, getUsageStats,
