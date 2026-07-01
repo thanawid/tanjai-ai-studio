@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700;800;900&family=Noto+Sans+Thai:wght@400;500;600;700;800;900&family=Prompt:wght@500;600;700;800;900&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
   <meta name="theme-color" content="#060713">
-  <meta name="description" content="ทันใจ AI Studio V9.7">
+  <meta name="description" content="ทันใจ AI Studio V9.7.2">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/animations.css">
 </head>
@@ -27,7 +27,7 @@
       <p class="eyebrow">สำหรับสมาชิก</p>
       <h1>ทันใจ AI Studio</h1>
       <p class="login-subtitle">สร้างสื่อไว ด้วยพลัง AI</p>
-      <span class="version-badge login-version-badge" aria-label="เวอร์ชันระบบ V9.7">V9.7</span>
+      <span class="version-badge login-version-badge" aria-label="เวอร์ชันระบบ V9.7.2">V9.7.2</span>
 
       <form id="loginForm" class="login-form">
         <label>
@@ -105,7 +105,7 @@
         <div>
           <div class="topbar-kicker">
             <p class="eyebrow">ทันใจ AI Studio</p>
-            <span class="version-badge app-version-badge" aria-label="เวอร์ชันระบบ V9.7">V9.7</span>
+            <span class="version-badge app-version-badge" aria-label="เวอร์ชันระบบ V9.7.2">V9.7.2</span>
           </div>
           <h2 id="pageTitle" aria-live="polite">สวัสดีครับ! 👋</h2>
         </div>
@@ -156,10 +156,9 @@
         <div class="tool-grid dashboard-main-tools-v861">
           <button class="tool-card" data-view="router"><img src="assets/icons/router.svg" alt=""><b>เริ่มต้นด้วย AI Router</b><span>บอกสิ่งที่อยากทำ แล้วระบบพาไปเมนูที่เหมาะที่สุด</span></button>
           <button class="tool-card" data-view="kit"><img src="assets/icons/kit.svg" alt=""><b>สร้างชุดสื่อ</b><span>กรอกครั้งเดียว ได้ Prompt ครบชุดสำหรับทำสื่อหลายรูปแบบ</span></button>
-          <button class="tool-card" data-view="photoPro"><img src="assets/icons/image.svg" alt=""><b>AI Photo Pro</b><span>อัปโหลดหลายภาพ ปรับแสง สี เงา ความคมชัด และดาวน์โหลด ZIP โดยไม่สร้างภาพใหม่</span></button>
           <button class="tool-card album-pro-card-v861" data-view="album"><img src="assets/icons/image.svg" alt=""><b>ชุดภาพโพสต์ Facebook</b><span>อัปโหลดหลายภาพ ใส่กรอบ ช่วยคิดแคปชั่น ดูตัวอย่างก่อนโพสต์ และดาวน์โหลดไฟล์ ZIP</span></button>
+          <button class="tool-card" data-view="photoPro"><img src="assets/icons/image.svg" alt=""><b>AI Photo Pro</b><span>อัปโหลดหลายภาพ ปรับแสง สี เงา ความคมชัด และดาวน์โหลด ZIP โดยไม่สร้างภาพใหม่</span></button>
           <button class="tool-card" data-view="projects"><img src="assets/icons/projects.svg" alt=""><b>โปรเจกต์ / งานที่บันทึกไว้</b><span>กลับมาดูงานเดิม บันทึกไอเดีย และต่อยอดงานที่ทำไว้</span></button>
-          <button class="tool-card" data-view="destinationHub"><img src="assets/icons/tools.svg" alt=""><b>เครื่องมือเสริม</b><span>คลัง Prompt เครื่องมือปลายทาง ตัวอย่างงาน และคู่มือระบบ</span></button>
         </div>
 
         <section class="panel mvp-sales-strip-v877">
@@ -175,70 +174,53 @@
           </div>
         </section>
 
-        <div class="dashboard-grid dashboard-sales-grid-v861">
+        <div class="dashboard-grid dashboard-sales-grid-v861 dashboard-single-grid-v972">
           <section class="panel wide">
             <div class="panel-head">
-              <div><h3>เมนูสร้างงาน</h3><p>เลือกประเภทงานที่ต้องการได้จากเมนูภาพ โพสต์ วิดีโอ เสียง สไลด์ และงานพิธีกร</p></div>
+              <div><h3>เมนูสร้างงาน</h3><p>เลือกประเภทงานที่ต้องการได้จากเมนูหลัก โดยจัดเรียงใหม่ให้ใช้งานง่ายขึ้น และพอดีกับทุกอุปกรณ์</p></div>
             </div>
-            <div class="sample-grid compact-sample-grid-v861 creation-menu-grid-v892 fixed-menu-visuals-v896">
-  
-  <article class="home-choice-card" data-view="kit">
-    <img src="assets/previews/preview-kit.jpg" class="preview-thumbnail" alt="สร้างชุดสื่อ">
-    <b>สร้างชุดสื่อ</b><span>Prompt ครบชุดจากข้อมูลเดียว</span>
-  </article>
+            <div class="sample-grid compact-sample-grid-v861 creation-menu-grid-v892 fixed-menu-visuals-v896 dashboard-menu-balanced-v972">
+              <article class="home-choice-card tone-kit" data-view="kit">
+                <img src="assets/previews/preview-kit.jpg" class="preview-thumbnail" alt="สร้างชุดสื่อ">
+                <b>สร้างชุดสื่อ</b><span>Prompt ครบชุดจากข้อมูลเดียว</span>
+              </article>
 
-  <article class="home-choice-card" data-view="post">
-    <img src="assets/previews/preview-post.jpg" class="preview-thumbnail" alt="เรียบเรียงเนื้อหา">
-    <b>เรียบเรียงเนื้อหา</b><span>สรุปงาน ข่าว โพสต์ Line และแคปชั่น</span>
-  </article>
+              <article class="home-choice-card tone-image" data-view="album">
+                <img src="assets/previews/preview-facebook.jpg" class="preview-thumbnail" alt="ชุดภาพโพสต์ Facebook">
+                <b>ชุดภาพโพสต์ Facebook</b><span>ภาพจริง + แคปชั่น + ไฟล์ ZIP</span>
+              </article>
 
-  <article class="home-choice-card" data-view="mc">
-    <img src="assets/previews/preview-mc.jpg" class="preview-thumbnail" alt="งานพิธีกร">
-    <b>งานพิธีกร</b><span>สคริปต์พิธีกร คำเชิญประธาน</span>
-  </article>
+              <article class="home-choice-card tone-image" data-view="photoPro">
+                <img src="assets/previews/preview-image.jpg" class="preview-thumbnail" alt="AI Photo Pro">
+                <b>AI Photo Pro</b><span>แต่งภาพจริงหลายภาพ ไม่สร้างภาพใหม่</span>
+              </article>
 
-  <article class="home-choice-card" data-view="image">
-    <img src="assets/previews/preview-image.jpg" class="preview-thumbnail" alt="สร้างภาพ">
-    <b>สร้างภาพ</b><span>Prompt ภาพพร้อมใช้</span>
-  </article>
+              <article class="home-choice-card tone-image" data-view="image">
+                <img src="assets/previews/preview-image.jpg" class="preview-thumbnail" alt="สร้างภาพ">
+                <b>สร้างภาพ</b><span>Prompt ภาพพร้อมใช้</span>
+              </article>
 
-  <article class="home-choice-card" data-view="photoPro">
-    <img src="assets/previews/preview-image.jpg" class="preview-thumbnail" alt="AI Photo Pro">
-    <b>AI Photo Pro</b><span>แต่งภาพจริงหลายภาพ ไม่สร้างภาพใหม่</span>
-  </article>
+              <article class="home-choice-card tone-video" data-view="video">
+                <img src="assets/previews/preview-video.jpg" class="preview-thumbnail" alt="ทำวิดีโอ">
+                <b>ทำวิดีโอ</b><span>เปิดเรื่อง + ลำดับภาพ</span>
+              </article>
 
-  <article class="home-choice-card" data-view="video">
-    <img src="assets/previews/preview-video.jpg" class="preview-thumbnail" alt="ทำวิดีโอ">
-    <b>ทำวิดีโอ</b><span>เปิดเรื่อง + ลำดับภาพ</span>
-  </article>
+              <article class="home-choice-card tone-voice" data-view="voice">
+                <img src="assets/previews/preview-voice.jpg" class="preview-thumbnail" alt="เสียงพากย์">
+                <b>เสียงพากย์</b><span>สคริปต์เสียงธรรมชาติ</span>
+              </article>
 
-  <article class="home-choice-card" data-view="voice">
-    <img src="assets/previews/preview-voice.jpg" class="preview-thumbnail" alt="เสียงพากย์">
-    <b>เสียงพากย์</b><span>สคริปต์เสียงธรรมชาติ</span>
-  </article>
-  
-  <article class="home-choice-card" data-view="deck">
-    <img src="assets/previews/preview-deck.jpg" class="preview-thumbnail" alt="ทำสไลด์">
-    <b>ทำสไลด์</b><span>โครงสไลด์ + บันทึกผู้พูด</span>
-  </article>
+              <article class="home-choice-card tone-deck" data-view="deck">
+                <img src="assets/previews/preview-deck.jpg" class="preview-thumbnail" alt="ทำสไลด์">
+                <b>ทำสไลด์</b><span>โครงสไลด์ + บันทึกผู้พูด</span>
+              </article>
 
-  <article class="home-choice-card" data-view="album">
-    <img src="assets/previews/preview-facebook.jpg" class="preview-thumbnail" alt="ชุดภาพโพสต์ Facebook">
-    <b>ชุดภาพโพสต์ Facebook</b><span>ภาพจริง + แคปชั่น + ไฟล์ ZIP</span>
-  </article>
-
-</div>          </section>
-
-          <aside class="panel">
-            <h3>เครื่องมือเสริม</h3>
-            <p class="muted">รวมคลัง Prompt เครื่องมือปลายทาง ตัวอย่างงาน และคู่มือระบบไว้ในที่เดียว</p>
-            <div class="steps compact-extra-links-v861">
-              <button class="step-card-v61" data-view="promptHub"><b>⭐</b><strong>คลัง Prompt</strong><span>คลังคำสั่งพร้อมใช้</span></button>
-              <button class="step-card-v61" data-view="destinationHub"><b>🚀</b><strong>เครื่องมือปลายทาง</strong><span>เปิด GPT, Canva, CapCut และเครื่องมือต่อเนื่อง</span></button>
-              <button class="step-card-v61" data-view="library"><b>🗂️</b><strong>ตัวอย่างงาน</strong><span>ดูตัวอย่างเพื่อเลือกแนวทาง</span></button>
-              <button class="step-card-v61" data-view="guide"><b>⚙️</b><strong>คู่มือระบบ</strong><span>วิธีใช้งานและแนวทางอัปเดต</span></button>
+              <article class="home-choice-card tone-post" data-view="mc">
+                <img src="assets/previews/preview-mc.jpg" class="preview-thumbnail" alt="งานพิธีกร">
+                <b>งานพิธีกร</b><span>สคริปต์พิธีกร คำเชิญประธาน</span>
+              </article>
             </div>
-          </aside>
+          </section>
         </div>
 
       </section>
@@ -312,7 +294,7 @@
       <section id="guide" class="view">
         <div class="panel guide-mvp-v877">
           <div class="panel-head">
-            <div><h3>⚙️ คู่มือระบบ</h3><p>คู่มือสั้นสำหรับผู้ใช้ใหม่ · Tanjai AI Studio <span class="version-badge" style="font-size:11px">V9.7</span></p></div>
+            <div><h3>⚙️ คู่มือระบบ</h3><p>คู่มือสั้นสำหรับผู้ใช้ใหม่ · Tanjai AI Studio <span class="version-badge" style="font-size:11px">V9.7.2</span></p></div>
             <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
               <button class="btn primary" data-view="kit">เริ่มสร้าง Prompt</button>
               <button class="btn secondary" id="guideLogoutBtn" type="button" style="display:flex;align-items:center;gap:6px">

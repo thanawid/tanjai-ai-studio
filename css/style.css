@@ -4983,3 +4983,34 @@ label > .field-hint + select{
   .photo-result-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
   .photo-preview-strip{grid-template-columns:repeat(2,minmax(0,1fr));}
 }
+
+/* V9.7.2 — Dashboard Card Reflow + Tool Panel Cleanup */
+.dashboard-single-grid-v972{
+  grid-template-columns:minmax(0,1fr);
+}
+.dashboard-single-grid-v972 .panel.wide{
+  min-width:0;
+}
+.dashboard-menu-balanced-v972{
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  align-items:stretch;
+}
+.dashboard-menu-balanced-v972 .home-choice-card{
+  min-height:212px;
+}
+@media (max-width:1180px){
+  .dashboard-menu-balanced-v972{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+}
+@media (max-width:860px){
+  .dashboard-menu-balanced-v972{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
+@media (max-width:720px){
+  .dashboard-single-grid-v972,
+  .dashboard-menu-balanced-v972{
+    grid-template-columns:1fr !important;
+  }
+}
