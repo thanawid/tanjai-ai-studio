@@ -217,8 +217,18 @@
     btn.id="openProofreadTop";
     btn.type="button";
     btn.textContent="ตรวจคำผิด";
-    const logout=$("#logoutBtn",actions);
-    actions.insertBefore(btn, logout || actions.firstChild);
+    try{
+      const logout=$("#logoutBtn",actions);
+      // ป้องกันกรณี header ถูก re-render แบบ async ระหว่างที่เรา query กับตอน insert
+      // ทำให้ logout ที่หาไว้ไม่ใช่ลูกของ actions อีกต่อไป (สาเหตุของ NotFoundError เดิม)
+      if(logout && logout.parentNode===actions){
+        actions.insertBefore(btn, logout);
+      }else{
+        actions.appendChild(btn);
+      }
+    }catch(_){
+      actions.appendChild(btn);
+    }
   }
 
   document.addEventListener("DOMContentLoaded",()=>{
