@@ -13,7 +13,7 @@
   T.generateWritingWithAI = async function({tool, data, options={}, fallback, button}){
     const fallbackText = typeof fallback === "function" ? fallback() : String(fallback || "");
     if(!T.aiIsConfigured()){
-      T.toast?.("ยังไม่ได้เชื่อม AI — ใช้ระบบเขียนสำรองให้ก่อน");
+      T.toast?.("ยังไม่ได้เชื่อม AI API — ใช้ Specialist Output Engine ในเว็บให้ก่อน");
       return {text:fallbackText, source:"fallback"};
     }
 
@@ -37,12 +37,12 @@
       if(!response.ok) throw new Error(payload.error || `AI ตอบกลับด้วยสถานะ ${response.status}`);
       const text = String(payload.text || "").trim();
       if(!text) throw new Error("AI ไม่ได้ส่งข้อความกลับมา");
-      T.toast?.("AI วิเคราะห์และสร้างผลงานให้แล้ว");
+      T.toast?.("AI API วิเคราะห์และสร้างผลงานให้แล้ว");
       return {text, source:"ai"};
     }catch(error){
       const message = error?.name === "AbortError" ? "AI ใช้เวลานานเกินไป" : (error?.message || "เชื่อม AI ไม่สำเร็จ");
       console.warn("TANJAI AI fallback:", message);
-      T.toast?.(`${message} — ใช้ระบบเขียนสำรองให้ก่อน`);
+      T.toast?.(`${message} — ใช้ Specialist Output Engine ในเว็บให้ก่อน`);
       return {text:fallbackText, source:"fallback", error:message};
     }finally{
       clearTimeout(timer);
