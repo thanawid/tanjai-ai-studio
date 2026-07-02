@@ -35,7 +35,6 @@ onAuthStateChanged(auth, async (user) => {
     } catch(_) {}
 
     if(window.TANJAI?.renderProjects) TANJAI.renderProjects();
-    console.log("Logged in:", user.email);
   } else {
     currentUser = null;
     document.body.classList.add("auth-locked");
@@ -167,8 +166,20 @@ const deleteProjectFromCloud = async (projectId) => {
 
 /* ─── ADMIN: เพิ่ม email เข้า whitelist ─── */
 // เรียกจาก console: TANJAI_AUTH.addToWhitelist("user@email.com")
+// สำคัญ: การเช็คสิทธิ์ตรงนี้เป็นแค่ชั้นป้องกันฝั่ง UI เท่านั้น
+// การบังคับใช้จริงต้องมาจาก Firestore Security Rules (ดู firestore.rules)
+// ที่จำกัดว่า collection "admins" และ "allowed_emails" เขียนได้เฉพาะ uid ที่อยู่ใน admins เท่านั้น
+const isAdmin = async () => {
+  if(!currentUser) return false;
+  try {
+    const snap = await getDoc(doc(db, "admins", currentUser.uid));
+    return snap.exists() && snap.data()?.active !== false;
+  } catch(_) { return false; }
+};
+
 const addToWhitelist = async (email) => {
-  if(!currentUser) return console.error("Not logged in");
+  if(!currentUser){ TANJAI.toast?.("กรุณาเข้าสู่ระบบก่อน"); return; }
+  if(!(await isAdmin())){ TANJAI.toast?.("เฉพาะผู้ดูแลระบบเท่านั้นที่เพิ่มสิทธิ์ได้"); return; }
   try {
     await setDoc(doc(db, "allowed_emails", email.toLowerCase().trim()), {
       email: email.toLowerCase().trim(),
@@ -176,8 +187,8 @@ const addToWhitelist = async (email) => {
       addedBy: currentUser.email,
       addedAt: serverTimestamp()
     });
-    console.log("✅ Added to whitelist:", email);
-  } catch(e) { console.error("Error:", e); }
+    TANJAI.toast?.(`เพิ่ม ${email} เข้า whitelist แล้ว`);
+  } catch(e) { TANJAI.toast?.("เพิ่ม whitelist ไม่สำเร็จ (ตรวจสอบสิทธิ์ admin)"); }
 };
 
 window.TANJAI_AUTH = {
@@ -187,5 +198,6 @@ window.TANJAI_AUTH = {
   trackUsage, getUsageStats,
   addToWhitelist,
   checkWhitelist,
+  isAdmin,
   db, auth
 };

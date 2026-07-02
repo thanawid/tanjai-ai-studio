@@ -1,0 +1,56 @@
+rules_version = '2';
+
+// เทมเพลตกฎความปลอดภัย Firestore สำหรับทันใจ AI Studio
+// Deploy ด้วย: firebase deploy --only firestore:rules
+//
+// ก่อน deploy ต้องสร้างเอกสาร admin คนแรกด้วยมือใน Firebase Console:
+//   collection "admins" -> document id = <uid ของแอดมิน> -> field { active: true }
+// เพราะไม่มีใครมีสิทธิ์เขียน "admins" ได้เองผ่านแอป (ป้องกันการเลื่อนสิทธิ์ตัวเอง)
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() &&
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.active == true;
+    }
+
+    // รายชื่ออีเมลที่ได้รับสิทธิ์สมัครสมาชิก — อ่านได้เฉพาะตอน validate ตอนสมัคร, เขียนได้เฉพาะ admin
+    match /allowed_emails/{email} {
+      allow get: if true; // ต้องอ่านได้ตอนตรวจสอบ whitelist ก่อน register (ยังไม่ login)
+      allow list: if false;
+      allow write: if isAdmin();
+    }
+
+    // รายชื่อแอดมิน — ห้ามใครเขียนผ่านแอปเลย ต้องตั้งค่าจาก Console/Admin SDK เท่านั้น
+    match /admins/{uid} {
+      allow read: if isSignedIn() && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    // ข้อมูลผู้ใช้ + usage — เจ้าของอ่าน/เขียนได้เท่านั้น
+    match /users/{uid} {
+      allow read, write: if isSignedIn() && request.auth.uid == uid;
+
+      match /usage/{day} {
+        allow read, write: if isSignedIn() && request.auth.uid == uid;
+      }
+    }
+
+    // โปรเจกต์ที่บันทึกไว้ — เจ้าของเท่านั้นที่เข้าถึงได้
+    match /projects/{projectId} {
+      allow read, delete, update: if isSignedIn() && resource.data.uid == request.auth.uid;
+      allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
+    }
+
+    // ปิดทุกอย่างที่ไม่ได้ระบุไว้ข้างบน
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

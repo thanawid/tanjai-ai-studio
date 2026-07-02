@@ -1,0 +1,12 @@
+{
+  "name": "tanjai-ai-studio",
+  "version": "9.8.2",
+  "private": true,
+  "description": "ทันใจ AI Studio — Static Web App สร้างสื่อด้วย AI",
+  "scripts": {
+    "test": "for f in tests/*.js; do echo \"== $f ==\"; node \"$f\" || exit 1; done"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
