@@ -11,6 +11,21 @@ const db = getFirestore(app);
 
 let currentUser = null;
 
+/* ─── USERNAME → EMAIL ───
+   ผู้ใช้พิมพ์แค่ "ชื่อผู้ใช้" ระบบเติมส่วนอีเมลให้เองเบื้องหลัง
+   - ชื่อในตาราง ALIASES ชี้ไปอีเมลจริงที่กำหนดไว้ (เช่น admin)
+   - ชื่ออื่นทั้งหมดเติม @tanjai.local อัตโนมัติ
+   - ถ้าพิมพ์อีเมลเต็มมาเอง (มี @) ใช้ตามนั้นเลย ไม่แปลง
+*/
+const ALIASES = {
+  "thanawid": "thanawid@gmail.com"
+};
+const toAuthEmail = (raw) => {
+  const v = String(raw || "").trim().toLowerCase();
+  if(!v || v.includes("@")) return v;
+  return ALIASES[v] || `${v}@tanjai.local`;
+};
+
 /* ─── AUTH STATE ─── */
 onAuthStateChanged(auth, async (user) => {
   const loginGate = document.getElementById("loginGate");
@@ -45,9 +60,9 @@ onAuthStateChanged(auth, async (user) => {
 /* ─── WHITELIST CHECK ─── */
 // ตรวจว่า email นี้ได้รับ invite หรือไม่
 // เพิ่ม email ใน Firestore collection "allowed_emails" → document id = email, field active: true
-const checkWhitelist = async (email) => {
+const checkWhitelist = async (identity) => {
   try {
-    const ref = doc(db, "allowed_emails", email.toLowerCase().trim());
+    const ref = doc(db, "allowed_emails", toAuthEmail(identity));
     const snap = await getDoc(ref);
     return snap.exists() && snap.data().active !== false;
   } catch(_) {
@@ -56,36 +71,39 @@ const checkWhitelist = async (email) => {
 };
 
 /* ─── LOGIN ─── */
-const login = async (email, password) => {
+const login = async (identity, password) => {
   try {
-    await signInWithEmailAndPassword(auth, email, password);
+    await signInWithEmailAndPassword(auth, toAuthEmail(identity), password);
     TANJAI.toast?.("เข้าสู่ระบบสำเร็จ ยินดีต้อนรับ!");
   } catch(error) {
-    let msg = "อีเมลหรือรหัสผ่านไม่ถูกต้อง";
+    let msg = "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง";
     if(error.code === "auth/user-not-found") msg = "ไม่พบบัญชีนี้ในระบบ";
     if(error.code === "auth/wrong-password") msg = "รหัสผ่านไม่ถูกต้อง";
     if(error.code === "auth/too-many-requests") msg = "พยายามเข้าสู่ระบบบ่อยเกินไป กรุณารอสักครู่";
-    if(error.code === "auth/invalid-credential") msg = "อีเมลหรือรหัสผ่านไม่ถูกต้อง";
+    if(error.code === "auth/invalid-credential") msg = "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง";
     throw new Error(msg);
   }
 };
 
 /* ─── REGISTER (with whitelist) ─── */
-const register = async (email, password) => {
+const register = async (identity, password) => {
+  const authEmail = toAuthEmail(identity);
   // ตรวจ whitelist ก่อน
-  const allowed = await checkWhitelist(email);
+  const allowed = await checkWhitelist(authEmail);
   if(!allowed) {
-    throw new Error("อีเมลนี้ยังไม่ได้รับสิทธิ์เข้าใช้งาน กรุณาติดต่อผู้ดูแลระบบเพื่อขอ invite");
+    throw new Error("ชื่อผู้ใช้นี้ยังไม่ได้รับสิทธิ์เข้าใช้งาน กรุณาติดต่อผู้ดูแลระบบเพื่อขอ invite");
   }
   try {
-    const cred = await createUserWithEmailAndPassword(auth, email, password);
-    // ส่ง email verification
-    try { await sendEmailVerification(cred.user); } catch(_) {}
-    TANJAI.toast?.("สมัครสมาชิกสำเร็จ! กรุณาตรวจสอบอีเมลเพื่อยืนยัน");
+    const cred = await createUserWithEmailAndPassword(auth, authEmail, password);
+    // ส่ง email verification เฉพาะอีเมลจริง (โดเมนปลอม @tanjai.local ส่งไม่ได้)
+    if(!authEmail.endsWith("@tanjai.local")){
+      try { await sendEmailVerification(cred.user); } catch(_) {}
+    }
+    TANJAI.toast?.("สมัครสมาชิกสำเร็จ!");
   } catch(error) {
     if(error.message.includes("invite")) throw error; // re-throw whitelist error
     let msg = "ไม่สามารถสมัครสมาชิกได้";
-    if(error.code === "auth/email-already-in-use") msg = "อีเมลนี้มีบัญชีอยู่แล้ว กรุณาเข้าสู่ระบบแทน";
+    if(error.code === "auth/email-already-in-use") msg = "ชื่อผู้ใช้นี้มีบัญชีอยู่แล้ว กรุณาเข้าสู่ระบบแทน";
     if(error.code === "auth/weak-password") msg = "รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร";
     throw new Error(msg);
   }
@@ -177,17 +195,18 @@ const isAdmin = async () => {
   } catch(_) { return false; }
 };
 
-const addToWhitelist = async (email) => {
+const addToWhitelist = async (identity) => {
   if(!currentUser){ TANJAI.toast?.("กรุณาเข้าสู่ระบบก่อน"); return; }
   if(!(await isAdmin())){ TANJAI.toast?.("เฉพาะผู้ดูแลระบบเท่านั้นที่เพิ่มสิทธิ์ได้"); return; }
+  const authEmail = toAuthEmail(identity);
   try {
-    await setDoc(doc(db, "allowed_emails", email.toLowerCase().trim()), {
-      email: email.toLowerCase().trim(),
+    await setDoc(doc(db, "allowed_emails", authEmail), {
+      email: authEmail,
       active: true,
       addedBy: currentUser.email,
       addedAt: serverTimestamp()
     });
-    TANJAI.toast?.(`เพิ่ม ${email} เข้า whitelist แล้ว`);
+    TANJAI.toast?.(`เพิ่ม ${authEmail} เข้า whitelist แล้ว`);
   } catch(e) { TANJAI.toast?.("เพิ่ม whitelist ไม่สำเร็จ (ตรวจสอบสิทธิ์ admin)"); }
 };
 
