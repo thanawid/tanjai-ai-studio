@@ -241,7 +241,8 @@
   }
 
   function preset(d=data()){
-    const p = d.themePreset || "Ribbon Civic Cover";
+    const p = d.themePreset || "Modern Clean Cover";
+    if(p.includes("Modern Clean")) return {name:"modern", titleScale:1.0, showFooterBar:true, showAccentSweep:false, liteCompact:false};
     if(p.includes("Minimal")) return {name:"minimal", titleScale:0.96, showFooterBar:false, showAccentSweep:true, liteCompact:true};
     if(p.includes("Glass")) return {name:"glass", titleScale:1.02, showFooterBar:true, showAccentSweep:true, liteCompact:false};
     return {name:"ribbon", titleScale:1.0, showFooterBar:true, showAccentSweep:true, liteCompact:false};
@@ -599,7 +600,15 @@
     const brandLabel=hasRealOrg(d.org) ? d.org : '';
     if(brandLabel){
       // มีชื่อหน่วยงาน → แถบชื่อ + โลโก้ ซ้ายบนตามเดิม
-      drawRibbon(ctx,brandX,brandY,brandW,brandH,th,'dark');
+      if(pst.name==='modern'){
+        // Modern: แคปซูลมน กระจกฝ้า ขอบขาวบาง
+        const capsuleG=ctx.createLinearGradient(brandX,brandY,brandX+brandW,brandY);
+        capsuleG.addColorStop(0,rgba(th.deep,.78));
+        capsuleG.addColorStop(1,rgba(th.dark,.55));
+        fillRoundRect(ctx,brandX,brandY,brandW,brandH,Math.round(brandH/2),capsuleG,'rgba(255,255,255,.22)',1);
+      }else{
+        drawRibbon(ctx,brandX,brandY,brandW,brandH,th,'dark');
+      }
       const logoS=Math.round(brandH*.92);
       const logoX=brandX-Math.round(logoS*.18);
       const logoY=brandY-Math.round((logoS-brandH)/2);
@@ -619,16 +628,30 @@
     const panelY=Math.round(h*(land?0.760:0.728));
     const panelW=w-panelX*2;
     const panelH=Math.round(h*(land?0.148:0.170));
-    drawGlassPanel(ctx,panelX,panelY,panelW,panelH,Math.round(panelH*.12),th,pst.name==='minimal'?0.58:0.66);
-    const panelAccent=ctx.createLinearGradient(panelX,panelY,panelX+panelW,panelY);
-    panelAccent.addColorStop(0,th.accent2); panelAccent.addColorStop(.6,th.accent); panelAccent.addColorStop(1,'rgba(255,255,255,.12)');
-    ctx.fillStyle=panelAccent;
-    fillRoundRect(ctx,panelX+Math.round(w*.012),panelY+Math.round(h*.012),panelW-Math.round(w*.024),Math.max(4,Math.round(h*.007)),Math.round(h*.006),panelAccent);
+    drawGlassPanel(ctx,panelX,panelY,panelW,panelH,Math.round(panelH*(pst.name==='modern'?.18:.12)),th,pst.name==='minimal'?0.58:pst.name==='modern'?0.60:0.66);
+    if(pst.name==='modern'){
+      // Modern: เส้นสีเน้นสั้น ๆ บาง ๆ มุมซ้ายบนของแผง แทนแถบเต็มความกว้าง
+      const lineW=Math.round(panelW*.16);
+      const lineG=ctx.createLinearGradient(panelX,0,panelX+lineW,0);
+      lineG.addColorStop(0,th.accent2); lineG.addColorStop(1,rgba(th.accent,.35));
+      fillRoundRect(ctx,panelX+Math.round(w*.03),panelY+Math.round(h*.014),lineW,Math.max(3,Math.round(h*.005)),Math.round(h*.003),lineG);
+    }else{
+      const panelAccent=ctx.createLinearGradient(panelX,panelY,panelX+panelW,panelY);
+      panelAccent.addColorStop(0,th.accent2); panelAccent.addColorStop(.6,th.accent); panelAccent.addColorStop(1,'rgba(255,255,255,.12)');
+      ctx.fillStyle=panelAccent;
+      fillRoundRect(ctx,panelX+Math.round(w*.012),panelY+Math.round(h*.012),panelW-Math.round(w*.024),Math.max(4,Math.round(h*.007)),Math.round(h*.006),panelAccent);
+    }
 
     if(d.categoryLabel){
       const catY=panelY-Math.round(h*.040);
       const catW=Math.min(Math.round(w*.36), Math.round(w*.14)+Math.round(clean(d.categoryLabel).length*16));
-      drawRibbon(ctx,panelX+Math.round(w*.006),catY,catW,Math.round(h*.035),th,'accent');
+      if(pst.name==='modern'){
+        const catG=ctx.createLinearGradient(panelX,catY,panelX+catW,catY);
+        catG.addColorStop(0,rgba(th.accent,.92)); catG.addColorStop(1,rgba(th.accent2,.85));
+        fillRoundRect(ctx,panelX+Math.round(w*.006),catY,catW,Math.round(h*.035),Math.round(h*.0175),catG,'rgba(255,255,255,.20)',1);
+      }else{
+        drawRibbon(ctx,panelX+Math.round(w*.006),catY,catW,Math.round(h*.035),th,'accent');
+      }
       drawText(ctx, smartShort(d.categoryLabel,46), panelX+Math.round(w*.024), catY+Math.round(h*.006), catW-Math.round(w*.040), 1, `900 ${Math.round(Math.min(w,h)*0.015)}px "Prompt","Noto Sans Thai",sans-serif`, '#fff', Math.round(Math.min(w,h)*0.021));
     }
 
