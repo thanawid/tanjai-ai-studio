@@ -179,6 +179,15 @@ $("#albumForm").innerHTML = `
       <div id="album-preview" class="album-upload-preview"></div>
     </div>
     <div class="form-section"><div class="section-title"><b>2</b><h4>ข้อมูลบนกรอบภาพ</h4></div>
+      <div class="album-quick-fill" role="group" aria-label="เติมตัวอย่างงานยอดฮิต">
+        <small class="album-quick-label">งานยอดฮิต — แตะเพื่อเติมตัวอย่างแล้วแก้เป็นข้อมูลจริง:</small>
+        <button type="button" class="btn secondary album-quick-btn" data-album-quick="tradition">🪷 งานบุญ/ประเพณี</button>
+        <button type="button" class="btn secondary album-quick-btn" data-album-quick="event">🎉 กิจกรรม/อีเวนต์</button>
+        <button type="button" class="btn secondary album-quick-btn" data-album-quick="announce">📣 ประกาศ/แจ้งข่าว</button>
+        <button type="button" class="btn secondary album-quick-btn" data-album-quick="meeting">🏛️ งานหน่วยงาน/ประชุม</button>
+        <button type="button" class="btn secondary album-quick-btn" data-album-quick="promo">🛍️ โปรโมทสินค้า/ร้านค้า</button>
+        <button type="button" class="btn secondary album-quick-btn" data-album-quick="showcase">✨ ผลงาน/รีวิว</button>
+      </div>
       <div class="form-grid">
         <label>หัวข้องาน<input id="album-title" placeholder="เช่น ชื่องาน / กิจกรรม / ประกาศ / แคมเปญ"></label>
         <label>หน่วยงาน<input id="album-orgName" placeholder="เช่น ชื่อหน่วยงาน / องค์กร / ร้านค้า / เพจ / แบรนด์"></label>
@@ -210,7 +219,7 @@ $("#albumForm").innerHTML = `
         <input id="album-previewLayout" type="hidden" value="auto">
         <label>สไตล์กรอบ<select id="album-frameStyle"><option>ทั่วไป / หน่วยงาน / แบรนด์</option><option>ประชุม / เวทีรับฟัง / ประชาคม</option><option>ลงพื้นที่ / ภารกิจ / ติดตามงาน</option><option>ข่าวด่วน / ประกาศสำคัญ</option><option>กิจกรรม / อบรม / อีเวนต์</option><option>โรงเรียน / การศึกษา</option><option>สุขภาพ / รณรงค์ / ชุมชน</option><option>ธุรกิจ / สินค้า / โปรโมชัน</option><option>เพจ / ครีเอเตอร์ / แบรนด์ส่วนตัว</option><option>มินิมอล ขอบบาง</option></select></label>
         <label>Theme Cover Frame Preset<select id="album-themePreset"><option>Ribbon Civic Cover</option><option>Modern Glass Cover</option><option>Clean Civic Cover</option><option>Minimal Story Cover</option></select></label>
-        <label>โทนสี<select id="album-colorTone"><option selected>AI เลือกโทนสีให้เข้ากับงาน</option><option>ม่วง–ทอง พรีเมียม</option><option>เขียว–เหลือง–ขาว</option><option>น้ำเงิน–ขาว ทางการ</option><option>ส้ม–ทอง สดเด่น</option><option>ดำ–ทอง หรูหรา</option></select></label>
+        <label>โทนสี<select id="album-colorTone"><option selected>AI เลือกโทนสีให้เข้ากับงาน</option><option>ม่วง–ทอง พรีเมียม</option><option>เขียว–เหลือง–ขาว</option><option>น้ำเงิน–ขาว ทางการ</option><option>ส้ม–ทอง สดเด่น</option><option>ดำ–ทอง หรูหรา</option><option>ชมพู–ครีม อ่อนหวาน</option><option>แดงเลือดหมู–ครีม งานวัด</option><option>น้ำตาล–ครีม คาเฟ่</option><option>เขียวมิ้นต์–ขาว สะอาด</option></select></label>
         <label>โหมดอัตโนมัติ<select id="album-autoMode"><option>ปรับภาพ + ครอป + ใส่กรอบ</option><option>ภาพกิจกรรมเน้นภาพ / แถบเล็ก</option><option>ครอป + ใส่กรอบเท่านั้น</option><option>ปรับภาพเท่านั้น</option></select></label>
         <label>Pro Frame (กรอบตามตัวอย่าง)<select id="album-proFrame"><option value="Balanced Ribbon" selected>Clean Civic Frame (กรอบเรียบสำหรับงานประชาสัมพันธ์)</option><option value="Gold Luxury">Gold Luxury (ขอบทองหรูหรา)</option><option value="None">ไม่มีกรอบพิเศษ</option><option value="Modern Neon">Modern Neon (ขอบนีออนเรืองแสง)</option><option value="Bold Corporate">Bold Corporate (ขอบสีแบรนด์)</option></select><small>ภาพปกใช้กรอบหัวเรื่องแบบสะอาด ภาพรองใช้เพียงขอบบางและแถบคำอธิบาย</small></label>
         <div class="full album-smart-choice" id="album-smartChoice">ระบบจะสรุปขนาดและรูปแบบพรีวิวที่เลือกให้อีกครั้งหลังสร้างชุดภาพ</div>
