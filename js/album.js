@@ -547,10 +547,30 @@
     ctx.restore();
     return bestLines.length;
   }
+  const THAI_COMPOUNDS=["เนื่องใน","เนื่องจาก","เนื่องด้วย","ประจำปี","เข้าพรรษา","ออกพรรษา","อาสาฬหบูชา","วิสาขบูชา","มาฆบูชา","เทียนพรรษา","พระภิกษุสงฆ์","ปฏิบัติธรรม","สวดมนต์","ขอเชิญร่วม","ประชาสัมพันธ์","เป็นสิริมงคล","ณ วัน","ในวัน"];
+  function mergeCompounds(tokens){
+    const out=[];
+    for(let i=0;i<tokens.length;i++){
+      let merged=false;
+      // ลองรวม 2-3 token ถัดไป ถ้าตรงกับคำประสมที่ห้ามพรากบรรทัด
+      for(let take=3;take>=2;take--){
+        if(i+take<=tokens.length){
+          const joined=tokens.slice(i,i+take).join("");
+          if(THAI_COMPOUNDS.some(c=>joined===c || joined.startsWith(c))){
+            if(THAI_COMPOUNDS.includes(joined)){ out.push(joined); i+=take-1; merged=true; break; }
+          }
+        }
+      }
+      if(!merged) out.push(tokens[i]);
+    }
+    return out;
+  }
   function segmentText(text){
     text = clean(text); if(!text) return [];
-    try{ if(window.Intl && Intl.Segmenter){ const seg = new Intl.Segmenter("th", {granularity:"word"}); return Array.from(seg.segment(text)).map(s=>s.segment).filter(Boolean);} }catch(e){}
-    return text.split(/(\s+|[\/|•,.:;()]+)/).filter(Boolean);
+    let tokens;
+    try{ if(window.Intl && Intl.Segmenter){ const seg = new Intl.Segmenter("th", {granularity:"word"}); tokens = Array.from(seg.segment(text)).map(s=>s.segment).filter(Boolean);} }catch(e){}
+    if(!tokens) tokens = text.split(/(\s+|[\/|•,.:;()]+)/).filter(Boolean);
+    return mergeCompounds(tokens);
   }
   function lineWidth(ctx, arr){ return ctx.measureText(arr.join("").replace(/\s+/g," ")).width; }
   function balancedLines(ctx,text,maxW,maxLines){
@@ -645,9 +665,9 @@
     }
 
     const panelX=pad+Math.round(w*.015);
-    const panelY=Math.round(h*(land?0.69:0.64));
+    const panelY=Math.round(h*(land?0.705:0.655));
     const panelW=w-panelX*2;
-    const panelH=Math.round(h*(land?0.16:0.19));
+    const panelH=Math.round(h*(land?0.148:0.178));
     drawGlassPanel(ctx,panelX,panelY,panelW,panelH,Math.round(panelH*.12),th,pst.name==='minimal'?0.58:0.66);
     const panelAccent=ctx.createLinearGradient(panelX,panelY,panelX+panelW,panelY);
     panelAccent.addColorStop(0,th.accent2); panelAccent.addColorStop(.6,th.accent); panelAccent.addColorStop(1,'rgba(255,255,255,.12)');
@@ -669,10 +689,18 @@
     drawText(ctx, smartShort(d.title,190), titleX, titleY, titleW, land?2:3, `900 ${titleFont}px "Prompt","Kanit","Noto Sans Thai",sans-serif`, '#fff', titleLineH);
 
     const subText = stripHashtags(d.detail) || stripHashtags(d.footer) || d.place || '';
-    const subY=titleY + titleLineH*(land?1.65:1.9);
+    const subY=titleY + titleLineH*(land?1.62:1.86);
     if(subText){
-      fillRoundRect(ctx,titleX,subY,titleW,Math.round(panelH*.15),Math.round(panelH*.075),rgba(th.accent,.78),'rgba(255,255,255,.12)',1);
-      drawText(ctx, smartShort(subText, land?130:100), titleX+Math.round(w*.018), subY+Math.round(panelH*.026), titleW-Math.round(w*.036), 1, `800 ${Math.round(Math.min(w,h)*0.017)}px "Prompt","Noto Sans Thai",sans-serif`, '#fff', Math.round(Math.min(w,h)*0.022));
+      const subFont=`800 ${Math.round(Math.min(w,h)*0.017)}px "Prompt","Noto Sans Thai",sans-serif`;
+      const subShown=smartShort(subText, land?130:100);
+      // วัดความกว้างจริงของข้อความ แล้วให้แถบหดพอดีเนื้อหา ไม่กางเต็มความกว้างซ้ำกับแผงหลัก
+      ctx.save(); ctx.font=subFont;
+      const subTextW=ctx.measureText(clean(subShown)).width;
+      ctx.restore();
+      const subPadX=Math.round(w*.018);
+      const subW=Math.min(titleW, Math.round(subTextW)+subPadX*2+Math.round(w*.006));
+      fillRoundRect(ctx,titleX,subY,subW,Math.round(panelH*.15),Math.round(panelH*.075),rgba(th.accent,.78),'rgba(255,255,255,.12)',1);
+      drawText(ctx, subShown, titleX+subPadX, subY+Math.round(panelH*.026), subW-subPadX*2, 1, subFont, '#fff', Math.round(Math.min(w,h)*0.022));
     }
 
     const metaY=panelY+panelH-Math.round(panelH*.18);
@@ -1085,7 +1113,7 @@
 
         <details class="album-review-details album-caption-edit-details" open>
           <summary>
-            <span><b>แคปชั่นโพสต์${state.captionSource==='ai' ? ' — ✨ AI เขียนให้ 3 แบบ' : ''}</b><small>${state.captionSource==='ai' ? 'เลือกแบบที่ชอบ แก้ไขได้ · ตัวอย่างด้านบนเปลี่ยนทันที' : 'Caption Writer + Fact Guard · พิมพ์แล้วตัวอย่างด้านบนจะเปลี่ยนทันที'}</small></span>
+            <span><b>แคปชั่นโพสต์${state.captionSource==='ai' ? ' — ✨ AI เขียนให้ 3 แบบ' : ''}</b><small>${state.captionSource==='ai' ? 'เลือกแบบที่ชอบ แก้ไขได้ · ตัวอย่างด้านบนเปลี่ยนทันที' : 'แก้ข้อความได้เลย · ตัวอย่างโพสต์ด้านบนจะเปลี่ยนตามทันที'}</small></span>
           </summary>
           <div class="album-caption-box">
             ${state.captionVariants && state.captionVariants.length>1 ? `
