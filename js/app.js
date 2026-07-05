@@ -179,15 +179,6 @@ $("#albumForm").innerHTML = `
       <div id="album-preview" class="album-upload-preview"></div>
     </div>
     <div class="form-section"><div class="section-title"><b>2</b><h4>บอกว่างานอะไร (กรอกแค่ที่มี)</h4></div>
-      <div class="album-quick-fill" role="group" aria-label="เติมตัวอย่างงานยอดฮิต">
-        <small class="album-quick-label">งานยอดฮิต — แตะเพื่อเติมตัวอย่างแล้วแก้เป็นข้อมูลจริง:</small>
-        <button type="button" class="btn secondary album-quick-btn" data-album-quick="tradition">🪷 งานบุญ/ประเพณี</button>
-        <button type="button" class="btn secondary album-quick-btn" data-album-quick="event">🎉 กิจกรรม/อีเวนต์</button>
-        <button type="button" class="btn secondary album-quick-btn" data-album-quick="announce">📣 ประกาศ/แจ้งข่าว</button>
-        <button type="button" class="btn secondary album-quick-btn" data-album-quick="meeting">🏛️ งานหน่วยงาน/ประชุม</button>
-        <button type="button" class="btn secondary album-quick-btn" data-album-quick="promo">🛍️ โปรโมทสินค้า/ร้านค้า</button>
-        <button type="button" class="btn secondary album-quick-btn" data-album-quick="showcase">✨ ผลงาน/รีวิว</button>
-      </div>
       <div class="form-grid">
         <label>หัวข้องาน<input id="album-title" placeholder="เช่น ชื่องาน / กิจกรรม / ประกาศ / แคมเปญ"></label>
         <label>หน่วยงาน<input id="album-orgName" placeholder="เช่น ชื่อหน่วยงาน / องค์กร / ร้านค้า / เพจ / แบรนด์"></label>
@@ -200,6 +191,19 @@ $("#albumForm").innerHTML = `
         <label class="full">ข้อความภาพ 3 (ไม่บังคับ)<input id="album-lite3" placeholder="เช่น บรรยากาศการประชุม / รับฟังความคิดเห็น / ผู้เข้าร่วม"></label>
         <label class="full">ข้อความภาพ 4 (ไม่บังคับ)<input id="album-lite4" placeholder="เช่น ร่วมติดตามและขับเคลื่อนงาน / สรุปผล / เชิญติดตาม"></label>
       </div>
+      <details class="quick-advanced">
+        <summary><span>ปรับละเอียด</span><small>ไม่บังคับ — ระบบเลือกสี กรอบ และสไตล์ให้เข้ากับงานอัตโนมัติ</small></summary>
+        <div class="quick-advanced-body">
+          <div class="form-grid quick-advanced-grid">
+            <label>สไตล์แคปชั่น<select id="album-captionStyle"><option value="pr-ready" selected>พร้อมโพสต์ — กระชับและครบประเด็น</option><option value="official">ทางการสำหรับหน่วยงาน</option><option value="friendly">อบอุ่น เข้าถึงง่าย</option><option value="story">เล่าเรื่องกิจกรรม</option><option value="announcement">ประกาศ / แจ้งข่าว</option></select></label>
+            <label>ลายกรอบตามประเภทงาน<select id="album-frameStyle"><option>ทั่วไป / หน่วยงาน / แบรนด์</option><option>ประชุม / เวทีรับฟัง / ประชาคม</option><option>ลงพื้นที่ / ภารกิจ / ติดตามงาน</option><option>ข่าวด่วน / ประกาศสำคัญ</option><option>กิจกรรม / อบรม / อีเวนต์</option><option>โรงเรียน / การศึกษา</option><option>สุขภาพ / รณรงค์ / ชุมชน</option><option>ธุรกิจ / สินค้า / โปรโมชัน</option><option>เพจ / ครีเอเตอร์ / แบรนด์ส่วนตัว</option><option>มินิมอล ขอบบาง</option></select></label>
+            <label>ธีมหน้าปก<select id="album-themePreset"><option>Ribbon Civic Cover</option><option>Modern Glass Cover</option><option>Clean Civic Cover</option><option>Minimal Story Cover</option></select></label>
+            <label>โทนสี<select id="album-colorTone"><option selected>AI เลือกโทนสีให้เข้ากับงาน</option><option>ม่วง–ทอง พรีเมียม</option><option>เขียว–เหลือง–ขาว</option><option>น้ำเงิน–ขาว ทางการ</option><option>ส้ม–ทอง สดเด่น</option><option>ดำ–ทอง หรูหรา</option><option>ชมพู–ครีม อ่อนหวาน</option><option>แดงเลือดหมู–ครีม งานวัด</option><option>น้ำตาล–ครีม คาเฟ่</option><option>เขียวมิ้นต์–ขาว สะอาด</option></select></label>
+            <label>การจัดการภาพ<select id="album-autoMode"><option>ปรับภาพ + ครอป + ใส่กรอบ</option><option>ภาพกิจกรรมเน้นภาพ / แถบเล็ก</option><option>ครอป + ใส่กรอบเท่านั้น</option><option>ปรับภาพเท่านั้น</option></select></label>
+            <label>กรอบพิเศษ<select id="album-proFrame"><option value="Balanced Ribbon" selected>กรอบเรียบ งานประชาสัมพันธ์ (แนะนำ)</option><option value="Gold Luxury">ขอบทองหรูหรา</option><option value="None">ไม่มีกรอบพิเศษ</option><option value="Modern Neon">ขอบนีออนเรืองแสง</option><option value="Bold Corporate">ขอบสีแบรนด์</option></select></label>
+          </div>
+        </div>
+      </details>
     </div>
     <div class="form-section"><div class="section-title"><b>3</b><h4>เลือกรูปแบบโพสต์ แล้วกดสร้างได้เลย</h4></div>
       <div class="form-grid">
@@ -212,17 +216,6 @@ $("#albumForm").innerHTML = `
             <button type="button" class="album-preset-card" data-album-preset="portrait-left"><span class="preset-diagram preset-portrait"><i></i><i></i><i></i><i></i></span><b>ปกตั้งด้านซ้าย</b><small>1280x1920 + ภาพรอง</small></button>
           </div>
         </div>
-        <details class="full album-advanced">
-          <summary>⚙️ ปรับแต่งเพิ่มเติม <small>(ไม่บังคับ — ระบบเลือกสี กรอบ และสไตล์ให้เข้ากับงานอัตโนมัติแล้ว)</small></summary>
-          <div class="form-grid album-advanced-grid">
-            <label>สไตล์แคปชั่น<select id="album-captionStyle"><option value="pr-ready" selected>พร้อมโพสต์ — กระชับและครบประเด็น</option><option value="official">ทางการสำหรับหน่วยงาน</option><option value="friendly">อบอุ่น เข้าถึงง่าย</option><option value="story">เล่าเรื่องกิจกรรม</option><option value="announcement">ประกาศ / แจ้งข่าว</option></select></label>
-            <label>ลายกรอบตามประเภทงาน<select id="album-frameStyle"><option>ทั่วไป / หน่วยงาน / แบรนด์</option><option>ประชุม / เวทีรับฟัง / ประชาคม</option><option>ลงพื้นที่ / ภารกิจ / ติดตามงาน</option><option>ข่าวด่วน / ประกาศสำคัญ</option><option>กิจกรรม / อบรม / อีเวนต์</option><option>โรงเรียน / การศึกษา</option><option>สุขภาพ / รณรงค์ / ชุมชน</option><option>ธุรกิจ / สินค้า / โปรโมชัน</option><option>เพจ / ครีเอเตอร์ / แบรนด์ส่วนตัว</option><option>มินิมอล ขอบบาง</option></select></label>
-            <label>ธีมหน้าปก<select id="album-themePreset"><option>Ribbon Civic Cover</option><option>Modern Glass Cover</option><option>Clean Civic Cover</option><option>Minimal Story Cover</option></select></label>
-            <label>โทนสี<select id="album-colorTone"><option selected>AI เลือกโทนสีให้เข้ากับงาน</option><option>ม่วง–ทอง พรีเมียม</option><option>เขียว–เหลือง–ขาว</option><option>น้ำเงิน–ขาว ทางการ</option><option>ส้ม–ทอง สดเด่น</option><option>ดำ–ทอง หรูหรา</option><option>ชมพู–ครีม อ่อนหวาน</option><option>แดงเลือดหมู–ครีม งานวัด</option><option>น้ำตาล–ครีม คาเฟ่</option><option>เขียวมิ้นต์–ขาว สะอาด</option></select></label>
-            <label>การจัดการภาพ<select id="album-autoMode"><option>ปรับภาพ + ครอป + ใส่กรอบ</option><option>ภาพกิจกรรมเน้นภาพ / แถบเล็ก</option><option>ครอป + ใส่กรอบเท่านั้น</option><option>ปรับภาพเท่านั้น</option></select></label>
-            <label>กรอบพิเศษ<select id="album-proFrame"><option value="Balanced Ribbon" selected>กรอบเรียบ งานประชาสัมพันธ์ (แนะนำ)</option><option value="Gold Luxury">ขอบทองหรูหรา</option><option value="None">ไม่มีกรอบพิเศษ</option><option value="Modern Neon">ขอบนีออนเรืองแสง</option><option value="Bold Corporate">ขอบสีแบรนด์</option></select></label>
-          </div>
-        </details>
         <div class="full album-smart-choice" id="album-smartChoice">ระบบจะสรุปขนาดและรูปแบบที่เลือกให้อีกครั้งหลังสร้างชุดภาพ</div>
         <input id="album-ratio" type="hidden" value="auto">
         <input id="album-previewLayout" type="hidden" value="auto">

@@ -24,61 +24,6 @@
     resolvedRatio: "1080x800", resolvedPreviewLayout: "cover-top", resolvedFacebookPreset: "wide-top"
   };
 
-  /* ─── งานยอดฮิต: เติมตัวอย่างให้แก้ต่อ (ภาษากลาง ใช้ได้ทั้งหน่วยงานและธุรกิจ) ─── */
-  const QUICK_FILL = {
-    tradition: {
-      title:"งานสืบสานประเพณีแห่เทียนพรรษา ประจำปี 2569",
-      categoryLabel:"ประเพณี",
-      detail:"ขอเชิญร่วมขบวนแห่เทียนพรรษา ถวายเทียนแด่พระภิกษุสงฆ์ สวดมนต์และปฏิบัติธรรม เนื่องในวันอาสาฬหบูชาและวันเข้าพรรษา",
-      footer:"ร่วมสืบสานประเพณีอันดีงามให้คงอยู่สืบไป",
-      frameStyle:"กิจกรรม / อบรม / อีเวนต์", captionStyle:"pr-ready"
-    },
-    event: {
-      title:"เทศกาลอาหารและดนตรี ครั้งที่ 1",
-      categoryLabel:"กิจกรรม",
-      detail:"พบกับร้านอาหารดัง ดนตรีสด กิจกรรมบนเวที และของรางวัลมากมายตลอดงาน เข้าร่วมฟรี",
-      footer:"ชวนเพื่อนมาร่วมสนุกด้วยกันนะครับ",
-      frameStyle:"กิจกรรม / อบรม / อีเวนต์", captionStyle:"friendly"
-    },
-    announce: {
-      title:"ประกาศแจ้งเปลี่ยนแปลงเวลาให้บริการ",
-      categoryLabel:"แจ้งข่าว",
-      detail:"แจ้งปรับเวลาเปิด-ปิดให้บริการชั่วคราว ขออภัยในความไม่สะดวก และขอบคุณที่ไว้วางใจใช้บริการ",
-      footer:"สอบถามเพิ่มเติมได้ทุกช่องทาง",
-      frameStyle:"ข่าวด่วน / ประกาศสำคัญ", captionStyle:"announcement"
-    },
-    meeting: {
-      title:"เวทีประชาคมรับฟังความคิดเห็นแผนพัฒนาท้องถิ่น",
-      categoryLabel:"ประชาสัมพันธ์",
-      detail:"ขอเชิญประชาชนร่วมแสดงความคิดเห็นต่อร่างแผนพัฒนาท้องถิ่น เพื่อนำข้อเสนอไปจัดทำแผนงานที่ตรงความต้องการของพื้นที่",
-      footer:"เสียงของท่านคือทิศทางการพัฒนา",
-      frameStyle:"ประชุม / เวทีรับฟัง / ประชาคม", captionStyle:"official"
-    },
-    promo: {
-      title:"เมนูใหม่ประจำเดือน ลดพิเศษ 20%",
-      categoryLabel:"โปรโมชัน",
-      detail:"เปิดตัวเมนูใหม่รสชาติจัดเต็ม พร้อมโปรโมชันพิเศษเฉพาะเดือนนี้ สั่งครบตามเงื่อนไขรับส่วนลดทันที",
-      footer:"สั่งเลยวันนี้ ก่อนโปรหมดเขต",
-      frameStyle:"ธุรกิจ / สินค้า / โปรโมชัน", captionStyle:"friendly"
-    },
-    showcase: {
-      title:"ส่งมอบงานเรียบร้อย ขอบคุณที่ไว้วางใจ",
-      categoryLabel:"ผลงาน",
-      detail:"เก็บภาพบรรยากาศผลงานล่าสุดที่ทีมงานตั้งใจทำอย่างเต็มที่ ตั้งแต่เริ่มต้นจนส่งมอบเรียบร้อย",
-      footer:"สนใจงานลักษณะนี้ ทักมาพูดคุยกันได้เลย",
-      frameStyle:"ลงพื้นที่ / ภารกิจ / ติดตามงาน", captionStyle:"story"
-    }
-  };
-  function applyQuickFill(key){
-    const p=QUICK_FILL[key]; if(!p) return;
-    const set=(id,v)=>{ const el=document.getElementById(id); if(el && v!==undefined){ el.value=v; el.dispatchEvent(new Event('input',{bubbles:true})); } };
-    set('album-title',p.title); set('album-categoryLabel',p.categoryLabel);
-    set('album-detail',p.detail); set('album-footer',p.footer);
-    const fs=document.getElementById('album-frameStyle'); if(fs && p.frameStyle) fs.value=p.frameStyle;
-    const cs=document.getElementById('album-captionStyle'); if(cs && p.captionStyle) cs.value=p.captionStyle;
-    if(window.TANJAI?.toast) TANJAI.toast('เติมตัวอย่างแล้ว — แก้ชื่องาน วันที่ สถานที่ ให้เป็นข้อมูลจริงก่อนสร้างนะครับ');
-    document.getElementById('album-title')?.focus();
-  }
 
   function val(id, fallback=""){
     const el = document.getElementById(id);
@@ -652,22 +597,28 @@
     const brandX=pad+Math.round(w*.014);
     const brandY=pad+Math.round(h*.012);
     const brandLabel=hasRealOrg(d.org) ? d.org : '';
-    if(brandLabel || state.logo){
+    if(brandLabel){
+      // มีชื่อหน่วยงาน → แถบชื่อ + โลโก้ ซ้ายบนตามเดิม
       drawRibbon(ctx,brandX,brandY,brandW,brandH,th,'dark');
       const logoS=Math.round(brandH*.92);
       const logoX=brandX-Math.round(logoS*.18);
       const logoY=brandY-Math.round((logoS-brandH)/2);
       const hasLogo=drawLogo(ctx,logoX,logoY,logoS);
       const brandTextX=hasLogo ? logoX+logoS+Math.round(w*.012) : brandX+Math.round(w*.018);
-      if(brandLabel) drawText(ctx,brandLabel,brandTextX,brandY+Math.round(brandH*.18),brandW-(brandTextX-brandX)-Math.round(w*.025),2,`900 ${Math.round(Math.min(w,h)*0.022)}px "Prompt","Noto Sans Thai",sans-serif`,'#fff',Math.round(Math.min(w,h)*0.029));
-      const orgSub=hasRealOrg(d.org) && d.categoryLabel ? smartShort(d.categoryLabel,38) : (d.place ? smartShort(d.place,36) : '');
+      drawText(ctx,brandLabel,brandTextX,brandY+Math.round(brandH*.18),brandW-(brandTextX-brandX)-Math.round(w*.025),2,`900 ${Math.round(Math.min(w,h)*0.022)}px "Prompt","Noto Sans Thai",sans-serif`,'#fff',Math.round(Math.min(w,h)*0.029));
+      const orgSub=d.categoryLabel ? smartShort(d.categoryLabel,38) : (d.place ? smartShort(d.place,36) : '');
       if(orgSub) drawText(ctx,orgSub,brandTextX,brandY+Math.round(brandH*.61),brandW-(brandTextX-brandX)-Math.round(w*.025),1,`800 ${Math.round(Math.min(w,h)*0.015)}px "Noto Sans Thai","Prompt",sans-serif`,'rgba(255,255,255,.84)',Math.round(Math.min(w,h)*0.021));
+    }else if(state.logo){
+      // ไม่มีชื่อหน่วยงาน → โลโก้เดี่ยว มุมบนขวา ไม่มีแถบเปล่า
+      const logoS=Math.round(Math.min(w,h)*(land?0.105:0.088));
+      drawLogo(ctx, w-pad-logoS-Math.round(w*.006), pad+Math.round(h*.010), logoS);
     }
 
     const panelX=pad+Math.round(w*.015);
-    const panelY=Math.round(h*(land?0.705:0.655));
+    // แผงหัวข้อลงไปชิดขอบล่าง (เว้นที่ให้แถบท้ายภาพ) ไม่บังกลางภาพ
+    const panelY=Math.round(h*(land?0.760:0.728));
     const panelW=w-panelX*2;
-    const panelH=Math.round(h*(land?0.148:0.178));
+    const panelH=Math.round(h*(land?0.148:0.170));
     drawGlassPanel(ctx,panelX,panelY,panelW,panelH,Math.round(panelH*.12),th,pst.name==='minimal'?0.58:0.66);
     const panelAccent=ctx.createLinearGradient(panelX,panelY,panelX+panelW,panelY);
     panelAccent.addColorStop(0,th.accent2); panelAccent.addColorStop(.6,th.accent); panelAccent.addColorStop(1,'rgba(255,255,255,.12)');
@@ -1241,8 +1192,6 @@
     renderUploadPreview();
     syncPresetButtons();
     document.addEventListener('click',(e)=>{
-      const quickButton=e.target && e.target.closest ? e.target.closest('[data-album-quick]') : null;
-      if(quickButton){ e.preventDefault(); applyQuickFill(quickButton.dataset.albumQuick); return; }
       const variantButton=e.target && e.target.closest ? e.target.closest('[data-caption-variant]') : null;
       if(variantButton){
         e.preventDefault();
