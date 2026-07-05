@@ -5102,3 +5102,11 @@ label > .field-hint + select{
     flex-direction:column;
   }
 }
+
+/* ─── v9.9: Album quick-fill + caption variants ─── */
+.album-quick-fill{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:4px 0 14px}
+.album-quick-label{flex-basis:100%;color:var(--muted,#9aa3b2);font-size:12px;margin-bottom:2px}
+.album-quick-btn{font-size:13px;padding:7px 12px;border-radius:999px;line-height:1}
+.album-caption-variants{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.album-variant-btn{font-size:13px;padding:7px 14px;border-radius:999px;line-height:1;opacity:.75}
+.album-variant-btn.selected{opacity:1;border-color:var(--accent,#c26bff);box-shadow:0 0 0 1px var(--accent,#c26bff) inset;font-weight:600}
