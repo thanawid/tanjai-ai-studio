@@ -5110,3 +5110,12 @@ label > .field-hint + select{
 .album-caption-variants{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
 .album-variant-btn{font-size:13px;padding:7px 14px;border-radius:999px;line-height:1;opacity:.75}
 .album-variant-btn.selected{opacity:1;border-color:var(--accent,#c26bff);box-shadow:0 0 0 1px var(--accent,#c26bff) inset;font-weight:600}
+
+/* ─── v9.9: Album advanced options collapse ─── */
+.album-advanced{border:1px solid rgba(255,255,255,.10);border-radius:14px;background:rgba(255,255,255,.03);padding:0;overflow:hidden}
+.album-advanced summary{cursor:pointer;padding:12px 16px;font-weight:600;list-style:none;display:flex;align-items:center;gap:8px;flex-wrap:wrap;user-select:none}
+.album-advanced summary::-webkit-details-marker{display:none}
+.album-advanced summary small{color:var(--muted,#9aa3b2);font-weight:400}
+.album-advanced summary::after{content:"▾";margin-left:auto;opacity:.6;transition:transform .2s}
+.album-advanced[open] summary::after{transform:rotate(180deg)}
+.album-advanced .album-advanced-grid{padding:4px 16px 16px}
