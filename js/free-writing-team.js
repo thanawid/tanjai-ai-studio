@@ -1,4 +1,4 @@
-/* Tanjai AI Studio V9.8.2.2
+/* Tanjai AI Studio V9.9.0
  * Specialist Output Engine — zero-API, rule-based specialist writers.
  * Goal: transform raw brief into usable outputs, not merely restate user text.
  */
