@@ -1,4 +1,4 @@
-/* Tanjai AI Studio V9.9.0
+/* Tanjai AI Studio V9.8.2.2
  * Specialist Output Engine — zero-API, rule-based specialist writers.
  * Goal: transform raw brief into usable outputs, not merely restate user text.
  */
@@ -64,7 +64,6 @@
     const b = contentBrain(d);
     const text = `${b.title} ${b.detail} ${b.contentType} ${d.mainCategory || ""} ${d.subCategory || ""} ${d.workContext || ""}`;
     if(/ไว้อาลัย|อาลัย|เสียชีวิต|รำลึก|ถวายความอาลัย/.test(text)) return "respectful";
-    if(/ประเพณี|แห่เทียน|เทียนพรรษา|เข้าพรรษา|ออกพรรษา|กฐิน|ผ้าป่า|สงกรานต์|ลอยกระทง|บุญบั้งไฟ|ทำบุญ|ตักบาตร|เวียนเทียน|วิสาขบูชา|มาฆบูชา|อาสาฬหบูชา|สวดมนต์|ปฏิบัติธรรม|ไหว้พระ|ทอดถวาย|บรรพชา|อุปสมบท|สรงน้ำ|รดน้ำดำหัว/.test(text)) return "tradition";
     if(/เพลง|ศิลปิน|ซิงเกิล|อัลบั้ม|MV|มิวสิก|Cover Art/i.test(text)) return "music";
     if(/สินค้า|บริการ|โปรโมชัน|โปรโมชั่น|ร้าน|อาหาร|OTOP|ขาย/.test(text)) return "commercial";
     if(/ประชุม|ประชาคม|ประชุมสภา|สัมมนา|อบรม|โครงการ|กิจกรรม|เชิญ|ขอเชิญ|เปิดรับ|รับสมัคร/.test(text)) return "invitation";
@@ -80,7 +79,6 @@
     if(intent === "invitation" && /ประชาคม|แผนพัฒนา|ท้องถิ่น/.test(`${b.title} ${b.detail}`)){
       return "เปิดโอกาสให้ประชาชนร่วมเสนอความคิดเห็น เพื่อนำข้อมูลจากพื้นที่ไปประกอบการวางแผนพัฒนาท้องถิ่นอย่างเป็นระบบ";
     }
-    if(intent === "tradition") return "ร่วมสืบสานประเพณีอันดีงามของท้องถิ่น เสริมสร้างความเป็นสิริมงคล และส่งต่อวัฒนธรรมสู่รุ่นลูกหลาน";
     if(intent === "invitation") return "เปิดโอกาสให้กลุ่มเป้าหมายเข้ามามีส่วนร่วม รับรู้ข้อมูล และร่วมขับเคลื่อนกิจกรรมให้เกิดประโยชน์จริง";
     if(intent === "announcement") return "ช่วยให้ผู้เกี่ยวข้องรับทราบข้อมูลสำคัญได้รวดเร็ว ลดความสับสน และเตรียมตัวได้ถูกต้อง";
     if(intent === "report") return "สะท้อนการดำเนินงานและความต่อเนื่องในการดูแล แก้ไข หรือพัฒนางานให้เห็นเป็นรูปธรรม";
@@ -93,9 +91,6 @@
   function extractHighlights(b){
     const source = `${b.title} ${b.detail}`;
     const items = [];
-    if(/แห่เทียน|เทียนพรรษา/.test(source)) items.push("กิจกรรมสำคัญคือการร่วมขบวนแห่เทียนพรรษา และถวายเทียนพรรษาแด่พระภิกษุสงฆ์ เพื่อความเป็นสิริมงคลแก่ตนเองและครอบครัว");
-    if(/สวดมนต์|ปฏิบัติธรรม/.test(source)) items.push("ผู้ร่วมงานจะได้ร่วมสวดมนต์และปฏิบัติธรรม เพื่อความสงบของจิตใจและเสริมสิริมงคลในชีวิต");
-    if(/เข้าพรรษา|อาสาฬหบูชา/.test(source)) items.push("งานนี้จัดขึ้นเนื่องในวันสำคัญทางพระพุทธศาสนา ซึ่งพุทธศาสนิกชนถือปฏิบัติสืบต่อกันมาแต่โบราณ");
     if(/แผนพัฒนาท้องถิ่น/.test(source)) items.push("การประชุมครั้งนี้มีเป้าหมายเพื่อรวบรวมความคิดเห็นและข้อเสนอจากพื้นที่ สำหรับใช้ประกอบการจัดทำแผนพัฒนาท้องถิ่น");
     const years = source.match(/พ\.ศ\.?\s*([0-9๐-๙]{4}).{0,12}?พ\.ศ\.?\s*([0-9๐-๙]{4})/);
     if(years) items.push(`กรอบแผนที่เกี่ยวข้องครอบคลุมช่วงปี พ.ศ. ${years[1]} ถึง พ.ศ. ${years[2]}`);
@@ -118,10 +113,7 @@
     const firstPoint = b.points[0] || b.detail;
 
     const details = [];
-    if(intent === "tradition"){
-      details.push(`${org} ขอเชิญพุทธศาสนิกชนและประชาชนทุกท่าน ร่วม “${subject}” เพื่อความเป็นสิริมงคลและร่วมสืบสานประเพณีอันดีงามให้คงอยู่สืบไป`);
-      details.push(benefit);
-    }else if(intent === "invitation"){
+    if(intent === "invitation"){
       details.push(`${org} ขอเชิญผู้เกี่ยวข้องเข้าร่วม “${subject}” เพื่อรับฟังข้อมูล แลกเปลี่ยนความคิดเห็น และร่วมเป็นส่วนหนึ่งของการขับเคลื่อนงานครั้งนี้`);
       details.push(benefit);
     }else if(intent === "announcement"){
@@ -161,7 +153,7 @@
       b.people && `บุคคล/ตำแหน่ง: ${b.people}`,
       b.visualPreset && `แนวภาพ/สไตล์: ${b.visualPreset}`
     ].filter(Boolean);
-    const eventLike = ["invitation","announcement","report","ceremony","education","tradition"].includes(intent);
+    const eventLike = ["invitation","announcement","report","ceremony","education"].includes(intent);
     const missing = [
       !real(d.title) && "หัวข้องาน / ข้อความหลัก",
       !real(d.detail) && "รายละเอียดเนื้อหา",
@@ -178,7 +170,6 @@
     const channel = real(d.channel) || "โพสต์ Facebook";
     const lines = rewriteCore(d, "post");
     const hookMap = {
-      tradition:"ขอเชิญร่วมสืบสานประเพณีอันดีงาม",
       invitation:"ขอเชิญร่วมเป็นส่วนหนึ่งของการพัฒนา",
       announcement:"แจ้งข้อมูลสำคัญ โปรดตรวจสอบรายละเอียด",
       report:"สรุปความคืบหน้าและการดำเนินงาน",
@@ -189,7 +180,7 @@
       general:"สื่อสารเรื่องสำคัญให้เข้าใจง่าย"
     };
     const hook = b.keyMessage || hookMap[intent] || hookMap.general;
-    const cta = b.action || (intent === "tradition" ? "ขอเชิญชวนทุกท่านร่วมงานตามวันเวลาและสถานที่ที่ประกาศ ร่วมกันสืบสานประเพณีให้คงอยู่คู่ท้องถิ่นสืบไป" : intent === "invitation" ? "ผู้สนใจสามารถติดตามรายละเอียดและเข้าร่วมตามข้อมูลที่ประกาศ" : b.org ? `ติดตามข้อมูลเพิ่มเติมจาก ${b.org}` : "โปรดตรวจสอบช่องทางติดต่อจริงก่อนเผยแพร่");
+    const cta = b.action || (intent === "invitation" ? "ผู้สนใจสามารถติดตามรายละเอียดและเข้าร่วมตามข้อมูลที่ประกาศ" : b.org ? `ติดตามข้อมูลเพิ่มเติมจาก ${b.org}` : "โปรดตรวจสอบช่องทางติดต่อจริงก่อนเผยแพร่");
     const tags = [hash(b.org), hash(b.title), intent === "music" ? "เพลงใหม่" : "ประชาสัมพันธ์"].filter(Boolean).slice(0,4).map(x=>`#${x}`).join(" ");
 
     if(/Line/.test(channel)){
@@ -224,7 +215,7 @@
     const count = seconds <= 15 ? 3 : seconds <= 30 ? 4 : seconds <= 60 ? 6 : 8;
     const per = Math.max(3, Math.round(seconds/count));
     const core = rewriteCore(d, "video");
-    const hook = b.keyMessage || (intent === "tradition" ? `ร่วมสืบสานประเพณี “${b.title}” ให้คงอยู่คู่ท้องถิ่น` : intent === "invitation" ? `ร่วมกำหนดทิศทางของ “${b.title}”` : intent === "announcement" ? `เรื่องสำคัญที่ควรรู้: ${b.title}` : b.title);
+    const hook = b.keyMessage || (intent === "invitation" ? `ร่วมกำหนดทิศทางของ “${b.title}”` : intent === "announcement" ? `เรื่องสำคัญที่ควรรู้: ${b.title}` : b.title);
     const sceneLabels = ["เปิดเรื่อง", "ปูบริบท", "สารหลัก", "รายละเอียด", "ประโยชน์", "ปิดท้าย", "CTA", "End Card"];
     const scenes = Array.from({length:count}, (_,idx)=>{
       const first = idx===0, last=idx===count-1;
@@ -239,9 +230,7 @@
     const b = contentBrain(d);
     const intent = detectIntent(d, "voice");
     const core = rewriteCore(d, "voice");
-    const open = intent === "tradition"
-      ? `ขอเชิญพุทธศาสนิกชนและพี่น้องประชาชนทุกท่าน ร่วม “${b.title}” เพื่อความเป็นสิริมงคล และร่วมกันสืบสานประเพณีอันดีงามของท้องถิ่นเรา`
-      : intent === "invitation"
+    const open = intent === "invitation"
       ? `ขอเชิญพี่น้องประชาชนและผู้เกี่ยวข้อง ร่วมรับฟังและมีส่วนร่วมใน “${b.title}”`
       : intent === "announcement"
         ? `ขอแจ้งประชาสัมพันธ์เรื่อง “${b.title}” เพื่อให้ทุกท่านรับทราบข้อมูลอย่างถูกต้อง`
@@ -249,10 +238,7 @@
           ? `ขอสรุปการดำเนินงานเรื่อง “${b.title}” ให้ทุกท่านได้รับทราบ`
           : `ขอนำเสนอเรื่อง “${b.title}”`;
     const bodyCore = core.slice(1,6).join("\n\n") || benefitLine(b, intent);
-    const bridgeText = intent === "tradition"
-      ? "ประเพณีที่สืบทอดกันมา คือสายใยที่เชื่อมคนในชุมชนเข้าด้วยกัน การได้มาร่วมงานพร้อมหน้ากัน ทั้งผู้เฒ่าผู้แก่ ลูกหลาน และเยาวชน คือการส่งต่อคุณค่าอันดีงามนี้ให้คงอยู่คู่ท้องถิ่นของเราตลอดไป"
-      : "การมีส่วนร่วมของทุกฝ่ายช่วยให้ข้อมูลที่นำไปใช้วางแผนหรือสื่อสารต่อ มีความใกล้เคียงกับความต้องการจริงของพื้นที่มากขึ้น และช่วยให้การดำเนินงานเกิดประโยชน์ต่อประชาชนอย่างเป็นรูปธรรม";
-    const extendedBridge = /3\s*นาที|90/.test(length) ? `\n\n[ขยายความ — ใช้น้ำเสียงต่อเนื่อง]\n${bridgeText}` : "";
+    const extendedBridge = /3\s*นาที|90/.test(length) ? `\n\n[ขยายความ — ใช้น้ำเสียงต่อเนื่อง]\nการมีส่วนร่วมของทุกฝ่ายช่วยให้ข้อมูลที่นำไปใช้วางแผนหรือสื่อสารต่อ มีความใกล้เคียงกับความต้องการจริงของพื้นที่มากขึ้น และช่วยให้การดำเนินงานเกิดประโยชน์ต่อประชาชนอย่างเป็นรูปธรรม` : "";
     const datePlace = joinNonEmpty([b.date && `กำหนดการที่เกี่ยวข้อง คือ ${b.date}`, b.place && `สถานที่ ${b.place}`], "\n");
     const close = b.action || (b.org ? `ติดตามข้อมูลเพิ่มเติมได้จาก ${b.org}` : "ติดตามรายละเอียดเพิ่มเติมจากช่องทางประชาสัมพันธ์ที่ถูกต้อง");
     return `สคริปต์เสียงพร้อมอ่าน — Voice Script Director\n\n[โทน ${style} | ความยาวเป้าหมาย ${length}]\n\n[เปิด — ชัดเจน / ดึงความสนใจ]\n${open}\n\n[เนื้อหา — เล่าให้เข้าใจง่าย]\n${bodyCore}${extendedBridge}\n\n${datePlace ? `[ข้อมูลสำคัญ — อ่านให้ช้าและชัด]\n${datePlace}\n\n` : ""}[ปิด — ย้ำประโยชน์และการมีส่วนร่วม]\n${close}\n\nคำกำกับการอ่าน\n• เว้นจังหวะหลังหัวข้อ “${b.title}”\n• เน้นคำสำคัญ: ${b.keyMessage || benefitLine(b, intent)}\n• คำอ่านชื่อเฉพาะ: ${b.pronunciation || placeholder("คำอ่านชื่อเฉพาะ")}\n• ตรวจวัน เวลา สถานที่ และชื่อหน่วยงานก่อนบันทึกเสียงจริง`;
