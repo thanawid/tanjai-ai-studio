@@ -12,9 +12,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700;800;900&family=Noto+Sans+Thai:wght@400;500;600;700;800;900&family=Prompt:wght@500;600;700;800;900&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
   <meta name="theme-color" content="#060713">
-  <meta name="description" content="ทันใจ AI Studio V9.8.3">
-  <link rel="stylesheet" href="css/style.css?v=9.8.3">
-  <link rel="stylesheet" href="css/animations.css?v=9.8.3">
+  <meta name="description" content="ทันใจ AI Studio V9.9.0">
+  <link rel="stylesheet" href="css/style.css?v=9.9.0">
+  <link rel="stylesheet" href="css/animations.css?v=9.9.0">
 </head>
 <body class="auth-locked">
   <a class="skip-link" href="#mainContent">ข้ามไปยังเนื้อหาหลัก</a>
@@ -27,12 +27,12 @@
       <p class="eyebrow">สำหรับสมาชิก</p>
       <h1>ทันใจ AI Studio</h1>
       <p class="login-subtitle">สร้างสื่อไว ด้วยพลัง AI</p>
-      <span class="version-badge login-version-badge" aria-label="เวอร์ชันระบบ V9.8.3">V9.8.3</span>
+      <span class="version-badge login-version-badge" aria-label="เวอร์ชันระบบ V9.9.0">V9.9.0</span>
 
       <form id="loginForm" class="login-form">
         <label>
-          อีเมลผู้ใช้งาน
-          <input id="loginEmail" type="email" autocomplete="username" placeholder="example@email.com" required>
+          ชื่อผู้ใช้งาน
+          <input id="loginEmail" type="text" autocomplete="username" placeholder="เช่น teamtanjai" required>
         </label>
         <label>
           รหัสผ่าน
@@ -86,7 +86,6 @@
         <span>ต่อยอด / ตัวอย่าง</span>
         <button class="nav-link" data-view="destinationHub"><i>🚀</i><b>เครื่องมือปลายทาง</b></button>
         <button class="nav-link" data-view="promptHub"><i>⭐</i><b>คลัง Prompt</b></button>
-        <button class="nav-link" id="openProofreadNav" type="button"><i>✅</i><b>ตรวจคำผิด</b></button>
         <button class="nav-link" data-view="library"><i>🗂️</i><b>ตัวอย่างงาน</b></button>
 
         <span>จัดการ</span>
@@ -106,7 +105,7 @@
         <div>
           <div class="topbar-kicker">
             <p class="eyebrow">ทันใจ AI Studio</p>
-            <span class="version-badge app-version-badge" aria-label="เวอร์ชันระบบ V9.8.3">V9.8.3</span>
+            <span class="version-badge app-version-badge" aria-label="เวอร์ชันระบบ V9.9.0">V9.9.0</span>
           </div>
           <h2 id="pageTitle" aria-live="polite">สวัสดีครับ! 👋</h2>
         </div>
@@ -295,7 +294,7 @@
       <section id="guide" class="view">
         <div class="panel guide-mvp-v877">
           <div class="panel-head">
-            <div><h3>⚙️ คู่มือระบบ</h3><p>คู่มือสั้น ใช้จริงในทีม · Tanjai AI Studio <span class="version-badge" style="font-size:11px">V9.8.3</span></p></div>
+            <div><h3>⚙️ คู่มือระบบ</h3><p>คู่มือสั้นสำหรับผู้ใช้ใหม่ · Tanjai AI Studio <span class="version-badge" style="font-size:11px">V9.9.0</span></p></div>
             <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
               <button class="btn primary" data-view="kit">เริ่มสร้าง Prompt</button>
               <button class="btn secondary" id="guideLogoutBtn" type="button" style="display:flex;align-items:center;gap:6px">
@@ -304,14 +303,14 @@
             </div>
           </div>
           <div class="quick-guide-v877">
-            <article><b>01</b><h4>เลือกเมนูให้ตรงงาน</h4><p>ภาพ โพสต์ วิดีโอ เสียง สไลด์ หรือชุดสื่อ เลือกตามผลลัพธ์ที่ต้องส่งจริง</p></article>
-            <article><b>02</b><h4>กรอกข้อมูลจริงให้ครบ</h4><p>หัวข้อ หน่วยงาน วันเวลา สถานที่ บุคคลสำคัญ และสิ่งที่ห้าม AI แต่งเพิ่ม</p></article>
-            <article><b>03</b><h4>ระบบช่วยตรวจและจัดบรีฟ</h4><p>ระบบตรวจคำผิดเบื้องต้น เลือก AI เฉพาะทางหลังบ้าน และจัด Prompt พร้อมใช้</p></article>
-            <article><b>04</b><h4>คัดลอกไปใช้ต่อ</h4><p>นำไปวางใน ChatGPT, Canva, CapCut หรือเครื่องมือปลายทาง พร้อมแนบภาพจริงเมื่อจำเป็น</p></article>
+            <article><b>01</b><h4>เลือกประเภทงาน</h4><p>เช่น ภาพประชาสัมพันธ์ โพสต์ Facebook วิดีโอ เสียงพากย์ หรือสไลด์</p></article>
+            <article><b>02</b><h4>กรอกข้อมูลจริง</h4><p>ใส่หัวข้อ หน่วยงาน รายละเอียด วันเวลา สถานที่ และบุคคลสำคัญเท่าที่มี</p></article>
+            <article><b>03</b><h4>กดสร้าง Prompt</h4><p>ระบบจะแยก Prompt สำหรับแก้/คุยต่อ และ Prompt สำหรับสั่ง AI ทำงานทันที</p></article>
+            <article><b>04</b><h4>คัดลอกไปใช้ต่อ</h4><p>นำไปวางใน ChatGPT, Canva, CapCut หรือเครื่องมือปลายทางที่ต้องการ แล้วแนบรูปประกอบถ้ามี</p></article>
           </div>
           <div class="guide-grid">
-            <article><h4>จำง่าย ๆ</h4><ol><li>เลือกเมนูตามงานจริง</li><li>กรอกข้อมูลที่มี</li><li>กดตรวจคำผิดเมื่อจำเป็น</li><li>กดสร้างผลลัพธ์</li><li>ตรวจชื่อเฉพาะก่อนเผยแพร่</li></ol></article>
-            <article><h4>คำเตือนสำคัญ</h4><ol><li>ห้ามให้ AI แต่งวันที่ เวลา สถานที่ ราคา เบอร์ หรือ QR เอง</li><li>ตรวจชื่อคน หน่วยงาน ตำแหน่ง และคำราชการก่อนเผยแพร่</li><li>ถ้าเป็นภาพจริง ให้แนบไฟล์ต้นฉบับไปพร้อม Prompt ทุกครั้ง</li><li>ผลลัพธ์คือผู้ช่วยจัดงาน ไม่ใช่หนังสือรับรองข้อเท็จจริง</li></ol></article>
+            <article><h4>จำง่าย ๆ</h4><ol><li>เลือกงาน</li><li>กรอกข้อมูล</li><li>กดสร้าง</li><li>คัดลอก Prompt</li><li>นำไปใช้กับ AI ปลายทาง</li></ol></article>
+            <article><h4>คำเตือนสำคัญ</h4><ol><li>ห้ามแต่งข้อมูลจริงเพิ่มเอง</li><li>ตรวจชื่อคน หน่วยงาน วันที่ และสถานที่ก่อนเผยแพร่</li><li>ถ้า AI ปลายทางสร้างภาพไม่ได้ ให้ใช้ Prompt ที่ระบบเตรียมไว้ไปวางในเครื่องมือสร้างภาพ</li><li>ถ้ามีรูปถ่าย ให้แนบรูปไปพร้อม Prompt ทุกครั้ง</li></ol></article>
           </div>
           <!-- PRICING SECTION -->
           <div class="pricing-section-v93" id="pricingSection">
@@ -320,42 +319,41 @@
               <div class="pricing-card-v93">
                 <div class="pricing-badge-v93 trial">ทดลองใช้</div>
                 <div class="pricing-price-v93">ฟรี</div>
-                <div class="pricing-period-v93">14 วัน</div>
+                <div class="pricing-period-v93">30 วัน</div>
                 <ul class="pricing-features-v93">
                   <li>&#x2705; ทุกเมนูสร้าง Prompt</li>
-                  <li>&#x2705; บันทึกโปรเจกต์ 5 ชิ้น</li>
+                  <li>&#x2705; บันทึกโปรเจกต์ 10 ชิ้น</li>
                   <li>&#x2705; ชุดภาพโพสต์ Facebook</li>
                   <li>&#x274C; ไม่มี Priority Support</li>
                 </ul>
-                <div class="pricing-note-v93">เหมาะสำหรับทดลองงานจริงก่อนตัดสินใจ</div>
+                <div class="pricing-note-v93">สำหรับผู้ได้รับ invite ทดลองใช้</div>
               </div>
               <div class="pricing-card-v93 featured-v93">
                 <div class="pricing-badge-v93 pro">แนะนำ</div>
                 <div class="pricing-price-v93">490 ฿</div>
-                <div class="pricing-period-v93">ต่อเดือน / 1 ผู้ใช้</div>
+                <div class="pricing-period-v93">ต่อเดือน</div>
                 <ul class="pricing-features-v93">
                   <li>&#x2705; ทุกฟีเจอร์ในระบบ</li>
                   <li>&#x2705; บันทึกโปรเจกต์ไม่จำกัด</li>
                   <li>&#x2705; Prompt ทุกประเภท</li>
                   <li>&#x2705; อัปเดตฟีเจอร์ใหม่</li>
-                  <li>&#x2705; Line Support เบื้องต้น</li>
+                  <li>&#x2705; Line Support</li>
                 </ul>
                 <button class="btn primary" style="width:100%;margin-top:8px" onclick="TANJAI.toast('ติดต่อ Line @tanjai เพื่อสมัคร')">สมัครแผนนี้</button>
               </div>
               <div class="pricing-card-v93">
-                <div class="pricing-badge-v93 org">ทีม / องค์กร</div>
-                <div class="pricing-price-v93">เริ่ม 1,490 ฿</div>
-                <div class="pricing-period-v93">ต่อเดือน / 3–5 ผู้ใช้</div>
+                <div class="pricing-badge-v93 org">องค์กร</div>
+                <div class="pricing-price-v93">ราคา<br>พิเศษ</div>
+                <div class="pricing-period-v93">สำหรับหน่วยงาน</div>
                 <ul class="pricing-features-v93">
-                  <li>&#x2705; 3–5 บัญชีผู้ใช้</li>
-                  <li>&#x2705; แนะนำการตั้งค่า + ใช้งานทีม</li>
+                  <li>&#x2705; 5+ บัญชีผู้ใช้</li>
+                  <li>&#x2705; Training + Setup</li>
                   <li>&#x2705; Custom Prompt ตามงาน</li>
-                  <li>&#x2705; Support ทีม + ปรับคำเฉพาะองค์กร</li>
+                  <li>&#x2705; Support ทีม</li>
                 </ul>
                 <button class="btn secondary" style="width:100%;margin-top:8px" onclick="TANJAI.toast('ติดต่อเพื่อรับข้อเสนอพิเศษ')">ติดต่อสอบถาม</button>
               </div>
             </div>
-            <p class="mini-note" style="margin-top:12px">หมายเหตุ: ราคาเป็นกรอบ MVP สำหรับทดสอบตลาด ยังไม่รวมต้นทุน API/ระบบสร้างภาพจริง หากต่อยอดเป็นระบบ AI เต็มรูปแบบควรประเมินต้นทุนต่อการใช้งานอีกครั้ง</p>
           </div>
           <div class="rights-box">สงวนสิทธิ์การใช้งาน Dashboard และระบบ “ทันใจ AI Studio” สำหรับผู้ได้รับสิทธิ์เท่านั้น ห้ามคัดลอก ดัดแปลง แจกจ่าย เผยแพร่ต่อ หรือนำไปใช้ในเชิงพาณิชย์โดยไม่ได้รับอนุญาต<br><br>พัฒนาโดย Thanawid Ritchi</div>
         </div>
@@ -382,23 +380,23 @@
 
   <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
-  <script src="js/data.js?v=9.8.3"></script>
-  <script src="js/generators.js?v=9.8.3"></script>
-  <script src="js/voice.js?v=9.8.3"></script>
-  <script src="js/projects.js?v=9.8.3"></script>
-  <script src="js/ui.js?v=9.8.3"></script>
-  <script src="js/photo-pro.js?v=9.8.3"></script>
-  <script src="js/prompt-brain.js?v=9.8.3"></script>
-  <script src="js/pro-brief-output.js?v=9.8.3"></script>
-  <script src="js/expert-prompt-engine.js?v=9.8.3"></script>
-  <script src="js/free-writing-team.js?v=9.8.3"></script>
-  <script src="js/ai-config.js?v=9.8.3"></script>
-  <script src="js/ai-client.js?v=9.8.3"></script>
-  <script src="js/firebase-config.js?v=9.8.3"></script>
-  <script type="module" src="js/firebase-auth.js?v=9.8.3"></script>
-  <script src="js/auth-fallback.js?v=9.8.3"></script>
-  <script src="js/app.js?v=9.8.3"></script>
-  <script src="js/album.js?v=9.8.3"></script>
-  <script src="js/proofread.js?v=9.8.3"></script>
+  <script src="js/data.js?v=9.9.0"></script>
+  <script src="js/generators.js?v=9.9.0"></script>
+  <script src="js/voice.js?v=9.9.0"></script>
+  <script src="js/projects.js?v=9.9.0"></script>
+  <script src="js/ui.js?v=9.9.0"></script>
+  <script src="js/photo-pro.js?v=9.9.0"></script>
+  <script src="js/prompt-brain.js?v=9.9.0"></script>
+  <script src="js/pro-brief-output.js?v=9.9.0"></script>
+  <script src="js/expert-prompt-engine.js?v=9.9.0"></script>
+  <script src="js/free-writing-team.js?v=9.9.0"></script>
+  <script src="js/ai-config.js?v=9.9.0"></script>
+  <script src="js/ai-client.js?v=9.9.0"></script>
+  <script src="js/firebase-config.js?v=9.9.0"></script>
+  <script type="module" src="js/firebase-auth.js?v=9.9.0"></script>
+  <script src="js/auth-fallback.js?v=9.9.0"></script>
+  <script src="js/app.js?v=9.9.0"></script>
+  <script src="js/album.js?v=9.9.0"></script>
+  <script src="js/proofread.js?v=9.9.0"></script>
 </body>
 </html>
