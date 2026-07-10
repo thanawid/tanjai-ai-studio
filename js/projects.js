@@ -82,6 +82,7 @@ TANJAI.renderProjects = async function() {
       <b>${TANJAI.escapeHtml(p.title)}</b>
       <span>${TANJAI.escapeHtml(p.tool)} • ${TANJAI.escapeHtml(p.date ? (String(p.date).includes('T') ? new Date(p.date).toLocaleString('th-TH') : p.date) : '')}</span>
       <div class="button-row">
+        ${String(p.text||'').includes('##TANJAI_ALBUM##') ? `<button class="btn primary" data-load-album="${i}">ใช้เป็นต้นแบบ</button>` : ''}
         <button class="btn secondary" data-copy-project="${i}">คัดลอก</button>
         <button class="btn secondary" data-del-project="${i}" data-id="${TANJAI.escapeHtml(p.id || '')}">ลบ</button>
       </div>
@@ -92,11 +93,24 @@ TANJAI.renderProjects = async function() {
     btn.onclick = () => {
       const idx = Number(btn.dataset.copyProject);
       if (items[idx] && items[idx].text) {
-        TANJAI.copyText(items[idx].text);
+        TANJAI.copyText(String(items[idx].text).split('##TANJAI_ALBUM##')[0].trim());
       }
     };
   });
   
+  TANJAI.$$("[data-load-album]").forEach(btn => {
+    btn.onclick = () => {
+      const idx = Number(btn.dataset.loadAlbum);
+      const raw = items[idx] && items[idx].text ? String(items[idx].text) : '';
+      const mark = raw.indexOf('##TANJAI_ALBUM##');
+      if(mark < 0) return;
+      try{
+        const snap = JSON.parse(raw.slice(mark + 16));
+        TANJAI.applyAlbumTemplate?.(snap);
+      }catch(_){ TANJAI.toast?.('ข้อมูลต้นแบบเสียหาย'); }
+    };
+  });
+
   TANJAI.$$("[data-del-project]").forEach(btn => {
     btn.onclick = async () => {
       const idx = Number(btn.dataset.delProject);

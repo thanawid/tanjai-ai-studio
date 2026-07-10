@@ -1104,6 +1104,7 @@
             <div class="album-caption-actions">
               <button class="btn primary" id="albumCopyCaption">คัดลอกแคปชั่น</button>
               <button class="btn secondary" id="albumRefreshPreview">อัปเดตตัวอย่าง</button>
+              <button class="btn secondary" id="albumSaveProject">💾 บันทึกงาน</button>
             </div>
           </div>
         </details>
@@ -1220,6 +1221,22 @@
     } finally { if(btn){ btn.disabled=false; btn.textContent=old || 'สร้างชุดภาพ'; } }
   }
 
+  // โหลด "สูตรงาน" ที่บันทึกไว้ กลับมาเติมฟอร์ม (ไม่รวมภาพ — ใส่ภาพใหม่แล้วกดสร้าง)
+  window.TANJAI = window.TANJAI || {};
+  TANJAI.applyAlbumTemplate = function(snap){
+    try{
+      Object.entries(snap||{}).forEach(([k,v])=>{
+        const el=document.getElementById(k); if(!el) return;
+        el.value=v; el.dispatchEvent(new Event('input',{bubbles:true}));
+      });
+      if(snap['album-facebookPreset']){
+        $$('[data-album-preset]').forEach(b=>b.classList.toggle('selected',b.dataset.albumPreset===snap['album-facebookPreset']));
+      }
+      TANJAI.switchView?.('album');
+      TANJAI.toast?.('โหลดต้นแบบแล้ว — ใส่ภาพ แล้วกดสร้างได้เลย');
+    }catch(_){ TANJAI.toast?.('โหลดต้นแบบไม่สำเร็จ'); }
+  };
+
   document.addEventListener('DOMContentLoaded',()=>{
     ensureAlbumInputs();
     collectFilesFromInputs(false);
@@ -1258,6 +1275,28 @@
         const smart=$('#album-smartChoice'); if(smart){ smart.textContent='ระบบจะสรุปขนาดและรูปแบบพรีวิวที่เลือกให้อีกครั้งหลังสร้างชุดภาพ'; smart.classList.remove('resolved'); }
         const host=$('#albumResult .ready-main') || $('#albumResult'); if(host) host.innerHTML='';
         const prog=$('#albumProgress'); if(prog) prog.style.display='none';
+      }
+      if(id==='albumSaveProject'){
+        e.preventDefault();
+        const ids=['album-title','album-orgName','album-detail','album-footer','album-categoryLabel','album-dateTime','album-place','album-lite2','album-lite3','album-lite4','album-captionStyle','album-frameStyle','album-themePreset','album-colorTone','album-autoMode','album-proFrame','album-facebookPreset'];
+        const snap={}; ids.forEach(k=>{ const el=document.getElementById(k); if(el && el.value) snap[k]=el.value; });
+        const d0=data();
+        const caps=(state.captionVariants&&state.captionVariants.length?state.captionVariants:[state.caption]).filter(Boolean);
+        const capNames=['แบบครบประเด็น','แบบอบอุ่น','แบบสั้นกระชับ'];
+        const human=[
+          '【ข้อมูลงาน】',
+          d0.title?('หัวข้อ: '+d0.title):'',
+          d0.org?('หน่วยงาน: '+d0.org):'',
+          d0.dateTime?('วันที่: '+d0.dateTime):'',
+          d0.place?('สถานที่: '+d0.place):'',
+          d0.detail?('รายละเอียด: '+d0.detail):'',
+          d0.footer?('ปิดท้าย: '+d0.footer):'',
+          '',
+          ...caps.map((c,i)=>'【แคปชั่น '+(capNames[i]||('แบบที่ '+(i+1)))+'】\n'+c)
+        ].filter(s=>s!=='' || true).join('\n').replace(/\n{3,}/g,'\n\n').trim();
+        const payload=human+'\n\n##TANJAI_ALBUM##'+JSON.stringify(snap);
+        TANJAI.saveProject(d0.title||'ชุดภาพโพสต์ Facebook', payload, 'ชุดภาพโพสต์ Facebook');
+        return;
       }
       if(id==='albumCopyCaption' || id==='albumCopyCaptionQuick'){ e.preventDefault(); const t=$('#albumCaptionText'); const value=t?t.value:state.caption; if(value){ navigator.clipboard?.writeText(value); const old=e.target.textContent; e.target.textContent='คัดลอกแล้ว ✓'; setTimeout(()=>e.target.textContent=old || 'คัดลอกแคปชั่น',1400); } }
       if(id==='albumRefreshPreview'){ e.preventDefault(); renderFacebookPreview(); }

@@ -1,4 +1,4 @@
-/* v9.8.3 — Smart Thai Proofread Foundation
+/* v8.6.7 — Smart Thai Proofread
    Customer-ready proofreading: confident corrections + protected words per customer/org.
 */
 (function(){
@@ -29,19 +29,6 @@
     ["ประชาสัมพันธ์์","ประชาสัมพันธ์"],
     ["ประชาสัมพันธื","ประชาสัมพันธ์"],
     ["ประชาสัมพันธ์ุ","ประชาสัมพันธ์"],
-    ["ประสัมพันธ์","ประชาสัมพันธ์"],
-    ["โครงกาน","โครงการ"],
-    ["กิจกรม","กิจกรรม"],
-    ["กิจกรรรม","กิจกรรม"],
-    ["กำหนดการ์","กำหนดการ"],
-    ["ระเบียบว่าลการประชุม","ระเบียบวาระการประชุม"],
-    ["ระเบียบว่าระ","ระเบียบวาระ"],
-    ["ผู้เข้าร่วมประชุมฯ","ผู้เข้าร่วมประชุม"],
-    ["นวัตกรรมม","นวัตกรรม"],
-    ["อบต.บางรักน้อย","เทศบาลเมืองบางรักน้อย"],
-    ["องค์การบริหารส่วนตำบลบางรักน้อย","เทศบาลเมืองบางรักน้อย"],
-    ["Bangraknoi Municipality","Bang Rak Noi Municipality"],
-    ["Bangraknoi","Bang Rak Noi"],
     ["เฟสบุ๊ค","Facebook"],
     ["เฟสบุ๊ค","Facebook"],
     ["เฟส","Facebook"],
@@ -68,19 +55,14 @@
   const DEFAULT_PROTECTED = [
     "ทันใจ AI Studio",
     "Tanjai AI Studio",
-    "Thanawid Ritchi",
+    "Thanawid Sangsakol",
     "AI Router",
     "Facebook",
     "Line",
     "Canva",
     "CapCut",
     "ChatGPT",
-    "ZIP",
-    "เทศบาลเมืองบางรักน้อย",
-    "Bang Rak Noi Municipality",
-    "นายสุชาติ แก้วประดิษฐ์",
-    "พ.ศ.",
-    "QR Code"
+    "ZIP"
   ];
 
   function esc(s){ return String(s||"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m])); }
@@ -130,20 +112,6 @@
     map.forEach(([token,w])=>{ out=out.split(token).join(w); });
     return out;
   }
-  function normalizeThaiOfficialText(out, changes){
-    const before=out;
-    out=out.replace(/พ\.ศ\.(\d{4})/g, "พ.ศ. $1");
-    out=out.replace(/พศ\.?\s*(\d{4})/g, "พ.ศ. $1");
-    out=out.replace(/เวลา(\d{1,2}[.:]\d{2})/g, "เวลา $1");
-    out=out.replace(/วันที่(\d{1,2})/g, "วันที่ $1");
-    out=out.replace(/ครั้งที่\s*(\d+)\s*\/\s*(\d{4})/g, "ครั้งที่ $1/$2");
-    out=out.replace(/QR\s*โค้ด/gi, "QR Code");
-    out=out.replace(/Qrcode/gi, "QR Code");
-    out=out.replace(/\s+([,.:;!?])/g, "$1");
-    if(out!==before) changes.push({bad:"รูปแบบวันที่/เวลา/คำมาตรฐาน", good:"จัดรูปแบบให้เป็นทางการ", type:"auto"});
-    return out;
-  }
-
   function applyRules(text){
     const protectedWords=getProtected();
     const p=protectText(text,protectedWords);
@@ -157,7 +125,6 @@
         changes.push({bad,good,type:"auto"});
       }
     });
-    out=normalizeThaiOfficialText(out, changes);
     const suggestions=[];
     SUGGEST_ONLY.forEach(([bad,good])=>{
       const re=new RegExp(escapeRegExp(bad),"g");
@@ -269,7 +236,7 @@
     ensureModal();
 
     document.addEventListener("click",(e)=>{
-      if(e.target.closest("#openProofreadTop") || e.target.closest("#openProofreadNav")){
+      if(e.target.closest("#openProofreadTop")){
         e.preventDefault(); openModal();
       }
       if(e.target.closest("[data-proofread-close]")){
