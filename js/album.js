@@ -105,11 +105,13 @@
     return d.facebookPreset && d.facebookPreset!=="auto" ? d.facebookPreset : (state.resolvedFacebookPreset || "wide-top");
   }
   function presetLayout(preset){
+    if(preset==="pano-split") return "grid";
     if(preset==="square-grid") return "grid";
     if(preset==="portrait-left") return "cover-left";
     return "cover-top";
   }
   function facebookPresetLabel(preset){
+    if(preset==="pano-split") return "ปกพาโนรามา (ภาพ 1-2 ต่อกัน) + ภาพรองจัตุรัส";
     if(preset==="square-grid") return "4 ภาพจัตุรัส 1080x1080";
     if(preset==="portrait-left") return "ปกตั้ง 1280x1920 + ภาพรองจัตุรัส";
     return "ปกกว้าง 1080x800 + ภาพรองจัตุรัส";
@@ -139,13 +141,14 @@
       return {role, layout, label:"Cover Frame", frameWeight:"balanced-cover", textDensity:"full", logoScale:.84, targetY:layout==="cover-left"?.43:.41, bottomRatio:.17};
     }
     if(role==="lite"){
-      return {role, layout, label:`Lite Frame ${idx+1}`, frameWeight:"balanced-lite", textDensity:"short", logoScale:.56, targetY:.49, bottomRatio: d.mode.includes("ภาพกิจกรรมเน้นภาพ")?.058:.072};
+      return {role, layout, label:`Lite Frame ${idx+1}`, frameWeight:"balanced-lite", textDensity:"short", logoScale:.56, targetY:.49, bottomRatio: d.mode.includes("ภาพกิจกรรมเน้นภาพ")?.068:.088};
     }
     return {role, layout, label:`Additional Frame ${idx+1}`, frameWeight:"balanced-minimal", textDensity:"minimal", logoScale:.42, targetY:.50, bottomRatio:.048};
   }
   function slotSize(idx,d=data(),total=state.files.length||4){
     const preset=effectiveFacebookPreset(d);
     const role=slotRole(idx);
+    if(preset==="pano-split") return {w:1080,h:1080};
     if(preset==="square-grid") return {w:1080,h:1080};
     if(preset==="portrait-left") return role==="cover" ? {w:1280,h:1920} : {w:1080,h:1080};
     if(preset==="wide-top") return role==="cover" ? {w:1080,h:800} : {w:1080,h:1080};
@@ -454,11 +457,12 @@
 
   function drawLogo(ctx,x,y,s){
     if(!state.logo) return false;
+    // วางโลโก้เต็มขนาด คงสัดส่วนไฟล์จริง ไม่ครอปวงกลม ไม่มีวงแหวนขาว (มาตรฐานเดียวทุกภาพ)
     ctx.save();
-    ctx.shadowColor="rgba(0,0,0,.28)"; ctx.shadowBlur=Math.max(8,Math.round(s*.18));
-    ctx.fillStyle="rgba(255,255,255,.96)"; ctx.beginPath(); ctx.arc(x+s/2,y+s/2,s/2,0,Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.arc(x+s/2,y+s/2,s*.46,0,Math.PI*2); ctx.clip();
-    ctx.drawImage(state.logo,x+s*.04,y+s*.04,s*.92,s*.92);
+    ctx.shadowColor="rgba(0,0,0,.40)"; ctx.shadowBlur=Math.max(10,Math.round(s*.14));
+    const iw=state.logo.naturalWidth||state.logo.width||1, ih=state.logo.naturalHeight||state.logo.height||1;
+    const r=Math.min(s/iw,s/ih), dw=iw*r, dh=ih*r;
+    ctx.drawImage(state.logo, x+(s-dw)/2, y+(s-dh)/2, dw, dh);
     ctx.restore();
     return true;
   }
@@ -593,117 +597,108 @@
     drawAccentSweep(ctx,w,h,th,pst);
     drawBorderFrame(ctx,w,h,th);
 
-    const brandW=Math.round(w*(land?0.46:0.74));
-    const brandH=Math.round(h*(land?0.085:0.068));
+    const brandH=Math.round(h*(land?0.095:0.076));
     const brandX=pad+Math.round(w*.014);
     const brandY=pad+Math.round(h*.012);
     const brandLabel=hasRealOrg(d.org) ? d.org : '';
     if(brandLabel){
-      // มีชื่อหน่วยงาน → แถบชื่อ + โลโก้ ซ้ายบนตามเดิม
+      const brandShown=smartShort(brandLabel,60);
+      const brandFont=`900 ${Math.round(Math.min(w,h)*0.027)}px "Prompt","Noto Sans Thai",sans-serif`;
+      const hasLogo=!!state.logo;
+      const logoS=Math.round(brandH*1.02);
+      // วัดข้อความจริง → แถบหดพอดีเนื้อหา (ขั้นต่ำ 25% สูงสุด 70% ของภาพ)
+      ctx.save(); ctx.font=brandFont;
+      const textW=ctx.measureText(clean(brandShown)).width;
+      ctx.restore();
+      const padX=Math.round(w*.020);
+      const logoSpace=hasLogo ? logoS+Math.round(w*.012) : 0;
+      const brandW=Math.max(Math.round(w*.25), Math.min(Math.round(w*.70), Math.round(textW)+padX*2+logoSpace));
       if(pst.name==='modern'){
-        // Modern: แคปซูลมน กระจกฝ้า ขอบขาวบาง
         const capsuleG=ctx.createLinearGradient(brandX,brandY,brandX+brandW,brandY);
-        capsuleG.addColorStop(0,rgba(th.deep,.78));
-        capsuleG.addColorStop(1,rgba(th.dark,.55));
+        capsuleG.addColorStop(0,rgba(th.deep,.80));
+        capsuleG.addColorStop(1,rgba(th.dark,.58));
         fillRoundRect(ctx,brandX,brandY,brandW,brandH,Math.round(brandH/2),capsuleG,'rgba(255,255,255,.22)',1);
       }else{
         drawRibbon(ctx,brandX,brandY,brandW,brandH,th,'dark');
       }
-      const logoS=Math.round(brandH*.92);
-      const logoX=brandX-Math.round(logoS*.18);
-      const logoY=brandY-Math.round((logoS-brandH)/2);
-      const hasLogo=drawLogo(ctx,logoX,logoY,logoS);
-      const brandTextX=hasLogo ? logoX+logoS+Math.round(w*.012) : brandX+Math.round(w*.018);
-      drawText(ctx,brandLabel,brandTextX,brandY+Math.round(brandH*.18),brandW-(brandTextX-brandX)-Math.round(w*.025),2,`900 ${Math.round(Math.min(w,h)*0.022)}px "Prompt","Noto Sans Thai",sans-serif`,'#fff',Math.round(Math.min(w,h)*0.029));
-      const orgSub=d.categoryLabel ? smartShort(d.categoryLabel,38) : (d.place ? smartShort(d.place,36) : '');
-      if(orgSub) drawText(ctx,orgSub,brandTextX,brandY+Math.round(brandH*.61),brandW-(brandTextX-brandX)-Math.round(w*.025),1,`800 ${Math.round(Math.min(w,h)*0.015)}px "Noto Sans Thai","Prompt",sans-serif`,'rgba(255,255,255,.84)',Math.round(Math.min(w,h)*0.021));
+      if(hasLogo) drawLogo(ctx,brandX+Math.round(w*.010),brandY+Math.round((brandH-logoS)/2),logoS);
+      const brandTextX=brandX+(hasLogo ? logoSpace+Math.round(w*.010) : padX);
+      drawText(ctx,brandShown,brandTextX,brandY+Math.round(brandH*.24),brandW-(brandTextX-brandX)-padX,1,brandFont,'#fff',Math.round(Math.min(w,h)*0.034));
     }else if(state.logo){
-      // ไม่มีชื่อหน่วยงาน → โลโก้เดี่ยว มุมบนขวา ไม่มีแถบเปล่า
-      const logoS=Math.round(Math.min(w,h)*(land?0.105:0.088));
-      drawLogo(ctx, w-pad-logoS-Math.round(w*.006), pad+Math.round(h*.010), logoS);
+      // ไม่มีชื่อหน่วยงาน → โลโก้เดี่ยว มุมบนขวา ใหญ่ชัด
+      const logoS=Math.round(Math.min(w,h)*(land?0.155:0.13));
+      drawLogo(ctx, w-pad-logoS-Math.round(w*.008), pad+Math.round(h*.012), logoS);
     }
 
     const panelX=pad+Math.round(w*.015);
-    // แผงหัวข้อลงไปชิดขอบล่าง (เว้นที่ให้แถบท้ายภาพ) ไม่บังกลางภาพ
-    const panelY=Math.round(h*(land?0.760:0.728));
+    // ── แผงหัวข้อ: วัดจำนวนบรรทัดจริงก่อน แล้ววางทุกอย่างเกาะขอบล่าง ──
+    const titleFontSize=Math.round(Math.min(w,h)*(land?0.041:0.037)*pst.titleScale);
+    const titleFont=`900 ${titleFontSize}px "Prompt","Kanit","Noto Sans Thai",sans-serif`;
+    const titleLineH=Math.round(titleFontSize*1.15);
     const panelW=w-panelX*2;
-    const panelH=Math.round(h*(land?0.148:0.170));
-    drawGlassPanel(ctx,panelX,panelY,panelW,panelH,Math.round(panelH*(pst.name==='modern'?.18:.12)),th,pst.name==='minimal'?0.58:pst.name==='modern'?0.60:0.66);
+    const titleX=panelX+Math.round(w*.03);
+    const titleW=panelW-Math.round(w*.06);
+    const titleShown=smartShort(d.title,190);
+    ctx.save(); ctx.font=titleFont;
+    const measuredLines=balancedLines(ctx,titleShown,titleW,3);
+    ctx.restore();
+    const nLines=Math.max(1,measuredLines.length);
+    const hasMeta=!!(d.dateTime||d.place);
+    const metaH=hasMeta?Math.round(Math.min(w,h)*0.055):0;
+    const padTop=Math.round(h*.032), padBottom=Math.round(h*.028);
+    const panelH=padTop + nLines*titleLineH + (hasMeta?Math.round(h*.016)+metaH:0) + padBottom;
+    const hasFooter=pst.showFooterBar && !!stripHashtags(d.footer);
+    const barH=Math.round(h*(land?0.055:0.050));
+    const barY=h-pad-barH;
+    const panelY=(hasFooter?barY:h-pad)-Math.round(h*.014)-panelH;
+
+    drawGlassPanel(ctx,panelX,panelY,panelW,panelH,Math.round(Math.min(w,h)*.030),th,pst.name==='minimal'?0.58:pst.name==='modern'?0.64:0.70);
     if(pst.name==='modern'){
-      // Modern: เส้นสีเน้นสั้น ๆ บาง ๆ มุมซ้ายบนของแผง แทนแถบเต็มความกว้าง
       const lineW=Math.round(panelW*.16);
-      const lineG=ctx.createLinearGradient(panelX,0,panelX+lineW,0);
+      const lineG=ctx.createLinearGradient(titleX,0,titleX+lineW,0);
       lineG.addColorStop(0,th.accent2); lineG.addColorStop(1,rgba(th.accent,.35));
-      fillRoundRect(ctx,panelX+Math.round(w*.03),panelY+Math.round(h*.014),lineW,Math.max(3,Math.round(h*.005)),Math.round(h*.003),lineG);
+      fillRoundRect(ctx,titleX,panelY+Math.round(h*.013),lineW,Math.max(3,Math.round(h*.005)),Math.round(h*.003),lineG);
     }else{
       const panelAccent=ctx.createLinearGradient(panelX,panelY,panelX+panelW,panelY);
       panelAccent.addColorStop(0,th.accent2); panelAccent.addColorStop(.6,th.accent); panelAccent.addColorStop(1,'rgba(255,255,255,.12)');
-      ctx.fillStyle=panelAccent;
-      fillRoundRect(ctx,panelX+Math.round(w*.012),panelY+Math.round(h*.012),panelW-Math.round(w*.024),Math.max(4,Math.round(h*.007)),Math.round(h*.006),panelAccent);
+      fillRoundRect(ctx,panelX+Math.round(w*.012),panelY+Math.round(h*.010),panelW-Math.round(w*.024),Math.max(4,Math.round(h*.007)),Math.round(h*.006),panelAccent);
     }
 
     if(d.categoryLabel){
-      const catY=panelY-Math.round(h*.040);
-      const catW=Math.min(Math.round(w*.36), Math.round(w*.14)+Math.round(clean(d.categoryLabel).length*16));
+      const catH=Math.round(h*.042);
+      const catY=panelY-catH-Math.round(h*.012);
+      const catW=Math.min(Math.round(w*.38), Math.round(w*.15)+Math.round(clean(d.categoryLabel).length*19));
       if(pst.name==='modern'){
         const catG=ctx.createLinearGradient(panelX,catY,panelX+catW,catY);
         catG.addColorStop(0,rgba(th.accent,.92)); catG.addColorStop(1,rgba(th.accent2,.85));
-        fillRoundRect(ctx,panelX+Math.round(w*.006),catY,catW,Math.round(h*.035),Math.round(h*.0175),catG,'rgba(255,255,255,.20)',1);
+        fillRoundRect(ctx,panelX+Math.round(w*.006),catY,catW,catH,Math.round(catH/2),catG,'rgba(255,255,255,.20)',1);
       }else{
-        drawRibbon(ctx,panelX+Math.round(w*.006),catY,catW,Math.round(h*.035),th,'accent');
+        drawRibbon(ctx,panelX+Math.round(w*.006),catY,catW,catH,th,'accent');
       }
-      drawText(ctx, smartShort(d.categoryLabel,46), panelX+Math.round(w*.024), catY+Math.round(h*.006), catW-Math.round(w*.040), 1, `900 ${Math.round(Math.min(w,h)*0.015)}px "Prompt","Noto Sans Thai",sans-serif`, '#fff', Math.round(Math.min(w,h)*0.021));
+      drawText(ctx, smartShort(d.categoryLabel,46), panelX+Math.round(w*.026), catY+Math.round(catH*.20), catW-Math.round(w*.044), 1, `900 ${Math.round(Math.min(w,h)*0.019)}px "Prompt","Noto Sans Thai",sans-serif`, '#fff', Math.round(Math.min(w,h)*0.025));
     }
 
-    const titleX=panelX+Math.round(w*.03);
-    const titleW=panelW-Math.round(w*.06);
-    const titleY=panelY+Math.round(panelH*.16);
-    const titleFont=Math.round(Math.min(w,h)*(land?0.037:0.034)*pst.titleScale);
-    const titleLineH=Math.round(titleFont*1.11);
-    drawText(ctx, smartShort(d.title,190), titleX, titleY, titleW, land?2:3, `900 ${titleFont}px "Prompt","Kanit","Noto Sans Thai",sans-serif`, '#fff', titleLineH);
+    const titleY=panelY+padTop;
+    drawText(ctx,titleShown,titleX,titleY,titleW,3,titleFont,'#fff',titleLineH);
 
-    const subText = stripHashtags(d.detail) || stripHashtags(d.footer) || d.place || '';
-    const subY=titleY + titleLineH*(land?1.62:1.86);
-    if(subText){
-      const subFont=`800 ${Math.round(Math.min(w,h)*0.017)}px "Prompt","Noto Sans Thai",sans-serif`;
-      const subShown=smartShort(subText, land?130:100);
-      // วัดความกว้างจริงของข้อความ แล้วให้แถบหดพอดีเนื้อหา ไม่กางเต็มความกว้างซ้ำกับแผงหลัก
-      ctx.save(); ctx.font=subFont;
-      const subTextW=ctx.measureText(clean(subShown)).width;
-      ctx.restore();
-      const subPadX=Math.round(w*.018);
-      const subW=Math.min(titleW, Math.round(subTextW)+subPadX*2+Math.round(w*.006));
-      fillRoundRect(ctx,titleX,subY,subW,Math.round(panelH*.15),Math.round(panelH*.075),rgba(th.accent,.78),'rgba(255,255,255,.12)',1);
-      drawText(ctx, subShown, titleX+subPadX, subY+Math.round(panelH*.026), subW-subPadX*2, 1, subFont, '#fff', Math.round(Math.min(w,h)*0.022));
+    if(hasMeta){
+      const metaY=titleY + nLines*titleLineH + Math.round(h*.016);
+      let metaX=titleX;
+      if(d.dateTime) metaX += drawInfoPill(ctx,metaX,metaY,d.dateTime,th,'🗓') + Math.round(w*.012);
+      if(d.place) metaX += drawInfoPill(ctx,metaX,metaY,d.place,th,'📍') + Math.round(w*.012);
     }
 
-    const metaY=panelY+panelH-Math.round(panelH*.18);
-    let metaX=titleX;
-    if(d.dateTime) metaX += drawInfoPill(ctx,metaX,metaY,d.dateTime,th,'🗓') + Math.round(w*.012);
-    if(d.place) metaX += drawInfoPill(ctx,metaX,metaY,d.place,th,'📍') + Math.round(w*.012);
-
-    if(pst.showFooterBar && stripHashtags(d.footer)){
-      const barH=Math.round(h*(land?0.046:0.043));
-      const barY=h-pad-barH;
-      drawGlassPanel(ctx,pad+Math.round(w*.012),barY,w-pad*2-Math.round(w*.024),barH,Math.round(barH*.45),th,.72);
-      drawText(ctx, smartShort(stripHashtags(d.footer), land?140:110), pad+Math.round(w*.035), barY+Math.round(barH*.22), w-pad*2-Math.round(w*.07), 1, `800 ${Math.round(Math.min(w,h)*0.017)}px "Prompt","Noto Sans Thai",sans-serif`, '#fff', Math.round(Math.min(w,h)*0.022));
+    if(hasFooter){
+      drawGlassPanel(ctx,pad+Math.round(w*.012),barY,w-pad*2-Math.round(w*.024),barH,Math.round(barH*.45),th,.76);
+      drawText(ctx, smartShort(stripHashtags(d.footer), land?140:110), pad+Math.round(w*.035), barY+Math.round(barH*.20), w-pad*2-Math.round(w*.07), 1, `800 ${Math.round(Math.min(w,h)*0.021)}px "Prompt","Noto Sans Thai",sans-serif`, '#fff', Math.round(Math.min(w,h)*0.027));
     }
   }
 
   function liteText(d, idx){
     const custom = idx===1 ? d.lite2 : idx===2 ? d.lite3 : idx===3 ? d.lite4 : '';
     if(clean(custom)) return smartShort(stripHashtags(custom), 160);
-
-    const safeDetail = stripHashtags(d.detail);
-    const safeFooter = stripHashtags(d.footer);
-    const detailShort = smartShort(safeDetail, 160);
-    const footerShort = smartShort(safeFooter, 130);
-
-    const meta=[d.dateTime,d.place].filter(Boolean).join(' • ');
-    if(idx===1) return detailShort || meta || smartShort(d.title,120);
-    if(idx===2) return footerShort || meta || smartShort(d.categoryLabel,110) || smartShort(d.title,120);
-    if(idx===3) return meta || detailShort || footerShort || smartShort(d.title,120);
-    return footerShort || smartShort(d.categoryLabel,110) || smartShort(d.title,120);
+    // ค่าเริ่มต้น: ทุกภาพพูดประโยคเดียวกัน = ชื่องานแบบย่อ ทั้งชุดเป็นเรื่องเดียวกัน
+    return smartShort(d.title, 95) || smartShort(stripHashtags(d.detail), 95) || smartShort(stripHashtags(d.footer), 95);
   }
   function drawLiteFrame(ctx,w,h,d,idx,th,profile=slotProfile(idx,d)){
     const pad=Math.round(Math.min(w,h)*0.020);
@@ -731,7 +726,7 @@
     }
 
     const text=liteText(d, idx);
-    const liteFont=`900 ${Math.round(min*0.0175)}px "Prompt","Noto Sans Thai",sans-serif`;
+    const liteFont=`900 ${Math.round(min*0.023)}px "Prompt","Noto Sans Thai",sans-serif`;
     const usableW=w-pad*2-Math.round(w*.024)-Math.round(w*.052);
     // วัดก่อนว่าข้อความต้องใช้กี่บรรทัด (สูงสุด 2) แล้วขยายกล่องให้พอดี
     ctx.save(); ctx.font=liteFont;
@@ -757,7 +752,7 @@
 
     const leftPad=x+Math.round(w*.026);
     const textY=y+Math.round(bottomH*(needTwo?.22:.30));
-    drawText(ctx, text, leftPad, textY, boxW-Math.round(w*.052), lines, liteFont, '#fff', Math.round(min*0.023));
+    drawText(ctx, text, leftPad, textY, boxW-Math.round(w*.052), lines, liteFont, '#fff', Math.round(min*0.029));
   }
 
   function drawAdditionalFrame(ctx,w,h,d,idx,th,profile=slotProfile(idx,d)){
@@ -828,6 +823,26 @@
   }
   function canvasToBlob(canvas){ return new Promise(res=>canvas.toBlob(b=>res(b),"image/jpeg",.92)); }
   async function waitFonts(){ try{ if(document.fonts && document.fonts.ready) await document.fonts.ready; }catch(e){} }
+
+  async function makePanoCover(file,d,th){
+    // วาดปกผืนกว้าง 2160x1080 แล้วผ่าครึ่งเป็น 2 ภาพจัตุรัส — เฟซบุ๊กวางติดกันจะต่อเป็นภาพยาว
+    const W=2160,H=1080;
+    const canvas=document.createElement('canvas'); canvas.width=W; canvas.height=H;
+    const ctx=canvas.getContext('2d');
+    const img=await makeImage(file);
+    const enhance=!d.mode.includes('ครอป + ใส่กรอบเท่านั้น');
+    const faceFocus=await detectFaceFocus(img);
+    coverDraw(img,ctx,W,H,enhance,faceFocus,.43);
+    if(!d.mode.includes('ปรับภาพเท่านั้น')) drawCoverFrame(ctx,W,H,d,th,slotProfile(0,d));
+    const outs=[];
+    for(let k=0;k<2;k++){
+      const half=document.createElement('canvas'); half.width=1080; half.height=1080;
+      half.getContext('2d').drawImage(canvas,k*1080,0,1080,1080,0,0,1080,1080);
+      const blob=await canvasToBlob(half);
+      outs.push({blob,url:URL.createObjectURL(blob),role:'cover',label:k===0?'ปกพาโนรามา ซ้าย':'ปกพาโนรามา ขวา',w:1080,h:1080,filename:`facebook_album_01${k===0?'a':'b'}_cover_pano_1080x1080.jpg`});
+    }
+    return outs;
+  }
 
   async function processImage(file,idx,total){
     const d=data(), th=theme(d), profile=slotProfile(idx,d,total), sz=slotSize(idx,d,total);
@@ -1197,8 +1212,13 @@
       await resolveSmartSettings(files);
       setProgress(0,files.length,'โหลดโลโก้และตั้งค่า...');
       const logoInput=$('#album-logoFile'); if(logoInput && logoInput.files && logoInput.files[0]) await loadLogo(logoInput.files[0]); else state.logo=null;
+      const usePano = effectiveFacebookPreset(data())==='pano-split';
       for(let i=0;i<files.length;i++){
         setProgress(i,files.length,`ประมวลผลภาพที่ ${i+1}/${files.length}...`);
+        if(usePano && i===0){
+          state.outputs.push(...await makePanoCover(files[0],data(),theme(data())));
+          continue;
+        }
         state.outputs.push(await processImage(files[i],i,files.length));
       }
       setProgress(files.length,files.length,'AI กำลังเขียนแคปชั่น 3 แบบ...');

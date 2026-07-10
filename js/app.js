@@ -202,12 +202,13 @@ $("#albumForm").innerHTML = `
     <div class="form-section"><div class="section-title"><b>3</b><h4>เลือกรูปแบบโพสต์ แล้วกดสร้างได้เลย</h4></div>
       <div class="form-grid">
         <div class="full album-preset-picker">
-          <select id="album-facebookPreset" hidden><option value="auto" selected>อัตโนมัติ</option><option value="square-grid">4 ภาพจัตุรัส</option><option value="wide-top">ปกกว้างด้านบน</option><option value="portrait-left">ปกตั้งด้านซ้าย</option></select>
+          <select id="album-facebookPreset" hidden><option value="auto" selected>อัตโนมัติ</option><option value="square-grid">4 ภาพจัตุรัส</option><option value="wide-top">ปกกว้างด้านบน</option><option value="portrait-left">ปกตั้งด้านซ้าย</option><option value="pano-split">ปกพาโนรามา</option></select>
           <div class="album-preset-cards" role="group" aria-label="เลือกรูปแบบการโพสต์ Facebook">
             <button type="button" class="album-preset-card selected" data-album-preset="auto"><span class="preset-auto-mark">AI</span><b>อัตโนมัติ</b><small>ระบบเลือกให้ (แนะนำ)</small></button>
             <button type="button" class="album-preset-card" data-album-preset="square-grid"><span class="preset-diagram preset-square"><i></i><i></i><i></i><i></i></span><b>4 ภาพจัตุรัส</b><small>1080x1080 ทุกภาพ</small></button>
             <button type="button" class="album-preset-card" data-album-preset="wide-top"><span class="preset-diagram preset-wide"><i></i><i></i><i></i><i></i></span><b>ปกกว้างด้านบน</b><small>1080x800 + ภาพรอง</small></button>
             <button type="button" class="album-preset-card" data-album-preset="portrait-left"><span class="preset-diagram preset-portrait"><i></i><i></i><i></i><i></i></span><b>ปกตั้งด้านซ้าย</b><small>1280x1920 + ภาพรอง</small></button>
+            <button type="button" class="album-preset-card" data-album-preset="pano-split"><span class="preset-diagram preset-wide"><i></i><i></i><i></i><i></i></span><b>ปกพาโนรามา</b><small>ภาพ 1-2 ต่อกันยาวบนเฟซ</small></button>
           </div>
         </div>
         <div class="full album-smart-choice" id="album-smartChoice">ระบบจะสรุปขนาดและรูปแบบที่เลือกให้อีกครั้งหลังสร้างชุดภาพ</div>
