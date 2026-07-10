@@ -143,7 +143,7 @@
     if(role==="lite"){
       return {role, layout, label:`Lite Frame ${idx+1}`, frameWeight:"balanced-lite", textDensity:"short", logoScale:.56, targetY:.49, bottomRatio: d.mode.includes("ภาพกิจกรรมเน้นภาพ")?.068:.088};
     }
-    return {role, layout, label:`Additional Frame ${idx+1}`, frameWeight:"balanced-minimal", textDensity:"minimal", logoScale:.42, targetY:.50, bottomRatio:.048};
+    return {role, layout, label:`Additional Frame ${idx+1}`, frameWeight:"balanced-minimal", textDensity:"minimal", logoScale:.42, targetY:.50, bottomRatio:.082};
   }
   function slotSize(idx,d=data(),total=state.files.length||4){
     const preset=effectiveFacebookPreset(d);
@@ -497,7 +497,7 @@
     ctx.restore();
     return bestLines.length;
   }
-  const THAI_COMPOUNDS=["เนื่องใน","เนื่องจาก","เนื่องด้วย","ประจำปี","เข้าพรรษา","ออกพรรษา","อาสาฬหบูชา","วิสาขบูชา","มาฆบูชา","เทียนพรรษา","พระภิกษุสงฆ์","ปฏิบัติธรรม","สวดมนต์","ขอเชิญร่วม","ประชาสัมพันธ์","เป็นสิริมงคล","ณ วัน","ในวัน"];
+  const THAI_COMPOUNDS=["ประดิษฐาน","บวงสรวง","เบิกเนตร","อัญเชิญ","ที่ว่าการ","เนื่องใน","เนื่องจาก","เนื่องด้วย","ประจำปี","เข้าพรรษา","ออกพรรษา","อาสาฬหบูชา","วิสาขบูชา","มาฆบูชา","เทียนพรรษา","พระภิกษุสงฆ์","ปฏิบัติธรรม","สวดมนต์","ขอเชิญร่วม","ประชาสัมพันธ์","เป็นสิริมงคล","ณ วัน","ในวัน"];
   function mergeCompounds(tokens){
     const out=[];
     for(let i=0;i<tokens.length;i++){
@@ -698,30 +698,15 @@
     const custom = idx===1 ? d.lite2 : idx===2 ? d.lite3 : idx===3 ? d.lite4 : '';
     if(clean(custom)) return smartShort(stripHashtags(custom), 160);
     // ค่าเริ่มต้น: ทุกภาพพูดประโยคเดียวกัน = ชื่องานแบบย่อ ทั้งชุดเป็นเรื่องเดียวกัน
-    return smartShort(d.title, 95) || smartShort(stripHashtags(d.detail), 95) || smartShort(stripHashtags(d.footer), 95);
+    return smartShort(d.title, 130) || smartShort(stripHashtags(d.detail), 130) || smartShort(stripHashtags(d.footer), 130);
   }
   function drawLiteFrame(ctx,w,h,d,idx,th,profile=slotProfile(idx,d)){
     const pad=Math.round(Math.min(w,h)*0.020);
     const min=Math.min(w,h);
     drawSlotBorderFrame(ctx,w,h,th,"lite");
 
-    // Compact identity corner; one accent only to keep the photo clean.
-    ctx.save();
-    const corner=ctx.createLinearGradient(w*.82,0,w*.98,h*.12);
-    corner.addColorStop(0,rgba(th.accent,.18));
-    corner.addColorStop(1,th.accent2);
-    ctx.fillStyle=corner;
-    ctx.beginPath();
-    ctx.moveTo(w*.86,pad);
-    ctx.lineTo(w-pad,pad);
-    ctx.lineTo(w-pad,h*.11);
-    ctx.lineTo(w*.95,h*.06);
-    ctx.closePath();
-    ctx.fill();
-    ctx.restore();
-
     if(state.logo){
-      const ls=Math.round(min*.09*profile.logoScale);
+      const ls=Math.round(min*.10);
       drawLogo(ctx,w-pad-ls-Math.round(w*.006),pad+Math.round(h*.012),ls);
     }
 
@@ -767,21 +752,27 @@
 
     const label=liteText(d, idx);
     if(!label) return;
-    const boxW=Math.round(w*0.52);
-    const boxH=Math.max(Math.round(h*profile.bottomRatio), Math.round(min*0.082));
+    // มาตรฐานเดียวกับภาพรองทุกอย่าง: แถบเต็มความกว้าง ฟอนต์ใหญ่ ขึ้น 2 บรรทัดเมื่อยาว
+    const addFont=`900 ${Math.round(min*0.023)}px "Prompt","Noto Sans Thai",sans-serif`;
+    const usableW=w-pad*2-Math.round(w*.024)-Math.round(w*.052);
+    ctx.save(); ctx.font=addFont;
+    const needTwo=ctx.measureText(clean(label)).width>usableW;
+    ctx.restore();
+    const bottomH=Math.round(h*profile.bottomRatio*(needTwo?1.62:1));
     const x=pad+Math.round(w*.012);
-    const y=h-pad-boxH-Math.round(h*.006);
+    const y=h-pad-bottomH-Math.round(h*.006);
+    const boxW=w-pad*2-Math.round(w*.024);
     const g=ctx.createLinearGradient(x,y,x+boxW,y);
-    g.addColorStop(0,rgba(th.deep,.56));
-    g.addColorStop(1,rgba(th.dark,.34));
-    fillRoundRect(ctx,x,y,boxW,boxH,Math.round(boxH*.40),g,"rgba(255,255,255,.10)",1);
-
+    g.addColorStop(0,rgba(th.deep,.70));
+    g.addColorStop(.56,rgba(th.dark,.58));
+    g.addColorStop(1,rgba(th.accent,.34));
+    fillRoundRect(ctx,x,y,boxW,bottomH,Math.round(bottomH*.30/(needTwo?1.5:1)),g,"rgba(255,255,255,.12)",1);
     const line=ctx.createLinearGradient(x,y,x+boxW,y);
-    line.addColorStop(0,rgba(th.accent2,.88));
-    line.addColorStop(1,rgba(th.accent,.42));
-    fillRoundRect(ctx,x+Math.round(w*.018),y+Math.round(boxH*.12),boxW-Math.round(w*.036),Math.max(2,Math.round(boxH*.05)),Math.round(boxH*.025),line,null,0);
-
-    drawText(ctx, smartShort(label,70), x+Math.round(w*.022), y+Math.round(boxH*.30), boxW-Math.round(w*.044), 1, `800 ${Math.round(min*0.016)}px "Prompt","Noto Sans Thai",sans-serif`, '#fff', Math.round(min*0.020));
+    line.addColorStop(0,th.accent2);
+    line.addColorStop(.58,rgba(th.accent,.76));
+    line.addColorStop(1,"rgba(255,255,255,.10)");
+    fillRoundRect(ctx,x+Math.round(w*.018),y+Math.round(bottomH*.10/(needTwo?1.5:1)),boxW-Math.round(w*.036),Math.max(2,Math.round(bottomH*.045/(needTwo?1.5:1))),Math.round(bottomH*.025),line,null,0);
+    drawText(ctx, label, x+Math.round(w*.026), y+Math.round(bottomH*(needTwo?.22:.30)), boxW-Math.round(w*.052), needTwo?2:1, addFont, '#fff', Math.round(min*0.029));
   }
 
 
