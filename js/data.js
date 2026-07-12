@@ -33,8 +33,7 @@ TANJAI.categories = {
     "4:5 Facebook / Line 1080x1350",
     "1:1 Square 1080x1080",
     "9:16 TikTok / Reels 1080x1920",
-    "16:9 YouTube / จอทีวี 1920x1080",
-    "3:1 ป้ายไวนิลแนวนอน"
+    "16:9 YouTube / จอทีวี 1920x1080"
   ],
   "imageStyles": [
     "ให้ AI เลือกตามงาน",
