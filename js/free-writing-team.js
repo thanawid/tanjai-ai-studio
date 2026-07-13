@@ -220,19 +220,105 @@
   function videoWriter(d={}, length="60 วินาที"){
     const b = contentBrain(d);
     const intent = detectIntent(d, "video");
+    const format = real(d.format) || "คลิปประชาสัมพันธ์";
+    const platform = real(d.channel) || "TikTok / Reels / Facebook";
+    const aspectRatio = real(d.aspectRatio) || "ให้ AI เลือกตามช่องทาง";
+    const videoStyle = real(d.videoStyle) || real(d.style) || "ให้ AI เลือกตามงาน";
+    const outputPack = real(d.outputPack) || "Production Pack ครบชุด";
+    const assets = real(d.expertAssets);
+    const lyricLines = splitPoints(real(d.expertLyrics));
+    const textMode = /lyric|เนื้อเพลง|mv|music|เพลง|นิทาน|หนังสั้น|series|ซีรีส์/i.test(`${format} ${b.title} ${b.detail}`);
     const seconds = /15/.test(length) ? 15 : /30/.test(length) ? 30 : /90/.test(length) ? 90 : /3\s*นาที/.test(length) ? 180 : 60;
     const count = seconds <= 15 ? 3 : seconds <= 30 ? 4 : seconds <= 60 ? 6 : 8;
-    const per = Math.max(3, Math.round(seconds/count));
+    const base = Math.floor(seconds / count);
+    const extra = seconds % count;
     const core = rewriteCore(d, "video");
-    const hook = b.keyMessage || (intent === "tradition" ? `ร่วมสืบสานประเพณี “${b.title}” ให้คงอยู่คู่ท้องถิ่น` : intent === "invitation" ? `ร่วมกำหนดทิศทางของ “${b.title}”` : intent === "announcement" ? `เรื่องสำคัญที่ควรรู้: ${b.title}` : b.title);
-    const sceneLabels = ["เปิดเรื่อง", "ปูบริบท", "สารหลัก", "รายละเอียด", "ประโยชน์", "ปิดท้าย", "CTA", "End Card"];
-    const scenes = Array.from({length:count}, (_,idx)=>{
+    const cta = b.action || (b.org ? `ติดตามข้อมูลเพิ่มเติมจาก ${b.org}` : "ติดตามรายละเอียดจากช่องทางที่เผยแพร่");
+    const hook = b.keyMessage || (intent === "music" ? `ฟังอารมณ์ของ “${b.title}” ตั้งแต่วินาทีแรก` : intent === "commercial" ? `เหตุผลที่ควรรู้จัก “${b.title}” ภายในไม่กี่วินาที` : intent === "tradition" ? `ร่วมสืบสานประเพณี “${b.title}” ให้คงอยู่คู่ท้องถิ่น` : intent === "invitation" ? `ร่วมกำหนดทิศทางของ “${b.title}”` : intent === "announcement" ? `เรื่องสำคัญที่ควรรู้: ${b.title}` : b.title);
+    const sceneLabels = textMode ? ["Hook / Mood", "Verse / Setup", "Key Line", "Emotion Beat", "Payoff", "CTA / End Card", "Extra Beat", "End Card"] : ["เปิดเรื่อง", "ปูบริบท", "สารหลัก", "รายละเอียด", "ประโยชน์", "ปิดท้าย", "CTA", "End Card"];
+    const timecode = value => `${String(Math.floor(value/60)).padStart(2,"0")}:${String(value%60).padStart(2,"0")}`;
+    let cursor = 0;
+    const sceneObjects = Array.from({length:count}, (_,idx)=>{
+      const duration = base + (idx < extra ? 1 : 0);
+      const start = cursor;
+      const end = cursor + duration;
+      cursor = end;
       const first = idx===0, last=idx===count-1;
-      const message = first ? hook : last ? (b.action || (b.org ? `ติดตามข้อมูลเพิ่มเติมจาก ${b.org}` : "ติดตามรายละเอียดจากช่องทางประชาสัมพันธ์")) : (core[(idx-1)%core.length] || b.title);
-      const visual = first ? `ภาพเปิดที่ทำให้รู้ทันทีว่าเรื่องคือ “${b.title}”` : last ? "ภาพปิด โลโก้จริง/ช่องทางจริง ถ้ามีไฟล์หรือข้อมูลยืนยัน" : `ภาพประกอบหรือภาพจริงที่สื่อสารประเด็น: ${clamp(message,90)}`;
-      return `SCENE ${idx+1} — ${sceneLabels[idx] || "เล่าเรื่องต่อ"} / ประมาณ ${per} วินาที\nภาพ: ${visual}\nข้อความบนจอ: ${clamp(message,70)}\nบทพากย์: ${message}`;
-    }).join("\n\n");
-    return `บทวิดีโอพร้อมผลิต — Video Director / ${length}\n\nHOOK\n${hook}\n\n${scenes}\n\nบทพากย์ต่อเนื่อง\n${[hook, ...core, b.date && `กำหนดการ ${b.date}`, b.place && `สถานที่ ${b.place}`, b.action || "ติดตามรายละเอียดเพิ่มเติมจากช่องทางที่เผยแพร่"].filter(Boolean).join(" ")}\n\nหมายเหตุกองตัดต่อ\n• ใช้เฉพาะภาพจริงที่ตรงกับข้อความแต่ละช่วง\n• ตรวจชื่อ วันที่ สถานที่ และตัวเลขก่อนขึ้นข้อความบนจอ\n• ไม่สร้างโลโก้ บุคคล QR Code หรือข้อมูลจริงเพิ่ม`;
+      const lyricLine = lyricLines[idx % Math.max(lyricLines.length, 1)];
+      const message = first ? hook : last ? cta : (textMode && lyricLine ? lyricLine : (core[(idx-1)%core.length] || b.title));
+      const visual = first
+        ? `ภาพเปิดที่ทำให้รู้ทันทีว่าเรื่องคือ “${b.title}” ในสไตล์ ${videoStyle}`
+        : last
+          ? "ภาพปิด โลโก้จริง/ช่องทางจริงเฉพาะเมื่อมีไฟล์หรือข้อมูลยืนยัน"
+          : textMode
+            ? `ภาพตามอารมณ์หรือเหตุการณ์ของบรรทัด: ${clamp(message,90)}`
+            : `ภาพประกอบหรือภาพจริงที่สื่อสารประเด็น: ${clamp(message,90)}`;
+      const movement = first ? "push in / quick reveal" : last ? "hold / clean end card" : (idx % 2 ? "slow pan / cut on beat" : "medium shot + detail cutaway");
+      const audio = textMode ? "ใช้จังหวะเพลงหรือเสียงบรรยายให้ตรงคำสำคัญ" : "เสียงพากย์ชัด + ดนตรีรองเบา ไม่กลบข้อความ";
+      const transition = idx === count - 1 ? "fade out" : (textMode ? "cut on beat" : "clean cut");
+      const aiPrompt = `สร้างช็อตวิดีโอ ${aspectRatio} สไตล์ ${videoStyle}: ${visual}. กล้อง ${movement}. ห้ามสร้างโลโก้ QR Code เบอร์โทร บุคคลจริง หรือข้อมูลที่ไม่มีในบรีฟ`;
+      return {idx, duration, start, end, message, visual, movement, audio, transition, aiPrompt};
+    });
+    const scenes = sceneObjects.map(scene => `SCENE ${scene.idx+1} — ${sceneLabels[scene.idx] || "เล่าเรื่องต่อ"} / ${timecode(scene.start)}-${timecode(scene.end)} (${scene.duration} วินาที)
+Visual/Shot: ${scene.visual}
+Movement: ${scene.movement}
+Voice Over / Lyric: ${scene.message}
+On-screen Text: ${clamp(scene.message,70)}
+Audio/SFX: ${scene.audio}
+Transition: ${scene.transition}
+AI Video Prompt: ${scene.aiPrompt}`).join("\n\n");
+    const continuousScript = textMode && lyricLines.length ? lyricLines.join("\n") : [hook, ...core, b.date && `กำหนดการ ${b.date}`, b.place && `สถานที่ ${b.place}`, cta].filter(Boolean).join(" ");
+    const mustHave = [
+      `หัวข้อ/ชื่อเรื่องจริง: ${b.title}`,
+      b.org && `ชื่อหน่วยงาน/แบรนด์จริง: ${b.org}`,
+      assets && `วัตถุดิบที่มี: ${assets}`,
+      b.date && `วันเวลา: ${b.date}`,
+      b.place && `สถานที่: ${b.place}`
+    ].filter(Boolean).map(x=>`• ${x}`).join("\n");
+    return `Video Production Pack — Tanjai Video Studio / ${length}
+
+Project Setup
+รูปแบบงาน: ${format}
+ช่องทาง: ${platform}
+สัดส่วนภาพ: ${aspectRatio}
+สไตล์วิดีโอ: ${videoStyle}
+ชุดผลลัพธ์: ${outputPack}
+กลุ่มเป้าหมาย: ${b.audience || "ให้ระบบเลือกตามบริบท"}
+
+Core Message
+${b.keyMessage || benefitLine(b, intent)}
+
+Hook แนะนำ
+${hook}
+
+Storyboard พร้อมผลิต
+${scenes}
+
+Voice Over / Lyric Timing
+${continuousScript || "[เติมเนื้อเพลง บทพูด หรือข้อความบรรยายตามข้อมูลจริง]"}
+
+Shot List
+Must-have
+${mustHave || "• หัวข้อจริงของงาน\n• ภาพหรือวัตถุดิบจริงที่ผู้ใช้มี\n• CTA หรือช่องทางจริงที่ได้รับการยืนยัน"}
+
+Nice-to-have
+• ภาพเปิดที่หยุดสายตาใน 1-3 วินาทีแรก
+• B-roll รายละเอียดมือ วัตถุ สถานที่ หรือบรรยากาศที่ตรงกับบรีฟ
+• End Card สะอาด อ่านง่าย และไม่ใส่ข้อมูลปลอม
+
+AI Video Prompt Pack
+${sceneObjects.map(scene => `Shot ${scene.idx+1}: ${scene.aiPrompt}`).join("\n")}
+
+CapCut / Editing Notes
+• ตั้งโปรเจกต์เป็น ${aspectRatio}
+• ใส่ Subtitle หรือ Lyric ให้อยู่ใน safe area และอ่านทันในแต่ละซีน
+• ตัดภาพตาม timecode ด้านบน แล้วปรับจังหวะจริงตามเพลงหรือเสียงพากย์
+• ใช้ฟอนต์ไทยอ่านง่าย หลีกเลี่ยงข้อความยาวบนจอมือถือ
+
+Fact/Asset Checklist ก่อนผลิต
+• ตรวจชื่อ วันที่ สถานที่ ตัวเลข ช่องทางติดต่อ และโลโก้ก่อนขึ้นจอ
+• ใช้เฉพาะภาพจริงหรือภาพที่ผู้ใช้อนุญาต
+• ห้ามสร้างโลโก้ บุคคล QR Code เบอร์โทร หรือเหตุการณ์จริงเพิ่มเอง`;
   }
 
   function voiceWriter(d={}, length="60 วินาที", style="ทางการ สุภาพ"){

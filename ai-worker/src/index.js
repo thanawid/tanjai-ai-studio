@@ -1,7 +1,7 @@
 const TOOL_RULES = {
   post: "สร้างงานเขียนหรือโพสต์พร้อมเผยแพร่ตามช่องทางที่เลือก มีหัวเรื่อง เนื้อหา และคำเชิญชวนที่เหมาะสม",
   mc: "สร้างสคริปต์พิธีกรพร้อมอ่าน จัดลำดับพิธี คำเชื่อม จังหวะหยุด และคำกำกับเวทีอย่างชัดเจน",
-  video: "สร้างบทวิดีโอพร้อมผลิต แบ่งฉาก ระบุภาพ บทพากย์ ข้อความบนจอ และจังหวะเวลา",
+  video: "สร้าง Video Production Pack พร้อมผลิต แบ่งฉาก ระบุภาพ บทพากย์ ข้อความบนจอ จังหวะเวลา Shot List และ AI Video Prompt รายช็อต",
   voice: "สร้างสคริปต์เสียงพากย์พร้อมอ่าน จัดจังหวะ เว้นวรรค คำเน้น อารมณ์ และควบคุมความยาว",
   deck: "สร้างโครงสไลด์ตามจำนวนหน้า ระบุหัวข้อ เนื้อหาบนสไลด์ และ Speaker Notes"
 };
@@ -37,7 +37,42 @@ async function usageAllowed(request, env){
   return {ok:true, remaining:Math.max(0, limit-used-1)};
 }
 
+function buildVideoPrompt(data = {}, options = {}){
+  return `คุณคือ Tanjai Video Studio: AI Video Creative Director, Storyboard Artist, Thai Copywriter และ Video Editor
+
+ภารกิจ:
+สร้าง Video Production Pack ภาษาไทยที่พร้อมนำไปผลิตต่อใน CapCut, ทีมตัดต่อ หรือเครื่องมือ AI Video
+
+ข้อมูลตั้งต้น:
+${JSON.stringify(data || {}, null, 2)}
+
+ตัวเลือกงานวิดีโอ:
+${JSON.stringify(options || {}, null, 2)}
+
+กติกาสำคัญ:
+- ห้ามแต่งชื่อบุคคล ตำแหน่ง วัน เวลา สถานที่ ตัวเลข โลโก้ QR Code เบอร์โทร หรือข้อเท็จจริงที่ผู้ใช้ไม่ได้ให้
+- ถ้าข้อมูลสำคัญขาด ให้ใช้ [กรุณาเติมข้อมูล] เฉพาะจุดนั้น ไม่ต้องเดา
+- ทุกซีนต้องมีหน้าที่ชัดเจนและเวลารวมพอดีกับความยาวที่เลือก
+- ข้อความบนจอต้องสั้น อ่านทัน และเหมาะกับ safe area ของสัดส่วนภาพที่เลือก
+- ถ้าเป็น MV เพลงหรือ Lyric Video ให้จัดจังหวะเนื้อเพลง/ข้อความตาม timecode และเน้นอ่านง่าย
+- ถ้าเป็นนิทานเด็ก หนังสั้น หรือซีรีส์สั้น ให้มีโครงเรื่อง ต้น-กลาง-จบ และอารมณ์ของฉาก
+- ถ้าเป็นโฆษณาหรือรีวิวสินค้า ให้ชัดเรื่องปัญหา คุณค่า หลักฐานที่มี และ CTA โดยไม่กล่าวเกินจริง
+- ส่งกลับเฉพาะผลงานสุดท้าย ห้ามใช้ Markdown code fence
+
+รูปแบบผลลัพธ์ที่ต้องส่งออก:
+1. Project Setup: รูปแบบงาน ช่องทาง สัดส่วนภาพ สไตล์ ความยาว และเป้าหมาย
+2. Core Message + Viewer Promise
+3. Hook 3 แบบ พร้อมเลือก 1 แบบที่แนะนำ
+4. Storyboard Table คอลัมน์: Timecode | Duration | Visual/Shot | Voice Over หรือ Lyric | On-screen Text | Audio/SFX | Transition | AI Video Prompt
+5. Voice Over ต่อเนื่อง หรือ Lyric Timing พร้อมใช้
+6. Shot List: Must-have / Nice-to-have / B-roll สำรอง
+7. CapCut / Editing Notes: subtitle, safe area, rhythm, color mood, transition
+8. AI Video Prompt Pack รายช็อต
+9. Fact/Asset Checklist ก่อนผลิต`;
+}
+
 function buildPrompt(tool, data, options){
+  if(tool === "video") return buildVideoPrompt(data, options);
   const job = TOOL_RULES[tool];
   return `คุณคือทีมบรรณาธิการภาษาไทยมืออาชีพของทันใจ AI Studio
 
@@ -110,4 +145,3 @@ export default {
     return json({text, source:"gemini", remaining:usage.remaining}, 200, origin);
   }
 };
-
