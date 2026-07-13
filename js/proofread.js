@@ -125,6 +125,9 @@
         changes.push({bad,good,type:"auto"});
       }
     });
+    const buddhistYearBefore = out;
+    out=out.replace(/พ\.ศ\.\s*(\d{4})/g,"พ.ศ. $1");
+    if(out!==buddhistYearBefore) changes.push({bad:"พ.ศ.ปี",good:"พ.ศ. ปี",type:"auto"});
     const suggestions=[];
     SUGGEST_ONLY.forEach(([bad,good])=>{
       const re=new RegExp(escapeRegExp(bad),"g");
@@ -236,7 +239,7 @@
     ensureModal();
 
     document.addEventListener("click",(e)=>{
-      if(e.target.closest("#openProofreadTop")){
+      if(e.target.closest("#openProofreadTop") || e.target.closest("#openProofreadNav")){
         e.preventDefault(); openModal();
       }
       if(e.target.closest("[data-proofread-close]")){

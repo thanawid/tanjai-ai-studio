@@ -141,7 +141,7 @@
       return {role, layout, label:"Cover Frame", frameWeight:"balanced-cover", textDensity:"full", logoScale:.84, targetY:layout==="cover-left"?.43:.41, bottomRatio:.17};
     }
     if(role==="lite"){
-      return {role, layout, label:`Lite Frame ${idx+1}`, frameWeight:"balanced-lite", textDensity:"short", logoScale:.56, targetY:.49, bottomRatio: d.mode.includes("ภาพกิจกรรมเน้นภาพ")?.068:.088};
+      return {role, layout, label:`Lite Frame ${idx+1}`, frameWeight:"balanced-lite", textDensity:"short", logoScale:.56, targetY:.49, bottomRatio: d.mode.includes("ภาพกิจกรรมเน้นภาพ")?.058:.072};
     }
     return {role, layout, label:`Additional Frame ${idx+1}`, frameWeight:"balanced-minimal", textDensity:"minimal", logoScale:.42, targetY:.50, bottomRatio:.082};
   }
@@ -1223,7 +1223,7 @@
 
   // โหลด "สูตรงาน" ที่บันทึกไว้ กลับมาเติมฟอร์ม (ไม่รวมภาพ — ใส่ภาพใหม่แล้วกดสร้าง)
   window.TANJAI = window.TANJAI || {};
-  TANJAI.applyAlbumTemplate = function(snap){
+  window.TANJAI.applyAlbumTemplate = function(snap){
     try{
       Object.entries(snap||{}).forEach(([k,v])=>{
         const el=document.getElementById(k); if(!el) return;
@@ -1232,9 +1232,9 @@
       if(snap['album-facebookPreset']){
         $$('[data-album-preset]').forEach(b=>b.classList.toggle('selected',b.dataset.albumPreset===snap['album-facebookPreset']));
       }
-      TANJAI.switchView?.('album');
-      TANJAI.toast?.('โหลดต้นแบบแล้ว — ใส่ภาพ แล้วกดสร้างได้เลย');
-    }catch(_){ TANJAI.toast?.('โหลดต้นแบบไม่สำเร็จ'); }
+      window.TANJAI.switchView?.('album');
+      window.TANJAI.toast?.('โหลดต้นแบบแล้ว — ใส่ภาพ แล้วกดสร้างได้เลย');
+    }catch(_){ window.TANJAI.toast?.('โหลดต้นแบบไม่สำเร็จ'); }
   };
 
   document.addEventListener('DOMContentLoaded',()=>{

@@ -51,7 +51,7 @@ const app = fs.readFileSync(path.join(root, "js", "app.js"), "utf8");
 const ui = fs.readFileSync(path.join(root, "js", "ui.js"), "utf8");
 const index = fs.readFileSync(path.join(root, "index.html"), "utf8");
 assert.match(index, /js\/free-writing-team\.js/);
-assert.match(index, /V9\.9\.3/);
+assert.match(index, /V9\.9\.4/);
 assert.match(app, /team\.captionWriter\(d\)/);
 assert.match(app, /team\.mcWriter\(d\)/);
 assert.match(app, /team\.videoWriter\(d, length\)/);
