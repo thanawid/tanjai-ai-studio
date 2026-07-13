@@ -5102,3 +5102,8 @@ label > .field-hint + select{
     flex-direction:column;
   }
 }
+
+/* ─── v9.9: Album caption variants ─── */
+.album-caption-variants{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.album-variant-btn{font-size:13px;padding:7px 14px;border-radius:999px;line-height:1;opacity:.75}
+.album-variant-btn.selected{opacity:1;border-color:var(--accent,#c26bff);box-shadow:0 0 0 1px var(--accent,#c26bff) inset;font-weight:600}
