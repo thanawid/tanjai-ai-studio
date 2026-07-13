@@ -237,6 +237,18 @@
     const hook = b.keyMessage || (intent === "music" ? `ฟังอารมณ์ของ “${b.title}” ตั้งแต่วินาทีแรก` : intent === "commercial" ? `เหตุผลที่ควรรู้จัก “${b.title}” ภายในไม่กี่วินาที` : intent === "tradition" ? `ร่วมสืบสานประเพณี “${b.title}” ให้คงอยู่คู่ท้องถิ่น` : intent === "invitation" ? `ร่วมกำหนดทิศทางของ “${b.title}”` : intent === "announcement" ? `เรื่องสำคัญที่ควรรู้: ${b.title}` : b.title);
     const sceneLabels = textMode ? ["Hook / Mood", "Verse / Setup", "Key Line", "Emotion Beat", "Payoff", "CTA / End Card", "Extra Beat", "End Card"] : ["เปิดเรื่อง", "ปูบริบท", "สารหลัก", "รายละเอียด", "ประโยชน์", "ปิดท้าย", "CTA", "End Card"];
     const timecode = value => `${String(Math.floor(value/60)).padStart(2,"0")}:${String(value%60).padStart(2,"0")}`;
+    const ttsLine = value => clamp(clean(value)
+      .replace(/\bAI\b/gi, "เอไอ")
+      .replace(/\bMV\b/gi, "เอ็มวี")
+      .replace(/TikTok/gi, "ติ๊กต็อก")
+      .replace(/Reels/gi, "รีลส์")
+      .replace(/YouTube Shorts/gi, "ยูทูบ ชอร์ตส์")
+      .replace(/YouTube/gi, "ยูทูบ")
+      .replace(/CapCut/gi, "แคปคัต")
+      .replace(/QR\s*Code/gi, "คิวอาร์โค้ด")
+      .replace(/\bCTA\b/gi, "ซีทีเอ")
+      .replace(/[|/]/g, " ")
+      .replace(/\s+/g, " "), 140);
     let cursor = 0;
     const sceneObjects = Array.from({length:count}, (_,idx)=>{
       const duration = base + (idx < extra ? 1 : 0);
@@ -259,6 +271,8 @@
       const aiPrompt = `สร้างช็อตวิดีโอ ${aspectRatio} สไตล์ ${videoStyle}: ${visual}. กล้อง ${movement}. ห้ามสร้างโลโก้ QR Code เบอร์โทร บุคคลจริง หรือข้อมูลที่ไม่มีในบรีฟ`;
       return {idx, duration, start, end, message, visual, movement, audio, transition, aiPrompt};
     });
+    const shortPromptFor = scene => clamp(`SHOT ${String(scene.idx+1).padStart(2,"0")} | ${scene.duration} วินาที | ${aspectRatio} | ภาพ: ${scene.visual} | กล้อง: ${scene.movement} | สไตล์: ${videoStyle} | อารมณ์: ${textMode ? "ตามจังหวะเพลง/เนื้อเรื่อง" : "ชัดเจน น่าเชื่อถือ"} | ห้ามใส่ตัวหนังสือ โลโก้ คิวอาร์โค้ด เบอร์โทร บุคคลจริง หรือข้อมูลปลอม`, 650);
+    const shortPromptBlocks = sceneObjects.map(scene => shortPromptFor(scene)).join("\n\n");
     const scenes = sceneObjects.map(scene => `SCENE ${scene.idx+1} — ${sceneLabels[scene.idx] || "เล่าเรื่องต่อ"} / ${timecode(scene.start)}-${timecode(scene.end)} (${scene.duration} วินาที)
 Visual/Shot: ${scene.visual}
 Movement: ${scene.movement}
@@ -268,6 +282,10 @@ Audio/SFX: ${scene.audio}
 Transition: ${scene.transition}
 AI Video Prompt: ${scene.aiPrompt}`).join("\n\n");
     const continuousScript = textMode && lyricLines.length ? lyricLines.join("\n") : [hook, ...core, b.date && `กำหนดการ ${b.date}`, b.place && `สถานที่ ${b.place}`, cta].filter(Boolean).join(" ");
+    const capCutVoiceScript = (textMode && lyricLines.length ? lyricLines : [hook, ...core.slice(0, Math.max(2, count - 2)), cta])
+      .map(ttsLine)
+      .filter(Boolean)
+      .join("\n\n");
     const mustHave = [
       `หัวข้อ/ชื่อเรื่องจริง: ${b.title}`,
       b.org && `ชื่อหน่วยงาน/แบรนด์จริง: ${b.org}`,
@@ -291,6 +309,21 @@ ${b.keyMessage || benefitLine(b, intent)}
 Hook แนะนำ
 ${hook}
 
+วิธีใช้เร็ว
+• ใช้ Short Prompt รายช็อตไปสร้างวิดีโอทีละช็อต ไม่ต้องวางทั้งแพ็ก
+• ใช้ CapCut Voice/Lyric Clean Script เฉพาะกับเสียงพากย์หรือซับ
+• เนื้อเพลง ข้อความบนจอ และเสียง ให้ใส่ใน CapCut ทีหลัง เพื่อเลี่ยงตัวอักษรเกินและอ่านเพี้ยน
+
+Short Prompt รายช็อต (คัดลอกทีละช็อต / ไม่เกิน 650 ตัวอักษรต่อช็อต)
+[SHORT_SHOT_PROMPTS]
+${shortPromptBlocks}
+[/SHORT_SHOT_PROMPTS]
+
+CapCut Voice/Lyric Clean Script
+[CAPCUT_VOICE_SCRIPT]
+${capCutVoiceScript || "[เติมบทพูดหรือเนื้อเพลงที่ต้องการให้ CapCut อ่าน]"}
+[/CAPCUT_VOICE_SCRIPT]
+
 Storyboard พร้อมผลิต
 ${scenes}
 
@@ -306,7 +339,7 @@ Nice-to-have
 • B-roll รายละเอียดมือ วัตถุ สถานที่ หรือบรรยากาศที่ตรงกับบรีฟ
 • End Card สะอาด อ่านง่าย และไม่ใส่ข้อมูลปลอม
 
-AI Video Prompt Pack
+AI Video Prompt Pack แบบละเอียด
 ${sceneObjects.map(scene => `Shot ${scene.idx+1}: ${scene.aiPrompt}`).join("\n")}
 
 CapCut / Editing Notes

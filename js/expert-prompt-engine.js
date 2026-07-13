@@ -691,8 +691,9 @@ ${truthContract(d, "video", [
 4. แบ่งซีนตามความยาว ${seconds} วินาที และตรวจให้ผลรวมเวลาทุกซีนเท่ากับ ${seconds} วินาที
 5. แต่ละซีนต้องระบุ Visual, Shot/Movement, Voice Over, On-screen Text, Audio และ Transition
 6. สำหรับ Lyric Video ให้แบ่งเนื้อเพลงเป็นบรรทัดอ่านทัน พร้อมจุดเข้าคำและ safe area ภาษาไทย
-7. สำหรับ AI Video ให้เขียน Prompt รายช็อตที่ไม่สร้างโลโก้ บุคคล เหตุการณ์ หรือข้อมูลจริงปลอม
-8. ถ้าไม่มีภาพตามแผน ให้เสนอ B-roll ทางเลือกที่ไม่สร้างบุคคล/เหตุการณ์จริงปลอม
+7. สำหรับ AI Video ให้เขียน Short Prompt รายช็อต ความยาวไม่เกิน 650 ตัวอักษรต่อช็อต เพื่อเอาไปวางทีละช็อต
+8. แยก CapCut Voice/Lyric Clean Script ออกจาก Storyboard โดยห้ามมี timecode, SCENE, bullet, slash, prompt, transition หรือคำกำกับภาพ
+9. ถ้าไม่มีภาพตามแผน ให้เสนอ B-roll ทางเลือกที่ไม่สร้างบุคคล/เหตุการณ์จริงปลอม
 
 ค่ากำกับ:
 - Format: ${format}
@@ -708,17 +709,26 @@ A. Project Setup: format, platform, aspect ratio, tone, production goal
 B. Core Message + Viewer Promise
 C. Hook 3 แบบ พร้อมเหตุผลสั้น ๆ แล้วเลือก 1 แบบที่แนะนำ
 D. Storyboard Table คอลัมน์: Timecode | Duration | Visual/Shot | Voice Over | On-screen Text | Audio/SFX | Transition | AI Video Prompt
-E. Voice Over หรือ Lyric Timing ฉบับต่อเนื่องพร้อมนำไปอัดเสียง/วางใน CapCut
-F. Shot List แยก Must-have / Nice-to-have / B-roll สำรอง
-G. Editing Notes: subtitle, safe area, rhythm, color mood, transition, caption style
-H. AI Video Prompt Pack รายช็อต สำหรับนำไปใช้กับเครื่องมือสร้างวิดีโอ
-I. Fact/Asset Checklist ก่อนผลิต
+E. Short Prompt รายช็อต โดยครอบด้วย [SHORT_SHOT_PROMPTS] และ [/SHORT_SHOT_PROMPTS] เท่านั้นในส่วนนั้น
+F. CapCut Voice/Lyric Clean Script โดยครอบด้วย [CAPCUT_VOICE_SCRIPT] และ [/CAPCUT_VOICE_SCRIPT] เท่านั้นในส่วนนั้น
+G. Shot List แยก Must-have / Nice-to-have / B-roll สำรอง
+H. Editing Notes: subtitle, safe area, rhythm, color mood, transition, caption style
+I. AI Video Prompt Pack รายช็อตแบบละเอียด สำหรับนำไปใช้กับเครื่องมือสร้างวิดีโอ
+J. Fact/Asset Checklist ก่อนผลิต
+
+ข้อกำชับของบล็อกคัดลอก:
+- ใน [SHORT_SHOT_PROMPTS] ให้ใส่เฉพาะ Prompt สั้นรายช็อต รูปแบบ SHOT 01, SHOT 02, ... ห้ามใส่ Storyboard ทั้งก้อน
+- Prompt สั้นแต่ละช็อตต้องไม่เกิน 650 ตัวอักษร และห้ามสั่งให้สร้างตัวหนังสือ โลโก้ QR Code เบอร์โทร หรือข้อมูลจริงปลอม
+- ใน [CAPCUT_VOICE_SCRIPT] ให้ใส่เฉพาะคำพูด/เนื้อเพลงที่ให้เสียงหรือซับใช้จริง ประโยคสั้น อ่านง่าย ไม่มีคำเทคนิค
+- แปลงคำอังกฤษสำคัญให้อ่านไทย เช่น AI=เอไอ, MV=เอ็มวี, TikTok=ติ๊กต็อก, Reels=รีลส์, YouTube=ยูทูบ, CapCut=แคปคัต, QR Code=คิวอาร์โค้ด
 
 ${silentQualityGate([
   `เวลารวมทุกซีนเท่ากับ ${seconds} วินาที`,
   "ภาพ เสียง และข้อความบนจอของแต่ละซีนสื่อสารเรื่องเดียวกัน",
   "Hook ดึงดูดแต่ไม่กล่าวเกินจริง",
   "ข้อความบนจอและเนื้อเพลงอ่านทันในสัดส่วนภาพที่เลือก",
+  "Short Prompt รายช็อตไม่เกิน 650 ตัวอักษรต่อช็อต",
+  "CapCut Voice Script ไม่มี timecode หรือคำกำกับภาพ",
   "Storyboard ถ่ายทำได้จากวัตถุดิบที่มีหรือระบุสิ่งที่ต้องหาเพิ่ม",
   "CTA ชัดและไม่สร้างช่องทางติดต่อปลอม"
 ])}`;
