@@ -18,8 +18,8 @@ assert.match(client, /source:"fallback"/);
 assert.match(worker, /GEMINI_API_KEY/);
 assert.match(worker, /ALLOWED_ORIGINS/);
 assert.match(worker, /USAGE_KV/);
+assert.match(worker, /CAPCUT_CHARACTER_DIALOGUE/);
 assert.doesNotMatch(index, /GEMINI_API_KEY\s*=/);
 assert.doesNotMatch(client, /AIza[0-9A-Za-z_-]{20,}/);
 
 console.log(JSON.stringify({tools:5, secureWorker:true, fallback:true, status:"PASS"}, null, 2));
-

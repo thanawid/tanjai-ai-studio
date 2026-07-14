@@ -59,6 +59,7 @@ ${JSON.stringify(options || {}, null, 2)}
 - ถ้าเป็นโฆษณาหรือรีวิวสินค้า ให้ชัดเรื่องปัญหา คุณค่า หลักฐานที่มี และ CTA โดยไม่กล่าวเกินจริง
 - ต้องมีบล็อก [SHORT_SHOT_PROMPTS] สำหรับคัดลอก prompt รายช็อตไปใช้ทีละช็อต โดยแต่ละช็อตไม่เกิน 650 ตัวอักษร
 - ต้องมีบล็อก [CAPCUT_VOICE_SCRIPT] สำหรับคัดลอกเสียงพากย์/เนื้อเพลงไปใช้กับ CapCut โดยไม่มี timecode, SCENE, bullet, prompt, slash หรือคำกำกับภาพ
+- ต้องมีบล็อก [CAPCUT_CHARACTER_DIALOGUE] สำหรับบทพูดตัวละครเท่านั้น ถ้าไม่มีตัวละครให้ใส่บทสนทนาสั้นแบบคนถาม-คนตอบตามบรีฟ ห้ามใส่คำกำกับภาพ และควรคัดลอกทีละบรรทัดไปใส่เสียงตัวละคร
 - แปลงคำอังกฤษในบล็อกเสียงให้อ่านไทย เช่น AI=เอไอ, MV=เอ็มวี, TikTok=ติ๊กต็อก, Reels=รีลส์, YouTube=ยูทูบ, CapCut=แคปคัต, QR Code=คิวอาร์โค้ด
 - ส่งกลับเฉพาะผลงานสุดท้าย ห้ามใช้ Markdown code fence
 
@@ -68,11 +69,12 @@ ${JSON.stringify(options || {}, null, 2)}
 3. Hook 3 แบบ พร้อมเลือก 1 แบบที่แนะนำ
 4. Short Prompt รายช็อต ครอบด้วย [SHORT_SHOT_PROMPTS] และ [/SHORT_SHOT_PROMPTS]
 5. CapCut Voice/Lyric Clean Script ครอบด้วย [CAPCUT_VOICE_SCRIPT] และ [/CAPCUT_VOICE_SCRIPT]
-6. Storyboard Table คอลัมน์: Timecode | Duration | Visual/Shot | Voice Over หรือ Lyric | On-screen Text | Audio/SFX | Transition | AI Video Prompt
-7. Shot List: Must-have / Nice-to-have / B-roll สำรอง
-8. CapCut / Editing Notes: subtitle, safe area, rhythm, color mood, transition
-9. AI Video Prompt Pack รายช็อตแบบละเอียด
-10. Fact/Asset Checklist ก่อนผลิต`;
+6. CapCut Character Dialogue Clean Script ครอบด้วย [CAPCUT_CHARACTER_DIALOGUE] และ [/CAPCUT_CHARACTER_DIALOGUE]
+7. Storyboard Table คอลัมน์: Timecode | Duration | Visual/Shot | Voice Over หรือ Lyric | Character Dialogue | On-screen Text | Audio/SFX | Transition | AI Video Prompt
+8. Shot List: Must-have / Nice-to-have / B-roll สำรอง
+9. CapCut / Editing Notes: subtitle, safe area, rhythm, color mood, transition
+10. AI Video Prompt Pack รายช็อตแบบละเอียด
+11. Fact/Asset Checklist ก่อนผลิต`;
 }
 
 function buildPrompt(tool, data, options){

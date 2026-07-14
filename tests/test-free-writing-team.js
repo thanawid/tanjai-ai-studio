@@ -14,6 +14,7 @@ const data = {
   expertAction: "ติดตามประกาศจากเทศบาล",
   expertAgenda: "กล่าวต้อนรับ\nชี้แจงรายละเอียด\nรับฟังความคิดเห็น",
   expertKeyMessage: "ร่วมคิด ร่วมทำ เพื่อชุมชน",
+  videoVoiceMode: "บรรยาย + บทพูดตัวละคร (แนะนำ)",
   channel: "โพสต์ Facebook",
   length: "มาตรฐาน อ่านง่าย"
 };
@@ -35,6 +36,7 @@ assert.match(outputs.mc, /รับฟังความคิดเห็น/);
 assert.match(outputs.video, /Video Production Pack/);
 assert.match(outputs.video, /\[SHORT_SHOT_PROMPTS\]/);
 assert.match(outputs.video, /\[CAPCUT_VOICE_SCRIPT\]/);
+assert.match(outputs.video, /\[CAPCUT_CHARACTER_DIALOGUE\]/);
 assert.match(outputs.video, /SCENE 6/);
 assert.match(outputs.voice, /สคริปต์เสียงพร้อมอ่าน/);
 assert.match(outputs.slides, /SLIDE 8/);
@@ -51,15 +53,20 @@ const app = fs.readFileSync(path.join(root, "js", "app.js"), "utf8");
 const ui = fs.readFileSync(path.join(root, "js", "ui.js"), "utf8");
 const index = fs.readFileSync(path.join(root, "index.html"), "utf8");
 assert.match(index, /js\/free-writing-team\.js/);
-assert.match(index, /V9\.9\.4/);
+assert.match(index, /V9\.9\.5/);
 assert.match(app, /team\.captionWriter\(d\)/);
 assert.match(app, /team\.mcWriter\(d\)/);
 assert.match(app, /team\.videoWriter\(d, length\)/);
+assert.match(app, /videoVoiceModes/);
+assert.match(app, /บรรยาย \+ บทพูดตัวละคร/);
+assert.doesNotMatch(app, /Cinematic Emotional|Modern Social Fast Cut|Warm Storytelling/);
 assert.match(app, /team\.voiceWriter\(d, length, style\)/);
 assert.match(app, /team\.slideWriter\(d, count\)/);
 assert.match(ui, /คัดลอกงานเขียน/);
 assert.match(ui, /คัดลอก Shot Prompts/);
 assert.match(ui, /คัดลอกเสียง CapCut/);
+assert.match(ui, /คัดลอกบทพูดตัวละคร/);
+assert.match(ui, /CAPCUT_CHARACTER_DIALOGUE/);
 assert.doesNotMatch(ui, /คัดลอก Prompt วิดีโอ/);
 assert.match(ui, /editableWritingTools = new Set\(\["post", "mc", "video", "voice", "deck"\]\)/);
 assert.match(ui, /contenteditable="true"/);

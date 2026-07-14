@@ -224,7 +224,8 @@
     const platform = real(d.channel) || "TikTok / Reels / Facebook";
     const aspectRatio = real(d.aspectRatio) || "ให้ AI เลือกตามช่องทาง";
     const videoStyle = real(d.videoStyle) || real(d.style) || "ให้ AI เลือกตามงาน";
-    const outputPack = real(d.outputPack) || "Production Pack ครบชุด";
+    const outputPack = real(d.outputPack) || "แพ็กผลิตวิดีโอครบชุด";
+    const voiceMode = real(d.videoVoiceMode) || real(d.voiceMode) || "บรรยาย + บทพูดตัวละคร (แนะนำ)";
     const assets = real(d.expertAssets);
     const lyricLines = splitPoints(real(d.expertLyrics));
     const textMode = /lyric|เนื้อเพลง|mv|music|เพลง|นิทาน|หนังสั้น|series|ซีรีส์/i.test(`${format} ${b.title} ${b.detail}`);
@@ -249,6 +250,22 @@
       .replace(/\bCTA\b/gi, "ซีทีเอ")
       .replace(/[|/]/g, " ")
       .replace(/\s+/g, " "), 140);
+    const wantsLyricOnly = /เนื้อเพลง|Lyric/i.test(voiceMode);
+    const wantsDialogue = !wantsLyricOnly && /ตัวละคร|นิทาน|หนัง|ซีรีส์|การ์ตูน|บรรยาย \+ บทพูด/i.test(`${voiceMode} ${format}`);
+    const wantsNarration = !/เฉพาะบทพูดตัวละคร/.test(voiceMode);
+    const dialogueFor = (message, idx) => {
+      if(!wantsDialogue) return "";
+      const promise = b.keyMessage || benefitLine(b, intent);
+      const lines = [
+        `เรื่องนี้เกี่ยวกับ ${b.title} ใช่ไหม`,
+        `ใช่ เราจะเล่าให้เข้าใจง่าย และไม่แต่งข้อมูลเกินจริง`,
+        `สิ่งสำคัญคือ ${promise}`,
+        `แล้วคนดูควรจำอะไรจากเรื่องนี้`,
+        `จำไว้ว่า ${message}`,
+        cta
+      ];
+      return ttsLine(lines[idx % lines.length]);
+    };
     let cursor = 0;
     const sceneObjects = Array.from({length:count}, (_,idx)=>{
       const duration = base + (idx < extra ? 1 : 0);
@@ -269,7 +286,8 @@
       const audio = textMode ? "ใช้จังหวะเพลงหรือเสียงบรรยายให้ตรงคำสำคัญ" : "เสียงพากย์ชัด + ดนตรีรองเบา ไม่กลบข้อความ";
       const transition = idx === count - 1 ? "fade out" : (textMode ? "cut on beat" : "clean cut");
       const aiPrompt = `สร้างช็อตวิดีโอ ${aspectRatio} สไตล์ ${videoStyle}: ${visual}. กล้อง ${movement}. ห้ามสร้างโลโก้ QR Code เบอร์โทร บุคคลจริง หรือข้อมูลที่ไม่มีในบรีฟ`;
-      return {idx, duration, start, end, message, visual, movement, audio, transition, aiPrompt};
+      const characterDialogue = dialogueFor(message, idx);
+      return {idx, duration, start, end, message, visual, movement, audio, transition, aiPrompt, characterDialogue};
     });
     const shortPromptFor = scene => clamp(`SHOT ${String(scene.idx+1).padStart(2,"0")} | ${scene.duration} วินาที | ${aspectRatio} | ภาพ: ${scene.visual} | กล้อง: ${scene.movement} | สไตล์: ${videoStyle} | อารมณ์: ${textMode ? "ตามจังหวะเพลง/เนื้อเรื่อง" : "ชัดเจน น่าเชื่อถือ"} | ห้ามใส่ตัวหนังสือ โลโก้ คิวอาร์โค้ด เบอร์โทร บุคคลจริง หรือข้อมูลปลอม`, 650);
     const shortPromptBlocks = sceneObjects.map(scene => shortPromptFor(scene)).join("\n\n");
@@ -277,15 +295,24 @@
 Visual/Shot: ${scene.visual}
 Movement: ${scene.movement}
 Voice Over / Lyric: ${scene.message}
+Character Dialogue: ${scene.characterDialogue || "[ใช้เฉพาะเมื่อเลือกโหมดบทพูดตัวละคร]"}
 On-screen Text: ${clamp(scene.message,70)}
 Audio/SFX: ${scene.audio}
 Transition: ${scene.transition}
 AI Video Prompt: ${scene.aiPrompt}`).join("\n\n");
     const continuousScript = textMode && lyricLines.length ? lyricLines.join("\n") : [hook, ...core, b.date && `กำหนดการ ${b.date}`, b.place && `สถานที่ ${b.place}`, cta].filter(Boolean).join(" ");
-    const capCutVoiceScript = (textMode && lyricLines.length ? lyricLines : [hook, ...core.slice(0, Math.max(2, count - 2)), cta])
+    const narrationScript = (textMode && lyricLines.length ? lyricLines : [hook, ...core.slice(0, Math.max(2, count - 2)), cta])
       .map(ttsLine)
       .filter(Boolean)
       .join("\n\n");
+    const characterDialogueScript = sceneObjects.map(scene => scene.characterDialogue).filter(Boolean).join("\n\n");
+    const capCutVoiceScript = wantsLyricOnly
+      ? narrationScript
+      : wantsDialogue && !wantsNarration
+        ? characterDialogueScript
+        : wantsDialogue
+          ? [narrationScript, characterDialogueScript].filter(Boolean).join("\n\n")
+          : narrationScript;
     const mustHave = [
       `หัวข้อ/ชื่อเรื่องจริง: ${b.title}`,
       b.org && `ชื่อหน่วยงาน/แบรนด์จริง: ${b.org}`,
@@ -301,6 +328,7 @@ Project Setup
 สัดส่วนภาพ: ${aspectRatio}
 สไตล์วิดีโอ: ${videoStyle}
 ชุดผลลัพธ์: ${outputPack}
+เสียงใน CapCut: ${voiceMode}
 กลุ่มเป้าหมาย: ${b.audience || "ให้ระบบเลือกตามบริบท"}
 
 Core Message
@@ -312,6 +340,7 @@ ${hook}
 วิธีใช้เร็ว
 • ใช้ Short Prompt รายช็อตไปสร้างวิดีโอทีละช็อต ไม่ต้องวางทั้งแพ็ก
 • ใช้ CapCut Voice/Lyric Clean Script เฉพาะกับเสียงพากย์หรือซับ
+• ถ้าต้องการให้ตัวละครพูด ให้ใช้บล็อก Character Dialogue แล้วคัดลอกทีละบรรทัดไปใส่เสียงของตัวละครนั้น
 • เนื้อเพลง ข้อความบนจอ และเสียง ให้ใส่ใน CapCut ทีหลัง เพื่อเลี่ยงตัวอักษรเกินและอ่านเพี้ยน
 
 Short Prompt รายช็อต (คัดลอกทีละช็อต / ไม่เกิน 650 ตัวอักษรต่อช็อต)
@@ -323,6 +352,11 @@ CapCut Voice/Lyric Clean Script
 [CAPCUT_VOICE_SCRIPT]
 ${capCutVoiceScript || "[เติมบทพูดหรือเนื้อเพลงที่ต้องการให้ CapCut อ่าน]"}
 [/CAPCUT_VOICE_SCRIPT]
+
+CapCut Character Dialogue Clean Script (คัดลอกทีละบรรทัดให้ตัวละครพูด)
+[CAPCUT_CHARACTER_DIALOGUE]
+${characterDialogueScript || "[เติมบทพูดตัวละครแบบสั้น ๆ ทีละประโยค ห้ามใส่คำกำกับภาพ]"}
+[/CAPCUT_CHARACTER_DIALOGUE]
 
 Storyboard พร้อมผลิต
 ${scenes}

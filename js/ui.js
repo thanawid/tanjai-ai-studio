@@ -242,7 +242,7 @@ TANJAI.primaryActionButtons = function(tool, bodyId){
   if(tool === "album") return btn("ดาวน์โหลดทั้งหมด", `id="albumDownloadAllTop"`, "primary") + btn("ล้างรูป", `id="albumClearTop"`);
   if(tool === "post") return btn("คัดลอกงานเขียน", `data-copybox="${bodyId}"`, "primary");
   if(tool === "mc") return btn("คัดลอกสคริปต์พิธีกร", `data-copybox="${bodyId}"`, "primary");
-  if(tool === "video") return btn("คัดลอก Shot Prompts", `data-copy-video-section="shots" data-copy-source="${bodyId}"`, "primary") + btn("คัดลอกเสียง CapCut", `data-copy-video-section="voice" data-copy-source="${bodyId}"`) + btn("คัดลอกทั้งแพ็ก", `data-copybox="${bodyId}"`) + btn("เปิด CapCut", `data-open="https://www.capcut.com/"`);
+  if(tool === "video") return btn("คัดลอก Shot Prompts", `data-copy-video-section="shots" data-copy-source="${bodyId}"`, "primary") + btn("คัดลอกเสียง CapCut", `data-copy-video-section="voice" data-copy-source="${bodyId}"`) + btn("คัดลอกบทพูดตัวละคร", `data-copy-video-section="dialogue" data-copy-source="${bodyId}"`) + btn("คัดลอกทั้งแพ็ก", `data-copybox="${bodyId}"`) + btn("เปิด CapCut", `data-open="https://www.capcut.com/"`);
   if(tool === "voice") return btn("คัดลอกสคริปต์เสียง", `data-copybox="${bodyId}"`, "primary") + btn("เปิด Voice Tool", `data-open="https://aistudio.google.com/"`);
   if(tool === "deck") return btn("คัดลอกเนื้อหาสไลด์", `data-copybox="${bodyId}"`, "primary") + btn("เปิด Slide Tool", `data-open="https://gamma.app/"`);
   if(tool === "kit") return btn("คัดลอก Prompt Pack พร้อมใช้", `data-copybox="${bodyId}"`, "primary") + btn("เปิด ทันใจ GPT", `data-open="${GPT}"`);
@@ -365,8 +365,9 @@ document.addEventListener("click", function(event){
     event.preventDefault();
     const source = TANJAI.$(`#${sectionButton.dataset.copySource || "videoOut"}`);
     const text = source?.textContent || "";
-    const marker = sectionButton.dataset.copyVideoSection === "voice" ? "CAPCUT_VOICE_SCRIPT" : "SHORT_SHOT_PROMPTS";
-    const label = sectionButton.dataset.copyVideoSection === "voice" ? "สคริปต์เสียง CapCut" : "Prompt รายช็อต";
+    const section = sectionButton.dataset.copyVideoSection;
+    const marker = section === "voice" ? "CAPCUT_VOICE_SCRIPT" : section === "dialogue" ? "CAPCUT_CHARACTER_DIALOGUE" : "SHORT_SHOT_PROMPTS";
+    const label = section === "voice" ? "สคริปต์เสียง CapCut" : section === "dialogue" ? "บทพูดตัวละคร" : "Prompt รายช็อต";
     const block = TANJAI.extractMarkedBlock(text, marker);
     TANJAI.copyText(block || text);
     if(block) TANJAI.toast?.(`คัดลอก${label}แล้ว`);
