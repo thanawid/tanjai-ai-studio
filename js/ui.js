@@ -227,7 +227,15 @@ TANJAI.getToolDestinations = function(tool){
     album:[{label:"เปิด Canva", url:"https://www.canva.com/"},{label:"เปิด ทันใจ GPT", url:GPT}],
     mc:[{label:"เปิด ทันใจ GPT", url:GPT},{label:"เปิด Notebook Tool", url:"https://notebooklm.google.com/"},{label:"เปิด Canva", url:"https://www.canva.com/"}],
     post:[{label:"เปิด ทันใจ GPT", url:GPT},{label:"เปิด Notebook Tool", url:"https://notebooklm.google.com/"},{label:"เปิด Canva", url:"https://www.canva.com/"},{label:"เปิด CapCut", url:"https://www.capcut.com/"}],
-    video:[{label:"เปิด ทันใจ GPT", url:GPT},{label:"เปิด CapCut", url:"https://www.capcut.com/"}],
+    video:[
+      {label:"เปิด ทันใจ GPT", url:GPT},
+      {label:"เปิด Google Flow", url:"https://flow.google/"},
+      {label:"เปิด Runway", url:"https://runwayml.com/"},
+      {label:"เปิด Luma", url:"https://lumalabs.ai/"},
+      {label:"เปิด HeyGen", url:"https://www.heygen.com/"},
+      {label:"เปิด Pika", url:"https://pika.art/"},
+      {label:"เปิด CapCut", url:"https://www.capcut.com/"}
+    ],
     voice:[{label:"เปิด ทันใจ GPT", url:GPT},{label:"เปิด Voice Tool", url:"https://aistudio.google.com/"},{label:"เปิด CapCut", url:"https://www.capcut.com/"}],
     deck:[{label:"เปิด ทันใจ GPT", url:GPT},{label:"เปิด Slide Tool", url:"https://gamma.app/"},{label:"เปิด Canva", url:"https://www.canva.com/"},{label:"เปิด Notebook Tool", url:"https://notebooklm.google.com/"}],
     kit:[{label:"เปิด ทันใจ GPT", url:GPT},{label:"เปิด Canva", url:"https://www.canva.com/"},{label:"เปิด CapCut", url:"https://www.capcut.com/"},{label:"เปิด Voice Tool", url:"https://aistudio.google.com/"},{label:"เปิด Slide Tool", url:"https://gamma.app/"}]
@@ -242,7 +250,7 @@ TANJAI.primaryActionButtons = function(tool, bodyId){
   if(tool === "album") return btn("ดาวน์โหลดทั้งหมด", `id="albumDownloadAllTop"`, "primary") + btn("ล้างรูป", `id="albumClearTop"`);
   if(tool === "post") return btn("คัดลอกงานเขียน", `data-copybox="${bodyId}"`, "primary");
   if(tool === "mc") return btn("คัดลอกสคริปต์พิธีกร", `data-copybox="${bodyId}"`, "primary");
-  if(tool === "video") return btn("คัดลอก Shot Prompts", `data-copy-video-section="shots" data-copy-source="${bodyId}"`, "primary") + btn("คัดลอกเสียง CapCut", `data-copy-video-section="voice" data-copy-source="${bodyId}"`) + btn("คัดลอกบทพูดตัวละคร", `data-copy-video-section="dialogue" data-copy-source="${bodyId}"`) + btn("คัดลอกทั้งแพ็ก", `data-copybox="${bodyId}"`) + btn("เปิด CapCut", `data-open="https://www.capcut.com/"`);
+  if(tool === "video") return btn("คัดลอก Shot Prompts", `data-copy-video-section="shots" data-copy-source="${bodyId}"`, "primary") + btn("คัดลอกบทพูดตัวละคร", `data-copy-video-section="dialogue" data-copy-source="${bodyId}"`) + btn("คัดลอกทั้งแพ็ก", `data-copybox="${bodyId}"`) + `<details class="video-more-actions"><summary class="btn secondary">เพิ่มเติม</summary><div class="video-more-actions-menu">${btn("คัดลอกเสียง CapCut", `data-copy-video-section="voice" data-copy-source="${bodyId}"`)}${btn("เปิด CapCut", `data-open="https://www.capcut.com/"`)}</div></details>`;
   if(tool === "voice") return btn("คัดลอกสคริปต์เสียง", `data-copybox="${bodyId}"`, "primary") + btn("เปิด Voice Tool", `data-open="https://aistudio.google.com/"`);
   if(tool === "deck") return btn("คัดลอกเนื้อหาสไลด์", `data-copybox="${bodyId}"`, "primary") + btn("เปิด Slide Tool", `data-open="https://gamma.app/"`);
   if(tool === "kit") return btn("คัดลอก Prompt Pack พร้อมใช้", `data-copybox="${bodyId}"`, "primary") + btn("เปิด ทันใจ GPT", `data-open="${GPT}"`);

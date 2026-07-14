@@ -13,7 +13,7 @@ assert.match(album, /bottomRatio:\.17/);
 assert.match(album, /bottomRatio: d\.mode\.includes\("ภาพกิจกรรมเน้นภาพ"\)\?\.058:\.072/);
 assert.doesNotMatch(album, /drawLiteNumberBadge\(ctx, idx,/);
 assert.match(album, /const thickness=pro \? Math\.max\(6,Math\.round\(min\*0\.009\)\)/);
-assert.match(index, /V9\.9\.5/);
+assert.match(index, /V9\.9\.6/);
 assert.doesNotMatch(album, /<b>โครงอัลบั้ม<\/b>/);
 assert.doesNotMatch(album, /<summary>โครงอัลบั้ม<\/summary>/);
 assert.match(app, /value="square-grid"/);

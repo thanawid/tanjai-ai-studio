@@ -38,6 +38,22 @@ async function usageAllowed(request, env){
 }
 
 function buildVideoPrompt(data = {}, options = {}){
+  const destination = options.destination || data.videoDestination || data.destination || "ให้ AI เลือกตามงาน";
+  const destinationGuide = /veo|flow/i.test(destination)
+    ? "Google Veo / Flow: ให้ Short Prompt รวมภาพ การเคลื่อนไหว เสียงบรรยากาศ และบทพูดสั้นได้ในช็อตเดียว แต่ยังต้องแยกบล็อกเสียงไว้ใช้ต่อ"
+    : /runway/i.test(destination)
+      ? "Runway: ให้เน้น visual, camera, motion, lighting, style และแยกเสียง/ซับไปทำใน CapCut"
+      : /luma/i.test(destination)
+        ? "Luma: ให้ prompt รายช็อตสั้น ชัด ใช้ภาพอ้างอิงถ้ามี และแยกเสียงภายหลัง"
+        : /heygen/i.test(destination)
+          ? "HeyGen: ให้ Character Dialogue เป็นสคริปต์พูดของ avatar/talking photo และให้ Short Prompt เป็นฉากหรือ B-roll ประกอบ"
+          : /pika/i.test(destination)
+            ? "Pika: ให้ prompt กระชับมาก มี action เดียว เหมาะคลิปสั้นหรือเอฟเฟกต์ social"
+            : /kling|seedance/i.test(destination)
+              ? "Kling / Seedance: ให้ระบุ subject, camera, motion ชัดเจน และแยกเสียง/บทพูดไปทำทีหลัง"
+              : /capcut|แคปคัต/i.test(destination)
+                ? "CapCut: ให้แยก prompt ภาพ เสียงบรรยาย บทพูดตัวละคร และโน้ตตัดต่อให้ชัด"
+                : "ให้ AI เลือกตามงาน: ถ้างานต้องการเสียงในฉากให้จัดแบบ Veo/Flow, ถ้าเน้นภาพให้จัดแบบ Runway/Luma, ถ้าคนพูดให้จัดแบบ HeyGen";
   return `คุณคือ Tanjai Video Studio: AI Video Creative Director, Storyboard Artist, Thai Copywriter และ Video Editor
 
 ภารกิจ:
@@ -49,6 +65,12 @@ ${JSON.stringify(data || {}, null, 2)}
 ตัวเลือกงานวิดีโอ:
 ${JSON.stringify(options || {}, null, 2)}
 
+ปลายทาง AI วิดีโอ:
+${destination}
+
+กติกาตามปลายทาง:
+${destinationGuide}
+
 กติกาสำคัญ:
 - ห้ามแต่งชื่อบุคคล ตำแหน่ง วัน เวลา สถานที่ ตัวเลข โลโก้ QR Code เบอร์โทร หรือข้อเท็จจริงที่ผู้ใช้ไม่ได้ให้
 - ถ้าข้อมูลสำคัญขาด ให้ใช้ [กรุณาเติมข้อมูล] เฉพาะจุดนั้น ไม่ต้องเดา
@@ -58,13 +80,14 @@ ${JSON.stringify(options || {}, null, 2)}
 - ถ้าเป็นนิทานเด็ก หนังสั้น หรือซีรีส์สั้น ให้มีโครงเรื่อง ต้น-กลาง-จบ และอารมณ์ของฉาก
 - ถ้าเป็นโฆษณาหรือรีวิวสินค้า ให้ชัดเรื่องปัญหา คุณค่า หลักฐานที่มี และ CTA โดยไม่กล่าวเกินจริง
 - ต้องมีบล็อก [SHORT_SHOT_PROMPTS] สำหรับคัดลอก prompt รายช็อตไปใช้ทีละช็อต โดยแต่ละช็อตไม่เกิน 650 ตัวอักษร
+- ใน [SHORT_SHOT_PROMPTS] ให้ขึ้นต้นแต่ละช็อตด้วยปลายทางที่เลือก และปรับ prompt ให้เหมาะกับเครื่องมือนั้น
 - ต้องมีบล็อก [CAPCUT_VOICE_SCRIPT] สำหรับคัดลอกเสียงพากย์/เนื้อเพลงไปใช้กับ CapCut โดยไม่มี timecode, SCENE, bullet, prompt, slash หรือคำกำกับภาพ
 - ต้องมีบล็อก [CAPCUT_CHARACTER_DIALOGUE] สำหรับบทพูดตัวละครเท่านั้น ถ้าไม่มีตัวละครให้ใส่บทสนทนาสั้นแบบคนถาม-คนตอบตามบรีฟ ห้ามใส่คำกำกับภาพ และควรคัดลอกทีละบรรทัดไปใส่เสียงตัวละคร
 - แปลงคำอังกฤษในบล็อกเสียงให้อ่านไทย เช่น AI=เอไอ, MV=เอ็มวี, TikTok=ติ๊กต็อก, Reels=รีลส์, YouTube=ยูทูบ, CapCut=แคปคัต, QR Code=คิวอาร์โค้ด
 - ส่งกลับเฉพาะผลงานสุดท้าย ห้ามใช้ Markdown code fence
 
 รูปแบบผลลัพธ์ที่ต้องส่งออก:
-1. Project Setup: รูปแบบงาน ช่องทาง สัดส่วนภาพ สไตล์ ความยาว และเป้าหมาย
+1. Project Setup: รูปแบบงาน ช่องทาง สัดส่วนภาพ สไตล์ ความยาว ปลายทาง AI วิดีโอ และเป้าหมาย
 2. Core Message + Viewer Promise
 3. Hook 3 แบบ พร้อมเลือก 1 แบบที่แนะนำ
 4. Short Prompt รายช็อต ครอบด้วย [SHORT_SHOT_PROMPTS] และ [/SHORT_SHOT_PROMPTS]

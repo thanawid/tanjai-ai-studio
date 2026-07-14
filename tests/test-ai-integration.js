@@ -19,6 +19,8 @@ assert.match(worker, /GEMINI_API_KEY/);
 assert.match(worker, /ALLOWED_ORIGINS/);
 assert.match(worker, /USAGE_KV/);
 assert.match(worker, /CAPCUT_CHARACTER_DIALOGUE/);
+assert.match(worker, /ปลายทาง AI วิดีโอ/);
+assert.match(worker, /Google Veo \/ Flow/);
 assert.doesNotMatch(index, /GEMINI_API_KEY\s*=/);
 assert.doesNotMatch(client, /AIza[0-9A-Za-z_-]{20,}/);
 

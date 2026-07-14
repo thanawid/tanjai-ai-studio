@@ -226,6 +226,29 @@
     const videoStyle = real(d.videoStyle) || real(d.style) || "ให้ AI เลือกตามงาน";
     const outputPack = real(d.outputPack) || "แพ็กผลิตวิดีโอครบชุด";
     const voiceMode = real(d.videoVoiceMode) || real(d.voiceMode) || "บรรยาย + บทพูดตัวละคร (แนะนำ)";
+    const destination = real(d.videoDestination) || real(d.destination) || "ให้ AI เลือกตามงาน";
+    const isCapCut = /capcut|แคปคัต/i.test(destination);
+    const isVeo = /veo|flow/i.test(destination);
+    const isRunway = /runway/i.test(destination);
+    const isLuma = /luma/i.test(destination);
+    const isHeyGen = /heygen/i.test(destination);
+    const isPika = /pika/i.test(destination);
+    const isKlingSeedance = /kling|seedance/i.test(destination);
+    const destinationGuide = isVeo
+      ? "Google Veo / Flow: ใช้ Short Prompt รายช็อตเป็นหลัก ใส่ภาพ การเคลื่อนไหว เสียงบรรยากาศ และบทพูดสั้นในช็อตเดียวได้"
+      : isRunway
+        ? "Runway: เน้นคุณภาพภาพ มุมกล้อง motion และ mood ให้ชัด เสียงพูด/ซับ/เพลงควรแยกไปทำใน CapCut"
+        : isLuma
+          ? "Luma: เหมาะกับทดลองหลายโมเดลและต่อช็อต ใช้ prompt สั้นชัด พร้อมภาพอ้างอิงถ้ามี แล้วแยกเสียงภายหลัง"
+          : isHeyGen
+            ? "HeyGen: ใช้ Character Dialogue เป็นสคริปต์ให้ avatar หรือ talking photo พูด ส่วน Short Prompt ใช้ทำ B-roll หรือฉากประกอบ"
+            : isPika
+              ? "Pika: เหมาะกับคลิปสั้น เอฟเฟกต์ และ social hook ให้ prompt กระชับมากและมี action เดียวต่อช็อต"
+              : isKlingSeedance
+                ? "Kling / Seedance: ใช้ prompt รายช็อตที่ชัดเรื่องตัวแบบ กล้อง และ motion เสียง/บทพูดควรแยกไปทำทีหลัง"
+                : isCapCut
+                  ? "CapCut: ใช้เป็นจุดรวมงาน ตัดต่อ ใส่เสียง ซับ เนื้อเพลง และบทพูดตัวละครจากบล็อกที่แยกไว้"
+                  : "ให้ AI เลือกตามงาน: ถ้าเน้นภาพยนตร์ใช้แนว Runway/Luma, ถ้าต้องมีเสียงในฉากลอง Veo/Flow, ถ้าเป็นคนพูดเลือก HeyGen, แล้วจบงานใน CapCut";
     const assets = real(d.expertAssets);
     const lyricLines = splitPoints(real(d.expertLyrics));
     const textMode = /lyric|เนื้อเพลง|mv|music|เพลง|นิทาน|หนังสั้น|series|ซีรีส์/i.test(`${format} ${b.title} ${b.detail}`);
@@ -285,11 +308,39 @@
       const movement = first ? "push in / quick reveal" : last ? "hold / clean end card" : (idx % 2 ? "slow pan / cut on beat" : "medium shot + detail cutaway");
       const audio = textMode ? "ใช้จังหวะเพลงหรือเสียงบรรยายให้ตรงคำสำคัญ" : "เสียงพากย์ชัด + ดนตรีรองเบา ไม่กลบข้อความ";
       const transition = idx === count - 1 ? "fade out" : (textMode ? "cut on beat" : "clean cut");
-      const aiPrompt = `สร้างช็อตวิดีโอ ${aspectRatio} สไตล์ ${videoStyle}: ${visual}. กล้อง ${movement}. ห้ามสร้างโลโก้ QR Code เบอร์โทร บุคคลจริง หรือข้อมูลที่ไม่มีในบรีฟ`;
       const characterDialogue = dialogueFor(message, idx);
+      const destinationPrompt = isVeo
+        ? `. เสียงในฉาก: ${characterDialogue || ttsLine(message)}. ambient audio สมจริง ไม่ใส่ข้อความบนภาพ`
+        : isHeyGen
+          ? `. ทำเป็นฉากพูด/ภาพประกอบสำหรับ avatar หรือ talking photo. สคริปต์พูด: ${characterDialogue || ttsLine(message)}`
+          : isRunway
+            ? ". สร้างเฉพาะภาพและ motion คุณภาพสูง ไม่ต้องสร้างเสียง ไม่ใส่ข้อความบนภาพ"
+            : isLuma
+              ? ". motion ชัด ต่อเนื่อง ใช้ภาพอ้างอิงถ้ามี ไม่ใส่ข้อความบนภาพ"
+              : isPika
+                ? ". action เดียวชัด ๆ จังหวะไว เหมาะคลิปสั้น ไม่ใส่ข้อความบนภาพ"
+                : isKlingSeedance
+                  ? ". ระบุ subject, camera, motion ชัด ใช้สำหรับ video generation รายช็อต ไม่ต้องสร้างเสียง"
+                  : ". ใช้ภาพจากช็อตนี้ แล้วนำเสียง/ซับ/ข้อความไปใส่ในขั้นตัดต่อ";
+      const aiPrompt = `สร้างช็อตวิดีโอ ${aspectRatio} สำหรับ ${destination} สไตล์ ${videoStyle}: ${visual}. กล้อง ${movement}${destinationPrompt}. ห้ามสร้างโลโก้ QR Code เบอร์โทร บุคคลจริง หรือข้อมูลที่ไม่มีในบรีฟ`;
       return {idx, duration, start, end, message, visual, movement, audio, transition, aiPrompt, characterDialogue};
     });
-    const shortPromptFor = scene => clamp(`SHOT ${String(scene.idx+1).padStart(2,"0")} | ${scene.duration} วินาที | ${aspectRatio} | ภาพ: ${scene.visual} | กล้อง: ${scene.movement} | สไตล์: ${videoStyle} | อารมณ์: ${textMode ? "ตามจังหวะเพลง/เนื้อเรื่อง" : "ชัดเจน น่าเชื่อถือ"} | ห้ามใส่ตัวหนังสือ โลโก้ คิวอาร์โค้ด เบอร์โทร บุคคลจริง หรือข้อมูลปลอม`, 650);
+    const shortPromptFor = scene => {
+      const destinationHint = isVeo
+        ? ` | เสียงในช็อต: ${scene.characterDialogue || ttsLine(scene.message)}`
+        : isHeyGen
+          ? ` | ใช้คู่กับสคริปต์พูด: ${scene.characterDialogue || ttsLine(scene.message)}`
+          : isRunway
+            ? " | visual only, no generated speech"
+            : isLuma
+              ? " | motion ต่อเนื่อง ใช้ภาพอ้างอิงถ้ามี"
+              : isPika
+                ? " | action เดียว จังหวะไว"
+                : isKlingSeedance
+                  ? " | subject + camera + motion ชัด"
+                  : "";
+      return clamp(`SHOT ${String(scene.idx+1).padStart(2,"0")} | ปลายทาง: ${destination} | ${scene.duration} วินาที | ${aspectRatio} | ภาพ: ${scene.visual} | กล้อง: ${scene.movement} | สไตล์: ${videoStyle}${destinationHint} | ห้ามใส่ตัวหนังสือ โลโก้ คิวอาร์โค้ด เบอร์โทร บุคคลจริง หรือข้อมูลปลอม`, 650);
+    };
     const shortPromptBlocks = sceneObjects.map(scene => shortPromptFor(scene)).join("\n\n");
     const scenes = sceneObjects.map(scene => `SCENE ${scene.idx+1} — ${sceneLabels[scene.idx] || "เล่าเรื่องต่อ"} / ${timecode(scene.start)}-${timecode(scene.end)} (${scene.duration} วินาที)
 Visual/Shot: ${scene.visual}
@@ -327,6 +378,7 @@ Project Setup
 ช่องทาง: ${platform}
 สัดส่วนภาพ: ${aspectRatio}
 สไตล์วิดีโอ: ${videoStyle}
+ปลายทาง AI วิดีโอ: ${destination}
 ชุดผลลัพธ์: ${outputPack}
 เสียงใน CapCut: ${voiceMode}
 กลุ่มเป้าหมาย: ${b.audience || "ให้ระบบเลือกตามบริบท"}
@@ -342,6 +394,9 @@ ${hook}
 • ใช้ CapCut Voice/Lyric Clean Script เฉพาะกับเสียงพากย์หรือซับ
 • ถ้าต้องการให้ตัวละครพูด ให้ใช้บล็อก Character Dialogue แล้วคัดลอกทีละบรรทัดไปใส่เสียงของตัวละครนั้น
 • เนื้อเพลง ข้อความบนจอ และเสียง ให้ใส่ใน CapCut ทีหลัง เพื่อเลี่ยงตัวอักษรเกินและอ่านเพี้ยน
+
+ปลายทางที่เลือก
+• ${destinationGuide}
 
 Short Prompt รายช็อต (คัดลอกทีละช็อต / ไม่เกิน 650 ตัวอักษรต่อช็อต)
 [SHORT_SHOT_PROMPTS]

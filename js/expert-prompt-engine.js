@@ -665,6 +665,22 @@ ${silentQualityGate([
     const aspectRatio = clean(extra.aspectRatio || d.aspectRatio, "ให้ AI เลือกตามช่องทาง");
     const videoStyle = clean(extra.videoStyle || d.videoStyle || d.style, "ให้ AI เลือกตามงาน");
     const outputPack = clean(extra.outputPack || d.outputPack, "Production Pack ครบชุด");
+    const destination = clean(extra.destination || d.videoDestination || d.destination, "ให้ AI เลือกตามงาน");
+    const destinationGuide = /veo|flow/i.test(destination)
+      ? "Google Veo / Flow: Short Prompt รวมภาพ การเคลื่อนไหว เสียงบรรยากาศ และบทพูดสั้นได้ในช็อตเดียว แต่ยังต้องแยก voice/dialogue block ไว้ใช้ต่อ"
+      : /runway/i.test(destination)
+        ? "Runway: เน้น visual, camera, motion, lighting, style และแยกเสียง/ซับไปทำใน CapCut"
+        : /luma/i.test(destination)
+          ? "Luma: prompt รายช็อตสั้น ชัด ใช้ภาพอ้างอิงถ้ามี และแยกเสียงภายหลัง"
+          : /heygen/i.test(destination)
+            ? "HeyGen: ใช้ Character Dialogue เป็นสคริปต์พูดของ avatar/talking photo และใช้ Short Prompt เป็นฉากหรือ B-roll ประกอบ"
+            : /pika/i.test(destination)
+              ? "Pika: prompt กระชับมาก มี action เดียว เหมาะคลิปสั้นหรือเอฟเฟกต์ social"
+              : /kling|seedance/i.test(destination)
+                ? "Kling / Seedance: ระบุ subject, camera, motion ชัดเจน และแยกเสียง/บทพูดไปทำทีหลัง"
+                : /capcut|แคปคัต/i.test(destination)
+                  ? "CapCut: แยก prompt ภาพ เสียงบรรยาย บทพูดตัวละคร และโน้ตตัดต่อให้ชัด"
+                  : "ให้ AI เลือกตามงาน: ถ้าต้องมีเสียงในฉากให้จัดแบบ Veo/Flow, ถ้าเน้นภาพให้จัดแบบ Runway/Luma, ถ้าคนพูดให้จัดแบบ HeyGen";
     return `EXPERT MODE: SHORT-FORM VIDEO CREATIVE DIRECTOR & EDITOR
 
 ภารกิจ
@@ -675,6 +691,7 @@ ${truthContract(d, "video", [
   line("แพลตฟอร์ม", platform),
   line("สัดส่วนภาพ", aspectRatio),
   line("สไตล์วิดีโอ", videoStyle),
+  line("ปลายทาง AI วิดีโอ", destination),
   line("ชุดผลลัพธ์", outputPack),
   line("CTA", d.expertCTA || d.brainGoal),
   line("วัตถุดิบภาพที่มี", d.expertAssets),
@@ -692,21 +709,23 @@ ${truthContract(d, "video", [
 5. แต่ละซีนต้องระบุ Visual, Shot/Movement, Voice Over, On-screen Text, Audio และ Transition
 6. สำหรับ Lyric Video ให้แบ่งเนื้อเพลงเป็นบรรทัดอ่านทัน พร้อมจุดเข้าคำและ safe area ภาษาไทย
 7. สำหรับ AI Video ให้เขียน Short Prompt รายช็อต ความยาวไม่เกิน 650 ตัวอักษรต่อช็อต เพื่อเอาไปวางทีละช็อต
-8. แยก CapCut Voice/Lyric Clean Script ออกจาก Storyboard โดยห้ามมี timecode, SCENE, bullet, slash, prompt, transition หรือคำกำกับภาพ
-9. แยก CapCut Character Dialogue Clean Script สำหรับ “ตัวละครพูด” โดยเฉพาะ ประโยคสั้น คัดลอกทีละบรรทัดได้ และห้ามใส่คำกำกับภาพในบล็อกนี้
-10. ถ้าไม่มีภาพตามแผน ให้เสนอ B-roll ทางเลือกที่ไม่สร้างบุคคล/เหตุการณ์จริงปลอม
+8. ปรับ Short Prompt ตามปลายทางนี้: ${destinationGuide}
+9. แยก CapCut Voice/Lyric Clean Script ออกจาก Storyboard โดยห้ามมี timecode, SCENE, bullet, slash, prompt, transition หรือคำกำกับภาพ
+10. แยก CapCut Character Dialogue Clean Script สำหรับ “ตัวละครพูด” โดยเฉพาะ ประโยคสั้น คัดลอกทีละบรรทัดได้ และห้ามใส่คำกำกับภาพในบล็อกนี้
+11. ถ้าไม่มีภาพตามแผน ให้เสนอ B-roll ทางเลือกที่ไม่สร้างบุคคล/เหตุการณ์จริงปลอม
 
 ค่ากำกับ:
 - Format: ${format}
 - Platform: ${platform}
 - Aspect Ratio: ${aspectRatio}
 - Style: ${videoStyle}
+- Destination: ${destination}
 - Output Pack: ${outputPack}
 - Pace: ${clean(d.expertPace, "กระชับ มีจังหวะหายใจ")}
 - Tone: ${clean(d.tone, "สุภาพ ทันสมัย น่าเชื่อถือ")}
 
 === OUTPUT CONTRACT ===
-A. Project Setup: format, platform, aspect ratio, tone, production goal
+A. Project Setup: format, platform, aspect ratio, destination, tone, production goal
 B. Core Message + Viewer Promise
 C. Hook 3 แบบ พร้อมเหตุผลสั้น ๆ แล้วเลือก 1 แบบที่แนะนำ
 D. Storyboard Table คอลัมน์: Timecode | Duration | Visual/Shot | Voice Over | On-screen Text | Audio/SFX | Transition | AI Video Prompt
@@ -720,7 +739,7 @@ K. Fact/Asset Checklist ก่อนผลิต
 
 ข้อกำชับของบล็อกคัดลอก:
 - ใน [SHORT_SHOT_PROMPTS] ให้ใส่เฉพาะ Prompt สั้นรายช็อต รูปแบบ SHOT 01, SHOT 02, ... ห้ามใส่ Storyboard ทั้งก้อน
-- Prompt สั้นแต่ละช็อตต้องไม่เกิน 650 ตัวอักษร และห้ามสั่งให้สร้างตัวหนังสือ โลโก้ QR Code เบอร์โทร หรือข้อมูลจริงปลอม
+- Prompt สั้นแต่ละช็อตต้องไม่เกิน 650 ตัวอักษร ระบุปลายทางที่เลือก และห้ามสั่งให้สร้างตัวหนังสือ โลโก้ QR Code เบอร์โทร หรือข้อมูลจริงปลอม
 - ใน [CAPCUT_VOICE_SCRIPT] ให้ใส่เฉพาะคำพูด/เนื้อเพลงที่ให้เสียงหรือซับใช้จริง ประโยคสั้น อ่านง่าย ไม่มีคำเทคนิค
 - ใน [CAPCUT_CHARACTER_DIALOGUE] ให้ใส่เฉพาะบทพูดของตัวละครทีละบรรทัด ไม่ใส่คำว่า SCENE, timecode, ชื่อตัวละคร, prompt หรือคำกำกับภาพ เพื่อไม่ให้ CapCut อ่านเพี้ยน
 - แปลงคำอังกฤษสำคัญให้อ่านไทย เช่น AI=เอไอ, MV=เอ็มวี, TikTok=ติ๊กต็อก, Reels=รีลส์, YouTube=ยูทูบ, CapCut=แคปคัต, QR Code=คิวอาร์โค้ด
