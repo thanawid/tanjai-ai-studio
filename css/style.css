@@ -5147,7 +5147,7 @@ label > .field-hint + select{
 .album-variant-btn{font-size:13px;padding:7px 14px;border-radius:999px;line-height:1;opacity:.75}
 .album-variant-btn.selected{opacity:1;border-color:var(--accent,#c26bff);box-shadow:0 0 0 1px var(--accent,#c26bff) inset;font-weight:600}
 
-/* v10.0.0 — Video mobile action buttons */
+/* v10.0.1 — Video mobile action buttons */
 .result-buttons.stable-result-buttons[data-primary-actions="video"]{
   width:100%;
   max-width:640px;

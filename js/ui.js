@@ -255,7 +255,12 @@ TANJAI.getToolDestinations = function(tool){
 TANJAI.primaryActionButtons = function(tool, bodyId){
   const GPT = TANJAI.customGptUrl || TANJAI_CUSTOM_GPT_URL;
   const btn = (label, attrs, cls="secondary")=>`<button class="btn ${cls}" ${attrs}>${label}</button>`;
-  if(tool === "image") return btn("คัดลอก Prompt", `data-copy-image="execute"`, "primary") + btn("สร้างภาพในเว็บ", `data-generate-image="imageOut"`) + btn("เปิด ทันใจ GPT", `data-open="${GPT}"`);
+  if(tool === "image"){
+    const imageGenerateButton = window.TANJAI_AI_CONFIG?.imageGenerationEnabled
+      ? btn("สร้างภาพในเว็บ", `data-generate-image="imageOut"`)
+      : "";
+    return btn("คัดลอก Prompt", `data-copy-image="execute"`, "primary") + imageGenerateButton + btn("เปิด ทันใจ GPT", `data-open="${GPT}"`);
+  }
   if(tool === "album") return btn("ดาวน์โหลดทั้งหมด", `id="albumDownloadAllTop"`, "primary") + btn("ล้างรูป", `id="albumClearTop"`);
   if(tool === "post") return btn("คัดลอกงานเขียน", `data-copybox="${bodyId}"`, "primary");
   if(tool === "mc") return btn("คัดลอกสคริปต์พิธีกร", `data-copybox="${bodyId}"`, "primary");

@@ -7,5 +7,6 @@
 window.TANJAI_AI_CONFIG = Object.assign({
   endpoint: "https://tanjai-ai.thanawid.workers.dev",
   timeoutMs: 60000,
-  imageTimeoutMs: 120000
+  imageTimeoutMs: 120000,
+  imageGenerationEnabled: false
 }, window.TANJAI_AI_CONFIG || {});
