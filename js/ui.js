@@ -250,7 +250,7 @@ TANJAI.primaryActionButtons = function(tool, bodyId){
   if(tool === "album") return btn("ดาวน์โหลดทั้งหมด", `id="albumDownloadAllTop"`, "primary") + btn("ล้างรูป", `id="albumClearTop"`);
   if(tool === "post") return btn("คัดลอกงานเขียน", `data-copybox="${bodyId}"`, "primary");
   if(tool === "mc") return btn("คัดลอกสคริปต์พิธีกร", `data-copybox="${bodyId}"`, "primary");
-  if(tool === "video") return btn("คัดลอก Shot Prompts", `data-copy-video-section="shots" data-copy-source="${bodyId}"`, "primary") + btn("คัดลอกบทพูดตัวละคร", `data-copy-video-section="dialogue" data-copy-source="${bodyId}"`) + btn("คัดลอกทั้งแพ็ก", `data-copybox="${bodyId}"`) + `<details class="video-more-actions"><summary class="btn secondary">เพิ่มเติม</summary><div class="video-more-actions-menu">${btn("คัดลอกเสียง CapCut", `data-copy-video-section="voice" data-copy-source="${bodyId}"`)}${btn("เปิด CapCut", `data-open="https://www.capcut.com/"`)}</div></details>`;
+  if(tool === "video") return btn("Shot Prompts", `data-copy-video-section="shots" data-copy-source="${bodyId}" aria-label="คัดลอก Shot Prompts"`, "primary") + btn("บทพูดตัวละคร", `data-copy-video-section="dialogue" data-copy-source="${bodyId}" aria-label="คัดลอกบทพูดตัวละคร"`) + btn("ทั้งแพ็ก", `data-copybox="${bodyId}" aria-label="คัดลอกทั้งแพ็ก"`) + `<details class="video-more-actions"><summary class="btn secondary">เพิ่มเติม</summary><div class="video-more-actions-menu">${btn("เสียง CapCut", `data-copy-video-section="voice" data-copy-source="${bodyId}" aria-label="คัดลอกเสียง CapCut"`)}${btn("เปิด CapCut", `data-open="https://www.capcut.com/"`)}</div></details>`;
   if(tool === "voice") return btn("คัดลอกสคริปต์เสียง", `data-copybox="${bodyId}"`, "primary") + btn("เปิด Voice Tool", `data-open="https://aistudio.google.com/"`);
   if(tool === "deck") return btn("คัดลอกเนื้อหาสไลด์", `data-copybox="${bodyId}"`, "primary") + btn("เปิด Slide Tool", `data-open="https://gamma.app/"`);
   if(tool === "kit") return btn("คัดลอก Prompt Pack พร้อมใช้", `data-copybox="${bodyId}"`, "primary") + btn("เปิด ทันใจ GPT", `data-open="${GPT}"`);
@@ -282,7 +282,7 @@ TANJAI.readyOutputShell = function(tool, recommended, desc, bodyId){
         <h4 id="${tool}ResultTitle">${recommended}</h4>
         <p id="${tool}ResultDesc">${desc}</p>
       </div>
-      <div class="result-buttons stable-result-buttons primary-first-actions">
+      <div class="result-buttons stable-result-buttons primary-first-actions" data-primary-actions="${tool}">
         ${TANJAI.primaryActionButtons(tool, bodyId)}
       </div>
     </div>

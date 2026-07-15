@@ -5146,3 +5146,60 @@ label > .field-hint + select{
 .album-caption-variants{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
 .album-variant-btn{font-size:13px;padding:7px 14px;border-radius:999px;line-height:1;opacity:.75}
 .album-variant-btn.selected{opacity:1;border-color:var(--accent,#c26bff);box-shadow:0 0 0 1px var(--accent,#c26bff) inset;font-weight:600}
+
+/* v9.9.7 — Video mobile action buttons */
+.result-buttons.stable-result-buttons[data-primary-actions="video"]{
+  width:100%;
+  max-width:640px;
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0, 1fr));
+  gap:8px;
+  align-items:stretch;
+}
+.result-buttons.stable-result-buttons[data-primary-actions="video"] > .btn,
+.result-buttons.stable-result-buttons[data-primary-actions="video"] .video-more-actions,
+.result-buttons.stable-result-buttons[data-primary-actions="video"] .video-more-actions summary{
+  min-width:0;
+  width:100%;
+}
+.result-buttons.stable-result-buttons[data-primary-actions="video"] > .btn,
+.result-buttons.stable-result-buttons[data-primary-actions="video"] .video-more-actions summary,
+.result-buttons.stable-result-buttons[data-primary-actions="video"] .video-more-actions-menu .btn{
+  white-space:normal;
+  line-height:1.25;
+  text-align:center;
+}
+.result-buttons.stable-result-buttons[data-primary-actions="video"] > .btn.primary{
+  grid-column:1 / -1;
+}
+.result-buttons.stable-result-buttons[data-primary-actions="video"] .video-more-actions{
+  position:relative;
+}
+.result-buttons.stable-result-buttons[data-primary-actions="video"] .video-more-actions-menu{
+  right:0;
+  left:auto;
+  width:min(220px, 92vw);
+}
+@media(max-width:720px){
+  .result-buttons.stable-result-buttons[data-primary-actions="video"]{
+    max-width:100%;
+    grid-template-columns:1fr 1fr;
+  }
+  .result-buttons.stable-result-buttons[data-primary-actions="video"] .video-more-actions{
+    grid-column:1 / -1;
+  }
+  .result-buttons.stable-result-buttons[data-primary-actions="video"] .video-more-actions-menu{
+    position:static;
+    width:100%;
+    margin-top:8px;
+    box-shadow:none;
+  }
+}
+@media(max-width:380px){
+  .result-buttons.stable-result-buttons[data-primary-actions="video"]{
+    grid-template-columns:1fr;
+  }
+  .result-buttons.stable-result-buttons[data-primary-actions="video"] > .btn.primary{
+    grid-column:auto;
+  }
+}
