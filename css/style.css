@@ -5147,7 +5147,7 @@ label > .field-hint + select{
 .album-variant-btn{font-size:13px;padding:7px 14px;border-radius:999px;line-height:1;opacity:.75}
 .album-variant-btn.selected{opacity:1;border-color:var(--accent,#c26bff);box-shadow:0 0 0 1px var(--accent,#c26bff) inset;font-weight:600}
 
-/* v9.9.7 — Video mobile action buttons */
+/* v10.0.0 — Video mobile action buttons */
 .result-buttons.stable-result-buttons[data-primary-actions="video"]{
   width:100%;
   max-width:640px;
@@ -5202,4 +5202,54 @@ label > .field-hint + select{
   .result-buttons.stable-result-buttons[data-primary-actions="video"] > .btn.primary{
     grid-column:auto;
   }
+}
+
+/* v10 — Generated image result */
+.generated-image-card-v10{
+  margin:0;
+  display:grid;
+  gap:14px;
+}
+.generated-image-card-v10 img{
+  display:block;
+  width:100%;
+  max-height:min(72vh, 900px);
+  object-fit:contain;
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(2,6,23,.72);
+}
+.generated-image-card-v10 figcaption{
+  display:grid;
+  gap:4px;
+}
+.generated-image-card-v10 figcaption b{
+  color:#f8fafc;
+  font-size:16px;
+}
+.generated-image-card-v10 figcaption span{
+  color:rgba(255,255,255,.68);
+  font-size:13px;
+}
+.generated-image-prompt-v10{
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:14px;
+  background:rgba(15,23,42,.50);
+  overflow:hidden;
+}
+.generated-image-prompt-v10 summary{
+  cursor:pointer;
+  padding:12px 14px;
+  font-weight:800;
+  color:#f6e5b5;
+}
+.generated-image-prompt-v10 pre{
+  margin:0;
+  padding:14px;
+  white-space:pre-wrap;
+  color:rgba(255,255,255,.82);
+  border-top:1px solid rgba(255,255,255,.08);
+  font-family:inherit;
+  font-size:13px;
+  line-height:1.6;
 }

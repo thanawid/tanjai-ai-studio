@@ -6,9 +6,9 @@ compatibility_date = "2026-06-22"
 ALLOWED_ORIGINS = "https://thanawid.github.io"
 DAILY_LIMIT = "10"
 GEMINI_MODEL = "gemini-2.5-flash-lite"
+GEMINI_IMAGE_MODEL = "gemini-3.1-flash-image"
 
 # แนะนำให้สร้าง KV แล้วเปิดบรรทัดด้านล่างเพื่อจำกัดโควตาต่อผู้ใช้
 # [[kv_namespaces]]
 # binding = "USAGE_KV"
 # id = "ใส่-kv-namespace-id"
-

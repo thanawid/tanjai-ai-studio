@@ -3,6 +3,15 @@ const TANJAI_CUSTOM_GPT_URL = "https://chatgpt.com/g/g-6a30a740e7f88191b30aa4392
 TANJAI.openCustomGPT = function(){ window.open(TANJAI_CUSTOM_GPT_URL, "_blank", "noopener,noreferrer"); };
 TANJAI.$ = s => document.querySelector(s);
 TANJAI.$$ = s => Array.from(document.querySelectorAll(s));
+TANJAI.escapeHTML = function(value){
+  return String(value || "").replace(/[&<>"']/g, ch => ({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#39;"
+  }[ch]));
+};
 
 TANJAI.toast = function(msg){
   const t = TANJAI.$("#toast");
@@ -246,7 +255,7 @@ TANJAI.getToolDestinations = function(tool){
 TANJAI.primaryActionButtons = function(tool, bodyId){
   const GPT = TANJAI.customGptUrl || TANJAI_CUSTOM_GPT_URL;
   const btn = (label, attrs, cls="secondary")=>`<button class="btn ${cls}" ${attrs}>${label}</button>`;
-  if(tool === "image") return btn("คัดลอก Prompt", `data-copy-image="execute"`, "primary") + btn("เปิด ทันใจ GPT", `data-open="${GPT}"`);
+  if(tool === "image") return btn("คัดลอก Prompt", `data-copy-image="execute"`, "primary") + btn("สร้างภาพในเว็บ", `data-generate-image="imageOut"`) + btn("เปิด ทันใจ GPT", `data-open="${GPT}"`);
   if(tool === "album") return btn("ดาวน์โหลดทั้งหมด", `id="albumDownloadAllTop"`, "primary") + btn("ล้างรูป", `id="albumClearTop"`);
   if(tool === "post") return btn("คัดลอกงานเขียน", `data-copybox="${bodyId}"`, "primary");
   if(tool === "mc") return btn("คัดลอกสคริปต์พิธีกร", `data-copybox="${bodyId}"`, "primary");
@@ -368,6 +377,12 @@ document.addEventListener("input", function(event){
 });
 
 document.addEventListener("click", function(event){
+  const generateImageButton = event.target.closest?.("[data-generate-image]");
+  if(generateImageButton){
+    event.preventDefault();
+    TANJAI.generateCurrentImage?.(generateImageButton);
+    return;
+  }
   const sectionButton = event.target.closest?.("[data-copy-video-section]");
   if(sectionButton){
     event.preventDefault();
@@ -451,9 +466,22 @@ if(!TANJAI.setupNavigationHistory){
   TANJAI.setupNavigationHistory = function(){};
 }
 
-TANJAI.showImageResult = function(imageUrl) {
+TANJAI.showImageResult = function(imageUrl, meta={}) {
   const box = document.getElementById("imageOut");
   if(!box || !imageUrl) return;
-  box.innerHTML = `<img src="${imageUrl}" style="max-width:100%; border-radius:12px;" alt="Result">
-                   <a href="${imageUrl}" download class="btn primary">ดาวน์โหลดภาพ</a>`;
+  const prompt = TANJAI.escapeHTML?.(meta.prompt || TANJAI.state?.lastImageGPT || "") || "";
+  box.dataset.edited = "false";
+  box.innerHTML = `
+    <figure class="generated-image-card-v10">
+      <img src="${imageUrl}" alt="ภาพที่สร้างด้วย AI ในเว็บ">
+      <figcaption>
+        <b>ภาพที่สร้างในเว็บพร้อมใช้งาน</b>
+        <span>${meta.model ? `โมเดล: ${TANJAI.escapeHTML(meta.model)}` : "สร้างผ่าน AI Worker หลังบ้าน"}</span>
+      </figcaption>
+      <div class="button-row">
+        <a href="${imageUrl}" download="tanjai-ai-image.jpg" class="btn primary">ดาวน์โหลดภาพ</a>
+        <button class="btn secondary" data-copy-image="execute" type="button">คัดลอก Prompt</button>
+      </div>
+      ${prompt ? `<details class="generated-image-prompt-v10"><summary>ดู Prompt ที่ใช้สร้าง</summary><pre>${prompt}</pre></details>` : ""}
+    </figure>`;
 };
