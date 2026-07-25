@@ -5303,3 +5303,8 @@ label > .field-hint + select{
 .voice-script-panel{padding:14px;border:1px solid rgba(172,121,255,.26);border-radius:16px;background:rgba(104,62,181,.06)}.voice-script-panel textarea{min-height:250px;margin-top:10px;line-height:1.7}.timeline-info small{display:block;margin-top:3px;color:#bbaecb;font-size:9px;line-height:1.35}
 @media(max-width:900px){.story-option-grid{grid-template-columns:1fr}.clip-group-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:560px){.clip-group-grid{grid-template-columns:1fr}.voice-script-panel textarea{min-height:300px}}
+
+/* V10.3.1 — download actual selected footage */
+.editor-export-box .export-help{display:block;margin-top:10px;color:var(--muted);line-height:1.5}
+#downloadSelectedClipsBtn{min-width:245px}
+#downloadSelectedClipsBtn:disabled{opacity:.65;cursor:wait}
