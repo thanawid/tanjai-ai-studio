@@ -1,6 +1,6 @@
 {
   "name": "tanjai-ai-studio",
-  "version": "10.2.0",
+  "version": "10.3.0",
   "private": true,
   "description": "ทันใจ AI Studio — Static Web App สร้างสื่อด้วย AI",
   "scripts": {

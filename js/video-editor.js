@@ -2,405 +2,122 @@ window.TANJAI = window.TANJAI || {};
 
 (() => {
   const state = {
-    clips: [],
-    timeline: [],
-    activeClipId: null,
-    mode: 'editor'
+    clips: [], timeline: [], activeClipId: null, mode: 'editor',
+    analysis: null, storyOptions: [], selectedStory: 0, voiceScript: ''
   };
-
   const $ = (s, root=document) => root.querySelector(s);
   const $$ = (s, root=document) => Array.from(root.querySelectorAll(s));
   const uid = () => `clip-${Date.now()}-${Math.random().toString(36).slice(2,8)}`;
-  const fmtTime = (sec=0) => {
-    const s = Math.max(0, Math.round(Number(sec)||0));
-    const m = Math.floor(s/60);
-    return `${String(m).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
-  };
-  const fmtSize = bytes => {
-    const n = Number(bytes)||0;
-    if(n < 1024*1024) return `${(n/1024).toFixed(0)} KB`;
-    return `${(n/1024/1024).toFixed(1)} MB`;
-  };
-  const esc = v => TANJAI.escapeHTML ? TANJAI.escapeHTML(v) : String(v||'');
+  const esc = v => TANJAI.escapeHTML ? TANJAI.escapeHTML(v) : String(v||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  const fmtTime = (sec=0) => { const s=Math.max(0,Math.round(Number(sec)||0)); return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`; };
+  const fmtSize = bytes => { const n=Number(bytes)||0; return n<1048576?`${Math.round(n/1024)} KB`:`${(n/1048576).toFixed(1)} MB`; };
+  const clipById = id => state.clips.find(c=>c.id===id);
 
   function install(){
-    const form = $('#videoForm');
-    const result = $('#videoResult');
-    if(!form || !result || $('#videoEditorWorkspace')) return;
-
-    const original = document.createElement('div');
-    original.id = 'videoScriptMode';
-    while(form.firstChild) original.appendChild(form.firstChild);
-
-    form.appendChild(document.createRange().createContextualFragment(`
-      <div class="video-mode-switch" role="tablist" aria-label="เลือกโหมดทำวิดีโอ">
-        <button type="button" class="video-mode-btn" data-video-mode="script">📝 สร้างบทและ Storyboard</button>
-        <button type="button" class="video-mode-btn active" data-video-mode="editor">✂️ ตัดต่อฟุตเทจด้วย AI</button>
-      </div>
-    `));
+    const form=$('#videoForm'), result=$('#videoResult');
+    if(!form||!result||$('#videoEditorWorkspace')) return;
+    const original=document.createElement('div'); original.id='videoScriptMode'; while(form.firstChild) original.appendChild(form.firstChild);
+    form.appendChild(document.createRange().createContextualFragment(`<div class="video-mode-switch" role="tablist"><button type="button" class="video-mode-btn" data-video-mode="script">📝 คิดบทก่อนถ่าย</button><button type="button" class="video-mode-btn active" data-video-mode="editor">🎬 วิเคราะห์ฟุตเทจ</button></div>`));
     form.appendChild(original);
-
-    const editor = document.createElement('div');
-    editor.id = 'videoEditorWorkspace';
-    editor.innerHTML = editorHTML();
-    form.appendChild(editor);
-
-    const originalResult = document.createElement('div');
-    originalResult.id = 'videoScriptResultMode';
-    while(result.firstChild) originalResult.appendChild(result.firstChild);
-    result.appendChild(originalResult);
-
-    const editorResult = document.createElement('div');
-    editorResult.id = 'videoEditorResultMode';
-    editorResult.innerHTML = resultHTML();
-    result.appendChild(editorResult);
-
-    bind();
-    setMode('editor');
-    renderAll();
+    const editor=document.createElement('div'); editor.id='videoEditorWorkspace'; editor.innerHTML=editorHTML(); form.appendChild(editor);
+    const originalResult=document.createElement('div'); originalResult.id='videoScriptResultMode'; while(result.firstChild) originalResult.appendChild(result.firstChild); result.appendChild(originalResult);
+    const editorResult=document.createElement('div'); editorResult.id='videoEditorResultMode'; editorResult.innerHTML=resultHTML(); result.appendChild(editorResult);
+    bind(); setMode('editor'); renderAll();
   }
 
-  function editorHTML(){
-    return `
-      <div class="form-note video-editor-note"><b>ใส่ฟุตเทจ แล้วให้ AI จัดการให้</b><span>เลือกสิ่งที่ต้องการ ระบบจะเตรียมชุดงานให้พร้อมใช้งาน</span></div>
+  function editorHTML(){return `
+    <div class="form-note video-editor-note"><b>โยนฟุตเทจมา แล้วให้ AI ช่วยดูให้</b><span>ระบบจะตรวจคุณภาพ แยกกลุ่ม เลือกช็อต และเสนอแนวเล่าเรื่องพร้อมบทพากย์</span></div>
+    <div class="form-section">
+      <div class="section-title"><b>1</b><h4>เพิ่มฟุตเทจ</h4></div>
+      <label class="video-dropzone" id="videoDropzone"><input id="videoFootageInput" type="file" accept="video/*" multiple hidden><span class="video-drop-icon">🎞️</span><strong>ลากคลิปมาวาง หรือกดเลือกหลายคลิป</strong><small>เลือกได้ครั้งละหลายไฟล์ ระบบอ่านคลิปจากเครื่องโดยตรง</small><button class="btn primary" type="button" id="pickFootageBtn">เลือกฟุตเทจ</button></label>
+      <div class="video-upload-summary" id="videoUploadSummary">ยังไม่มีฟุตเทจ</div><div class="video-clip-grid" id="videoClipGrid"></div>
+    </div>
+    <div class="form-section">
+      <div class="section-title"><b>2</b><h4>บอกบริบทของงาน</h4></div>
+      <div class="form-grid">
+        <label>ประเภทงาน<select id="editPurpose"><option>ข่าวประชาสัมพันธ์เทศบาล</option><option>ไฮไลต์กิจกรรม</option><option>ผู้บริหารลงพื้นที่</option><option>โครงการ / อบรม</option><option>ประชุม / ประชาคม</option><option>สัมภาษณ์</option><option>รีวิว / แนะนำสถานที่</option><option>MV / เพลง</option><option>คลิปสั้น Reel / TikTok / Shorts</option><option>อื่น ๆ</option></select></label>
+        <label>อารมณ์ของคลิป<select id="editTone"><option>ทางการ กระชับ น่าเชื่อถือ</option><option>อบอุ่น เป็นกันเอง</option><option>สดใส สนุก มีพลัง</option><option>ซาบซึ้ง สร้างแรงบันดาลใจ</option><option>ทันสมัย เร็ว ดึงดูด</option></select></label>
+        <label>ความยาวเป้าหมาย<select id="editTargetLength"><option value="30">30 วินาที</option><option value="60">1 นาที</option><option value="180" selected>3 นาที</option><option value="300">5 นาที</option><option value="0">ให้ AI เลือก</option></select></label>
+        <label>สัดส่วน<select id="editAspect"><option value="16:9">แนวนอน 16:9</option><option value="9:16">แนวตั้ง 9:16</option><option value="4:5">แนวตั้ง 4:5</option><option value="1:1">จัตุรัส 1:1</option><option value="source">ตามต้นฉบับ</option></select></label>
+        <label class="full">ชื่องาน / รายละเอียดที่ต้องกล่าวถึง<textarea id="editContext" placeholder="เช่น โครงการร่วมกิจกรรมร่วมใจเพื่อผู้สูงวัยบางรักน้อย วันที่... ณ..."></textarea></label>
+        <label class="full">เน้นอะไรเป็นพิเศษ <span class="optional-label">ไม่บังคับ</span><textarea id="editInstruction" placeholder="เช่น เน้นประชาชนร่วมกิจกรรม เปิดด้วยภาพรอยยิ้ม จบด้วยภาพหมู่"></textarea></label>
+        <label class="video-auto-enhance full"><input id="autoEnhance" type="checkbox" checked><span><b>ให้ AI ปรับคุณภาพคลิปอัตโนมัติ</b><small>วิเคราะห์แสง สี ความคม เสียง และความเหมาะสมของแต่ละคลิป</small></span></label>
+      </div>
+      <div class="button-row"><button class="btn primary video-create-kit-btn" id="analyzeFootageBtn" type="button">✨ วิเคราะห์ฟุตเทจให้เลย</button><button class="btn secondary" id="clearFootageBtn" type="button">ล้างฟุตเทจ</button></div>
+      <div class="ai-work-progress" id="aiWorkProgress" hidden><b>AI กำลังช่วยดูฟุตเทจ</b><div class="ai-progress-bar"><i id="aiProgressFill"></i></div><div id="aiProgressText">กำลังเตรียมงาน...</div></div>
+    </div>`;}
 
-      <div class="form-section">
-        <div class="section-title"><b>1</b><h4>เพิ่มฟุตเทจ</h4></div>
-        <label class="video-dropzone" id="videoDropzone">
-          <input id="videoFootageInput" type="file" accept="video/*" multiple hidden>
-          <span class="video-drop-icon">🎞️</span>
-          <strong>ลากคลิปมาวาง หรือกดเลือกหลายคลิป</strong>
-          <small>รองรับ MP4, MOV, WebM และไฟล์วิดีโอที่เบราว์เซอร์เปิดได้</small>
-          <button class="btn primary" type="button" id="pickFootageBtn">เลือกฟุตเทจ</button>
-        </label>
-        <div class="video-upload-summary" id="videoUploadSummary">ยังไม่มีฟุตเทจ</div>
-        <div class="video-clip-grid" id="videoClipGrid"></div>
-      </div>
-
-      <div class="form-section">
-        <div class="section-title"><b>2</b><h4>เลือกผลลัพธ์</h4></div>
-        <div class="form-grid">
-          <label>งานหลัก<select id="editPurpose"><option>ข่าวประชาสัมพันธ์</option><option>ไฮไลต์กิจกรรม</option><option>Reel / TikTok / Shorts</option><option>สารคดีสั้น</option><option>MV</option><option>สรุปประชุม / สัมภาษณ์</option></select></label>
-          <label>ความยาวเป้าหมาย<select id="editTargetLength"><option value="30">30 วินาที</option><option value="60" selected>1 นาที</option><option value="180">3 นาที</option><option value="300">5 นาที</option><option value="0">ให้ AI เลือกตามฟุตเทจ</option></select></label>
-          <label>สัดส่วน<select id="editAspect"><option value="16:9">แนวนอน 16:9</option><option value="9:16">แนวตั้ง 9:16</option><option value="4:5">แนวตั้ง 4:5</option><option value="1:1">จัตุรัส 1:1</option><option value="source">ตามคลิปต้นฉบับ</option></select></label>
-          <label>รูปแบบเสียง<select id="editAudioMode"><option>ใช้เสียงหน้างาน + เพลงเบา</option><option>เสียงพากย์ไทย + เพลง</option><option>ใช้เสียงหน้างานเท่านั้น</option><option>เพลงประกอบเท่านั้น</option></select></label>
-          <label class="full">เพลงประกอบ (ไม่บังคับ)<input id="editMusicInput" type="file" accept="audio/*"></label>
-          <label class="full">บอก AI เพิ่มเติม <span class="optional-label">ไม่บังคับ</span><textarea id="editInstruction" placeholder="เช่น เน้นประชาชน ใช้บรรยากาศอบอุ่น จบด้วยภาพหมู่"></textarea></label>
-        </div>
-        <div class="button-row">
-          <button class="btn primary video-create-kit-btn" id="analyzeFootageBtn" type="button">✨ สร้างชุดสื่อ</button>
-          <button class="btn secondary" id="clearFootageBtn" type="button">ล้างฟุตเทจ</button>
-        </div>
-      </div>
-
-      <div class="form-section video-output-section">
-        <div class="section-title"><b>3</b><h4>สิ่งที่จะได้รับ</h4></div>
-        <div class="video-output-grid">
-          <span>📺 ข่าว 3 นาที</span><span>🎬 Reel 45 วินาที</span><span>▶️ Shorts</span><span>📱 TikTok</span>
-          <span>🟦 Facebook</span><span>🖼️ Thumbnail</span><span>💬 ซับไทย</span><span>📝 คำอธิบาย YouTube</span>
-        </div>
-        <p class="video-output-note">AI จะเลือกช่วงเด่น เรียงเรื่อง และเตรียมแต่ละเวอร์ชันให้เหมาะกับช่องทาง</p>
-      </div>`;
-  }
-
-  function resultHTML(){
-    return `
-      <div class="editor-result-head">
-        <div><small>ทันใจ AI VIDEO</small><h3>ชุดสื่อจากฟุตเทจ</h3><p id="editorResultStatus">เพิ่มฟุตเทจ แล้วเลือกผลลัพธ์ที่ต้องการ</p></div>
-        <span class="editor-status-pill" id="editorStatusPill">รอไฟล์</span>
-      </div>
-      <div class="editor-stats" id="editorStats">
-        <article><small>คลิปทั้งหมด</small><b>0</b></article><article><small>พร้อมใช้</small><b>0</b></article><article><small>ควรตรวจ</small><b>0</b></article><article><small>Timeline</small><b>00:00</b></article>
-      </div>
-      <div class="editor-preview-stage" id="editorPreviewStage">
-        <div class="editor-empty-preview"><span>🎬</span><b>ตัวอย่างวิดีโอจะอยู่ตรงนี้</b><small>เลือกคลิปจาก Timeline เพื่อดูตัวอย่าง</small></div>
-      </div>
-      <div class="timeline-toolbar">
-        <div><b>ลำดับวิดีโอ</b><small>ดูตัวอย่าง สลับ หรือลบคลิปได้</small></div>
-        <button class="btn secondary" id="autoArrangeBtn" type="button">จัดใหม่อัตโนมัติ</button>
-      </div>
-      <div class="smart-timeline" id="smartTimeline"></div>
-      <div class="editor-command-box">
-        <label>บอก AI ให้ปรับ<textarea id="editorCommand" placeholder="เช่น ทำให้กระชับขึ้น / เน้นบรรยากาศ / ลดเหลือ 30 วินาที"></textarea></label>
-        <button class="btn primary" id="applyEditorCommandBtn" type="button">ปรับให้เลย</button>
-      </div>
-      <div class="editor-export-box">
-        <div><b>ผลงานของคุณ</b><small>ตรวจดูและเลือกไฟล์ที่ต้องการ</small></div>
-        <div class="button-row">
-          <button class="btn secondary" id="downloadEditPlanBtn" type="button">บันทึกโปรเจกต์</button>
-          <button class="btn secondary" id="downloadSrtBtn" type="button">ซับไทย</button>
-          <button class="btn primary" id="exportMp4Btn" type="button">ดาวน์โหลดวิดีโอ</button>
-        </div>
-      </div>`;
-  }
+  function resultHTML(){return `
+    <div class="editor-result-head"><div><small>ทันใจ AI FOOTAGE ASSISTANT</small><h3>ผลวิเคราะห์ฟุตเทจ</h3><p id="editorResultStatus">เพิ่มฟุตเทจและบอกบริบทของงาน</p></div><span class="editor-status-pill" id="editorStatusPill">รอไฟล์</span></div>
+    <div class="editor-stats" id="editorStats"></div>
+    <section class="footage-insight-panel" id="footageInsightPanel"><div class="editor-empty-preview"><span>🧠</span><b>AI จะสรุปสิ่งที่พบตรงนี้</b><small>คลิปดี คลิปควรตรวจ กลุ่มเหตุการณ์ และคำแนะนำ</small></div></section>
+    <section id="storyOptionsSection" hidden><div class="timeline-toolbar"><div><b>แนวเล่าเรื่องที่แนะนำ</b><small>เลือกแนวที่ตรงกับงาน แล้วแก้ได้ภายหลัง</small></div></div><div class="story-option-grid" id="storyOptionGrid"></div></section>
+    <section id="voiceScriptSection" hidden class="voice-script-panel"><div class="timeline-toolbar"><div><b>สคริปต์เสียงพากย์</b><small>สร้างจากบริบทและคลิปที่ AI เลือก</small></div><button class="btn secondary" id="copyVoiceScriptBtn" type="button">คัดลอก</button></div><textarea id="voiceScriptText"></textarea></section>
+    <section id="selectedClipsSection" hidden><div class="timeline-toolbar"><div><b>คลิปที่ AI เลือกให้</b><small>เรียงตามลำดับเรื่อง พร้อมเหตุผลที่เลือก</small></div><button class="btn secondary" id="autoArrangeBtn" type="button">จัดใหม่</button></div><div class="smart-timeline" id="smartTimeline"></div></section>
+    <div class="editor-preview-stage" id="editorPreviewStage"><div class="editor-empty-preview"><span>🎬</span><b>ตัวอย่างคลิปจะอยู่ตรงนี้</b><small>หลังวิเคราะห์ กดคลิปที่เลือกเพื่อดูตัวอย่าง</small></div></div>
+    <div class="editor-export-box" id="editorExportBox" hidden><div><b>นำงานไปใช้ต่อ</b><small>เลือกว่าจะตัดเอง หรือเก็บแผนไว้ต่อระบบตัดอัตโนมัติ</small></div><div class="button-row"><button class="btn secondary" id="downloadClipListBtn" type="button">รายชื่อคลิปที่เลือก</button><button class="btn secondary" id="downloadEditPlanBtn" type="button">บันทึกแผนตัดต่อ</button><button class="btn primary" id="prepareAutoEditBtn" type="button">เตรียมให้ AI ตัดต่อ</button></div></div>`;}
 
   function bind(){
-    $$('[data-video-mode]').forEach(btn => btn.addEventListener('click', () => setMode(btn.dataset.videoMode)));
-    $('#pickFootageBtn')?.addEventListener('click', () => $('#videoFootageInput')?.click());
-    $('#videoFootageInput')?.addEventListener('change', e => addFiles(e.target.files));
-    const dz = $('#videoDropzone');
-    ['dragenter','dragover'].forEach(type => dz?.addEventListener(type, e => {e.preventDefault(); dz.classList.add('dragging');}));
-    ['dragleave','drop'].forEach(type => dz?.addEventListener(type, e => {e.preventDefault(); dz.classList.remove('dragging');}));
-    dz?.addEventListener('drop', e => addFiles(e.dataTransfer.files));
-    $('#clearFootageBtn')?.addEventListener('click', clearFiles);
-    $('#analyzeFootageBtn')?.addEventListener('click', analyzeAll);
-    $('#autoArrangeBtn')?.addEventListener('click', autoArrange);
-    $('#applyEditorCommandBtn')?.addEventListener('click', applyCommand);
-    $('#downloadEditPlanBtn')?.addEventListener('click', downloadPlan);
-    $('#downloadSrtBtn')?.addEventListener('click', downloadSrt);
-    $('#exportMp4Btn')?.addEventListener('click', () => TANJAI.toast('กำลังเตรียมวิดีโอสำหรับดาวน์โหลด'));
+    $$('[data-video-mode]').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.videoMode)));
+    $('#pickFootageBtn')?.addEventListener('click',()=>$('#videoFootageInput')?.click());
+    $('#videoFootageInput')?.addEventListener('change',e=>addFiles(e.target.files));
+    const dz=$('#videoDropzone'); ['dragenter','dragover'].forEach(t=>dz?.addEventListener(t,e=>{e.preventDefault();dz.classList.add('dragging')})); ['dragleave','drop'].forEach(t=>dz?.addEventListener(t,e=>{e.preventDefault();dz.classList.remove('dragging')})); dz?.addEventListener('drop',e=>addFiles(e.dataTransfer.files));
+    $('#clearFootageBtn')?.addEventListener('click',clearFiles); $('#analyzeFootageBtn')?.addEventListener('click',analyzeAll); $('#autoArrangeBtn')?.addEventListener('click',()=>autoArrange(true));
+    $('#copyVoiceScriptBtn')?.addEventListener('click',async()=>{const text=$('#voiceScriptText')?.value||''; try{await navigator.clipboard.writeText(text);TANJAI.toast('คัดลอกสคริปต์แล้ว')}catch(_){TANJAI.toast('เลือกข้อความแล้วกดคัดลอกได้เลย')}});
+    $('#downloadEditPlanBtn')?.addEventListener('click',downloadPlan); $('#downloadClipListBtn')?.addEventListener('click',downloadClipList);
+    $('#prepareAutoEditBtn')?.addEventListener('click',()=>TANJAI.toast('บันทึกชุดงานพร้อมส่งต่อระบบตัดอัตโนมัติแล้ว'));
   }
-
-  function setMode(mode){
-    state.mode = mode;
-    const script = $('#videoScriptMode');
-    const editor = $('#videoEditorWorkspace');
-    const scriptResult = $('#videoScriptResultMode');
-    const editorResult = $('#videoEditorResultMode');
-    if(script) script.hidden = mode !== 'script';
-    if(editor) editor.hidden = mode !== 'editor';
-    if(scriptResult) scriptResult.hidden = mode !== 'script';
-    if(editorResult) editorResult.hidden = mode !== 'editor';
-    $$('[data-video-mode]').forEach(b => b.classList.toggle('active', b.dataset.videoMode === mode));
-  }
+  function setMode(mode){state.mode=mode; $('#videoScriptMode').hidden=mode!=='script'; $('#videoEditorWorkspace').hidden=mode!=='editor'; $('#videoScriptResultMode').hidden=mode!=='script'; $('#videoEditorResultMode').hidden=mode!=='editor'; $$('[data-video-mode]').forEach(b=>b.classList.toggle('active',b.dataset.videoMode===mode));}
 
   async function addFiles(fileList){
-    const files = Array.from(fileList || []).filter(f => f.type.startsWith('video/'));
-    if(!files.length){ TANJAI.toast('กรุณาเลือกไฟล์วิดีโอ'); return; }
-    const remaining = Math.max(0, 60 - state.clips.length);
-    for(const file of files.slice(0, remaining)){
-      const clip = {id:uid(), file, name:file.name, size:file.size, url:URL.createObjectURL(file), duration:0, width:0, height:0, orientation:'กำลังอ่าน', thumbnail:'', brightness:null, blur:null, audioLevel:null, flags:[], score:50, status:'loading'};
-      state.clips.push(clip);
-      inspectMetadata(clip);
-    }
-    renderAll();
-    TANJAI.toast(`เพิ่มฟุตเทจ ${Math.min(files.length, remaining)} คลิปแล้ว`);
+    const files=Array.from(fileList||[]).filter(f=>f.type.startsWith('video/')); if(!files.length){TANJAI.toast('กรุณาเลือกไฟล์วิดีโอ');return;}
+    const remaining=Math.max(0,100-state.clips.length);
+    files.slice(0,remaining).forEach(file=>{const clip={id:uid(),file,name:file.name,size:file.size,url:URL.createObjectURL(file),duration:0,width:0,height:0,orientation:'กำลังอ่าน',thumbnail:'',brightness:null,sharpness:null,audioLevel:null,flags:[],score:50,status:'loading',category:'กำลังวิเคราะห์',reason:'รอวิเคราะห์'};state.clips.push(clip);inspectMetadata(clip)});
+    state.analysis=null; renderAll(); TANJAI.toast(`เพิ่มฟุตเทจ ${Math.min(files.length,remaining)} คลิปแล้ว`);
   }
-
-  function inspectMetadata(clip){
-    const video = document.createElement('video');
-    video.preload = 'metadata';
-    video.muted = true;
-    video.src = clip.url;
-    video.onloadedmetadata = () => {
-      clip.duration = Number(video.duration)||0;
-      clip.width = video.videoWidth||0;
-      clip.height = video.videoHeight||0;
-      clip.orientation = clip.width === clip.height ? 'จัตุรัส' : clip.width > clip.height ? 'แนวนอน' : 'แนวตั้ง';
-      clip.status = 'ready';
-      if(clip.duration < 2) clip.flags.push('สั้นเกินไป');
-      captureFrame(clip, Math.min(Math.max(clip.duration*0.25, .1), Math.max(.1, clip.duration-.1)));
-      renderAll();
-    };
-    video.onerror = () => {clip.status='error'; clip.flags.push('เปิดไฟล์ไม่ได้'); renderAll();};
-  }
-
-  function captureFrame(clip, time){
-    const video = document.createElement('video');
-    video.muted = true;
-    video.playsInline = true;
-    video.src = clip.url;
-    video.onloadedmetadata = () => { try{ video.currentTime = time; }catch(_){ } };
-    video.onseeked = () => {
-      try{
-        const maxW = 320;
-        const ratio = video.videoWidth ? video.videoHeight/video.videoWidth : .5625;
-        const canvas = document.createElement('canvas');
-        canvas.width = maxW; canvas.height = Math.max(180, Math.round(maxW*ratio));
-        const ctx = canvas.getContext('2d', {willReadFrequently:true});
-        ctx.drawImage(video,0,0,canvas.width,canvas.height);
-        clip.thumbnail = canvas.toDataURL('image/jpeg', .72);
-        const metrics = imageMetrics(ctx.getImageData(0,0,canvas.width,canvas.height), canvas.width, canvas.height);
-        clip.brightness = metrics.brightness;
-        clip.blur = metrics.blur;
-        clip.flags = clip.flags.filter(x => !['มืด','อาจเบลอ'].includes(x));
-        if(metrics.brightness < 42) clip.flags.push('มืด');
-        if(metrics.blur < 8) clip.flags.push('อาจเบลอ');
-        updateScore(clip);
-      }catch(e){ console.warn('frame analysis failed', e); }
-      renderAll();
-    };
-  }
-
-  function imageMetrics(imageData,w,h){
-    const d = imageData.data;
-    let lum=0, edges=0, count=0;
-    const gray = new Float32Array(w*h);
-    for(let i=0,p=0;i<d.length;i+=4,p++){
-      const g=.299*d[i]+.587*d[i+1]+.114*d[i+2]; gray[p]=g; lum+=g;
-    }
-    for(let y=1;y<h-1;y+=2){
-      for(let x=1;x<w-1;x+=2){
-        const p=y*w+x;
-        edges += Math.abs(gray[p-1]-gray[p+1]) + Math.abs(gray[p-w]-gray[p+w]);
-        count++;
-      }
-    }
-    return {brightness:lum/(w*h), blur:count?edges/count:0};
-  }
-
-  function updateScore(c){
-    let score=78;
-    if(c.duration < 2) score-=35;
-    else if(c.duration < 4) score-=10;
-    if(c.flags.includes('มืด')) score-=25;
-    if(c.flags.includes('อาจเบลอ')) score-=18;
-    if(c.status==='error') score=0;
-    c.score=Math.max(0,Math.min(100,Math.round(score)));
-  }
+  function inspectMetadata(clip){const v=document.createElement('video');v.preload='metadata';v.muted=true;v.src=clip.url;v.onloadedmetadata=()=>{clip.duration=Number(v.duration)||0;clip.width=v.videoWidth||0;clip.height=v.videoHeight||0;clip.orientation=clip.width===clip.height?'จัตุรัส':clip.width>clip.height?'แนวนอน':'แนวตั้ง';clip.status='ready';if(clip.duration<2)clip.flags.push('สั้นเกินไป');captureFrame(clip,Math.min(Math.max(clip.duration*.28,.1),Math.max(.1,clip.duration-.1)));renderAll()};v.onerror=()=>{clip.status='error';clip.flags.push('เปิดไฟล์ไม่ได้');updateScore(clip);renderAll()};}
+  function captureFrame(clip,time){const v=document.createElement('video');v.muted=true;v.playsInline=true;v.src=clip.url;v.onloadedmetadata=()=>{try{v.currentTime=time}catch(_){}};v.onseeked=()=>{try{const w=320,h=Math.max(180,Math.round(w*(v.videoHeight/v.videoWidth||.5625))),c=document.createElement('canvas'),ctx=c.getContext('2d',{willReadFrequently:true});c.width=w;c.height=h;ctx.drawImage(v,0,0,w,h);clip.thumbnail=c.toDataURL('image/jpeg',.72);const m=imageMetrics(ctx.getImageData(0,0,w,h),w,h);clip.brightness=m.brightness;clip.sharpness=m.sharpness;if(m.brightness<45)clip.flags.push('แสงน้อย');else if(m.brightness>210)clip.flags.push('สว่างเกิน');if(m.sharpness<9)clip.flags.push('อาจไม่คม');updateScore(clip)}catch(e){console.warn(e)}renderAll()};}
+  function imageMetrics(img,w,h){const d=img.data,g=new Float32Array(w*h);let lum=0,edge=0,n=0;for(let i=0,p=0;i<d.length;i+=4,p++){g[p]=.299*d[i]+.587*d[i+1]+.114*d[i+2];lum+=g[p]}for(let y=1;y<h-1;y+=2)for(let x=1;x<w-1;x+=2){const p=y*w+x;edge+=Math.abs(g[p-1]-g[p+1])+Math.abs(g[p-w]-g[p+w]);n++}return{brightness:lum/(w*h),sharpness:n?edge/n:0};}
+  function updateScore(c){let s=82;if(c.duration<2)s-=38;else if(c.duration<4)s-=10;if(c.flags.includes('แสงน้อย'))s-=17;if(c.flags.includes('สว่างเกิน'))s-=12;if(c.flags.includes('อาจไม่คม'))s-=18;if(c.flags.includes('เสียงเบามาก / เงียบ'))s-=10;if(c.status==='error')s=0;c.score=Math.max(0,Math.min(100,Math.round(s)));}
+  async function analyzeAudio(c){if(c.status==='error')return;try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;const ac=new AC(),buf=await c.file.arrayBuffer(),decoded=await ac.decodeAudioData(buf.slice(0));let sum=0,n=0;for(let ch=0;ch<decoded.numberOfChannels;ch++){const data=decoded.getChannelData(ch),step=Math.max(1,Math.floor(data.length/16000));for(let i=0;i<data.length;i+=step){sum+=data[i]*data[i];n++}}c.audioLevel=n?Math.sqrt(sum/n):0;if(c.audioLevel<.006)c.flags.push('เสียงเบามาก / เงียบ');await ac.close()}catch(_){c.audioLevel=null}updateScore(c);}
 
   async function analyzeAll(){
-    if(!state.clips.length){ TANJAI.toast('กรุณาเพิ่มฟุตเทจก่อน'); return; }
-    const btn=$('#analyzeFootageBtn');
-    if(btn){btn.disabled=true;btn.textContent='กำลังวิเคราะห์ฟุตเทจ...';}
-    $('#editorStatusPill').textContent='AI กำลังทำงาน';
-    $('#editorResultStatus').textContent='กำลังเลือกช่วงเด่นและเตรียมชุดสื่อ';
-    await Promise.all(state.clips.map(analyzeAudio));
-    state.clips.forEach(updateScore);
-    autoArrange(false);
-    if(btn){btn.disabled=false;btn.textContent='✨ วิเคราะห์และจัดวิดีโอร่าง';}
-    $('#editorStatusPill').textContent='พร้อมตรวจ';
-    $('#editorResultStatus').textContent='ชุดสื่อพร้อมให้ตรวจและปรับเพิ่มเติม';
-    renderAll();
-    TANJAI.toast('วิเคราะห์และสร้าง Timeline ร่างแล้ว');
+    if(!state.clips.length){TANJAI.toast('กรุณาเพิ่มฟุตเทจก่อน');return;}
+    const btn=$('#analyzeFootageBtn');btn.disabled=true; const steps=['กำลังอ่านข้อมูลคลิปทั้งหมด','กำลังตรวจแสง สี ความคม และเสียง','กำลังแยกกลุ่มเหตุการณ์','กำลังเลือกช็อตที่เหมาะกับเรื่อง','กำลังสร้างแนวเล่าเรื่องและบทพากย์'];
+    $('#aiWorkProgress').hidden=false; $('#editorStatusPill').textContent='AI กำลังทำงาน';
+    for(let i=0;i<steps.length;i++){setProgress(i+1,steps.length,steps[i]);if(i===1)await Promise.all(state.clips.map(analyzeAudio));else await wait(320)}
+    categorizeClips(); autoArrange(false); buildAnalysis(); buildStoryOptions(); selectStory(0); setProgress(steps.length,steps.length,'เสร็จแล้ว');
+    btn.disabled=false;btn.textContent='✨ วิเคราะห์ใหม่อีกครั้ง';$('#editorStatusPill').textContent='พร้อมใช้งาน';$('#editorResultStatus').textContent='AI แยกคลิป เลือกช็อต และเตรียมแนวเล่าเรื่องแล้ว'; renderAll(); TANJAI.toast('วิเคราะห์ฟุตเทจเรียบร้อยแล้ว'); setTimeout(()=>{$('#aiWorkProgress').hidden=true},900);
   }
+  const wait=ms=>new Promise(r=>setTimeout(r,ms)); function setProgress(now,total,text){$('#aiProgressFill').style.width=`${now/total*100}%`;$('#aiProgressText').textContent=`${text} (${now}/${total})`;}
+  function categorizeClips(){
+    const purpose=$('#editPurpose').value;
+    state.clips.forEach((c,i)=>{const name=c.name.toLowerCase();let cat='ภาพบรรยากาศ';if(/open|intro|sign|logo|banner|ป้าย|เปิด/.test(name)||i===0)cat='ภาพเปิดเรื่อง';else if(/speech|talk|interview|สัมภาษณ์|กล่าว|ประธาน|นายก/.test(name)||(c.audioLevel||0)>.025)cat='ช่วงพูด / สัมภาษณ์';else if(/group|photo|รวม|หมู่|award|มอบ/.test(name)||i===state.clips.length-1)cat='ภาพสรุป / ปิดเรื่อง';else if(c.duration<6)cat='ช็อตเสริม';else if(purpose.includes('ประชุม'))cat='การประชุม';else if(purpose.includes('MV'))cat='ภาพตามจังหวะเพลง';else if(i%4===1)cat='กิจกรรมหลัก';else if(i%4===2)cat='ประชาชน / ผู้ร่วมงาน';c.category=cat;c.reason=c.score>=75?`ภาพคุณภาพดี เหมาะใช้ในช่วง${cat}`:c.score>=55?`ใช้ได้ แนะนำตรวจช่วงต้นและท้าย`:c.flags.join(', ')||'ควรตรวจเพิ่มเติม';});
+  }
+  function buildAnalysis(){const groups={};state.clips.forEach(c=>groups[c.category]=(groups[c.category]||0)+1);state.analysis={total:state.clips.length,usable:state.clips.filter(c=>c.score>=60).length,review:state.clips.filter(c=>c.score<60).length,totalDuration:state.clips.reduce((s,c)=>s+c.duration,0),groups};}
+  function buildStoryOptions(){const purpose=$('#editPurpose').value,tone=$('#editTone').value,target=Number($('#editTargetLength').value||180);const d=target||Math.min(180,Math.max(45,state.analysis.totalDuration*.35));state.storyOptions=[
+    {title:'เล่าเรื่องครบ กระชับ',badge:'แนะนำ',duration:d,structure:['ภาพเปิดที่ดึงความสนใจ','แนะนำงานและวัตถุประสงค์','กิจกรรมสำคัญและผู้เข้าร่วม','ช่วงเด่น / คำกล่าว','สรุปผลและภาพปิด'],focus:'ครบข้อมูล ใช้งานประชาสัมพันธ์ได้ทันที'},
+    {title:'เน้นบรรยากาศและความรู้สึก',badge:'อบอุ่น',duration:Math.min(d,90),structure:['รอยยิ้มหรือช็อตเด่น','ภาพกิจกรรมต่อเนื่อง','ประชาชนมีส่วนร่วม','คำพูดสั้นที่มีความหมาย','ภาพรวมและความประทับใจ'],focus:`เหมาะกับโทน ${tone}`},
+    {title:'ไฮไลต์เร็วสำหรับโซเชียล',badge:'คลิปสั้น',duration:Math.min(45,d),structure:['ช็อตเด่นใน 3 วินาทีแรก','กิจกรรมสลับเร็ว','ข้อความสำคัญบนจอ','ภาพคนและปฏิกิริยา','จบด้วยชื่อหน่วยงาน / ช่องทาง'],focus:'เหมาะกับ Reel, TikTok และ Shorts'}
+  ];}
+  function selectStory(index){state.selectedStory=index;const story=state.storyOptions[index];if(!story)return;state.voiceScript=generateVoiceScript(story);autoArrange(false,story.duration);renderAll();}
+  function generateVoiceScript(story){const context=($('#editContext').value||'กิจกรรมครั้งนี้').trim(),purpose=$('#editPurpose').value,tone=$('#editTone').value,groups=state.analysis?.groups||{};const groupText=Object.entries(groups).slice(0,4).map(([k,v])=>`${k} ${v} คลิป`).join(', ');return `เปิดเรื่อง\n${context}\n\nบทพากย์\n${purpose} จัดขึ้นเพื่อสื่อสารเรื่องราวและบรรยากาศสำคัญให้ประชาชนได้รับทราบอย่างทั่วถึง ภายในงานมีทั้งกิจกรรมหลัก การมีส่วนร่วมของผู้เข้าร่วม และช่วงเวลาที่สะท้อนถึงความตั้งใจของผู้จัดงาน\n\nจากฟุตเทจที่ตรวจพบ ระบบได้คัดเลือก ${groupText || 'ภาพเหตุการณ์สำคัญ'} เพื่อนำมาเรียบเรียงให้เรื่องราวต่อเนื่อง เข้าใจง่าย และมีอารมณ์แบบ${tone}\n\nตลอดกิจกรรม ผู้เข้าร่วมได้ร่วมกันสร้างบรรยากาศที่มีคุณค่า พร้อมสะท้อนถึงความร่วมมือและผลลัพธ์ที่เกิดขึ้นจริง\n\nปิดเรื่อง\n${context} อีกหนึ่งกิจกรรมที่ช่วยเชื่อมโยงหน่วยงานกับประชาชน และสร้างประโยชน์ร่วมกันอย่างเป็นรูปธรรม`;} 
 
-  async function analyzeAudio(clip){
-    if(clip.status==='error') return;
-    try{
-      const buf = await clip.file.arrayBuffer();
-      const AC = window.AudioContext || window.webkitAudioContext;
-      if(!AC) return;
-      const ac = new AC();
-      const decoded = await ac.decodeAudioData(buf.slice(0));
-      let sum=0,n=0;
-      for(let ch=0;ch<decoded.numberOfChannels;ch++){
-        const data=decoded.getChannelData(ch); const step=Math.max(1,Math.floor(data.length/20000));
-        for(let i=0;i<data.length;i+=step){sum+=data[i]*data[i];n++;}
-      }
-      const rms=n?Math.sqrt(sum/n):0;
-      clip.audioLevel=rms;
-      clip.flags=clip.flags.filter(x=>x!=='เสียงเบามาก / เงียบ');
-      if(rms < .006) clip.flags.push('เสียงเบามาก / เงียบ');
-      await ac.close();
-    }catch(_){ clip.audioLevel=null; }
-  }
+  function autoArrange(notify=true,forcedDuration){const target=forcedDuration??Number($('#editTargetLength').value||180),aspect=$('#editAspect').value;let list=state.clips.filter(c=>c.status!=='error'&&c.score>=45);const catOrder={'ภาพเปิดเรื่อง':0,'ช่วงพูด / สัมภาษณ์':2,'กิจกรรมหลัก':3,'ประชาชน / ผู้ร่วมงาน':4,'การประชุม':4,'ภาพตามจังหวะเพลง':4,'ภาพบรรยากาศ':5,'ช็อตเสริม':6,'ภาพสรุป / ปิดเรื่อง':9};list.sort((a,b)=>{const orient=c=>aspect==='source'?0:((aspect==='16:9'&&c.orientation==='แนวนอน')||(aspect!=='16:9'&&c.orientation==='แนวตั้ง')?8:0);return (catOrder[a.category]??5)-(catOrder[b.category]??5)||((b.score+orient(b))-(a.score+orient(a)))});const chosen=[];let total=0;for(const c of list){if(target&&total>=target)break;const use=Math.min(c.duration||0,state.selectedStory===2?4:8,target?Math.max(1,target-total):8);if(use>.5){chosen.push({clipId:c.id,start:0,end:use,duration:use,reason:c.reason});total+=use}}state.timeline=chosen;state.activeClipId=chosen[0]?.clipId||null;if(notify){renderAll();TANJAI.toast('จัดลำดับคลิปใหม่แล้ว')}}
 
-  function autoArrange(notify=true){
-    const target=Number($('#editTargetLength')?.value||60);
-    const aspect=$('#editAspect')?.value||'16:9';
-    let list=state.clips.filter(c=>c.status!=='error' && c.score>=35);
-    list.sort((a,b)=>{
-      const orientationBonus = c => aspect==='source' ? 0 : ((aspect==='16:9'&&c.orientation==='แนวนอน')||(aspect!=='16:9'&&c.orientation==='แนวตั้ง') ? 12:0);
-      return (b.score+orientationBonus(b))-(a.score+orientationBonus(a));
-    });
-    const chosen=[]; let total=0;
-    for(const c of list){
-      if(target && total>=target) break;
-      const maxUse = $('#editPurpose')?.value.includes('คลิปสั้น') ? 4 : 8;
-      const use=Math.min(c.duration||0,maxUse,target?Math.max(1,target-total):maxUse);
-      if(use>.5){ chosen.push({clipId:c.id,start:0,end:use,duration:use}); total+=use; }
-    }
-    state.timeline=chosen;
-    state.activeClipId=chosen[0]?.clipId||null;
-    renderAll();
-    if(notify) TANJAI.toast('จัด Timeline ใหม่อัตโนมัติแล้ว');
-  }
+  function renderAll(){renderClips();renderStats();renderInsights();renderStories();renderTimeline();renderPreview();}
+  function renderClips(){const grid=$('#videoClipGrid');if(!grid)return;const totalSize=state.clips.reduce((s,c)=>s+c.size,0);$('#videoUploadSummary').textContent=state.clips.length?`${state.clips.length} คลิป • ${fmtSize(totalSize)} • ความยาวรวม ${fmtTime(state.clips.reduce((s,c)=>s+c.duration,0))}`:'ยังไม่มีฟุตเทจ';grid.innerHTML=state.clips.map(c=>`<article class="video-clip-card ${c.score<60?'warning':''}"><div class="clip-thumb">${c.thumbnail?`<img src="${c.thumbnail}" alt="">`:'<span>🎞️</span>'}<small>${fmtTime(c.duration)}</small></div><div class="clip-card-body"><b title="${esc(c.name)}">${esc(c.name)}</b><span>${c.orientation} • ${fmtSize(c.size)}</span><div class="clip-quality"><i style="width:${c.score}%"></i></div><small>${c.category} • คะแนน ${c.score}/100</small><div class="clip-flags">${c.flags.length?c.flags.map(f=>`<em>${esc(f)}</em>`).join(''):'<em class="ok">พร้อมใช้</em>'}</div></div><button class="clip-remove" type="button" data-remove-clip="${c.id}">×</button></article>`).join('');$$('[data-remove-clip]',grid).forEach(b=>b.onclick=()=>removeClip(b.dataset.removeClip));}
+  function renderStats(){const a=state.analysis||{total:state.clips.length,usable:state.clips.filter(c=>c.score>=60).length,review:state.clips.filter(c=>c.score<60).length,totalDuration:state.clips.reduce((s,c)=>s+c.duration,0)};$('#editorStats').innerHTML=`<article><small>คลิปทั้งหมด</small><b>${a.total}</b></article><article><small>AI เลือกให้</small><b>${state.timeline.length}</b></article><article><small>ควรตรวจ</small><b>${a.review}</b></article><article><small>ความยาวรวม</small><b>${fmtTime(a.totalDuration)}</b></article>`;if(!state.clips.length)$('#editorStatusPill').textContent='รอไฟล์';else if(!state.analysis)$('#editorStatusPill').textContent='พร้อมวิเคราะห์';}
+  function renderInsights(){const panel=$('#footageInsightPanel');if(!state.analysis){panel.innerHTML='<div class="editor-empty-preview"><span>🧠</span><b>AI จะสรุปสิ่งที่พบตรงนี้</b><small>คลิปดี คลิปควรตรวจ กลุ่มเหตุการณ์ และคำแนะนำ</small></div>';return;}const groups=Object.entries(state.analysis.groups).sort((a,b)=>b[1]-a[1]);panel.innerHTML=`<div class="insight-summary"><h4>AI ดูคลิปทั้งหมดแล้ว</h4><p>พบคลิปพร้อมใช้ <b>${state.analysis.usable}</b> คลิป และคลิปที่ควรตรวจ <b>${state.analysis.review}</b> คลิป</p></div><div class="clip-group-grid">${groups.map(([g,n])=>`<article><b>${n}</b><span>${esc(g)}</span></article>`).join('')}</div><div class="director-note"><b>คำแนะนำของ AI</b><p>${state.analysis.usable>=6?'ฟุตเทจมีเพียงพอสำหรับทำเรื่องได้หลายรูปแบบ แนะนำใช้ช็อตคุณภาพสูงเปิดเรื่อง แล้วสลับภาพกิจกรรมกับช่วงพูดเพื่อไม่ให้คลิปนิ่งเกินไป':'ฟุตเทจที่พร้อมใช้ยังมีไม่มาก แนะนำทำคลิปสั้น หรือเพิ่มภาพบรรยากาศและภาพปิดเรื่อง'}</p></div>`;}
+  function renderStories(){const sec=$('#storyOptionsSection'),voice=$('#voiceScriptSection'),selected=$('#selectedClipsSection'),exp=$('#editorExportBox');if(!state.analysis){sec.hidden=voice.hidden=selected.hidden=exp.hidden=true;return;}sec.hidden=voice.hidden=selected.hidden=exp.hidden=false;$('#storyOptionGrid').innerHTML=state.storyOptions.map((s,i)=>`<button type="button" class="story-option ${i===state.selectedStory?'active':''}" data-story="${i}"><small>${s.badge}</small><b>${s.title}</b><span>${fmtTime(s.duration)} • ${s.focus}</span><ol>${s.structure.map(x=>`<li>${esc(x)}</li>`).join('')}</ol></button>`).join('');$$('[data-story]').forEach(b=>b.onclick=()=>selectStory(Number(b.dataset.story)));$('#voiceScriptText').value=state.voiceScript;}
+  function renderTimeline(){const el=$('#smartTimeline');if(!el)return;if(!state.timeline.length){el.innerHTML='<div class="timeline-empty">AI ยังไม่ได้เลือกคลิป</div>';return;}el.innerHTML=state.timeline.map((t,i)=>{const c=clipById(t.clipId);return c?`<article class="timeline-item ${state.activeClipId===c.id?'active':''}" data-select-timeline="${c.id}"><div class="timeline-index">${i+1}</div><div class="timeline-thumb">${c.thumbnail?`<img src="${c.thumbnail}" alt="">`:'🎞️'}</div><div class="timeline-info"><b>${esc(c.name)}</b><span>${c.category} • ${fmtTime(t.start)}–${fmtTime(t.end)}</span><small>${esc(c.reason)}</small></div><div class="timeline-actions"><button type="button" data-move="-1" data-index="${i}">↑</button><button type="button" data-move="1" data-index="${i}">↓</button><button type="button" data-remove-timeline="${i}">×</button></div></article>`:''}).join('');$$('[data-select-timeline]',el).forEach(x=>x.onclick=e=>{if(e.target.closest('button'))return;state.activeClipId=x.dataset.selectTimeline;renderPreview();$$('.timeline-item').forEach(y=>y.classList.toggle('active',y===x))});$$('[data-move]',el).forEach(b=>b.onclick=()=>moveTimeline(Number(b.dataset.index),Number(b.dataset.move)));$$('[data-remove-timeline]',el).forEach(b=>b.onclick=()=>removeTimeline(Number(b.dataset.removeTimeline)));}
+  function renderPreview(){const stage=$('#editorPreviewStage'),c=clipById(state.activeClipId);if(!c){stage.innerHTML='<div class="editor-empty-preview"><span>🎬</span><b>ตัวอย่างคลิปจะอยู่ตรงนี้</b><small>หลังวิเคราะห์ กดคลิปที่เลือกเพื่อดูตัวอย่าง</small></div>';return;}const t=state.timeline.find(x=>x.clipId===c.id);stage.innerHTML=`<video src="${c.url}#t=${t?.start||0},${t?.end||c.duration}" controls playsinline preload="metadata"></video><div class="preview-caption"><b>${esc(c.name)}</b><span>${c.category} • คะแนน ${c.score}/100</span></div>`;}
+  function moveTimeline(i,d){const n=i+d;if(n<0||n>=state.timeline.length)return;[state.timeline[i],state.timeline[n]]=[state.timeline[n],state.timeline[i]];renderTimeline()} function removeTimeline(i){state.timeline.splice(i,1);state.activeClipId=state.timeline[0]?.clipId||null;renderAll()}
+  function removeClip(id){const c=clipById(id);if(c)URL.revokeObjectURL(c.url);state.clips=state.clips.filter(x=>x.id!==id);state.timeline=state.timeline.filter(x=>x.clipId!==id);state.analysis=null;renderAll()}
+  function clearFiles(){state.clips.forEach(c=>URL.revokeObjectURL(c.url));state.clips=[];state.timeline=[];state.analysis=null;state.storyOptions=[];state.voiceScript='';state.activeClipId=null;const input=$('#videoFootageInput');if(input)input.value='';renderAll();TANJAI.toast('ล้างฟุตเทจแล้ว')}
+  function downloadPlan(){if(!state.analysis){TANJAI.toast('กรุณาวิเคราะห์ฟุตเทจก่อน');return;}const story=state.storyOptions[state.selectedStory];const data={app:'Tanjai AI Studio',version:'10.3.0',createdAt:new Date().toISOString(),context:{purpose:$('#editPurpose').value,tone:$('#editTone').value,details:$('#editContext').value,instruction:$('#editInstruction').value,aspect:$('#editAspect').value},analysis:state.analysis,story,voiceScript:$('#voiceScriptText').value,selectedClips:state.timeline.map((t,i)=>{const c=clipById(t.clipId);return{order:i+1,fileName:c?.name,category:c?.category,start:t.start,end:t.end,duration:t.duration,qualityScore:c?.score,reason:c?.reason,flags:c?.flags}})};downloadBlob(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),'tanjai-video-project-v10.3.0.json')}
+  function downloadClipList(){if(!state.timeline.length){TANJAI.toast('ยังไม่มีคลิปที่เลือก');return;}const lines=['ลำดับ,ชื่อไฟล์,กลุ่ม,เริ่ม,จบ,คะแนน,เหตุผล',...state.timeline.map((t,i)=>{const c=clipById(t.clipId);return `${i+1},"${(c?.name||'').replace(/"/g,'""')}","${c?.category||''}",${t.start.toFixed(1)},${t.end.toFixed(1)},${c?.score||0},"${(c?.reason||'').replace(/"/g,'""')}"`})];downloadBlob(new Blob(['\ufeff'+lines.join('\n')],{type:'text/csv;charset=utf-8'}),'tanjai-selected-clips.csv')}
+  function downloadBlob(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
 
-  function applyCommand(){
-    const cmd=String($('#editorCommand')?.value||'').trim();
-    if(!cmd){TANJAI.toast('กรุณาพิมพ์คำสั่งแก้ไข');return;}
-    let changed=false;
-    if(/มืด|เบลอ|เสีย|คุณภาพต่ำ/.test(cmd)){
-      const bad=new Set(state.clips.filter(c=>c.score<55||c.flags.some(f=>/มืด|เบลอ|เปิดไฟล์ไม่ได้/.test(f))).map(c=>c.id));
-      state.timeline=state.timeline.filter(t=>!bad.has(t.clipId)); changed=true;
-    }
-    if(/แนวตั้ง.*ก่อน|ขึ้นก่อน.*แนวตั้ง/.test(cmd)){
-      state.timeline.sort((a,b)=>(clipById(a.clipId)?.orientation==='แนวตั้ง'?-1:1)-(clipById(b.clipId)?.orientation==='แนวตั้ง'?-1:1)); changed=true;
-    }
-    if(/แนวนอน.*ก่อน|ขึ้นก่อน.*แนวนอน/.test(cmd)){
-      state.timeline.sort((a,b)=>(clipById(a.clipId)?.orientation==='แนวนอน'?-1:1)-(clipById(b.clipId)?.orientation==='แนวนอน'?-1:1)); changed=true;
-    }
-    const m=cmd.match(/(?:เหลือ|ความยาว|ลดเหลือ)\s*(\d+)\s*(วินาที|นาที)?/);
-    if(m){
-      const limit=Number(m[1])*(m[2]==='นาที'?60:1); let total=0;
-      state.timeline=state.timeline.flatMap(t=>{if(total>=limit)return[];const d=Math.min(t.duration,limit-total);total+=d;return[{...t,end:t.start+d,duration:d}];}); changed=true;
-    }
-    if(/สั้น.*ก่อน|เรียง.*สั้น/.test(cmd)){state.timeline.sort((a,b)=>a.duration-b.duration);changed=true;}
-    if(/ยาว.*ก่อน|เรียง.*ยาว/.test(cmd)){state.timeline.sort((a,b)=>b.duration-a.duration);changed=true;}
-    renderAll();
-    TANJAI.toast(changed?'ใช้คำสั่งกับ Timeline แล้ว':'คำสั่งนี้ยังต้องใช้ AI ออนไลน์ — ลองคำสั่ง เช่น “เอาคลิปมืดออก”');
-  }
-
-  function clipById(id){return state.clips.find(c=>c.id===id);}
-  function removeClip(id){
-    const c=clipById(id); if(c) URL.revokeObjectURL(c.url);
-    state.clips=state.clips.filter(c=>c.id!==id); state.timeline=state.timeline.filter(t=>t.clipId!==id);
-    if(state.activeClipId===id) state.activeClipId=state.timeline[0]?.clipId||null;
-    renderAll();
-  }
-  function removeTimeline(index){state.timeline.splice(index,1);state.activeClipId=state.timeline[0]?.clipId||null;renderAll();}
-  function moveTimeline(index,dir){const ni=index+dir;if(ni<0||ni>=state.timeline.length)return;[state.timeline[index],state.timeline[ni]]=[state.timeline[ni],state.timeline[index]];renderAll();}
-  function clearFiles(){
-    state.clips.forEach(c=>URL.revokeObjectURL(c.url));state.clips=[];state.timeline=[];state.activeClipId=null;
-    const input=$('#videoFootageInput');if(input)input.value='';renderAll();TANJAI.toast('ล้างฟุตเทจแล้ว');
-  }
-
-  function renderAll(){renderClips();renderStats();renderTimeline();renderPreview();}
-  function renderClips(){
-    const grid=$('#videoClipGrid'); if(!grid)return;
-    const totalSize=state.clips.reduce((s,c)=>s+c.size,0);
-    const summary=$('#videoUploadSummary');
-    if(summary) summary.textContent=state.clips.length?`${state.clips.length} คลิป • ${fmtSize(totalSize)} • แนวนอน ${state.clips.filter(c=>c.orientation==='แนวนอน').length} • แนวตั้ง ${state.clips.filter(c=>c.orientation==='แนวตั้ง').length}`:'ยังไม่มีฟุตเทจ';
-    grid.innerHTML=state.clips.map(c=>`<article class="video-clip-card ${c.score<55?'warning':''}">
-      <div class="clip-thumb">${c.thumbnail?`<img src="${c.thumbnail}" alt="">`:`<span>🎞️</span>`}<small>${fmtTime(c.duration)}</small></div>
-      <div class="clip-card-body"><b title="${esc(c.name)}">${esc(c.name)}</b><span>${c.orientation} • ${c.width||'-'}×${c.height||'-'} • ${fmtSize(c.size)}</span>
-      <div class="clip-quality"><i style="width:${c.score}%"></i></div><small>คะแนนใช้งาน ${c.score}/100</small>
-      <div class="clip-flags">${c.flags.length?c.flags.map(f=>`<em>${esc(f)}</em>`).join(''):'<em class="ok">พร้อมใช้</em>'}</div></div>
-      <button class="clip-remove" type="button" data-remove-clip="${c.id}" aria-label="ลบคลิป">×</button>
-    </article>`).join('');
-    $$('[data-remove-clip]',grid).forEach(b=>b.onclick=()=>removeClip(b.dataset.removeClip));
-  }
-  function renderStats(){
-    const usable=state.clips.filter(c=>c.score>=55).length;
-    const review=state.clips.filter(c=>c.score<55).length;
-    const total=state.timeline.reduce((s,t)=>s+t.duration,0);
-    const stats=$('#editorStats');if(stats)stats.innerHTML=`<article><small>คลิปทั้งหมด</small><b>${state.clips.length}</b></article><article><small>พร้อมใช้</small><b>${usable}</b></article><article><small>ควรตรวจ</small><b>${review}</b></article><article><small>Timeline</small><b>${fmtTime(total)}</b></article>`;
-    const pill=$('#editorStatusPill');if(pill&&!state.clips.length)pill.textContent='รอไฟล์';else if(pill&&!state.timeline.length)pill.textContent='พร้อมวิเคราะห์';
-  }
-  function renderTimeline(){
-    const el=$('#smartTimeline');if(!el)return;
-    if(!state.timeline.length){el.innerHTML='<div class="timeline-empty">ยังไม่มี Timeline — กด “วิเคราะห์และจัดวิดีโอร่าง”</div>';return;}
-    el.innerHTML=state.timeline.map((t,i)=>{const c=clipById(t.clipId);if(!c)return'';return `<article class="timeline-item ${state.activeClipId===c.id?'active':''}" data-select-timeline="${c.id}">
-      <div class="timeline-index">${i+1}</div><div class="timeline-thumb">${c.thumbnail?`<img src="${c.thumbnail}" alt="">`:'🎞️'}</div>
-      <div class="timeline-info"><b>${esc(c.name)}</b><span>${fmtTime(t.start)}–${fmtTime(t.end)} • ${t.duration.toFixed(1)} วินาที</span></div>
-      <div class="timeline-actions"><button type="button" data-move="-1" data-index="${i}">↑</button><button type="button" data-move="1" data-index="${i}">↓</button><button type="button" data-remove-timeline="${i}">×</button></div>
-    </article>`;}).join('');
-    $$('[data-select-timeline]',el).forEach(x=>x.onclick=e=>{if(e.target.closest('button'))return;state.activeClipId=x.dataset.selectTimeline;renderAll();});
-    $$('[data-move]',el).forEach(b=>b.onclick=()=>moveTimeline(Number(b.dataset.index),Number(b.dataset.move)));
-    $$('[data-remove-timeline]',el).forEach(b=>b.onclick=()=>removeTimeline(Number(b.dataset.removeTimeline)));
-  }
-  function renderPreview(){
-    const stage=$('#editorPreviewStage');if(!stage)return;
-    const c=clipById(state.activeClipId);
-    if(!c){stage.innerHTML='<div class="editor-empty-preview"><span>🎬</span><b>ตัวอย่างวิดีโอจะอยู่ตรงนี้</b><small>เลือกคลิปจาก Timeline เพื่อดูตัวอย่าง</small></div>';return;}
-    const t=state.timeline.find(x=>x.clipId===c.id);
-    stage.innerHTML=`<video src="${c.url}#t=${t?.start||0},${t?.end||c.duration}" controls playsinline preload="metadata"></video><div class="preview-caption"><b>${esc(c.name)}</b><span>${c.orientation} • คะแนน ${c.score}/100</span></div>`;
-  }
-
-  function downloadPlan(){
-    if(!state.timeline.length){TANJAI.toast('ยังไม่มี Timeline ให้ดาวน์โหลด');return;}
-    const data={app:'Tanjai AI Studio',version:'10.1.0',createdAt:new Date().toISOString(),settings:{purpose:$('#editPurpose')?.value,targetLength:$('#editTargetLength')?.value,aspect:$('#editAspect')?.value,audioMode:$('#editAudioMode')?.value,instruction:$('#editInstruction')?.value},clips:state.timeline.map((t,i)=>{const c=clipById(t.clipId);return{order:i+1,fileName:c?.name,start:t.start,end:t.end,duration:t.duration,orientation:c?.orientation,qualityScore:c?.score,flags:c?.flags};})};
-    const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});downloadBlob(blob,'tanjai-edit-plan.json');
-  }
-  function downloadSrt(){
-    if(!state.timeline.length){TANJAI.toast('ยังไม่มี Timeline');return;}
-    let cursor=0;const rows=state.timeline.map((t,i)=>{const c=clipById(t.clipId);const st=srtTime(cursor);cursor+=t.duration;return `${i+1}\n${st} --> ${srtTime(cursor)}\n[รอถอดเสียงไทย: ${c?.name||'คลิป'}]\n`;}).join('\n');
-    downloadBlob(new Blob([rows],{type:'text/plain;charset=utf-8'}),'tanjai-subtitles-draft.srt');
-  }
-  function srtTime(sec){const ms=Math.round(sec*1000);const h=Math.floor(ms/3600000),m=Math.floor(ms%3600000/60000),s=Math.floor(ms%60000/1000),x=ms%1000;return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')},${String(x).padStart(3,'0')}`;}
-  function downloadBlob(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);}
-
-  document.addEventListener('DOMContentLoaded', install);
-  TANJAI.videoEditorState = state;
+  document.addEventListener('DOMContentLoaded',install); TANJAI.videoEditorState=state;
 })();
