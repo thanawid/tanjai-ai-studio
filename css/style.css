@@ -5308,3 +5308,11 @@ label > .field-hint + select{
 .editor-export-box .export-help{display:block;margin-top:10px;color:var(--muted);line-height:1.5}
 #downloadSelectedClipsBtn{min-width:245px}
 #downloadSelectedClipsBtn:disabled{opacity:.65;cursor:wait}
+
+/* V10.3.2 — keep technical clip details secondary */
+.footage-insight-details{margin:10px 0 14px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.025);overflow:hidden}
+.footage-insight-details>summary{cursor:pointer;list-style:none;padding:12px 14px;font-weight:700;color:var(--muted);display:flex;align-items:center;justify-content:space-between}
+.footage-insight-details>summary::-webkit-details-marker{display:none}
+.footage-insight-details>summary::after{content:'＋';font-size:18px}
+.footage-insight-details[open]>summary::after{content:'−'}
+.footage-insight-details .footage-insight-panel{margin:0;border:0;border-top:1px solid var(--line);border-radius:0}
