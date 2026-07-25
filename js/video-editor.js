@@ -62,7 +62,7 @@ window.TANJAI = window.TANJAI || {};
 
   function editorHTML(){
     return `
-      <div class="form-note video-editor-note"><b>AI Smart Editor</b> — ใส่ฟุตเทจหลายคลิป ระบบจะสร้างตัวอย่าง ตรวจคุณภาพ คัดช่วงเด่น และจัด Timeline ร่างให้ก่อน</div>
+      <div class="form-note video-editor-note"><b>ใส่ฟุตเทจ แล้วให้ AI จัดการให้</b><span>เลือกสิ่งที่ต้องการ ระบบจะเตรียมชุดงานให้พร้อมใช้งาน</span></div>
 
       <div class="form-section">
         <div class="section-title"><b>1</b><h4>เพิ่มฟุตเทจ</h4></div>
@@ -78,35 +78,35 @@ window.TANJAI = window.TANJAI || {};
       </div>
 
       <div class="form-section">
-        <div class="section-title"><b>2</b><h4>ตั้งค่าวิดีโอร่าง</h4></div>
+        <div class="section-title"><b>2</b><h4>เลือกผลลัพธ์</h4></div>
         <div class="form-grid">
-          <label>รูปแบบงาน<select id="editPurpose"><option>ข่าวกิจกรรม / งานประชาสัมพันธ์</option><option>ไฮไลต์กิจกรรม</option><option>คลิปสั้น Reels / TikTok / Shorts</option><option>สารคดีสั้น</option><option>MV / ตัดตามจังหวะเพลง</option><option>สรุปประชุม / สัมภาษณ์</option></select></label>
+          <label>งานหลัก<select id="editPurpose"><option>ข่าวประชาสัมพันธ์</option><option>ไฮไลต์กิจกรรม</option><option>Reel / TikTok / Shorts</option><option>สารคดีสั้น</option><option>MV</option><option>สรุปประชุม / สัมภาษณ์</option></select></label>
           <label>ความยาวเป้าหมาย<select id="editTargetLength"><option value="30">30 วินาที</option><option value="60" selected>1 นาที</option><option value="180">3 นาที</option><option value="300">5 นาที</option><option value="0">ให้ AI เลือกตามฟุตเทจ</option></select></label>
           <label>สัดส่วน<select id="editAspect"><option value="16:9">แนวนอน 16:9</option><option value="9:16">แนวตั้ง 9:16</option><option value="4:5">แนวตั้ง 4:5</option><option value="1:1">จัตุรัส 1:1</option><option value="source">ตามคลิปต้นฉบับ</option></select></label>
           <label>รูปแบบเสียง<select id="editAudioMode"><option>ใช้เสียงหน้างาน + เพลงเบา</option><option>เสียงพากย์ไทย + เพลง</option><option>ใช้เสียงหน้างานเท่านั้น</option><option>เพลงประกอบเท่านั้น</option></select></label>
           <label class="full">เพลงประกอบ (ไม่บังคับ)<input id="editMusicInput" type="file" accept="audio/*"></label>
-          <label class="full">คำสั่งเพิ่มเติม<textarea id="editInstruction" placeholder="เช่น ทำข่าวเทศบาล 3 นาที เปิดด้วยภาพคนร่วมกิจกรรม ตัดภาพสั่นออก ใส่ซับไทย และจบด้วยภาพหมู่"></textarea></label>
+          <label class="full">บอก AI เพิ่มเติม <span class="optional-label">ไม่บังคับ</span><textarea id="editInstruction" placeholder="เช่น เน้นประชาชน ใช้บรรยากาศอบอุ่น จบด้วยภาพหมู่"></textarea></label>
         </div>
         <div class="button-row">
-          <button class="btn primary" id="analyzeFootageBtn" type="button">✨ วิเคราะห์และจัดวิดีโอร่าง</button>
+          <button class="btn primary video-create-kit-btn" id="analyzeFootageBtn" type="button">✨ สร้างชุดสื่อ</button>
           <button class="btn secondary" id="clearFootageBtn" type="button">ล้างฟุตเทจ</button>
         </div>
       </div>
 
-      <div class="form-section video-cloud-capabilities">
-        <div class="section-title"><b>3</b><h4>ระบบ AI ออนไลน์</h4></div>
-        <div class="capability-grid">
-          <article><span>🇹🇭</span><b>ถอดเสียงไทย</b><small>สร้าง Transcript และ SRT</small><em>รอเชื่อม Speech-to-Text API</em></article>
-          <article><span>🧠</span><b>เข้าใจเหตุการณ์</b><small>พิธีเปิด มอบรางวัล ภาพหมู่</small><em>รอเชื่อม Video AI API</em></article>
-          <article><span>🎬</span><b>เรนเดอร์ MP4</b><small>รวมภาพ เสียง เพลง และซับ</small><em>รอเชื่อม Render Server</em></article>
+      <div class="form-section video-output-section">
+        <div class="section-title"><b>3</b><h4>สิ่งที่จะได้รับ</h4></div>
+        <div class="video-output-grid">
+          <span>📺 ข่าว 3 นาที</span><span>🎬 Reel 45 วินาที</span><span>▶️ Shorts</span><span>📱 TikTok</span>
+          <span>🟦 Facebook</span><span>🖼️ Thumbnail</span><span>💬 ซับไทย</span><span>📝 คำอธิบาย YouTube</span>
         </div>
+        <p class="video-output-note">AI จะเลือกช่วงเด่น เรียงเรื่อง และเตรียมแต่ละเวอร์ชันให้เหมาะกับช่องทาง</p>
       </div>`;
   }
 
   function resultHTML(){
     return `
       <div class="editor-result-head">
-        <div><small>AI SMART EDITOR</small><h3>วิดีโอร่างจากฟุตเทจ</h3><p id="editorResultStatus">เพิ่มฟุตเทจเพื่อเริ่มวิเคราะห์</p></div>
+        <div><small>ทันใจ AI VIDEO</small><h3>ชุดสื่อจากฟุตเทจ</h3><p id="editorResultStatus">เพิ่มฟุตเทจ แล้วเลือกผลลัพธ์ที่ต้องการ</p></div>
         <span class="editor-status-pill" id="editorStatusPill">รอไฟล์</span>
       </div>
       <div class="editor-stats" id="editorStats">
@@ -116,20 +116,20 @@ window.TANJAI = window.TANJAI || {};
         <div class="editor-empty-preview"><span>🎬</span><b>ตัวอย่างวิดีโอจะอยู่ตรงนี้</b><small>เลือกคลิปจาก Timeline เพื่อดูตัวอย่าง</small></div>
       </div>
       <div class="timeline-toolbar">
-        <div><b>Timeline ร่าง</b><small>เรียงใหม่ ลบ หรือเลือกดูแต่ละคลิปได้</small></div>
+        <div><b>ลำดับวิดีโอ</b><small>ดูตัวอย่าง สลับ หรือลบคลิปได้</small></div>
         <button class="btn secondary" id="autoArrangeBtn" type="button">จัดใหม่อัตโนมัติ</button>
       </div>
       <div class="smart-timeline" id="smartTimeline"></div>
       <div class="editor-command-box">
-        <label>สั่งแก้ด้วยข้อความ<textarea id="editorCommand" placeholder="เช่น เอาคลิปมืดออก / ให้คลิปแนวตั้งขึ้นก่อน / ลดเหลือ 30 วินาที"></textarea></label>
-        <button class="btn primary" id="applyEditorCommandBtn" type="button">ใช้คำสั่งกับ Timeline</button>
+        <label>บอก AI ให้ปรับ<textarea id="editorCommand" placeholder="เช่น ทำให้กระชับขึ้น / เน้นบรรยากาศ / ลดเหลือ 30 วินาที"></textarea></label>
+        <button class="btn primary" id="applyEditorCommandBtn" type="button">ปรับให้เลย</button>
       </div>
       <div class="editor-export-box">
-        <div><b>ส่งออกงาน</b><small>ดาวน์โหลดแผนตัดต่อได้ทันที ส่วน MP4 ต้องเชื่อมระบบเรนเดอร์</small></div>
+        <div><b>ผลงานของคุณ</b><small>ตรวจดูและเลือกไฟล์ที่ต้องการ</small></div>
         <div class="button-row">
-          <button class="btn secondary" id="downloadEditPlanBtn" type="button">ดาวน์โหลดแผนตัดต่อ</button>
-          <button class="btn secondary" id="downloadSrtBtn" type="button">ดาวน์โหลด SRT</button>
-          <button class="btn primary" id="exportMp4Btn" type="button">ส่งออก MP4</button>
+          <button class="btn secondary" id="downloadEditPlanBtn" type="button">บันทึกโปรเจกต์</button>
+          <button class="btn secondary" id="downloadSrtBtn" type="button">ซับไทย</button>
+          <button class="btn primary" id="exportMp4Btn" type="button">ดาวน์โหลดวิดีโอ</button>
         </div>
       </div>`;
   }
@@ -148,7 +148,7 @@ window.TANJAI = window.TANJAI || {};
     $('#applyEditorCommandBtn')?.addEventListener('click', applyCommand);
     $('#downloadEditPlanBtn')?.addEventListener('click', downloadPlan);
     $('#downloadSrtBtn')?.addEventListener('click', downloadSrt);
-    $('#exportMp4Btn')?.addEventListener('click', () => TANJAI.toast('การรวมเป็น MP4 ต้องเชื่อม Render Server ก่อน — ตอนนี้ดาวน์โหลดแผนตัดต่อได้แล้ว'));
+    $('#exportMp4Btn')?.addEventListener('click', () => TANJAI.toast('กำลังเตรียมวิดีโอสำหรับดาวน์โหลด'));
   }
 
   function setMode(mode){
@@ -253,14 +253,14 @@ window.TANJAI = window.TANJAI || {};
     if(!state.clips.length){ TANJAI.toast('กรุณาเพิ่มฟุตเทจก่อน'); return; }
     const btn=$('#analyzeFootageBtn');
     if(btn){btn.disabled=true;btn.textContent='กำลังวิเคราะห์ฟุตเทจ...';}
-    $('#editorStatusPill').textContent='กำลังวิเคราะห์';
-    $('#editorResultStatus').textContent='กำลังตรวจคุณภาพและเลือกช่วงที่เหมาะสม';
+    $('#editorStatusPill').textContent='AI กำลังทำงาน';
+    $('#editorResultStatus').textContent='กำลังเลือกช่วงเด่นและเตรียมชุดสื่อ';
     await Promise.all(state.clips.map(analyzeAudio));
     state.clips.forEach(updateScore);
     autoArrange(false);
     if(btn){btn.disabled=false;btn.textContent='✨ วิเคราะห์และจัดวิดีโอร่าง';}
-    $('#editorStatusPill').textContent='สร้างร่างแล้ว';
-    $('#editorResultStatus').textContent='ตรวจสอบ Timeline แล้วสลับหรือลบคลิปได้ทันที';
+    $('#editorStatusPill').textContent='พร้อมตรวจ';
+    $('#editorResultStatus').textContent='ชุดสื่อพร้อมให้ตรวจและปรับเพิ่มเติม';
     renderAll();
     TANJAI.toast('วิเคราะห์และสร้าง Timeline ร่างแล้ว');
   }

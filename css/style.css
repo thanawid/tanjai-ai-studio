@@ -5280,3 +5280,14 @@ label > .field-hint + select{
 .editor-command-box{display:grid;gap:8px;padding:13px;border:1px solid rgba(164,111,255,.3);border-radius:15px;background:rgba(107,64,190,.07)}.editor-command-box textarea{min-height:72px}.editor-export-box{padding-top:13px;border-top:1px solid var(--line)}
 @media(max-width:900px){.video-clip-grid{grid-template-columns:1fr}.capability-grid{grid-template-columns:1fr}.editor-stats{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:560px){.video-mode-switch{grid-template-columns:1fr}.video-clip-card{grid-template-columns:96px 1fr}.timeline-item{grid-template-columns:28px 58px 1fr}.timeline-actions{grid-column:2/-1;justify-content:flex-end}.editor-export-box,.timeline-toolbar{align-items:stretch;flex-direction:column}.editor-export-box .button-row{width:100%;display:grid}.editor-preview-stage{min-height:210px}}
+
+/* V10.2.0 — Video Studio: simple, outcome-first UI */
+.video-editor-note{display:flex;flex-direction:column;gap:4px;padding:15px 17px!important}
+.video-editor-note span{color:var(--muted);font-size:13px}
+.optional-label{font-size:11px;color:var(--muted);font-weight:500;margin-left:6px}
+.video-create-kit-btn{min-width:180px;box-shadow:0 12px 30px rgba(112,67,220,.25)}
+.video-output-section{padding-bottom:18px}
+.video-output-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.video-output-grid span{display:flex;align-items:center;min-height:42px;padding:9px 12px;border:1px solid rgba(167,126,255,.18);border-radius:13px;background:rgba(255,255,255,.035);font-size:13px;font-weight:750}
+.video-output-note{margin:12px 2px 0;color:var(--muted);font-size:12px;line-height:1.55}
+@media(max-width:560px){.video-output-grid{grid-template-columns:1fr}.video-create-kit-btn{width:100%}}
