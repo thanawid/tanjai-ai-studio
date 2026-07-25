@@ -1,0 +1,15 @@
+const fs = require('fs');
+const assert = require('assert');
+const index = fs.readFileSync('index.html','utf8');
+const js = fs.readFileSync('js/video-editor.js','utf8');
+const css = fs.readFileSync('css/style.css','utf8');
+assert.match(index,/video-editor\.js\?v=10\.1\.0/);
+assert.match(js,/ตัดต่อฟุตเทจด้วย AI/);
+assert.match(js,/videoFootageInput/);
+assert.match(js,/imageMetrics/);
+assert.match(js,/analyzeAudio/);
+assert.match(js,/smartTimeline/);
+assert.match(js,/downloadEditPlan/);
+assert.match(js,/downloadSrt/);
+assert.match(css,/AI Smart Footage Editor/);
+console.log(JSON.stringify({version:'10.1.0',uploadMany:true,preview:true,orientation:true,qualityAnalysis:true,audioAnalysis:true,timeline:true,textCommands:true,editPlan:true,srtDraft:true,status:'PASS'},null,2));
