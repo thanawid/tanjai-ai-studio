@@ -7,9 +7,9 @@ const app = fs.readFileSync(path.join(root,"js","app.js"),"utf8");
 const proofread = fs.readFileSync(path.join(root,"js","proofread.js"),"utf8");
 const pkg = JSON.parse(fs.readFileSync(path.join(root,"package.json"),"utf8"));
 
-assert.strictEqual(pkg.version, "11.1.0");
-assert.match(index, /V11\.1\.0/);
-assert.match(index, /v=11\.1\.0/);
+assert.strictEqual(pkg.version, "11.2.0");
+assert.match(index, /V11\.2\.0/);
+assert.match(index, /v=11\.2\.0/);
 assert.match(index, /id="sidebarLogoutBtn"/);
 assert.match(index, /id="openProofreadNav"/);
 assert.match(app, /<select id="image-specialist" hidden/);
@@ -20,4 +20,4 @@ assert.match(proofread, /openProofreadNav/);
 assert.match(proofread, /make\[A-Z\]/);
 assert.match(proofread, /พ\.ศ\. \$1/);
 
-console.log(JSON.stringify({version:"11.1.0",hiddenSpecialist:true,proofreadNav:true,status:"PASS"},null,2));
+console.log(JSON.stringify({version:"11.2.0",hiddenSpecialist:true,proofreadNav:true,status:"PASS"},null,2));

@@ -4,7 +4,8 @@ window.TANJAI = window.TANJAI || {};
   const state = {
     clips: [], timeline: [], activeClipId: null, mode: 'editor',
     analysis: null, storyOptions: [], selectedStory: 0, voiceScript: '',
-    look: {preset:'auto',brightness:100,contrast:100,saturation:100,warmth:0,sharpness:0}
+    look: {preset:'auto',brightness:100,contrast:100,saturation:100,warmth:0,sharpness:0},
+    camera:{crop:'source',stabilize:true,autoFrame:true}, audio:{noiseReduce:true,normalize:true,musicDuck:false}, overlay:{title:'',subtitle:true,logo:false}
   };
   const $ = (s, root=document) => root.querySelector(s);
   const $$ = (s, root=document) => Array.from(root.querySelectorAll(s));
@@ -27,7 +28,7 @@ window.TANJAI = window.TANJAI || {};
   }
 
   function editorHTML(){return `
-    <div class="form-note video-editor-note"><b>เพิ่มคลิปที่ถ่ายมา</b><span>ทันใจจะช่วยคัด เรียง และเตรียมงานให้พร้อมนำไปใช้ต่อ</span></div>
+    <div class="form-note video-editor-note"><b>อัปโหลดคลิป → AI ปรับและจัดเตรียม → ดาวน์โหลด หรือ ให้ AI ทำต่อ</b><span>เพิ่มคลิปจากเครื่อง แล้วเลือกให้ AI ช่วยจัดการหรือปรับแต่งเองได้</span></div>
     <div class="form-section">
       <div class="section-title"><b>1</b><h4>เพิ่มคลิป</h4></div>
       <label class="video-dropzone" id="videoDropzone"><input id="videoFootageInput" type="file" accept="video/*" multiple hidden><span class="video-drop-icon">🎞️</span><strong>ลากคลิปมาวาง หรือเลือกหลายคลิป</strong><small>เลือกได้ครั้งละหลายไฟล์ ระบบอ่านคลิปจากเครื่องโดยตรง</small><button class="btn primary" type="button" id="pickFootageBtn">เลือกคลิป</button></label>
@@ -55,27 +56,57 @@ window.TANJAI = window.TANJAI || {};
     <section id="storyOptionsSection" hidden><div class="timeline-toolbar"><div><b>รูปแบบวิดีโอ</b><small>เลือกแบบที่เหมาะกับงาน</small></div></div><div class="story-option-grid" id="storyOptionGrid"></div></section>
     <section id="voiceScriptSection" hidden class="voice-script-panel"><div class="timeline-toolbar"><div><b>สคริปต์เสียงพากย์</b><small>พร้อมแก้ไขและนำไปใช้</small></div><button class="btn secondary" id="copyVoiceScriptBtn" type="button">คัดลอก</button></div><textarea id="voiceScriptText"></textarea></section>
     <section id="selectedClipsSection" hidden><div class="timeline-toolbar"><div><b>คลิปที่เตรียมไว้</b><small>เรียงตามลำดับเรื่องแล้ว</small></div><button class="btn secondary" id="autoArrangeBtn" type="button">จัดใหม่</button></div><div class="smart-timeline" id="smartTimeline"></div></section>
-    <div class="editor-preview-stage" id="editorPreviewStage"><div class="editor-empty-preview"><span>🎬</span><b>ตัวอย่างคลิปจะอยู่ตรงนี้</b><small>หลัง AI เตรียมงาน กดคลิปที่เลือกเพื่อดูตัวอย่าง</small></div></div>
-    <section class="video-look-panel" id="videoLookPanel" hidden>
-      <div class="timeline-toolbar"><div><b>ปรับแสง สี และแนวภาพ</b><small>ดูตัวอย่างได้ทันที แล้วบันทึกค่าไว้กับชุดงาน</small></div><button class="btn secondary" id="autoLookBtn" type="button">✨ AI แนะนำ</button></div>
-      <div class="look-presets" id="lookPresets">
-        <button type="button" data-look="auto" class="active">อัตโนมัติ<small>สมดุลตามคลิป</small></button>
-        <button type="button" data-look="natural">ธรรมชาติ<small>สีจริง ดูสบายตา</small></button>
-        <button type="button" data-look="bright">สดใส<small>สว่าง สีเด่น</small></button>
-        <button type="button" data-look="warm">อบอุ่น<small>นุ่มนวล เป็นมิตร</small></button>
-        <button type="button" data-look="cinema">ภาพยนตร์<small>เข้ม มีมิติ</small></button>
-        <button type="button" data-look="cool">โทนเย็น<small>สะอาด ทันสมัย</small></button>
+    <section class="video-adjust-workspace" id="videoLookPanel" hidden>
+      <div class="video-adjust-head"><div><small>AI ปรับและจัดเตรียม</small><h3>ปรับคลิปก่อนนำไปใช้</h3><p>เลือกให้ AI แนะนำ หรือปรับค่าต่าง ๆ เอง พร้อมดูตัวอย่างทันที</p></div><button class="btn primary" id="autoLookBtn" type="button">✨ AI แนะนำ</button></div>
+      <div class="video-adjust-tabs" role="tablist">
+        <button type="button" class="active" data-adjust-tab="light">☀ แสง & สี</button>
+        <button type="button" data-adjust-tab="style">🎨 แนวภาพ</button>
+        <button type="button" data-adjust-tab="camera">🎥 กล้อง</button>
+        <button type="button" data-adjust-tab="audio">🔊 เสียง</button>
+        <button type="button" data-adjust-tab="text">T ข้อความ</button>
       </div>
-      <div class="look-controls">
-        <label>ความสว่าง <input id="lookBrightness" type="range" min="60" max="145" value="100"><output>0</output></label>
-        <label>คอนทราสต์ <input id="lookContrast" type="range" min="60" max="145" value="100"><output>0</output></label>
-        <label>ความอิ่มสี <input id="lookSaturation" type="range" min="40" max="160" value="100"><output>0</output></label>
-        <label>อุณหภูมิสี <input id="lookWarmth" type="range" min="-30" max="30" value="0"><output>0</output></label>
-        <label>ความคมชัด <input id="lookSharpness" type="range" min="0" max="30" value="0"><output>0</output></label>
+      <div class="video-adjust-body">
+        <div class="video-adjust-controls">
+          <div class="adjust-pane active" data-adjust-pane="light">
+            <div class="look-controls">
+              <label>ความสว่าง <input id="lookBrightness" type="range" min="60" max="145" value="100"><output>0</output></label>
+              <label>คอนทราสต์ <input id="lookContrast" type="range" min="60" max="145" value="100"><output>0</output></label>
+              <label>ความอิ่มสี <input id="lookSaturation" type="range" min="40" max="160" value="100"><output>0</output></label>
+              <label>อุณหภูมิสี <input id="lookWarmth" type="range" min="-30" max="30" value="0"><output>0</output></label>
+              <label>ความคมชัด <input id="lookSharpness" type="range" min="0" max="30" value="0"><output>0</output></label>
+            </div>
+          </div>
+          <div class="adjust-pane" data-adjust-pane="style">
+            <div class="look-presets" id="lookPresets">
+              <button type="button" data-look="auto" class="active">อัตโนมัติ<small>สมดุลตามคลิป</small></button>
+              <button type="button" data-look="natural">ธรรมชาติ<small>สีจริง ดูสบายตา</small></button>
+              <button type="button" data-look="bright">สดใส<small>สว่าง สีเด่น</small></button>
+              <button type="button" data-look="warm">อบอุ่น<small>นุ่มนวล เป็นมิตร</small></button>
+              <button type="button" data-look="cinema">ภาพยนตร์<small>เข้ม มีมิติ</small></button>
+              <button type="button" data-look="cool">โทนเย็น<small>สะอาด ทันสมัย</small></button>
+            </div>
+          </div>
+          <div class="adjust-pane" data-adjust-pane="camera">
+            <div class="adjust-choice-grid"><button type="button" class="active" data-camera-crop="source">ตามต้นฉบับ</button><button type="button" data-camera-crop="16:9">16:9</button><button type="button" data-camera-crop="9:16">9:16</button><button type="button" data-camera-crop="1:1">1:1</button></div>
+            <label class="adjust-toggle"><input id="cameraAutoFrame" type="checkbox" checked><span><b>จัดเฟรมอัตโนมัติ</b><small>รักษาบุคคลหรือวัตถุสำคัญให้อยู่ในภาพ</small></span></label>
+            <label class="adjust-toggle"><input id="cameraStabilize" type="checkbox" checked><span><b>ลดภาพสั่น</b><small>เตรียมค่า Stabilization สำหรับขั้นตอนตัดต่อ</small></span></label>
+          </div>
+          <div class="adjust-pane" data-adjust-pane="audio">
+            <label class="adjust-toggle"><input id="audioNoiseReduce" type="checkbox" checked><span><b>ลดเสียงรบกวน</b><small>ลดเสียงพื้นหลังโดยรักษาเสียงพูด</small></span></label>
+            <label class="adjust-toggle"><input id="audioNormalize" type="checkbox" checked><span><b>ปรับระดับเสียงให้สม่ำเสมอ</b><small>ลดช่วงเสียงเบาหรือดังเกินไป</small></span></label>
+            <label class="adjust-toggle"><input id="audioMusicDuck" type="checkbox"><span><b>ลดเพลงเมื่อมีเสียงพูด</b><small>เตรียม Auto Ducking สำหรับการตัดต่อ</small></span></label>
+          </div>
+          <div class="adjust-pane" data-adjust-pane="text">
+            <label class="adjust-field">ข้อความเปิดเรื่อง<input id="overlayTitle" type="text" placeholder="เช่น ไฮไลต์กิจกรรมประจำปี"></label>
+            <label class="adjust-toggle"><input id="overlaySubtitle" type="checkbox" checked><span><b>เตรียมคำบรรยายอัตโนมัติ</b><small>สร้างไฟล์คำบรรยายพร้อมนำไปตรวจแก้</small></span></label>
+            <label class="adjust-toggle"><input id="overlayLogo" type="checkbox"><span><b>เว้นพื้นที่สำหรับโลโก้</b><small>กำหนด Safe Area ไม่ให้ข้อความหรือภาพสำคัญชนโลโก้</small></span></label>
+          </div>
+          <div class="look-panel-foot"><span id="lookSummary">AI จะเลือกค่าที่เหมาะกับภาพรวมของคลิป</span><button class="btn secondary" id="resetLookBtn" type="button">รีเซ็ต</button></div>
+        </div>
+        <div class="video-preview-column"><div class="preview-label"><b>ตัวอย่างหลังปรับ</b><small>เลือกคลิปจากรายการด้านล่างเพื่อดูผล</small></div><div class="editor-preview-stage" id="editorPreviewStage"><div class="editor-empty-preview"><span>🎬</span><b>ตัวอย่างคลิปจะอยู่ตรงนี้</b><small>หลัง AI เตรียมงาน กดคลิปที่เลือกเพื่อดูตัวอย่าง</small></div></div></div>
       </div>
-      <div class="look-panel-foot"><span id="lookSummary">AI จะเลือกค่าที่เหมาะกับภาพรวมของคลิป</span><button class="btn secondary" id="resetLookBtn" type="button">รีเซ็ต</button></div>
     </section>
-    <div class="editor-export-box editor-next-step-box" id="editorExportBox" hidden><div class="next-step-head"><b>เลือกว่าจะไปต่อแบบไหน</b><small>AI เตรียมคลิป ลำดับเรื่อง และสคริปต์ไว้ให้แล้ว</small></div><div class="video-next-step-grid"><article class="video-next-step-card"><span>⬇</span><div><b>เอางานกลับไปใช้</b><small>ดาวน์โหลดคลิปที่คัดและเรียงแล้ว พร้อมแผนตัดต่อและสคริปต์</small></div><button class="btn primary" id="downloadSelectedClipsBtn" type="button">ดาวน์โหลดชุดงาน (.ZIP)</button></article><article class="video-next-step-card"><span>✨</span><div><b>ให้ AI ทำต่อ</b><small>ส่งชุดงานที่เตรียมไว้เข้าสู่ขั้นตอนประกอบวิดีโอ</small></div><button class="btn secondary" id="prepareAutoEditBtn" type="button">เตรียมให้ AI ทำวิดีโอต่อ</button></article></div><details class="video-extra-downloads"><summary>ดาวน์โหลดไฟล์แยก</summary><div class="button-row"><button class="btn secondary" id="downloadClipListBtn" type="button">รายชื่อคลิป</button><button class="btn secondary" id="downloadEditPlanBtn" type="button">แผนตัดต่อ</button></div></details><small class="export-help">ไฟล์ ZIP มีคลิปต้นฉบับที่ AI คัดและเรียงลำดับแล้ว พร้อมสคริปต์เสียงพากย์และรายการช่วงเวลาที่แนะนำและค่าปรับแสงสี</small></div>`;}
+    <div class="editor-export-box editor-next-step-box" id="editorExportBox" hidden><div class="next-step-head"><b>ดาวน์โหลด หรือ ให้ AI ทำต่อ</b><small>AI เตรียมคลิป ลำดับเรื่อง และสคริปต์ไว้ให้แล้ว</small></div><div class="video-next-step-grid"><article class="video-next-step-card"><span>⬇</span><div><b>ดาวน์โหลดชุดงาน</b><small>ดาวน์โหลดคลิปที่คัดและเรียงแล้ว พร้อมแผนตัดต่อและสคริปต์</small></div><button class="btn primary" id="downloadSelectedClipsBtn" type="button">ดาวน์โหลดชุดงาน (.ZIP)</button></article><article class="video-next-step-card"><span>✨</span><div><b>ให้ AI ทำต่อ</b><small>ส่งชุดงานที่เตรียมไว้เข้าสู่ขั้นตอนประกอบวิดีโอ</small></div><button class="btn secondary" id="prepareAutoEditBtn" type="button">ให้ AI ทำต่อ</button></article></div><details class="video-extra-downloads"><summary>ดาวน์โหลดไฟล์แยก</summary><div class="button-row"><button class="btn secondary" id="downloadClipListBtn" type="button">รายชื่อคลิป</button><button class="btn secondary" id="downloadEditPlanBtn" type="button">แผนตัดต่อ</button></div></details><small class="export-help">ไฟล์ ZIP มีคลิปต้นฉบับที่ AI คัดและเรียงลำดับแล้ว พร้อมสคริปต์เสียงพากย์และรายการช่วงเวลาที่แนะนำและค่าปรับแสงสี</small></div>`;}
 
   function bind(){
     $$('[data-video-mode]').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.videoMode)));
@@ -87,9 +118,14 @@ window.TANJAI = window.TANJAI || {};
     $('#downloadEditPlanBtn')?.addEventListener('click',downloadPlan); $('#downloadClipListBtn')?.addEventListener('click',downloadClipList); $('#downloadSelectedClipsBtn')?.addEventListener('click',downloadSelectedClipsZip);
     $('#prepareAutoEditBtn')?.addEventListener('click',()=>TANJAI.toast('เตรียมชุดงานพร้อมค่าปรับภาพสำหรับทำวิดีโอต่อแล้ว'));
     $('#autoLookBtn')?.addEventListener('click',suggestLook); $('#resetLookBtn')?.addEventListener('click',()=>applyLookPreset('auto',true));
+    $$('[data-adjust-tab]').forEach(b=>b.addEventListener('click',()=>setAdjustTab(b.dataset.adjustTab)));
     $$('[data-look]').forEach(b=>b.addEventListener('click',()=>applyLookPreset(b.dataset.look,true)));
+    $$('[data-camera-crop]').forEach(b=>b.addEventListener('click',()=>{state.camera.crop=b.dataset.cameraCrop;$$('[data-camera-crop]').forEach(x=>x.classList.toggle('active',x===b));TANJAI.toast('ตั้งค่าสัดส่วนภาพแล้ว')}));
+    [['cameraAutoFrame','camera','autoFrame'],['cameraStabilize','camera','stabilize'],['audioNoiseReduce','audio','noiseReduce'],['audioNormalize','audio','normalize'],['audioMusicDuck','audio','musicDuck'],['overlaySubtitle','overlay','subtitle'],['overlayLogo','overlay','logo']].forEach(([id,group,key])=>$('#'+id)?.addEventListener('change',e=>state[group][key]=e.target.checked));
+    $('#overlayTitle')?.addEventListener('input',e=>state.overlay.title=e.target.value);
     [['lookBrightness','brightness'],['lookContrast','contrast'],['lookSaturation','saturation'],['lookWarmth','warmth'],['lookSharpness','sharpness']].forEach(([id,key])=>$('#'+id)?.addEventListener('input',e=>{state.look[key]=Number(e.target.value);state.look.preset='custom';updateLookUI();applyPreviewLook()}));
   }
+  function setAdjustTab(tab){$$('[data-adjust-tab]').forEach(b=>b.classList.toggle('active',b.dataset.adjustTab===tab));$$('[data-adjust-pane]').forEach(p=>p.classList.toggle('active',p.dataset.adjustPane===tab));}
   function setMode(mode){state.mode=mode; $('#videoScriptMode').hidden=mode!=='script'; $('#videoEditorWorkspace').hidden=mode!=='editor'; $('#videoScriptResultMode').hidden=mode!=='script'; $('#videoEditorResultMode').hidden=mode!=='editor'; $$('[data-video-mode]').forEach(b=>b.classList.toggle('active',b.dataset.videoMode===mode));}
 
   async function addFiles(fileList){
