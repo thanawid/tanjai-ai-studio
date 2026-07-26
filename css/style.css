@@ -5318,7 +5318,7 @@ label > .field-hint + select{
 .footage-insight-details .footage-insight-panel{margin:0;border:0;border-top:1px solid var(--line);border-radius:0}
 
 
-/* V11.0.0 — Video workflow: footage in → AI prepares → take work or continue */
+/* V11.1.0 — Video workflow: footage in → AI prepares → take work or continue */
 .video-next-step-box{display:block!important}
 .next-step-head{margin-bottom:12px}.next-step-head small{margin-top:3px}
 .video-next-step-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
@@ -5330,3 +5330,10 @@ label > .field-hint + select{
 .video-extra-downloads summary{cursor:pointer;color:var(--muted);font-size:12px;font-weight:700}
 .video-extra-downloads .button-row{margin-top:9px}
 @media(max-width:680px){.video-next-step-grid{grid-template-columns:1fr}}
+
+/* V11.1.0 — Video look controls */
+.video-look-panel{display:grid;gap:14px;padding:16px;border:1px solid rgba(168,102,255,.28);border-radius:18px;background:linear-gradient(145deg,rgba(89,61,151,.12),rgba(235,55,157,.045))}
+.look-presets{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}.look-presets button{min-height:72px;padding:10px 8px;border:1px solid var(--line);border-radius:13px;background:rgba(255,255,255,.025);color:var(--text);font-weight:800;cursor:pointer}.look-presets button small{display:block;margin-top:5px;color:var(--muted);font-size:10px;font-weight:500}.look-presets button:hover,.look-presets button.active{border-color:rgba(211,75,213,.75);background:linear-gradient(135deg,rgba(111,89,255,.18),rgba(239,49,155,.16));box-shadow:0 0 0 1px rgba(194,72,221,.12) inset}
+.look-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 18px}.look-controls label{display:grid;grid-template-columns:100px 1fr 42px;align-items:center;gap:10px;color:var(--muted);font-size:12px}.look-controls input{width:100%;accent-color:#cf4bd7}.look-controls output{padding:5px 7px;border:1px solid var(--line);border-radius:8px;text-align:center;color:var(--text);background:rgba(255,255,255,.03)}.look-panel-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:4px;color:var(--muted);font-size:11px}
+@media(max-width:1100px){.look-presets{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:700px){.look-presets{grid-template-columns:repeat(2,1fr)}.look-controls{grid-template-columns:1fr}.look-panel-foot{align-items:stretch;flex-direction:column}}
