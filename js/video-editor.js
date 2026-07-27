@@ -140,8 +140,8 @@ window.TANJAI = window.TANJAI || {};
         <header><div><small>ขั้นตอนที่ 3</small><h3>เลือกว่าจะนำคลิปไปทางไหน</h3></div><span>คลิปที่ปรับแล้วพร้อมใช้งาน</span></header>
         <div class="vprep-destination-grid">
           <article class="vprep-action-card download">
-            <span>⬇</span><div><b>ดาวน์โหลดคลิปที่ปรับแล้ว</b><small>นำไปตัดต่อเองใน CapCut, Premiere หรือโปรแกรมที่ถนัด</small></div>
-            <button class="btn primary" id="downloadAdjustedBtn" type="button">ดาวน์โหลดคลิปนี้</button>
+            <span>⬇</span><div><b>ดาวน์โหลด MP4 พร้อมตัดต่อ</b><small>H.264 + AAC เหมาะกับ CapCut, Premiere, DaVinci และการอัปโหลดทั่วไป</small></div>
+            <button class="btn primary" id="downloadAdjustedBtn" type="button">ดาวน์โหลด MP4</button>
           </article>
           <article class="vprep-action-card ai">
             <span>✨</span><div><b>ให้ AI ทำต่อ</b><small>เลือกแนวทางนำเสนอ แล้วให้ AI ช่วยวางโครงและคัดช่วงคลิป</small></div>
@@ -375,9 +375,17 @@ window.TANJAI = window.TANJAI || {};
     document.dispatchEvent(event);
   }
 
-  function mimeType() {
-    const options=['video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'];
-    return options.find(x=>window.MediaRecorder?.isTypeSupported?.(x)) || '';
+  function recordingFormat() {
+    const formats = [
+      { mimeType:'video/mp4;codecs=avc1.424028,mp4a.40.2', extension:'mp4' },
+      { mimeType:'video/mp4;codecs=avc1.42E01E,mp4a.40.2', extension:'mp4' },
+      { mimeType:'video/mp4;codecs=avc1,mp4a.40.2', extension:'mp4' },
+      { mimeType:'video/mp4', extension:'mp4' },
+      { mimeType:'video/webm;codecs=vp9,opus', extension:'webm' },
+      { mimeType:'video/webm;codecs=vp8,opus', extension:'webm' },
+      { mimeType:'video/webm', extension:'webm' }
+    ];
+    return formats.find(format => window.MediaRecorder?.isTypeSupported?.(format.mimeType)) || { mimeType:'', extension:'webm' };
   }
 
   async function renderAndDownloadActive() {
@@ -402,15 +410,27 @@ window.TANJAI = window.TANJAI || {};
         if(state.audio.normalize){const gain=audioCtx.createGain();gain.gain.value=1.08;node.connect(gain);node=gain;}
         node.connect(destination); destination.stream.getAudioTracks().forEach(t=>stream.addTrack(t));
       } catch(_) {}
-      const chunks=[], type=mimeType(); const recorder=new MediaRecorder(stream,type?{mimeType:type,videoBitsPerSecond:5000000}:undefined);
+      const chunks=[];
+      const requestedFormat=recordingFormat();
+      const recorderOptions=requestedFormat.mimeType ? {mimeType:requestedFormat.mimeType,videoBitsPerSecond:8000000,audioBitsPerSecond:192000} : undefined;
+      const recorder=new MediaRecorder(stream,recorderOptions);
+      const actualMimeType=recorder.mimeType || requestedFormat.mimeType || 'video/webm';
+      const actualIsMp4=/video\/mp4/i.test(actualMimeType);
+      const extension=actualIsMp4?'mp4':'webm';
       recorder.ondataavailable=e=>{if(e.data?.size)chunks.push(e.data)};
       const stopped=new Promise(resolve=>recorder.onstop=resolve);
       recorder.start(500); await video.play();
       const draw=()=>{if(video.paused||video.ended)return;ctx.save();ctx.filter=canvasFilterString();ctx.drawImage(video,0,0,canvas.width,canvas.height);ctx.restore();const pct=video.duration?Math.min(100,(video.currentTime/video.duration)*100):0;bar.style.width=`${pct}%`;text.textContent=`กำลังสร้าง ${Math.round(pct)}%`;requestAnimationFrame(draw)}; draw();
       await new Promise(resolve=>video.onended=resolve); recorder.stop(); await stopped;
       if(audioCtx) await audioCtx.close().catch(()=>{});
-      const blob=new Blob(chunks,{type:type||'video/webm'}); const base=clip.name.replace(/\.[^.]+$/,'').replace(/[\\/:*?"<>|]/g,'_'); downloadBlob(blob,`${base}-tanjai-${state.look.preset}.webm`);
-      TANJAI.toast?.('สร้างและดาวน์โหลดคลิปที่ปรับแล้วเรียบร้อย');
+      const blob=new Blob(chunks,{type:actualMimeType});
+      const base=clip.name.replace(/\.[^.]+$/,'').replace(/[\/:*?"<>|]/g,'_');
+      downloadBlob(blob,`${base}-tanjai-${state.look.preset}.${extension}`);
+      if (actualIsMp4) {
+        TANJAI.toast?.('ดาวน์โหลด MP4 พร้อมนำไปตัดต่อเรียบร้อย');
+      } else {
+        TANJAI.toast?.('เบราว์เซอร์นี้ยังสร้าง MP4 ไม่ได้ จึงดาวน์โหลดเป็น WebM แทน กรุณาใช้ Chrome, Edge หรือ Safari รุ่นล่าสุด');
+      }
     } catch(err) {
       console.error(err); TANJAI.toast?.('สร้างคลิปไม่สำเร็จ กรุณาลองคลิปขนาดสั้นลงหรือใช้ Chrome รุ่นล่าสุด');
     } finally {
