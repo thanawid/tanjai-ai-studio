@@ -5,7 +5,7 @@ window.TANJAI = window.TANJAI || {};
     mode: 'editor', clips: [], activeClipId: null, busy: false,
     look: { preset: 'auto', brightness: 100, contrast: 100, saturation: 100, warmth: 0 },
     audio: { normalize: true, noiseReduce: true },
-    destination: 'short'
+    destination: 'short', selectedClipIds: new Set()
   };
 
   const $ = (s, r = document) => r.querySelector(s);
@@ -16,6 +16,7 @@ window.TANJAI = window.TANJAI || {};
   const fmtSize = bytes => bytes < 1048576 ? `${Math.max(1, Math.round(bytes/1024))} KB` : `${(bytes/1048576).toFixed(1)} MB`;
   const clipById = id => state.clips.find(c => c.id === id);
   const activeClip = () => clipById(state.activeClipId);
+  const selectedClips = () => state.clips.filter(c => state.selectedClipIds.has(c.id));
 
   function install() {
     const form = $('#videoForm');
@@ -58,8 +59,8 @@ window.TANJAI = window.TANJAI || {};
       <section class="vprep-card vprep-intro">
         <div>
           <small>ขั้นตอนที่ 1</small>
-          <h3>โยนคลิปเข้ามา</h3>
-          <p>AI จะตรวจภาพ แสง สี และเสียง แล้วปรับคลิปให้พร้อมใช้ทันที</p>
+          <h3>อัปโหลดคลิป</h3>
+          <p>เลือกหรือลากคลิปมาวาง แล้วให้ AI ปรับภาพและเสียงให้พร้อมใช้งาน</p>
         </div>
         <span class="vprep-status" id="vprepStatus">รอคลิป</span>
       </section>
@@ -74,8 +75,13 @@ window.TANJAI = window.TANJAI || {};
 
       <div class="vprep-upload-head">
         <div><b>คลิปที่อัปโหลด</b><small id="videoUploadSummary">ยังไม่มีคลิป</small></div>
-        <button class="btn secondary" id="clearFootageBtn" type="button">ล้างคลิป</button>
+        <div class="vprep-upload-actions">
+          <button class="btn secondary" id="selectAllClipsBtn" type="button">เลือกทั้งหมด</button>
+          <button class="btn secondary" id="clearSelectionBtn" type="button">ยกเลิกที่เลือก</button>
+          <button class="btn secondary" id="clearFootageBtn" type="button">ล้างคลิป</button>
+        </div>
       </div>
+      <div class="vprep-selection-summary" id="videoSelectionSummary">ยังไม่ได้เลือกคลิป</div>
       <div class="vprep-clip-list" id="videoClipGrid"></div>
 
       <div class="vprep-auto-note" id="vprepAutoNote">
@@ -140,8 +146,12 @@ window.TANJAI = window.TANJAI || {};
         <header><div><small>ขั้นตอนที่ 3</small><h3>เลือกว่าจะนำคลิปไปทางไหน</h3></div><span>คลิปที่ปรับแล้วพร้อมใช้งาน</span></header>
         <div class="vprep-destination-grid">
           <article class="vprep-action-card download">
-            <span>⬇</span><div><b>ดาวน์โหลด MP4 พร้อมตัดต่อ</b><small>H.264 + AAC เหมาะกับ CapCut, Premiere, DaVinci และการอัปโหลดทั่วไป</small></div>
-            <button class="btn primary" id="downloadAdjustedBtn" type="button">ดาวน์โหลด MP4</button>
+            <span>⬇</span><div><b>ดาวน์โหลดคลิปที่ปรับแล้ว</b><small>เลือกโหลดคลิปปัจจุบัน คลิปที่เลือก หรือรวมทั้งหมดเป็น ZIP</small></div>
+            <div class="vprep-download-actions">
+              <button class="btn primary" id="downloadAdjustedBtn" type="button">ดาวน์โหลดคลิปนี้</button>
+              <button class="btn secondary" id="downloadSelectedBtn" type="button">ดาวน์โหลดที่เลือก</button>
+              <button class="btn secondary" id="downloadAllZipBtn" type="button">ดาวน์โหลดทั้งหมด (.ZIP)</button>
+            </div>
           </article>
           <article class="vprep-action-card ai">
             <span>✨</span><div><b>ให้ AI ทำต่อ</b><small>เลือกแนวทางนำเสนอ แล้วให้ AI ช่วยวางโครงและคัดช่วงคลิป</small></div>
@@ -168,6 +178,8 @@ window.TANJAI = window.TANJAI || {};
     $('#pickFootageBtn')?.addEventListener('click', e => { e.preventDefault(); $('#videoFootageInput')?.click(); });
     $('#videoFootageInput')?.addEventListener('change', e => addFiles(e.target.files));
     $('#clearFootageBtn')?.addEventListener('click', clearFiles);
+    $('#selectAllClipsBtn')?.addEventListener('click', () => { state.clips.forEach(c => state.selectedClipIds.add(c.id)); render(); });
+    $('#clearSelectionBtn')?.addEventListener('click', () => { state.selectedClipIds.clear(); render(); });
 
     const dz = $('#videoDropzone');
     ['dragenter','dragover'].forEach(ev => dz?.addEventListener(ev, e => { e.preventDefault(); dz.classList.add('dragging'); }));
@@ -187,6 +199,8 @@ window.TANJAI = window.TANJAI || {};
     $('#audioNoise')?.addEventListener('change', e => state.audio.noiseReduce = e.target.checked);
 
     $('#downloadAdjustedBtn')?.addEventListener('click', renderAndDownloadActive);
+    $('#downloadSelectedBtn')?.addEventListener('click', () => renderAndDownloadBatch(selectedClips(), false));
+    $('#downloadAllZipBtn')?.addEventListener('click', () => renderAndDownloadBatch([...state.clips], true));
     $('#showAiDestinationsBtn')?.addEventListener('click', () => {
       const box = $('#aiDestinations'); box.hidden = !box.hidden;
       if (!box.hidden) recommendDestination();
@@ -218,6 +232,7 @@ window.TANJAI = window.TANJAI || {};
     for (const file of files) {
       const clip = { id: uid(), file, name:file.name, size:file.size, url:URL.createObjectURL(file), duration:0, width:0, height:0, thumbnail:'', brightness:null, status:'loading' };
       state.clips.push(clip);
+      state.selectedClipIds.add(clip.id);
       if (!state.activeClipId) state.activeClipId = clip.id;
       inspectClip(clip);
     }
@@ -318,6 +333,14 @@ window.TANJAI = window.TANJAI || {};
     const status = $('#vprepStatus');
     if (status) status.textContent = !state.clips.length ? 'รอคลิป' : state.clips.some(c=>c.status==='loading') ? 'AI กำลังตรวจคลิป' : 'AI ปรับให้แล้ว';
     const btn = $('#downloadAdjustedBtn'); if (btn) btn.disabled = !activeClip() || state.busy;
+    const selectedBtn = $('#downloadSelectedBtn'); if (selectedBtn) selectedBtn.disabled = !selectedClips().length || state.busy;
+    const allBtn = $('#downloadAllZipBtn'); if (allBtn) allBtn.disabled = !state.clips.length || state.busy;
+    const selectAllBtn = $('#selectAllClipsBtn'); if (selectAllBtn) selectAllBtn.disabled = !state.clips.length || state.busy;
+    const clearSelectionBtn = $('#clearSelectionBtn'); if (clearSelectionBtn) clearSelectionBtn.disabled = !selectedClips().length || state.busy;
+    const selectionSummary = $('#videoSelectionSummary');
+    if (selectionSummary) selectionSummary.textContent = state.clips.length
+      ? `เลือกไว้ ${selectedClips().length} จาก ${state.clips.length} คลิป`
+      : 'ยังไม่ได้เลือกคลิป';
   }
 
   function renderClips() {
@@ -325,13 +348,29 @@ window.TANJAI = window.TANJAI || {};
     const total = state.clips.reduce((s,c)=>s+c.size,0), duration = state.clips.reduce((s,c)=>s+c.duration,0);
     $('#videoUploadSummary').textContent = state.clips.length ? `${state.clips.length} คลิป • ${fmtSize(total)} • รวม ${fmtTime(duration)}` : 'ยังไม่มีคลิป';
     grid.innerHTML = state.clips.length ? state.clips.map(c => `
-      <article class="vprep-clip ${c.id===state.activeClipId?'active':''}" data-select-clip="${c.id}">
+      <article class="vprep-clip ${c.id===state.activeClipId?'active':''} ${state.selectedClipIds.has(c.id)?'selected':''}" data-select-clip="${c.id}">
+        <label class="vprep-clip-check" title="เลือกคลิปนี้">
+          <input type="checkbox" data-check-clip="${c.id}" ${state.selectedClipIds.has(c.id)?'checked':''}>
+          <span></span>
+        </label>
         <div class="vprep-thumb">${c.thumbnail?`<img src="${c.thumbnail}" alt="">`:'<span>🎞️</span>'}<small>${fmtTime(c.duration)}</small></div>
         <div><b title="${esc(c.name)}">${esc(c.name)}</b><small>${c.width&&c.height?`${c.width}×${c.height} • `:''}${fmtSize(c.size)}</small><em>${c.status==='loading'?'AI กำลังตรวจ...':c.status==='error'?'เปิดคลิปไม่ได้':'พร้อมปรับและดาวน์โหลด'}</em></div>
-        <button type="button" class="clip-remove" data-remove-clip="${c.id}" aria-label="ลบ">×</button>
+        <button type="button" class="clip-remove" data-remove-clip="${c.id}" aria-label="ลบคลิป" title="ลบคลิป">🗑</button>
       </article>`).join('') : `<div class="vprep-empty-list">เมื่อเพิ่มคลิป รายการจะอยู่ตรงนี้</div>`;
-    $$('[data-select-clip]',grid).forEach(el => el.addEventListener('click', e => { if(e.target.closest('[data-remove-clip]')) return; state.activeClipId=el.dataset.selectClip; suggestLook(false); render(); }));
-    $$('[data-remove-clip]',grid).forEach(btn => btn.addEventListener('click', () => removeClip(btn.dataset.removeClip)));
+    $$('[data-select-clip]',grid).forEach(el => el.addEventListener('click', e => {
+      if (e.target.closest('[data-remove-clip]') || e.target.closest('[data-check-clip]')) return;
+      state.activeClipId=el.dataset.selectClip; suggestLook(false); render();
+    }));
+    $$('[data-check-clip]',grid).forEach(input => input.addEventListener('change', e => {
+      e.stopPropagation();
+      if (input.checked) state.selectedClipIds.add(input.dataset.checkClip);
+      else state.selectedClipIds.delete(input.dataset.checkClip);
+      render();
+    }));
+    $$('[data-remove-clip]',grid).forEach(btn => btn.addEventListener('click', e => {
+      e.stopPropagation();
+      removeClip(btn.dataset.removeClip);
+    }));
   }
 
   function renderPreview() {
@@ -349,12 +388,16 @@ window.TANJAI = window.TANJAI || {};
   function removeClip(id) {
     const c = clipById(id); if (c) URL.revokeObjectURL(c.url);
     state.clips = state.clips.filter(x=>x.id!==id);
+    state.selectedClipIds.delete(id);
     if (state.activeClipId===id) state.activeClipId=state.clips[0]?.id||null;
     render();
+    TANJAI.toast?.('ลบคลิปออกจากรายการแล้ว');
   }
 
   function clearFiles() {
-    state.clips.forEach(c=>URL.revokeObjectURL(c.url)); state.clips=[]; state.activeClipId=null; render(); TANJAI.toast?.('ล้างคลิปแล้ว');
+    state.clips.forEach(c=>URL.revokeObjectURL(c.url));
+    state.clips=[]; state.activeClipId=null; state.selectedClipIds.clear();
+    render(); TANJAI.toast?.('ล้างคลิปแล้ว');
   }
 
   function recommendDestination() {
@@ -391,54 +434,300 @@ window.TANJAI = window.TANJAI || {};
   async function renderAndDownloadActive() {
     const clip = activeClip();
     if (!clip || state.busy) return;
-    if (!window.MediaRecorder || !HTMLCanvasElement.prototype.captureStream) {
-      TANJAI.toast?.('เบราว์เซอร์นี้ยังไม่รองรับการสร้างไฟล์วิดีโอ กรุณาใช้ Chrome รุ่นล่าสุด'); return;
-    }
-    state.busy=true; render();
-    const progress=$('#renderProgress'), bar=$('#renderProgressBar'), text=$('#renderProgressText'); progress.hidden=false;
+    state.busy = true; render();
     try {
-      const video=document.createElement('video'); video.src=clip.url; video.preload='auto'; video.playsInline=true; video.crossOrigin='anonymous';
-      await new Promise((resolve,reject)=>{video.onloadedmetadata=resolve;video.onerror=()=>reject(new Error('เปิดคลิปไม่ได้'));});
-      const maxW=1280, scale=Math.min(1,maxW/(video.videoWidth||maxW));
-      const canvas=document.createElement('canvas'); canvas.width=Math.max(2,Math.round((video.videoWidth||1280)*scale)); canvas.height=Math.max(2,Math.round((video.videoHeight||720)*scale));
-      const ctx=canvas.getContext('2d'); const stream=canvas.captureStream(30);
-      let audioCtx, source, destination;
-      try {
-        audioCtx=new (window.AudioContext||window.webkitAudioContext)(); source=audioCtx.createMediaElementSource(video); destination=audioCtx.createMediaStreamDestination();
-        let node=source;
-        if(state.audio.noiseReduce){const high=audioCtx.createBiquadFilter(),low=audioCtx.createBiquadFilter();high.type='highpass';high.frequency.value=80;low.type='lowpass';low.frequency.value=15000;node.connect(high);high.connect(low);node=low;}
-        if(state.audio.normalize){const gain=audioCtx.createGain();gain.gain.value=1.08;node.connect(gain);node=gain;}
-        node.connect(destination); destination.stream.getAudioTracks().forEach(t=>stream.addTrack(t));
-      } catch(_) {}
-      const chunks=[];
-      const requestedFormat=recordingFormat();
-      const recorderOptions=requestedFormat.mimeType ? {mimeType:requestedFormat.mimeType,videoBitsPerSecond:8000000,audioBitsPerSecond:192000} : undefined;
-      const recorder=new MediaRecorder(stream,recorderOptions);
-      const actualMimeType=recorder.mimeType || requestedFormat.mimeType || 'video/webm';
-      const actualIsMp4=/video\/mp4/i.test(actualMimeType);
-      const extension=actualIsMp4?'mp4':'webm';
-      recorder.ondataavailable=e=>{if(e.data?.size)chunks.push(e.data)};
-      const stopped=new Promise(resolve=>recorder.onstop=resolve);
-      recorder.start(500); await video.play();
-      const draw=()=>{if(video.paused||video.ended)return;ctx.save();ctx.filter=canvasFilterString();ctx.drawImage(video,0,0,canvas.width,canvas.height);ctx.restore();const pct=video.duration?Math.min(100,(video.currentTime/video.duration)*100):0;bar.style.width=`${pct}%`;text.textContent=`กำลังสร้าง ${Math.round(pct)}%`;requestAnimationFrame(draw)}; draw();
-      await new Promise(resolve=>video.onended=resolve); recorder.stop(); await stopped;
-      if(audioCtx) await audioCtx.close().catch(()=>{});
-      const blob=new Blob(chunks,{type:actualMimeType});
-      const base=clip.name.replace(/\.[^.]+$/,'').replace(/[\/:*?"<>|]/g,'_');
-      downloadBlob(blob,`${base}-tanjai-${state.look.preset}.${extension}`);
-      if (actualIsMp4) {
-        TANJAI.toast?.('ดาวน์โหลด MP4 พร้อมนำไปตัดต่อเรียบร้อย');
-      } else {
-        TANJAI.toast?.('เบราว์เซอร์นี้ยังสร้าง MP4 ไม่ได้ จึงดาวน์โหลดเป็น WebM แทน กรุณาใช้ Chrome, Edge หรือ Safari รุ่นล่าสุด');
-      }
-    } catch(err) {
-      console.error(err); TANJAI.toast?.('สร้างคลิปไม่สำเร็จ กรุณาลองคลิปขนาดสั้นลงหรือใช้ Chrome รุ่นล่าสุด');
+      const result = await renderClipToBlob(clip, 1, 1);
+      downloadBlob(result.blob, result.name);
+      TANJAI.toast?.(result.fallback
+        ? 'ไฟล์นี้ใช้ตัวเข้ารหัสที่เบราว์เซอร์ปรับภาพไม่ได้ จึงดาวน์โหลด MP4 ต้นฉบับเพื่อป้องกันไฟล์มีแต่เสียง'
+        : `ดาวน์โหลด ${result.extension.toUpperCase()} พร้อมนำไปตัดต่อเรียบร้อย`);
+    } catch (err) {
+      console.error(err);
+      TANJAI.toast?.('สร้างคลิปไม่สำเร็จ กรุณาลองคลิปขนาดสั้นลงหรือใช้ Chrome รุ่นล่าสุด');
     } finally {
-      state.busy=false; progress.hidden=true; bar.style.width='0%'; render();
+      state.busy = false; hideRenderProgress(); render();
     }
   }
 
-  function downloadBlob(blob,name) { const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1500); }
+  async function renderAndDownloadBatch(clips, allMode) {
+    clips = (clips || []).filter(Boolean);
+    if (!clips.length || state.busy) {
+      TANJAI.toast?.(allMode ? 'ยังไม่มีคลิปให้ดาวน์โหลด' : 'กรุณาเลือกคลิปก่อน');
+      return;
+    }
+    const totalSize = clips.reduce((sum, clip) => sum + clip.size, 0);
+    if (totalSize > 850 * 1024 * 1024) {
+      const proceed = window.confirm(`คลิปชุดนี้มีขนาดรวม ${fmtSize(totalSize)} การสร้าง ZIP อาจใช้หน่วยความจำและเวลาค่อนข้างมาก\n\nต้องการดำเนินการต่อหรือไม่?`);
+      if (!proceed) return;
+    }
+    state.busy = true; render();
+    try {
+      const files = [];
+      let fallbackCount = 0;
+      for (let i = 0; i < clips.length; i++) {
+        const result = await renderClipToBlob(clips[i], i + 1, clips.length);
+        files.push({ name: result.name, blob: result.blob });
+        if (result.fallback) fallbackCount++;
+      }
+      updateRenderProgress(99, 'กำลังรวมไฟล์เป็น ZIP...');
+      const zipBlob = await makeZip(files);
+      const stamp = new Date().toISOString().slice(0,10).replace(/-/g,'');
+      downloadBlob(zipBlob, `Tanjai-Video-${allMode?'all':'selected'}-${stamp}.zip`);
+      TANJAI.toast?.(fallbackCount
+        ? `ดาวน์โหลด ZIP แล้ว • ${fallbackCount} คลิปใช้ไฟล์ MP4 ต้นฉบับเพื่อป้องกันอาการมีแต่เสียง`
+        : `ดาวน์โหลด ZIP ${clips.length} คลิปเรียบร้อย`);
+    } catch (err) {
+      console.error(err);
+      TANJAI.toast?.('สร้างไฟล์ ZIP ไม่สำเร็จ กรุณาลดจำนวนคลิปแล้วลองใหม่');
+    } finally {
+      state.busy = false; hideRenderProgress(); render();
+    }
+  }
+
+  async function renderClipToBlob(clip, itemIndex = 1, itemTotal = 1) {
+    if (!window.MediaRecorder || !HTMLCanvasElement.prototype.captureStream) {
+      throw new Error('Browser video export is not supported');
+    }
+    updateRenderProgress(0, `กำลังเตรียมคลิป ${itemIndex}/${itemTotal}: ${clip.name}`);
+
+    const video = document.createElement('video');
+    video.src = clip.url;
+    video.preload = 'auto';
+    video.playsInline = true;
+    video.muted = false;
+
+    await new Promise((resolve, reject) => {
+      video.addEventListener('loadedmetadata', resolve, { once:true });
+      video.addEventListener('error', () => reject(new Error('เปิดคลิปไม่ได้')), { once:true });
+      video.load();
+    });
+
+    await new Promise(resolve => {
+      if (video.readyState >= 3) return resolve();
+      video.addEventListener('canplay', resolve, { once:true });
+      setTimeout(resolve, 2500);
+    });
+
+    const maxW = 1280;
+    const scale = Math.min(1, maxW / (video.videoWidth || maxW));
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(2, Math.round((video.videoWidth || 1280) * scale));
+    canvas.height = Math.max(2, Math.round((video.videoHeight || 720) * scale));
+    const ctx = canvas.getContext('2d', { willReadFrequently:true });
+    const stream = canvas.captureStream(30);
+
+    let audioCtx, source, destination;
+    try {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      source = audioCtx.createMediaElementSource(video);
+      destination = audioCtx.createMediaStreamDestination();
+      let node = source;
+      if (state.audio.noiseReduce) {
+        const high = audioCtx.createBiquadFilter(), low = audioCtx.createBiquadFilter();
+        high.type = 'highpass'; high.frequency.value = 80;
+        low.type = 'lowpass'; low.frequency.value = 15000;
+        node.connect(high); high.connect(low); node = low;
+      }
+      if (state.audio.normalize) {
+        const gain = audioCtx.createGain(); gain.gain.value = 1.08;
+        node.connect(gain); node = gain;
+      }
+      node.connect(destination);
+      destination.stream.getAudioTracks().forEach(track => stream.addTrack(track));
+    } catch (_) {}
+
+    const requestedFormat = recordingFormat();
+    const recorderOptions = requestedFormat.mimeType
+      ? { mimeType:requestedFormat.mimeType, videoBitsPerSecond:8000000, audioBitsPerSecond:192000 }
+      : undefined;
+    const chunks = [];
+    const recorder = new MediaRecorder(stream, recorderOptions);
+    const actualMimeType = recorder.mimeType || requestedFormat.mimeType || 'video/webm';
+    const actualIsMp4 = /video\/mp4/i.test(actualMimeType);
+    const extension = actualIsMp4 ? 'mp4' : 'webm';
+    recorder.ondataavailable = event => { if (event.data?.size) chunks.push(event.data); };
+    const stopped = new Promise(resolve => recorder.onstop = resolve);
+
+    let frameCount = 0;
+    let visibleFrameCount = 0;
+    let ended = false;
+    const drawFrame = () => {
+      if (ended) return;
+      try {
+        ctx.save();
+        ctx.filter = canvasFilterString();
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        ctx.restore();
+        frameCount++;
+        if (frameCount <= 8 || frameCount % 30 === 0) {
+          const sx = Math.max(0, Math.floor(canvas.width * .35));
+          const sy = Math.max(0, Math.floor(canvas.height * .35));
+          const sw = Math.max(1, Math.floor(canvas.width * .3));
+          const sh = Math.max(1, Math.floor(canvas.height * .3));
+          const data = ctx.getImageData(sx, sy, sw, sh).data;
+          let lum = 0;
+          for (let i = 0; i < data.length; i += 16) lum += data[i] + data[i+1] + data[i+2];
+          const avg = lum / Math.max(1, data.length / 16) / 3;
+          if (avg > 2.5) visibleFrameCount++;
+        }
+      } catch (_) {}
+      const pct = video.duration ? Math.min(98, (video.currentTime / video.duration) * 98) : 0;
+      updateRenderProgress(pct, `กำลังสร้างคลิป ${itemIndex}/${itemTotal} • ${Math.round(pct)}%`);
+      if ('requestVideoFrameCallback' in video) video.requestVideoFrameCallback(drawFrame);
+      else requestAnimationFrame(drawFrame);
+    };
+
+    try {
+      video.currentTime = 0;
+      await new Promise(resolve => {
+        if (video.readyState >= 2) return resolve();
+        video.addEventListener('loadeddata', resolve, { once:true });
+        setTimeout(resolve, 1800);
+      });
+      drawFrame();
+      recorder.start(500);
+      await video.play();
+      await new Promise(resolve => {
+        video.addEventListener('ended', resolve, { once:true });
+        video.addEventListener('error', resolve, { once:true });
+      });
+      ended = true;
+      recorder.stop();
+      await stopped;
+    } finally {
+      ended = true;
+      video.pause();
+      stream.getTracks().forEach(track => track.stop());
+      if (audioCtx) await audioCtx.close().catch(() => {});
+    }
+
+    const sourceWasVisible = (clip.brightness == null || clip.brightness > 4) && !!clip.thumbnail;
+    const renderedLooksBlank = sourceWasVisible && visibleFrameCount === 0;
+    const blob = new Blob(chunks, { type:actualMimeType });
+    const suspiciouslySmall = blob.size < Math.max(15000, clip.duration * 12000);
+
+    if (renderedLooksBlank || suspiciouslySmall) {
+      const fallbackName = safeFileName(clip.name.replace(/\.[^.]+$/, '')) + '-original.mp4';
+      return { blob:clip.file, name:fallbackName, extension:'mp4', fallback:true };
+    }
+
+    const base = safeFileName(clip.name.replace(/\.[^.]+$/, ''));
+    return {
+      blob,
+      name:`${base}-tanjai-${state.look.preset}.${extension}`,
+      extension,
+      fallback:false
+    };
+  }
+
+  function updateRenderProgress(percent, message) {
+    const progress = $('#renderProgress'), bar = $('#renderProgressBar'), text = $('#renderProgressText');
+    if (progress) progress.hidden = false;
+    if (bar) bar.style.width = `${Math.max(0, Math.min(100, Number(percent) || 0))}%`;
+    if (text) text.textContent = message || 'กำลังเตรียม...';
+  }
+
+  function hideRenderProgress() {
+    const progress = $('#renderProgress'), bar = $('#renderProgressBar');
+    if (progress) progress.hidden = true;
+    if (bar) bar.style.width = '0%';
+  }
+
+  function safeFileName(name) {
+    return String(name || 'clip').replace(/[\\/:*?"<>|]/g, '_').trim() || 'clip';
+  }
+
+  async function makeZip(files) {
+    let offset = 0;
+    const localParts = [];
+    const centralParts = [];
+
+    for (const file of files) {
+      const nameBytes = new TextEncoder().encode(file.name);
+      const data = new Uint8Array(await file.blob.arrayBuffer());
+      const crc = crc32(data);
+      const local = new Uint8Array(30 + nameBytes.length);
+      const lv = new DataView(local.buffer);
+      lv.setUint32(0, 0x04034b50, true);
+      lv.setUint16(4, 20, true);
+      lv.setUint16(6, 0, true);
+      lv.setUint16(8, 0, true);
+      lv.setUint16(10, 0, true);
+      lv.setUint16(12, 0, true);
+      lv.setUint32(14, crc, true);
+      lv.setUint32(18, data.length, true);
+      lv.setUint32(22, data.length, true);
+      lv.setUint16(26, nameBytes.length, true);
+      lv.setUint16(28, 0, true);
+      local.set(nameBytes, 30);
+      localParts.push(local, data);
+
+      const central = new Uint8Array(46 + nameBytes.length);
+      const cv = new DataView(central.buffer);
+      cv.setUint32(0, 0x02014b50, true);
+      cv.setUint16(4, 20, true);
+      cv.setUint16(6, 20, true);
+      cv.setUint16(8, 0, true);
+      cv.setUint16(10, 0, true);
+      cv.setUint16(12, 0, true);
+      cv.setUint16(14, 0, true);
+      cv.setUint32(16, crc, true);
+      cv.setUint32(20, data.length, true);
+      cv.setUint32(24, data.length, true);
+      cv.setUint16(28, nameBytes.length, true);
+      cv.setUint16(30, 0, true);
+      cv.setUint16(32, 0, true);
+      cv.setUint16(34, 0, true);
+      cv.setUint16(36, 0, true);
+      cv.setUint32(38, 0, true);
+      cv.setUint32(42, offset, true);
+      central.set(nameBytes, 46);
+      centralParts.push(central);
+      offset += local.length + data.length;
+    }
+
+    const centralSize = centralParts.reduce((sum, part) => sum + part.length, 0);
+    const end = new Uint8Array(22);
+    const ev = new DataView(end.buffer);
+    ev.setUint32(0, 0x06054b50, true);
+    ev.setUint16(4, 0, true);
+    ev.setUint16(6, 0, true);
+    ev.setUint16(8, files.length, true);
+    ev.setUint16(10, files.length, true);
+    ev.setUint32(12, centralSize, true);
+    ev.setUint32(16, offset, true);
+    ev.setUint16(20, 0, true);
+
+    return new Blob([...localParts, ...centralParts, end], { type:'application/zip' });
+  }
+
+  function crc32(bytes) {
+    let crc = 0 ^ (-1);
+    for (let i = 0; i < bytes.length; i++) {
+      crc = (crc >>> 8) ^ CRC_TABLE[(crc ^ bytes[i]) & 0xff];
+    }
+    return (crc ^ (-1)) >>> 0;
+  }
+
+  const CRC_TABLE = (() => {
+    const table = new Uint32Array(256);
+    for (let n = 0; n < 256; n++) {
+      let c = n;
+      for (let k = 0; k < 8; k++) c = (c & 1) ? (0xedb88320 ^ (c >>> 1)) : (c >>> 1);
+      table[n] = c >>> 0;
+    }
+    return table;
+  })();
+
+  function downloadBlob(blob,name) {
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download=name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href),2500);
+  }
 
   document.addEventListener('DOMContentLoaded', install);
   TANJAI.videoEditorState = state;
