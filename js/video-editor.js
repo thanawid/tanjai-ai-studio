@@ -5,7 +5,8 @@ window.TANJAI = window.TANJAI || {};
     mode: 'editor', clips: [], activeClipId: null, busy: false,
     look: { preset: 'auto', brightness: 100, contrast: 100, saturation: 100, warmth: 0 },
     audio: { normalize: true, noiseReduce: true },
-    destination: 'short', selectedClipIds: new Set()
+    destination: 'short', selectedClipIds: new Set(),
+    queue: { active: 0, waiting: 0, completed: 0, total: 0, concurrency: 3 }
   };
 
   const $ = (s, r = document) => r.querySelector(s);
@@ -170,7 +171,7 @@ window.TANJAI = window.TANJAI || {};
         </div>
       </section>
 
-      <div class="vprep-render-progress" id="renderProgress" hidden><b>กำลังสร้างคลิปที่ปรับแล้ว</b><div><i id="renderProgressBar"></i></div><small id="renderProgressText">กำลังเตรียม...</small></div>`;
+      <div class="vprep-render-progress" id="renderProgress" hidden><b>กำลังสร้างคลิปที่ปรับแล้ว</b><div><i id="renderProgressBar"></i></div><small id="renderProgressText">กำลังเตรียม...</small><small id="renderQueueText"></small></div>`;
   }
 
   function bind() {
@@ -305,8 +306,8 @@ window.TANJAI = window.TANJAI || {};
     return `brightness(${l.brightness}%) contrast(${l.contrast}%) saturate(${l.saturation}%) sepia(${sepia}%) hue-rotate(${hue}deg)`;
   }
 
-  function canvasFilterString() {
-    const l = state.look;
+  function canvasFilterString(look = state.look) {
+    const l = look;
     return `brightness(${l.brightness}%) contrast(${l.contrast}%) saturate(${l.saturation}%) sepia(${Math.max(0,l.warmth)*.45}%) hue-rotate(${l.warmth<0?l.warmth*.55:0}deg)`;
   }
 
@@ -436,7 +437,8 @@ window.TANJAI = window.TANJAI || {};
     if (!clip || state.busy) return;
     state.busy = true; render();
     try {
-      const result = await renderClipToBlob(clip, 1, 1);
+      const settings = exportSettings();
+      const result = await renderClipToBlob(clip, 1, 1, settings);
       downloadBlob(result.blob, result.name);
       TANJAI.toast?.(result.fallback
         ? 'ไฟล์นี้ใช้ตัวเข้ารหัสที่เบราว์เซอร์ปรับภาพไม่ได้ จึงดาวน์โหลด MP4 ต้นฉบับเพื่อป้องกันไฟล์มีแต่เสียง'
@@ -462,13 +464,11 @@ window.TANJAI = window.TANJAI || {};
     }
     state.busy = true; render();
     try {
-      const files = [];
-      let fallbackCount = 0;
-      for (let i = 0; i < clips.length; i++) {
-        const result = await renderClipToBlob(clips[i], i + 1, clips.length);
-        files.push({ name: result.name, blob: result.blob });
-        if (result.fallback) fallbackCount++;
-      }
+      const settings = exportSettings();
+      const concurrency = queueConcurrency(clips.length);
+      const results = await processRenderQueue(clips, concurrency, settings);
+      const files = results.map(result => ({ name: result.name, blob: result.blob }));
+      const fallbackCount = results.filter(result => result.fallback).length;
       updateRenderProgress(99, 'กำลังรวมไฟล์เป็น ZIP...');
       const zipBlob = await makeZip(files);
       const stamp = new Date().toISOString().slice(0,10).replace(/-/g,'');
@@ -484,7 +484,54 @@ window.TANJAI = window.TANJAI || {};
     }
   }
 
-  async function renderClipToBlob(clip, itemIndex = 1, itemTotal = 1) {
+  function exportSettings() {
+    return {
+      look: { ...state.look },
+      audio: { ...state.audio }
+    };
+  }
+
+  function queueConcurrency(total) {
+    const cores = Number(navigator.hardwareConcurrency) || 4;
+    return Math.min(total, Math.max(3, Math.min(5, Math.floor(cores / 2) || 3)));
+  }
+
+  async function processRenderQueue(clips, concurrency, settings) {
+    const results = new Array(clips.length);
+    let nextIndex = 0;
+    state.queue = { active: 0, waiting: clips.length, completed: 0, total: clips.length, concurrency };
+    updateQueueProgress();
+
+    async function worker() {
+      while (nextIndex < clips.length) {
+        const index = nextIndex++;
+        state.queue.waiting--;
+        state.queue.active++;
+        updateQueueProgress();
+        try {
+          results[index] = await renderClipToBlob(clips[index], index + 1, clips.length, settings);
+        } finally {
+          state.queue.active--;
+          state.queue.completed++;
+          updateQueueProgress();
+        }
+        await new Promise(resolve => setTimeout(resolve, 0));
+      }
+    }
+
+    await Promise.all(Array.from({ length: Math.min(concurrency, clips.length) }, () => worker()));
+    return results;
+  }
+
+  function updateQueueProgress() {
+    const q = state.queue;
+    const el = $('#renderQueueText');
+    if (el) el.textContent = q.total
+      ? `ทำพร้อมกัน ${q.concurrency} คลิป • กำลังทำ ${q.active} • รอคิว ${q.waiting} • เสร็จ ${q.completed}/${q.total}`
+      : '';
+  }
+
+  async function renderClipToBlob(clip, itemIndex = 1, itemTotal = 1, settings = exportSettings()) {
     if (!window.MediaRecorder || !HTMLCanvasElement.prototype.captureStream) {
       throw new Error('Browser video export is not supported');
     }
@@ -495,9 +542,16 @@ window.TANJAI = window.TANJAI || {};
     video.preload = 'auto';
     video.playsInline = true;
     video.muted = false;
+    video.crossOrigin = 'anonymous';
 
     await new Promise((resolve, reject) => {
-      video.addEventListener('loadedmetadata', resolve, { once:true });
+      video.addEventListener('loadedmetadata', () => {
+        if (!video.videoWidth || !video.videoHeight || !Number.isFinite(video.duration)) {
+          reject(new Error('อ่าน video stream ไม่สำเร็จ'));
+          return;
+        }
+        resolve();
+      }, { once:true });
       video.addEventListener('error', () => reject(new Error('เปิดคลิปไม่ได้')), { once:true });
       video.load();
     });
@@ -522,13 +576,13 @@ window.TANJAI = window.TANJAI || {};
       source = audioCtx.createMediaElementSource(video);
       destination = audioCtx.createMediaStreamDestination();
       let node = source;
-      if (state.audio.noiseReduce) {
+      if (settings.audio.noiseReduce) {
         const high = audioCtx.createBiquadFilter(), low = audioCtx.createBiquadFilter();
         high.type = 'highpass'; high.frequency.value = 80;
         low.type = 'lowpass'; low.frequency.value = 15000;
         node.connect(high); high.connect(low); node = low;
       }
-      if (state.audio.normalize) {
+      if (settings.audio.normalize) {
         const gain = audioCtx.createGain(); gain.gain.value = 1.08;
         node.connect(gain); node = gain;
       }
@@ -555,7 +609,7 @@ window.TANJAI = window.TANJAI || {};
       if (ended) return;
       try {
         ctx.save();
-        ctx.filter = canvasFilterString();
+        ctx.filter = canvasFilterString(settings.look);
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
         ctx.restore();
         frameCount++;
@@ -597,8 +651,15 @@ window.TANJAI = window.TANJAI || {};
     } finally {
       ended = true;
       video.pause();
+      video.removeAttribute('src');
+      video.load();
       stream.getTracks().forEach(track => track.stop());
+      destination?.stream?.getTracks().forEach(track => track.stop());
+      source?.disconnect?.();
+      destination?.disconnect?.();
       if (audioCtx) await audioCtx.close().catch(() => {});
+      canvas.width = 1;
+      canvas.height = 1;
     }
 
     const sourceWasVisible = (clip.brightness == null || clip.brightness > 4) && !!clip.thumbnail;
@@ -614,7 +675,7 @@ window.TANJAI = window.TANJAI || {};
     const base = safeFileName(clip.name.replace(/\.[^.]+$/, ''));
     return {
       blob,
-      name:`${base}-tanjai-${state.look.preset}.${extension}`,
+      name:`${base}-tanjai-${settings.look.preset}.${extension}`,
       extension,
       fallback:false
     };
@@ -631,6 +692,8 @@ window.TANJAI = window.TANJAI || {};
     const progress = $('#renderProgress'), bar = $('#renderProgressBar');
     if (progress) progress.hidden = true;
     if (bar) bar.style.width = '0%';
+    state.queue = { active: 0, waiting: 0, completed: 0, total: 0, concurrency: 3 };
+    updateQueueProgress();
   }
 
   function safeFileName(name) {
