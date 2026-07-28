@@ -4,6 +4,7 @@ window.TANJAI = window.TANJAI || {};
   const state = {
     mode: 'editor', clips: [], activeClipId: null, busy: false,
     look: { preset: 'auto', brightness: 100, contrast: 100, saturation: 100, warmth: 0 },
+    lookMode: 'auto',
     audio: { normalize: true, noiseReduce: true },
     destination: 'short', selectedClipIds: new Set(),
     queue: { active: 0, waiting: 0, completed: 0, total: 0, concurrency: 3 }
@@ -188,13 +189,17 @@ window.TANJAI = window.TANJAI || {};
     dz?.addEventListener('drop', e => addFiles(e.dataTransfer.files));
 
     $$('[data-adjust-tab]').forEach(btn => btn.addEventListener('click', () => setAdjustTab(btn.dataset.adjustTab)));
-    $$('[data-look]').forEach(btn => btn.addEventListener('click', () => applyPreset(btn.dataset.look, true)));
+    $$('[data-look]').forEach(btn => btn.addEventListener('click', () => applyPreset(btn.dataset.look, true, true)));
     $('#autoLookBtn')?.addEventListener('click', () => suggestLook(true));
-    $('#resetLookBtn')?.addEventListener('click', () => applyPreset('auto', true));
+    $('#resetLookBtn')?.addEventListener('click', () => applyPreset('auto', true, true));
 
     const sliders = { lookBrightness:'brightness', lookContrast:'contrast', lookSaturation:'saturation', lookWarmth:'warmth' };
     Object.entries(sliders).forEach(([id,key]) => $('#'+id)?.addEventListener('input', e => {
-      state.look[key] = Number(e.target.value); state.look.preset = 'custom'; updateLookUI(); applyPreview();
+      state.look[key] = Number(e.target.value);
+      state.look.preset = 'custom';
+      state.lookMode = 'manual';
+      updateLookUI();
+      applyPreview();
     }));
     $('#audioNormalize')?.addEventListener('change', e => state.audio.normalize = e.target.checked);
     $('#audioNoise')?.addEventListener('change', e => state.audio.noiseReduce = e.target.checked);
@@ -260,7 +265,7 @@ window.TANJAI = window.TANJAI || {};
         clip.brightness = lum/(d.length/4);
       } catch (_) {}
       clip.status = 'ready';
-      if (clip.id === state.activeClipId) suggestLook(false);
+      if (clip.id === state.activeClipId && state.lookMode === 'auto') suggestLook(false);
       render();
     };
     v.onerror = () => { clip.status = 'error'; render(); };
@@ -285,12 +290,13 @@ window.TANJAI = window.TANJAI || {};
       else if (clip.brightness > 190) preset = 'cinema';
       else preset = 'news';
     }
-    applyPreset(preset, false);
+    applyPreset(preset, false, false);
     if (notify) TANJAI.toast?.(`AI แนะนำแนว “${presetName(preset)}”`);
   }
 
-  function applyPreset(name, notify = false) {
+  function applyPreset(name, notify = false, manual = true) {
     state.look = { preset:name, ...presetValues(name) };
+    state.lookMode = manual ? 'manual' : 'auto';
     updateLookUI(); applyPreview();
     if (notify) TANJAI.toast?.(`ใช้แนว ${presetName(name)} แล้ว`);
   }
@@ -322,11 +328,12 @@ window.TANJAI = window.TANJAI || {};
     $$('[data-look]').forEach(b => b.classList.toggle('active', b.dataset.look === state.look.preset));
     const name = presetName(state.look.preset);
     if ($('#previewPresetLabel')) $('#previewPresetLabel').textContent = name;
-    if ($('#lookSummary')) $('#lookSummary').innerHTML = `<b>AI ปรับให้แล้ว:</b> ${name} • สว่าง ${state.look.brightness-100>=0?'+':''}${state.look.brightness-100} • คอนทราสต์ ${state.look.contrast-100>=0?'+':''}${state.look.contrast-100} • สี ${state.look.saturation-100>=0?'+':''}${state.look.saturation-100}`;
+    if ($('#lookSummary')) $('#lookSummary').innerHTML = `<b>${state.lookMode === 'manual' ? 'ค่าที่คุณเลือก:' : 'AI แนะนำ:'}</b> ${name} • สว่าง ${state.look.brightness-100>=0?'+':''}${state.look.brightness-100} • คอนทราสต์ ${state.look.contrast-100>=0?'+':''}${state.look.contrast-100} • สี ${state.look.saturation-100>=0?'+':''}${state.look.saturation-100}`;
   }
 
   function applyPreview() {
-    const video = $('#editorPreviewStage video'); if (video) video.style.filter = filterString();
+    const video = $('#editorPreviewStage video');
+    if (video) video.style.setProperty('filter', filterString(), 'important');
   }
 
   function render() {
@@ -360,7 +367,9 @@ window.TANJAI = window.TANJAI || {};
       </article>`).join('') : `<div class="vprep-empty-list">เมื่อเพิ่มคลิป รายการจะอยู่ตรงนี้</div>`;
     $$('[data-select-clip]',grid).forEach(el => el.addEventListener('click', e => {
       if (e.target.closest('[data-remove-clip]') || e.target.closest('[data-check-clip]')) return;
-      state.activeClipId=el.dataset.selectClip; suggestLook(false); render();
+      state.activeClipId=el.dataset.selectClip;
+      if (state.lookMode === 'auto') suggestLook(false);
+      render();
     }));
     $$('[data-check-clip]',grid).forEach(input => input.addEventListener('change', e => {
       e.stopPropagation();

@@ -5356,7 +5356,7 @@ label > .field-hint + select{
 @media(max-width:1280px){#video.view.active .studio-layout{grid-template-columns:1fr}.video-adjust-body{grid-template-columns:1fr 1fr}.result-panel{position:relative;top:auto}}
 @media(max-width:760px){.video-adjust-body{grid-template-columns:1fr}.video-adjust-tabs{grid-template-columns:repeat(3,1fr)}.video-adjust-head{flex-direction:column}.video-adjust-head .btn{width:100%}.adjust-pane{min-height:auto}.video-next-step-grid{grid-template-columns:1fr}}
 
-/* ===== Tanjai Video Prep Workspace V11.5.1 ===== */
+/* ===== Tanjai Video Prep Workspace V11.5.2 ===== */
 #video.view.active .studio-layout{grid-template-columns:minmax(390px,.78fr) minmax(620px,1.22fr);gap:16px;align-items:start}
 #video.view.active .panel{padding:16px;border-radius:20px}
 #video.view.active .form-panel>.panel-head,#video.view.active .result-panel>.panel-head{display:none}
@@ -5374,7 +5374,7 @@ label > .field-hint + select{
 @media(max-width:1280px){#video.view.active .studio-layout{grid-template-columns:1fr}.vprep-main-grid{grid-template-columns:1fr 1fr}#video.view.active .result-panel{position:relative;top:auto}}
 @media(max-width:760px){.vprep-main-grid,.vprep-destination-grid{grid-template-columns:1fr}.vprep-preset-grid{grid-template-columns:repeat(2,1fr)}.vprep-destination-options{grid-template-columns:repeat(2,1fr)}.vprep-adjust-head,.vprep-destination header{flex-direction:column}.vprep-adjust-head .btn{width:100%}.vprep-sliders label{grid-template-columns:78px 1fr 34px}}
 
-/* ===== Tanjai Video Prep Workspace V11.5.1 ===== */
+/* ===== Tanjai Video Prep Workspace V11.5.2 ===== */
 .vprep-upload-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
 .vprep-upload-actions .btn{padding:7px 10px;font-size:10px}
 .vprep-selection-summary{margin:-3px 0 8px;color:#d8c8f2;font-size:10px;text-align:right}
