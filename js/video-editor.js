@@ -7,7 +7,8 @@ window.TANJAI = window.TANJAI || {};
     lookMode: 'auto',
     audio: { normalize: true, noiseReduce: true },
     destination: 'short', selectedClipIds: new Set(),
-    queue: { active: 0, waiting: 0, completed: 0, total: 0, concurrency: 3 }
+    queue: { active: 0, waiting: 0, completed: 0, failed: 0, total: 0, concurrency: 3, paused: false, cancelled: false },
+    activeJobs: new Set()
   };
 
   const $ = (s, r = document) => r.querySelector(s);
@@ -172,7 +173,16 @@ window.TANJAI = window.TANJAI || {};
         </div>
       </section>
 
-      <div class="vprep-render-progress" id="renderProgress" hidden><b>กำลังสร้างคลิปที่ปรับแล้ว</b><div><i id="renderProgressBar"></i></div><small id="renderProgressText">กำลังเตรียม...</small><small id="renderQueueText"></small></div>`;
+      <div class="vprep-render-progress" id="renderProgress" hidden>
+        <div class="vprep-progress-head"><b id="renderProgressTitle">กำลังประมวลผลวิดีโอ</b><strong id="renderOverallPercent">0%</strong></div>
+        <div class="vprep-overall-track"><i id="renderProgressBar"></i></div>
+        <small id="renderProgressText">กำลังเตรียม...</small>
+        <small id="renderQueueText"></small>
+        <div class="vprep-queue-actions">
+          <button class="btn secondary" id="pauseRenderBtn" type="button">⏸ พักงาน</button>
+          <button class="btn secondary danger" id="cancelRenderBtn" type="button">ยกเลิก</button>
+        </div>
+      </div>`;
   }
 
   function bind() {
@@ -207,6 +217,8 @@ window.TANJAI = window.TANJAI || {};
     $('#downloadAdjustedBtn')?.addEventListener('click', renderAndDownloadActive);
     $('#downloadSelectedBtn')?.addEventListener('click', () => renderAndDownloadBatch(selectedClips(), false));
     $('#downloadAllZipBtn')?.addEventListener('click', () => renderAndDownloadBatch([...state.clips], true));
+    $('#pauseRenderBtn')?.addEventListener('click', toggleQueuePause);
+    $('#cancelRenderBtn')?.addEventListener('click', cancelQueue);
     $('#showAiDestinationsBtn')?.addEventListener('click', () => {
       const box = $('#aiDestinations'); box.hidden = !box.hidden;
       if (!box.hidden) recommendDestination();
@@ -345,6 +357,9 @@ window.TANJAI = window.TANJAI || {};
     const allBtn = $('#downloadAllZipBtn'); if (allBtn) allBtn.disabled = !state.clips.length || state.busy;
     const selectAllBtn = $('#selectAllClipsBtn'); if (selectAllBtn) selectAllBtn.disabled = !state.clips.length || state.busy;
     const clearSelectionBtn = $('#clearSelectionBtn'); if (clearSelectionBtn) clearSelectionBtn.disabled = !selectedClips().length || state.busy;
+    const footageInput = $('#videoFootageInput'); if (footageInput) footageInput.disabled = state.busy;
+    const pickBtn = $('#pickFootageBtn'); if (pickBtn) pickBtn.disabled = state.busy;
+    $$('button,input', $('#videoLookPanel') || document.createElement('div')).forEach(control => control.disabled = state.busy);
     const selectionSummary = $('#videoSelectionSummary');
     if (selectionSummary) selectionSummary.textContent = state.clips.length
       ? `เลือกไว้ ${selectedClips().length} จาก ${state.clips.length} คลิป`
@@ -362,8 +377,8 @@ window.TANJAI = window.TANJAI || {};
           <span></span>
         </label>
         <div class="vprep-thumb">${c.thumbnail?`<img src="${c.thumbnail}" alt="">`:'<span>🎞️</span>'}<small>${fmtTime(c.duration)}</small></div>
-        <div><b title="${esc(c.name)}">${esc(c.name)}</b><small>${c.width&&c.height?`${c.width}×${c.height} • `:''}${fmtSize(c.size)}</small><em>${c.status==='loading'?'AI กำลังตรวจ...':c.status==='error'?'เปิดคลิปไม่ได้':'พร้อมปรับและดาวน์โหลด'}</em></div>
-        <button type="button" class="clip-remove" data-remove-clip="${c.id}" aria-label="ลบคลิป" title="ลบคลิป">🗑</button>
+        <div><b title="${esc(c.name)}">${esc(c.name)}</b><small>${c.width&&c.height?`${c.width}×${c.height} • `:''}${fmtSize(c.size)}</small><em data-clip-status="${c.id}" class="clip-status-${c.exportStatus||'ready'}">${clipStatusText(c)}</em><i class="vprep-clip-progress" data-clip-progress-wrap="${c.id}" ${c.exportStatus==='processing'?'':'hidden'}><span data-clip-progress="${c.id}" style="width:${c.exportProgress||0}%"></span></i></div>
+        <button type="button" class="clip-remove" data-remove-clip="${c.id}" aria-label="นำคลิปนี้ออก" title="นำคลิปนี้ออกจากรายการ">🗑 <span>ลบ</span></button>
       </article>`).join('') : `<div class="vprep-empty-list">เมื่อเพิ่มคลิป รายการจะอยู่ตรงนี้</div>`;
     $$('[data-select-clip]',grid).forEach(el => el.addEventListener('click', e => {
       if (e.target.closest('[data-remove-clip]') || e.target.closest('[data-check-clip]')) return;
@@ -396,7 +411,10 @@ window.TANJAI = window.TANJAI || {};
   }
 
   function removeClip(id) {
-    const c = clipById(id); if (c) URL.revokeObjectURL(c.url);
+    if (state.busy) { TANJAI.toast?.('กรุณารอให้งานปัจจุบันเสร็จ หรือกดยกเลิกก่อน'); return; }
+    const c = clipById(id);
+    if (c && !window.confirm(`นำ “${c.name}” ออกจากรายการหรือไม่?\nไฟล์ต้นฉบับในเครื่องจะไม่ถูกลบ`)) return;
+    if (c) URL.revokeObjectURL(c.url);
     state.clips = state.clips.filter(x=>x.id!==id);
     state.selectedClipIds.delete(id);
     if (state.activeClipId===id) state.activeClipId=state.clips[0]?.id||null;
@@ -405,6 +423,7 @@ window.TANJAI = window.TANJAI || {};
   }
 
   function clearFiles() {
+    if (state.busy) { TANJAI.toast?.('กรุณารอให้งานปัจจุบันเสร็จ หรือกดยกเลิกก่อน'); return; }
     state.clips.forEach(c=>URL.revokeObjectURL(c.url));
     state.clips=[]; state.activeClipId=null; state.selectedClipIds.clear();
     render(); TANJAI.toast?.('ล้างคลิปแล้ว');
@@ -467,15 +486,21 @@ window.TANJAI = window.TANJAI || {};
       return;
     }
     const totalSize = clips.reduce((sum, clip) => sum + clip.size, 0);
-    if (totalSize > 850 * 1024 * 1024) {
-      const proceed = window.confirm(`คลิปชุดนี้มีขนาดรวม ${fmtSize(totalSize)} การสร้าง ZIP อาจใช้หน่วยความจำและเวลาค่อนข้างมาก\n\nต้องการดำเนินการต่อหรือไม่?`);
-      if (!proceed) return;
-    }
+    const totalDuration = clips.reduce((sum, clip) => sum + (clip.duration || 0), 0);
+    const tempSize = totalSize * 2.2;
+    const proceed = window.confirm(
+      `กำลังประมวลผล ${clips.length} คลิป • ${fmtSize(totalSize)} • ความยาวรวม ${fmtTime(totalDuration)}\n\n` +
+      `ควรมีพื้นที่ว่างชั่วคราวประมาณ ${fmtSize(tempSize)} และอาจใช้เวลาหลายนาที ` +
+      `ระบบจะทำพร้อมกัน 3–5 คลิป\n\nต้องการเริ่มหรือไม่?`
+    );
+    if (!proceed) return;
+    clips.forEach(clip => { clip.exportStatus = 'queued'; clip.exportProgress = 0; });
     state.busy = true; render();
     try {
       const settings = exportSettings();
       const concurrency = queueConcurrency(clips.length);
       const results = await processRenderQueue(clips, concurrency, settings);
+      if (state.queue.cancelled) throw new Error('QUEUE_CANCELLED');
       const files = results.map(result => ({ name: result.name, blob: result.blob }));
       const fallbackCount = results.filter(result => result.fallback).length;
       updateRenderProgress(99, 'กำลังรวมไฟล์เป็น ZIP...');
@@ -487,8 +512,13 @@ window.TANJAI = window.TANJAI || {};
         : `ดาวน์โหลด ZIP ${clips.length} คลิปเรียบร้อย`);
     } catch (err) {
       console.error(err);
-      TANJAI.toast?.('สร้างไฟล์ ZIP ไม่สำเร็จ กรุณาลดจำนวนคลิปแล้วลองใหม่');
+      TANJAI.toast?.(err?.message === 'QUEUE_CANCELLED'
+        ? 'ยกเลิกการประมวลผลแล้ว'
+        : 'สร้างไฟล์ ZIP ไม่สำเร็จ กรุณาลดจำนวนคลิปแล้วลองใหม่');
     } finally {
+      clips.forEach(clip => {
+        if (clip.exportStatus === 'queued' || clip.exportStatus === 'processing') clip.exportStatus = state.queue.cancelled ? 'cancelled' : 'ready';
+      });
       state.busy = false; hideRenderProgress(); render();
     }
   }
@@ -508,20 +538,38 @@ window.TANJAI = window.TANJAI || {};
   async function processRenderQueue(clips, concurrency, settings) {
     const results = new Array(clips.length);
     let nextIndex = 0;
-    state.queue = { active: 0, waiting: clips.length, completed: 0, total: clips.length, concurrency };
+    state.queue = { active: 0, waiting: clips.length, completed: 0, failed: 0, total: clips.length, concurrency, paused: false, cancelled: false };
     updateQueueProgress();
 
     async function worker() {
-      while (nextIndex < clips.length) {
+      while (nextIndex < clips.length && !state.queue.cancelled) {
+        await waitWhilePaused();
+        if (state.queue.cancelled) break;
         const index = nextIndex++;
+        const clip = clips[index];
         state.queue.waiting--;
         state.queue.active++;
+        clip.exportStatus = 'processing';
+        clip.exportProgress = 0;
+        renderClips();
         updateQueueProgress();
         try {
-          results[index] = await renderClipToBlob(clips[index], index + 1, clips.length, settings);
+          results[index] = await renderClipToBlob(clip, index + 1, clips.length, settings);
+          if (state.queue.cancelled) throw new Error('QUEUE_CANCELLED');
+          clip.exportStatus = 'done';
+          clip.exportProgress = 100;
+          state.queue.completed++;
+        } catch (err) {
+          if (err?.message === 'QUEUE_CANCELLED') {
+            clip.exportStatus = 'cancelled';
+            return;
+          } else {
+            clip.exportStatus = 'error';
+            state.queue.failed++;
+          }
         } finally {
           state.queue.active--;
-          state.queue.completed++;
+          renderClips();
           updateQueueProgress();
         }
         await new Promise(resolve => setTimeout(resolve, 0));
@@ -529,15 +577,89 @@ window.TANJAI = window.TANJAI || {};
     }
 
     await Promise.all(Array.from({ length: Math.min(concurrency, clips.length) }, () => worker()));
+    if (state.queue.cancelled) throw new Error('QUEUE_CANCELLED');
+    if (state.queue.failed) throw new Error(`RENDER_FAILED:${state.queue.failed}`);
     return results;
   }
 
   function updateQueueProgress() {
     const q = state.queue;
+    const finished = q.completed + q.failed;
+    const percent = q.total ? Math.round((finished / q.total) * 100) : 0;
+    const bar = $('#renderProgressBar'), percentEl = $('#renderOverallPercent');
+    if (bar) bar.style.width = `${percent}%`;
+    if (percentEl) percentEl.textContent = `${percent}%`;
     const el = $('#renderQueueText');
     if (el) el.textContent = q.total
-      ? `ทำพร้อมกัน ${q.concurrency} คลิป • กำลังทำ ${q.active} • รอคิว ${q.waiting} • เสร็จ ${q.completed}/${q.total}`
+      ? `${q.paused?'พักงานอยู่ • ':''}กำลังทำ ${q.active} • รอคิว ${q.waiting} • เสร็จ ${q.completed}/${q.total}${q.failed?` • ผิดพลาด ${q.failed}`:''}`
       : '';
+    const allBtn = $('#downloadAllZipBtn');
+    if (allBtn) allBtn.textContent = state.busy && q.total
+      ? `กำลังประมวลผล… ${q.completed}/${q.total}`
+      : `ดาวน์โหลดทั้งหมด (.ZIP)`;
+    const text = $('#renderProgressText');
+    if (text && q.total) text.textContent = `ประมวลผลพร้อมกันสูงสุด ${q.concurrency} คลิป`;
+  }
+
+  function clipStatusText(clip) {
+    if (clip.status === 'loading') return 'AI กำลังตรวจ...';
+    if (clip.status === 'error') return 'เปิดคลิปไม่ได้';
+    return ({
+      queued:'รอคิว',
+      processing:`กำลังประมวลผล ${Math.round(clip.exportProgress||0)}%`,
+      done:'เสร็จแล้ว พร้อมดาวน์โหลด',
+      error:'ไม่สำเร็จ กรุณาลองใหม่',
+      cancelled:'ยกเลิกแล้ว',
+      ready:'พร้อมปรับและดาวน์โหลด'
+    })[clip.exportStatus || 'ready'];
+  }
+
+  function updateClipProgress(clip, percent) {
+    clip.exportProgress = Math.max(0, Math.min(100, Number(percent) || 0));
+    const status = $(`[data-clip-status="${clip.id}"]`);
+    const wrap = $(`[data-clip-progress-wrap="${clip.id}"]`);
+    const bar = $(`[data-clip-progress="${clip.id}"]`);
+    if (status) status.textContent = clipStatusText(clip);
+    if (status) status.className = `clip-status-${clip.exportStatus || 'ready'}`;
+    if (wrap) wrap.hidden = false;
+    if (bar) bar.style.width = `${clip.exportProgress}%`;
+  }
+
+  async function waitWhilePaused() {
+    while (state.queue.paused && !state.queue.cancelled) {
+      await new Promise(resolve => setTimeout(resolve, 150));
+    }
+  }
+
+  function toggleQueuePause() {
+    if (!state.busy || state.queue.cancelled) return;
+    state.queue.paused = !state.queue.paused;
+    state.activeJobs.forEach(job => {
+      try {
+        if (state.queue.paused) {
+          job.video.pause();
+          if (job.recorder?.state === 'recording') job.recorder.pause();
+        } else {
+          if (job.recorder?.state === 'paused') job.recorder.resume();
+          job.video.play().catch(() => {});
+        }
+      } catch (_) {}
+    });
+    const btn = $('#pauseRenderBtn');
+    if (btn) btn.textContent = state.queue.paused ? '▶ ทำต่อ' : '⏸ พักงาน';
+    updateQueueProgress();
+  }
+
+  function cancelQueue() {
+    if (!state.busy || state.queue.cancelled) return;
+    if (!window.confirm('ต้องการยกเลิกการประมวลผลชุดนี้หรือไม่? คลิปต้นฉบับจะไม่ถูกลบ')) return;
+    state.queue.cancelled = true;
+    state.queue.paused = false;
+    state.queue.waiting = 0;
+    state.activeJobs.forEach(job => {
+      try { job.video.pause(); } catch (_) {}
+    });
+    updateQueueProgress();
   }
 
   async function renderClipToBlob(clip, itemIndex = 1, itemTotal = 1, settings = exportSettings()) {
@@ -605,6 +727,8 @@ window.TANJAI = window.TANJAI || {};
       : undefined;
     const chunks = [];
     const recorder = new MediaRecorder(stream, recorderOptions);
+    const activeJob = { video, recorder };
+    state.activeJobs.add(activeJob);
     const actualMimeType = recorder.mimeType || requestedFormat.mimeType || 'video/webm';
     const actualIsMp4 = /video\/mp4/i.test(actualMimeType);
     const extension = actualIsMp4 ? 'mp4' : 'webm';
@@ -635,7 +759,7 @@ window.TANJAI = window.TANJAI || {};
         }
       } catch (_) {}
       const pct = video.duration ? Math.min(98, (video.currentTime / video.duration) * 98) : 0;
-      updateRenderProgress(pct, `กำลังสร้างคลิป ${itemIndex}/${itemTotal} • ${Math.round(pct)}%`);
+      updateClipProgress(clip, pct);
       if ('requestVideoFrameCallback' in video) video.requestVideoFrameCallback(drawFrame);
       else requestAnimationFrame(drawFrame);
     };
@@ -651,12 +775,23 @@ window.TANJAI = window.TANJAI || {};
       recorder.start(500);
       await video.play();
       await new Promise(resolve => {
-        video.addEventListener('ended', resolve, { once:true });
-        video.addEventListener('error', resolve, { once:true });
+        let cancelCheck;
+        const finish = () => {
+          clearInterval(cancelCheck);
+          resolve();
+        };
+        video.addEventListener('ended', finish, { once:true });
+        video.addEventListener('error', finish, { once:true });
+        cancelCheck = setInterval(() => {
+          if (state.queue.cancelled) {
+            finish();
+          }
+        }, 150);
       });
       ended = true;
-      recorder.stop();
+      if (recorder.state !== 'inactive') recorder.stop();
       await stopped;
+      if (state.queue.cancelled) throw new Error('QUEUE_CANCELLED');
     } finally {
       ended = true;
       video.pause();
@@ -669,6 +804,7 @@ window.TANJAI = window.TANJAI || {};
       if (audioCtx) await audioCtx.close().catch(() => {});
       canvas.width = 1;
       canvas.height = 1;
+      state.activeJobs.delete(activeJob);
     }
 
     const sourceWasVisible = (clip.brightness == null || clip.brightness > 4) && !!clip.thumbnail;
@@ -694,6 +830,7 @@ window.TANJAI = window.TANJAI || {};
     const progress = $('#renderProgress'), bar = $('#renderProgressBar'), text = $('#renderProgressText');
     if (progress) progress.hidden = false;
     if (bar) bar.style.width = `${Math.max(0, Math.min(100, Number(percent) || 0))}%`;
+    if ($('#renderOverallPercent')) $('#renderOverallPercent').textContent = `${Math.round(Math.max(0, Math.min(100, Number(percent) || 0)))}%`;
     if (text) text.textContent = message || 'กำลังเตรียม...';
   }
 
@@ -701,7 +838,9 @@ window.TANJAI = window.TANJAI || {};
     const progress = $('#renderProgress'), bar = $('#renderProgressBar');
     if (progress) progress.hidden = true;
     if (bar) bar.style.width = '0%';
-    state.queue = { active: 0, waiting: 0, completed: 0, total: 0, concurrency: 3 };
+    state.queue = { active: 0, waiting: 0, completed: 0, failed: 0, total: 0, concurrency: 3, paused: false, cancelled: false };
+    state.activeJobs.clear();
+    if ($('#pauseRenderBtn')) $('#pauseRenderBtn').textContent = '⏸ พักงาน';
     updateQueueProgress();
   }
 
