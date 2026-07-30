@@ -87,7 +87,7 @@ TANJAI.switchView = function(id, options = {}){
     album:"ชุดภาพโพสต์ Facebook",
     post:"เรียบเรียงเนื้อหา",
     mc:"งานพิธีกร",
-    video:"เตรียมคลิป",
+    video:"แต่งวิดีโอ AI",
     videoEditor:"ตัดต่อวิดีโอ",
     voice:"เสียงพากย์",
     deck:"ทำสไลด์",

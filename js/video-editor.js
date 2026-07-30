@@ -30,11 +30,6 @@ window.TANJAI = window.TANJAI || {};
     originalForm.id = 'videoScriptMode';
     while (form.firstChild) originalForm.appendChild(form.firstChild);
 
-    form.appendChild(document.createRange().createContextualFragment(`
-      <div class="video-mode-switch" role="tablist">
-        <button type="button" class="video-mode-btn" data-video-mode="script">✨ เริ่มจากไอเดีย</button>
-        <button type="button" class="video-mode-btn active" data-video-mode="editor">🎬 ใช้คลิปที่มี</button>
-      </div>`));
     form.appendChild(originalForm);
 
     const workspace = document.createElement('div');

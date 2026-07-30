@@ -4,7 +4,7 @@ const assert = require('assert');
 const js = fs.readFileSync('js/video-editor.js', 'utf8');
 const index = fs.readFileSync('index.html', 'utf8');
 
-assert.match(index, /video-editor\.js\?v=11\.6\.1/);
+assert.match(index, /video-editor\.js\?v=11\.6\.2/);
 assert.match(js, /processRenderQueue/);
 assert.match(js, /Math\.max\(3,\s*Math\.min\(5/);
 assert.match(js, /Promise\.all\(Array\.from/);
@@ -27,7 +27,7 @@ assert.match(js, /renderOverallPercent/);
 assert.match(js, /พื้นที่ว่างชั่วคราวประมาณ/);
 
 console.log(JSON.stringify({
-  version: '11.6.1',
+  version: '11.6.2',
   queueConcurrency: '3-5',
   presetSnapshot: true,
   streamValidation: true,
