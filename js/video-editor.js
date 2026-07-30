@@ -443,10 +443,22 @@ window.TANJAI = window.TANJAI || {};
     if (!state.clips.length) { TANJAI.toast?.('กรุณาเพิ่มคลิปก่อน'); return; }
     const names={short:'คลิปสั้น',summary:'สรุปกิจกรรม',highlight:'ไฮไลต์',news:'ข่าวประชาสัมพันธ์'};
     const chosen = selectedClips().length ? selectedClips() : state.clips;
-    TANJAI.toast?.(`ส่ง ${chosen.length} คลิปไปวางโครง “${names[state.destination]}” แล้ว`);
-    const event = new CustomEvent('tanjai:video-continue', {detail:{destination:state.destination,clips:chosen,look:{...state.look}}});
+    const projectId = `tv-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,8)}`;
+    const handoff = {
+      projectId,
+      source:'tanjai-ai-studio',
+      createdAt:Date.now(),
+      destination:state.destination,
+      destinationName:names[state.destination],
+      look:{...state.look},
+      clipCount:chosen.length,
+      clips:chosen.map(clip=>({name:clip.name,duration:clip.duration,size:clip.file?.size||0,type:clip.file?.type||''}))
+    };
+    try { localStorage.setItem(`tanjai-video-handoff:${projectId}`, JSON.stringify(handoff)); } catch {}
+    TANJAI.toast?.(`กำลังส่งแผนงาน ${chosen.length} คลิปไป Tanjai Video Studio`);
+    const event = new CustomEvent('tanjai:video-continue', {detail:handoff});
     document.dispatchEvent(event);
-    TANJAI.switchView?.('videoEditor');
+    setTimeout(()=>{ window.location.href=`https://thanawid.github.io/tanjai-video-studio/?source=tanjai-ai-studio&projectId=${encodeURIComponent(projectId)}`; },350);
   }
 
   function recordingFormat() {

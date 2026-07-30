@@ -4,36 +4,23 @@ const assert = require('assert');
 const index = fs.readFileSync('index.html','utf8');
 const ui = fs.readFileSync('js/ui.js','utf8');
 const prep = fs.readFileSync('js/video-editor.js','utf8');
-const editor = fs.readFileSync('js/timeline-editor.js','utf8');
 const css = fs.readFileSync('css/style.css','utf8');
 
 assert.match(index,/id="videoEditor"/);
-assert.match(index,/timeline-editor\.js\?v=11\.6\.0/);
-assert.match(index,/ui\.js\?v=11\.6\.0/);
+assert.match(index,/ui\.js\?v=11\.6\.1/);
+assert.match(index,/https:\/\/thanawid\.github\.io\/tanjai-video-studio\//);
 assert.match(ui,/"videoEditor"/);
-assert.match(prep,/TANJAI\.switchView\?\.\('videoEditor'\)/);
-assert.match(editor,/tanjai:video-continue/);
-assert.match(editor,/draggable="true"/);
-assert.match(editor,/setTrim/);
-assert.match(editor,/arrangeDraft/);
-assert.match(editor,/downloadPlan/);
-assert.match(editor,/exportVideo/);
-assert.match(editor,/MediaRecorder/);
-assert.match(editor,/16:9/);
-assert.match(editor,/9:16/);
-assert.match(editor,/1:1/);
-assert.match(css,/Tanjai Timeline Editor V11\.6\.0/);
+assert.match(prep,/tanjai-video-handoff:/);
+assert.match(prep,/projectId/);
+assert.match(prep,/tanjai-video-studio/);
+assert.match(css,/bridge to the dedicated Tanjai Video Studio/);
+assert.doesNotMatch(index,/script src="js\/timeline-editor\.js/);
 
 console.log(JSON.stringify({
-  version:'11.6.0',
-  separateView:true,
+  version:'11.6.1',
+  bridgeView:true,
   prepTransfer:true,
-  dragTimeline:true,
-  trim:true,
-  aspectRatios:3,
-  titleOverlay:true,
-  draftArrange:true,
-  editPlan:true,
-  browserExport:true,
+  projectId:true,
+  externalStudio:true,
   status:'PASS'
 },null,2));
