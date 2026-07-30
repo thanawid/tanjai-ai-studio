@@ -59,7 +59,7 @@ TANJAI.downloadText = function(text, filename){
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 };
 
-TANJAI.validViews = ["dashboard","router","image","photoPro","album","post","mc","video","voice","deck","kit","promptHub","destinationHub","projects","library","guide"];
+TANJAI.validViews = ["dashboard","router","image","photoPro","album","post","mc","video","videoEditor","voice","deck","kit","promptHub","destinationHub","projects","library","guide"];
 
 TANJAI.switchView = function(id, options = {}){
   if(!TANJAI.validViews.includes(id)) id = "dashboard";
@@ -87,7 +87,8 @@ TANJAI.switchView = function(id, options = {}){
     album:"ชุดภาพโพสต์ Facebook",
     post:"เรียบเรียงเนื้อหา",
     mc:"งานพิธีกร",
-    video:"ทำวิดีโอ",
+    video:"เตรียมคลิป",
+    videoEditor:"ตัดต่อวิดีโอ",
     voice:"เสียงพากย์",
     deck:"ทำสไลด์",
     kit:"สร้างชุดสื่อ",

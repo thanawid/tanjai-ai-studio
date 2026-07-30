@@ -442,9 +442,11 @@ window.TANJAI = window.TANJAI || {};
   function continueWithAI() {
     if (!state.clips.length) { TANJAI.toast?.('กรุณาเพิ่มคลิปก่อน'); return; }
     const names={short:'คลิปสั้น',summary:'สรุปกิจกรรม',highlight:'ไฮไลต์',news:'ข่าวประชาสัมพันธ์'};
-    TANJAI.toast?.(`AI รับคลิปที่ปรับแล้วไปวางโครง “${names[state.destination]}” ต่อให้แล้ว`);
-    const event = new CustomEvent('tanjai:video-continue', {detail:{destination:state.destination,clips:state.clips,look:state.look}});
+    const chosen = selectedClips().length ? selectedClips() : state.clips;
+    TANJAI.toast?.(`ส่ง ${chosen.length} คลิปไปวางโครง “${names[state.destination]}” แล้ว`);
+    const event = new CustomEvent('tanjai:video-continue', {detail:{destination:state.destination,clips:chosen,look:{...state.look}}});
     document.dispatchEvent(event);
+    TANJAI.switchView?.('videoEditor');
   }
 
   function recordingFormat() {
