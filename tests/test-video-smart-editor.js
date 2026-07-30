@@ -3,7 +3,7 @@ const assert = require('assert');
 const index = fs.readFileSync('index.html','utf8');
 const js = fs.readFileSync('js/video-editor.js','utf8');
 const css = fs.readFileSync('css/style.css','utf8');
-assert.match(index,/video-editor\.js\?v=11\.6\.2/);
+assert.match(index,/video-editor\.js\?v=11\.6\.3/);
 assert.match(index,/อัปโหลดคลิป แล้วให้ AI ปรับและจัดเตรียม/);
 assert.match(index,/แต่งวิดีโอ AI/);
 assert.match(js,/videoFootageInput/);

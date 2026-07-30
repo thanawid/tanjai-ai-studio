@@ -84,6 +84,7 @@ button,input,select,textarea{font-family:inherit}button{cursor:pointer}
   border-radius: 12px;
   padding: 12px 14px;
   font-weight: 600;
+  text-decoration: none;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
