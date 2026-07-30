@@ -141,7 +141,7 @@ window.TANJAI = window.TANJAI || {};
       </section>
 
       <section class="vprep-destination" id="vprepDestination">
-        <header><div><small>ขั้นตอนที่ 3</small><h3>เลือกว่าจะนำคลิปไปทางไหน</h3></div><span>คลิปที่ปรับแล้วพร้อมใช้งาน</span></header>
+        <header><div><small>ขั้นตอนที่ 3</small><h3>คลิปพร้อมแล้ว เลือกขั้นตอนถัดไป</h3></div><span>คลิปที่ปรับแล้วพร้อมใช้งาน</span></header>
         <div class="vprep-destination-grid">
           <article class="vprep-action-card download">
             <span>⬇</span><div><b>ดาวน์โหลดคลิปที่ปรับแล้ว</b><small>เลือกโหลดคลิปปัจจุบัน คลิปที่เลือก หรือรวมทั้งหมดเป็น ZIP</small></div>
@@ -152,19 +152,9 @@ window.TANJAI = window.TANJAI || {};
             </div>
           </article>
           <article class="vprep-action-card ai">
-            <span>✨</span><div><b>ให้ AI ทำต่อ</b><small>เลือกแนวทางนำเสนอ แล้วให้ AI ช่วยวางโครงและคัดช่วงคลิป</small></div>
-            <button class="btn primary" id="showAiDestinationsBtn" type="button">เลือกแนวทางนำเสนอ</button>
+            <span>✂️</span><div><b>ตัดต่อวิดีโอ</b><small>นำคลิปไปเรียงเรื่อง ใส่ข้อความและเสียง พร้อมแนบแนวที่ AI แนะนำไปให้</small></div>
+            <button class="btn primary" id="continueEditingBtn" type="button">ตัดต่อวิดีโอต่อ</button>
           </article>
-        </div>
-        <div class="vprep-ai-destinations" id="aiDestinations" hidden>
-          <div class="vprep-ai-recommend"><span>AI แนะนำ</span><b id="aiRecommendedText">คลิปสั้นสรุปกิจกรรม</b><small id="aiRecommendedReason">เหมาะกับคลิปที่อัปโหลดและความยาวรวม</small></div>
-          <div class="vprep-destination-options">
-            <button type="button" class="active" data-destination="short"><b>คลิปสั้น</b><small>Reels / TikTok / Shorts</small></button>
-            <button type="button" data-destination="summary"><b>สรุปกิจกรรม</b><small>เล่าเรื่องครบ กระชับ</small></button>
-            <button type="button" data-destination="highlight"><b>ไฮไลต์</b><small>รวมช่วงเด่นและบรรยากาศ</small></button>
-            <button type="button" data-destination="news"><b>ข่าวประชาสัมพันธ์</b><small>ทางการ ชัดเจน น่าเชื่อถือ</small></button>
-          </div>
-          <button class="btn primary vprep-continue-btn" id="continueAiBtn" type="button">ให้ AI วางโครงคลิปนี้ต่อ →</button>
         </div>
       </section>
 
@@ -214,15 +204,7 @@ window.TANJAI = window.TANJAI || {};
     $('#downloadAllZipBtn')?.addEventListener('click', () => renderAndDownloadBatch([...state.clips], true));
     $('#pauseRenderBtn')?.addEventListener('click', toggleQueuePause);
     $('#cancelRenderBtn')?.addEventListener('click', cancelQueue);
-    $('#showAiDestinationsBtn')?.addEventListener('click', () => {
-      const box = $('#aiDestinations'); box.hidden = !box.hidden;
-      if (!box.hidden) recommendDestination();
-    });
-    $$('[data-destination]').forEach(btn => btn.addEventListener('click', () => {
-      state.destination = btn.dataset.destination;
-      $$('[data-destination]').forEach(x => x.classList.toggle('active', x === btn));
-    }));
-    $('#continueAiBtn')?.addEventListener('click', continueWithAI);
+    $('#continueEditingBtn')?.addEventListener('click', continueWithAI);
   }
 
   function setMode(mode) {
@@ -430,13 +412,13 @@ window.TANJAI = window.TANJAI || {};
     if (state.clips.length >= 5 || total > 120) { dest='summary'; text='สรุปกิจกรรมแบบกระชับ'; reason='มีหลายคลิปและเนื้อหาเพียงพอสำหรับเรียงเรื่อง'; }
     if (state.look.preset === 'news') { dest='news'; text='ข่าวประชาสัมพันธ์'; reason='แนวภาพและลักษณะคลิปเหมาะกับงานสื่อสารองค์กร'; }
     state.destination=dest;
-    $$('[data-destination]').forEach(b=>b.classList.toggle('active',b.dataset.destination===dest));
-    $('#aiRecommendedText').textContent=text; $('#aiRecommendedReason').textContent=reason;
+    return {destination:dest, destinationName:text, reason};
   }
 
   function continueWithAI() {
     if (!state.clips.length) { TANJAI.toast?.('กรุณาเพิ่มคลิปก่อน'); return; }
     const names={short:'คลิปสั้น',summary:'สรุปกิจกรรม',highlight:'ไฮไลต์',news:'ข่าวประชาสัมพันธ์'};
+    const recommendation = recommendDestination();
     const chosen = selectedClips().length ? selectedClips() : state.clips;
     const projectId = `tv-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,8)}`;
     const handoff = {
@@ -445,6 +427,7 @@ window.TANJAI = window.TANJAI || {};
       createdAt:Date.now(),
       destination:state.destination,
       destinationName:names[state.destination],
+      recommendation,
       look:{...state.look},
       clipCount:chosen.length,
       clips:chosen.map(clip=>({name:clip.name,duration:clip.duration,size:clip.file?.size||0,type:clip.file?.type||''}))
