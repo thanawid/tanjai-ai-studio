@@ -141,8 +141,8 @@ window.TANJAI = window.TANJAI || {};
       </section>
 
       <section class="vprep-destination" id="vprepDestination">
-        <header><div><small>ขั้นตอนที่ 3</small><h3>คลิปพร้อมแล้ว เลือกขั้นตอนถัดไป</h3></div><span>คลิปที่ปรับแล้วพร้อมใช้งาน</span></header>
-        <div class="vprep-destination-grid">
+        <header><div><small>ขั้นตอนที่ 3</small><h3>ดาวน์โหลดคลิปที่ปรับแล้ว</h3></div><span>พร้อมนำไปตัดต่อในโปรแกรมที่คุณถนัด</span></header>
+        <div class="vprep-destination-grid vprep-download-only">
           <article class="vprep-action-card download">
             <span>⬇</span><div><b>ดาวน์โหลดคลิปที่ปรับแล้ว</b><small>เลือกโหลดคลิปปัจจุบัน คลิปที่เลือก หรือรวมทั้งหมดเป็น ZIP</small></div>
             <div class="vprep-download-actions">
@@ -150,10 +150,6 @@ window.TANJAI = window.TANJAI || {};
               <button class="btn secondary" id="downloadSelectedBtn" type="button">ดาวน์โหลดที่เลือก</button>
               <button class="btn secondary" id="downloadAllZipBtn" type="button">ดาวน์โหลดทั้งหมด (.ZIP)</button>
             </div>
-          </article>
-          <article class="vprep-action-card ai">
-            <span>✂️</span><div><b>ตัดต่อวิดีโอ</b><small>นำคลิปไปเรียงเรื่อง ใส่ข้อความและเสียง พร้อมแนบแนวที่ AI แนะนำไปให้</small></div>
-            <button class="btn primary" id="continueEditingBtn" type="button">ตัดต่อวิดีโอต่อ</button>
           </article>
         </div>
       </section>
@@ -204,7 +200,6 @@ window.TANJAI = window.TANJAI || {};
     $('#downloadAllZipBtn')?.addEventListener('click', () => renderAndDownloadBatch([...state.clips], true));
     $('#pauseRenderBtn')?.addEventListener('click', toggleQueuePause);
     $('#cancelRenderBtn')?.addEventListener('click', cancelQueue);
-    $('#continueEditingBtn')?.addEventListener('click', continueWithAI);
   }
 
   function setMode(mode) {
