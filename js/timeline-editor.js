@@ -231,7 +231,7 @@ window.TANJAI = window.TANJAI || {};
   }
 
   function downloadPlan() {
-    const plan={version:'11.6.4',title:state.title,aspect:state.aspect,totalDuration:totalDuration(),clips:state.clips.map((c,i)=>({order:i+1,name:c.name,trimStart:c.trimStart,trimEnd:c.trimEnd,look:c.look}))};
+    const plan={version:'11.6.5',title:state.title,aspect:state.aspect,totalDuration:totalDuration(),clips:state.clips.map((c,i)=>({order:i+1,name:c.name,trimStart:c.trimStart,trimEnd:c.trimEnd,look:c.look}))};
     TANJAI.downloadText?.(JSON.stringify(plan,null,2),`Tanjai-Edit-Plan-${Date.now()}.json`);
   }
 

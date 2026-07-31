@@ -415,28 +415,91 @@ window.TANJAI = window.TANJAI || {};
     return {destination:dest, destinationName:text, reason};
   }
 
-  function continueWithAI() {
+  async function continueWithAI() {
     if (!state.clips.length) { TANJAI.toast?.('กรุณาเพิ่มคลิปก่อน'); return; }
+    if (state.busy) return;
+    const mediaStore = window.TanjaiVideoMediaStore;
+    if (!mediaStore) { TANJAI.toast?.('ยังเปิดคลังคลิปร่วมไม่ได้ กรุณารีเฟรชหน้าเว็บ'); return; }
     const names={short:'คลิปสั้น',summary:'สรุปกิจกรรม',highlight:'ไฮไลต์',news:'ข่าวประชาสัมพันธ์'};
     const recommendation = recommendDestination();
     const chosen = selectedClips().length ? selectedClips() : state.clips;
     const projectId = `tv-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,8)}`;
+    const totalSize = chosen.reduce((sum, clip) => sum + (clip.file?.size || 0), 0);
+    const totalDuration = chosen.reduce((sum, clip) => sum + (clip.duration || 0), 0);
+    const estimatedOutput = Math.max(totalSize * 1.35, totalDuration * 1100000);
+    const storage = await mediaStore.storageStatus(estimatedOutput);
+    if (storage.quota && storage.available < estimatedOutput) {
+      TANJAI.toast?.(`พื้นที่เก็บคลิปไม่พอ ต้องการประมาณ ${fmtSize(estimatedOutput)} แต่เหลือ ${fmtSize(storage.available)}`);
+      return;
+    }
+    const proceed = window.confirm(
+      `ส่ง ${chosen.length} คลิปไปตัดต่อโดยไม่อัปโหลดซ้ำ\n\n` +
+      `ระบบจะปรับคลิปตามค่าที่เลือกและเก็บไว้ในเบราว์เซอร์ประมาณ ${fmtSize(estimatedOutput)} ` +
+      `จากนั้นเปิด Tanjai Video Studio ให้อัตโนมัติ\n\nต้องการเริ่มหรือไม่?`
+    );
+    if (!proceed) return;
     const handoff = {
       projectId,
       source:'tanjai-ai-studio',
       createdAt:Date.now(),
+      status:'preparing',
+      storageMode:'indexeddb-v1',
       destination:state.destination,
       destinationName:names[state.destination],
       recommendation,
       look:{...state.look},
       clipCount:chosen.length,
-      clips:chosen.map(clip=>({name:clip.name,duration:clip.duration,size:clip.file?.size||0,type:clip.file?.type||''}))
+      clips:[]
     };
-    try { localStorage.setItem(`tanjai-video-handoff:${projectId}`, JSON.stringify(handoff)); } catch {}
-    TANJAI.toast?.(`กำลังส่งแผนงาน ${chosen.length} คลิปไป Tanjai Video Studio`);
-    const event = new CustomEvent('tanjai:video-continue', {detail:handoff});
-    document.dispatchEvent(event);
-    setTimeout(()=>{ window.location.href=`https://thanawid.github.io/tanjai-video-studio/?source=tanjai-ai-studio&projectId=${encodeURIComponent(projectId)}`; },350);
+    chosen.forEach(clip => { clip.exportStatus = 'queued'; clip.exportProgress = 0; });
+    state.busy = true;
+    render();
+    try {
+      await mediaStore.deleteProject(projectId).catch(() => {});
+      await mediaStore.putProject(handoff);
+      const settings = exportSettings();
+      const concurrency = queueConcurrency(chosen.length);
+      const records = await processRenderQueue(chosen, concurrency, settings, async (result, clip, index) => {
+        const record = {
+          name:result.name,
+          sourceName:clip.name,
+          type:result.blob.type || clip.file?.type || 'video/mp4',
+          size:result.blob.size,
+          duration:clip.duration,
+          width:clip.width,
+          height:clip.height,
+          lastModified:Date.now(),
+          fallback:!!result.fallback,
+          look:{...settings.look},
+          audio:{...settings.audio},
+          blob:result.blob
+        };
+        await mediaStore.putClip(projectId, index, record);
+        return { ...record, blob:undefined };
+      });
+      handoff.status = 'ready';
+      handoff.readyAt = Date.now();
+      handoff.clips = records;
+      handoff.clipCount = records.length;
+      await mediaStore.putProject(handoff);
+      try { localStorage.setItem(`tanjai-video-handoff:${projectId}`, JSON.stringify(handoff)); } catch {}
+      TANJAI.toast?.(`เตรียม ${records.length} คลิปแล้ว กำลังเปิด Tanjai Video Studio`);
+      document.dispatchEvent(new CustomEvent('tanjai:video-continue', {detail:handoff}));
+      setTimeout(()=>{ window.location.href=`https://thanawid.github.io/tanjai-video-studio/?source=tanjai-ai-studio&projectId=${encodeURIComponent(projectId)}`; },350);
+    } catch (err) {
+      console.error(err);
+      await mediaStore.deleteProject(projectId).catch(() => {});
+      TANJAI.toast?.(err?.message === 'QUEUE_CANCELLED'
+        ? 'ยกเลิกการส่งคลิปแล้ว'
+        : 'เตรียมคลิปไปตัดต่อไม่สำเร็จ กรุณาลดจำนวนคลิปหรือตรวจพื้นที่ว่าง');
+    } finally {
+      chosen.forEach(clip => {
+        if (clip.exportStatus === 'queued' || clip.exportStatus === 'processing') clip.exportStatus = state.queue.cancelled ? 'cancelled' : 'ready';
+      });
+      state.busy = false;
+      hideRenderProgress();
+      render();
+    }
   }
 
   function recordingFormat() {
@@ -527,7 +590,7 @@ window.TANJAI = window.TANJAI || {};
     return Math.min(total, Math.max(3, Math.min(5, Math.floor(cores / 2) || 3)));
   }
 
-  async function processRenderQueue(clips, concurrency, settings) {
+  async function processRenderQueue(clips, concurrency, settings, onResult = null) {
     const results = new Array(clips.length);
     let nextIndex = 0;
     state.queue = { active: 0, waiting: clips.length, completed: 0, failed: 0, total: clips.length, concurrency, paused: false, cancelled: false };
@@ -546,7 +609,8 @@ window.TANJAI = window.TANJAI || {};
         renderClips();
         updateQueueProgress();
         try {
-          results[index] = await renderClipToBlob(clip, index + 1, clips.length, settings);
+          const rendered = await renderClipToBlob(clip, index + 1, clips.length, settings);
+          results[index] = onResult ? await onResult(rendered, clip, index) : rendered;
           if (state.queue.cancelled) throw new Error('QUEUE_CANCELLED');
           clip.exportStatus = 'done';
           clip.exportProgress = 100;
