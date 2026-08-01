@@ -126,18 +126,21 @@
         </div>
       </header>
 
-      <section id="dashboard" class="view active home-dashboard-v1167">
-        <div class="hero-card home-hero-v1167">
+      <section id="dashboard" class="view active">
+        <div class="hero-card sales-dashboard-hero" style="background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.15), transparent), radial-gradient(circle at bottom left, rgba(236, 72, 153, 0.1), transparent), var(--panel); border: 1px solid var(--line2); backdrop-filter: var(--blur);">
           <div class="hero-copy">
-            <p class="eyebrow">พื้นที่ทำงานสื่อครบในที่เดียว</p>
-            <h3 class="hero-title"><span>เริ่มจากงานที่ต้องทำ</span><span class="hero-tagline-thai">แล้วให้ทันใจช่วยต่อให้เป็นชิ้นงาน</span></h3>
-            <p class="hero-lead">สร้างและปรับแต่งภาพ เรียบเรียงเนื้อหา แต่งวิดีโอ วางชุดสื่อ เสียงพากย์ และสไลด์ โดยคุณตรวจแก้ได้ทุกขั้น</p>
+            <p class="eyebrow">AI MEDIA WORKSPACE</p>
+            <h3 class="hero-title"><span>ทันใจ AI Studio</span><span class="hero-tagline-thai">สร้างสื่อไว ด้วยพลัง AI</span></h3>
+            <p class="hero-lead"><span>เปลี่ยนไอเดียให้เป็น Prompt พร้อมใช้</span><span>ภาพ โพสต์ วิดีโอ เสียง และสไลด์ — พร้อมใช้ทันที</span></p>
             <div class="hero-actions">
-              <button class="btn primary" data-view="router">ให้ AI Router ช่วยเลือกเมนู</button>
-              <button class="btn secondary" data-view="kit">สร้างชุดสื่อ</button>
+              <button class="btn primary" data-view="kit">สร้างชุดสื่อทันที</button>
+              <button class="btn secondary" data-view="library">ดูตัวอย่างงาน</button>
+              <button class="btn secondary" data-view="guide">คู่มือเริ่มใช้งาน</button>
             </div>
-            <div class="home-flow-v1167" aria-label="ขั้นตอนเริ่มใช้งาน">
-              <span><b>1</b> เลือกงาน</span><span><b>2</b> ใส่ข้อมูลหรือไฟล์</span><span><b>3</b> ตรวจและนำไปใช้</span>
+            <div class="hero-stats hero-sales-stats">
+              <article><b>บอกงาน</b><span>หัวข้อ รายละเอียด</span></article>
+              <article><b>ได้ Prompt</b><span>ชุดคำสั่งพร้อมใช้</span></article>
+              <article><b>ใช้ต่อ</b><span>ทำสื่อหลายรูปแบบ</span></article>
             </div>
           </div>
           <div class="hero-visual">
@@ -145,87 +148,85 @@
               <video class="hero-logo-video" src="assets/videos/tanjai-logo-orb.mp4" poster="assets/logo.jpg" autoplay muted loop playsinline preload="metadata" aria-label="วิดีโอโลโก้ทันใจ AI Studio"></video>
               <span class="hero-video-glow" aria-hidden="true"></span>
             </div>
-            <div class="floating-chip chip-a"><small>สร้างใหม่</small><b>ภาพและเนื้อหา</b></div>
-            <div class="floating-chip chip-b"><small>ใช้ไฟล์ที่มี</small><b>แต่งภาพและวิดีโอ</b></div>
-            <div class="floating-chip chip-c"><small>วางแผน</small><b>ชุดสื่อและสไลด์</b></div>
+            <div class="floating-chip chip-a"><small>งานภาพ</small><b>สร้างภาพ</b></div>
+            <div class="floating-chip chip-b"><small>งานเสียง</small><b>เสียงพากย์</b></div>
+            <div class="floating-chip chip-c"><small>งานโพสต์</small><b>โซเชียล</b></div>
+            <div class="floating-chip chip-d"><small>งานวิดีโอ</small><b>ลำดับภาพ</b></div>
+            <div class="floating-chip chip-e"><small>แต่งภาพ</small><b>AI Photo Pro</b></div>
+            <div class="floating-chip chip-f"><small>Prompt</small><b>พร้อมใช้</b></div>
           </div>
         </div>
 
-        <section class="home-work-section-v1167" aria-labelledby="homeWorkTitle">
-          <div class="home-section-head-v1167">
-            <div><p class="eyebrow">เลือกประเภทงาน</p><h3 id="homeWorkTitle">วันนี้อยากทำอะไรครับ?</h3></div>
-            <p>เลือกเมนูได้โดยตรง หรือใช้ AI Router หากยังไม่แน่ใจว่าจะเริ่มตรงไหน</p>
+        <div class="tool-grid dashboard-main-tools-v861">
+          <button class="tool-card" data-view="router"><img src="assets/icons/router.svg" alt=""><b>AI Router</b><span>บอกสิ่งที่อยากทำ แล้วระบบพาไปเมนูที่เหมาะที่สุด</span></button>
+          <button class="tool-card" data-view="kit"><img src="assets/icons/kit.svg" alt=""><b>สร้างชุดสื่อ</b><span>กรอกครั้งเดียว ได้ Prompt ครบชุดสำหรับทำสื่อหลายรูปแบบ</span></button>
+          <button class="tool-card album-pro-card-v861" data-view="album"><img src="assets/icons/image.svg" alt=""><b>ชุดภาพโพสต์ Facebook</b><span>อัปโหลดหลายภาพ ใส่กรอบ ช่วยคิดแคปชั่น ดูตัวอย่างก่อนโพสต์ และดาวน์โหลดไฟล์ ZIP</span></button>
+          <button class="tool-card" data-view="photoPro"><img src="assets/icons/image.svg" alt=""><b>แต่งภาพ AI</b><span>อัปโหลดหลายภาพ ปรับแสง สี เงา ความคมชัด และดาวน์โหลด ZIP โดยไม่สร้างภาพใหม่</span></button>
+          <button class="tool-card" data-view="projects"><img src="assets/icons/projects.svg" alt=""><b>โปรเจกต์ของฉัน</b><span>กลับมาดูงานเดิม บันทึกไอเดีย และต่อยอดงานที่ทำไว้</span></button>
+        </div>
+
+        <section class="panel mvp-sales-strip-v877">
+          <div class="mvp-sales-copy">
+            <p class="eyebrow">เว็บไซต์นี้ช่วยอะไรได้บ้าง</p>
+            <h3>เว็บนี้ช่วยอะไร?</h3>
+            <p>ช่วยเปลี่ยนข้อมูลดิบให้เป็น Prompt พร้อมใช้งานจริง โดยแยกข้อมูลจริง ข้อมูลที่ยังไม่ระบุ สิ่งที่ AI ช่วยคิดได้ และข้อห้ามสำคัญ ก่อนส่งออกเป็นคำสั่งมืออาชีพที่คัดลอกไปใช้ได้ทันที</p>
           </div>
-          <div class="home-category-grid-v1167">
-            <section class="home-category-v1167">
-              <div class="home-category-title-v1167"><span>01</span><div><b>ภาพและเนื้อหา</b><small>สร้างใหม่ หรือใช้ภาพจริงที่มี</small></div></div>
-              <div class="sample-grid home-tool-grid-v1167">
+          <div class="mvp-benefit-grid-v877">
+            <article><b>1</b><span>เลือกงาน</span><small>ภาพ / โพสต์ / วิดีโอ / เสียง / สไลด์</small></article>
+            <article><b>2</b><span>กรอกข้อมูล</span><small>ชื่อหน่วยงาน รายละเอียด วันเวลา สถานที่</small></article>
+            <article><b>3</b><span>คัดลอก Prompt</span><small>นำไปใช้กับ ChatGPT, Canva, CapCut หรือเครื่องมือ AI ที่ต้องการ</small></article>
+          </div>
+        </section>
+
+        <div class="dashboard-grid dashboard-sales-grid-v861 dashboard-single-grid-v972">
+          <section class="panel wide">
+            <div class="panel-head">
+              <div><h3>เมนูสร้างงาน</h3><p>เลือกประเภทงานที่ต้องการได้จากเมนูหลัก โดยจัดเรียงใหม่ให้ใช้งานง่ายขึ้น และพอดีกับทุกอุปกรณ์</p></div>
+            </div>
+            <div class="sample-grid compact-sample-grid-v861 creation-menu-grid-v892 fixed-menu-visuals-v896 dashboard-menu-balanced-v972">
               <article class="home-choice-card tone-kit" data-view="kit">
                 <img src="assets/previews/preview-kit.jpg" class="preview-thumbnail" alt="สร้างชุดสื่อ">
-                <b>สร้างชุดสื่อ</b><span>วางภาพ เนื้อหา วิดีโอ และสื่อหลายแบบจากข้อมูลชุดเดียว</span>
+                <b>สร้างชุดสื่อ</b><span>Prompt ครบชุดจากข้อมูลเดียว</span>
               </article>
 
               <article class="home-choice-card tone-image" data-view="album">
                 <img src="assets/previews/preview-facebook.jpg" class="preview-thumbnail" alt="ชุดภาพโพสต์ Facebook">
-                <b>ชุดภาพโพสต์ Facebook</b><span>จัดชุดภาพจริง ใส่ข้อความ ช่วยเขียนแคปชั่น และดาวน์โหลด ZIP</span>
+                <b>ชุดภาพโพสต์ Facebook</b><span>ภาพจริง + แคปชั่น + ไฟล์ ZIP</span>
               </article>
 
               <article class="home-choice-card tone-image" data-view="photoPro">
-                <img src="assets/previews/preview-photo-pro.jpg" class="preview-thumbnail" alt="AI Photo Pro">
-                <b>แต่งภาพ AI</b><span>ปรับแสง สี เงา และความคมชัดของภาพจริงหลายภาพ</span>
+                <img src="assets/previews/preview-photo-pro.jpg" class="preview-thumbnail" alt="แต่งภาพ AI">
+                <b>แต่งภาพ AI</b><span>แต่งภาพจริงหลายภาพ ไม่สร้างภาพใหม่</span>
               </article>
 
               <article class="home-choice-card tone-image" data-view="image">
                 <img src="assets/previews/preview-image.jpg" class="preview-thumbnail" alt="สร้างภาพ">
-                <b>สร้างภาพ</b><span>วางแนวภาพและ Prompt พร้อมผลิต รวมแนวอนิเมะ</span>
+                <b>สร้างภาพ</b><span>Prompt ภาพพร้อมใช้</span>
               </article>
-              <article class="home-choice-card tone-post" data-view="post">
-                <img src="assets/previews/preview-post.jpg" class="preview-thumbnail" alt="เรียบเรียงเนื้อหา">
-                <b>เรียบเรียงเนื้อหา</b><span>สรุปงาน ข่าว โพสต์ แคปชั่น และข้อความเผยแพร่</span>
-              </article>
-              </div>
-            </section>
 
-            <section class="home-category-v1167">
-              <div class="home-category-title-v1167"><span>02</span><div><b>วิดีโอและเสียง</b><small>ปรับคลิปที่มี หรือสร้างเรื่องใหม่</small></div></div>
-              <div class="sample-grid home-tool-grid-v1167">
               <article class="home-choice-card tone-video" data-view="video">
-                <img src="assets/previews/preview-video.jpg" class="preview-thumbnail" alt="ทำวิดีโอ">
-                <b>แต่งวิดีโอ AI</b><span>ปรับภาพ เสียง และโทนสี แล้วดาวน์โหลดคลิปพร้อมตัดต่อ</span>
+                <img src="assets/previews/preview-video.jpg" class="preview-thumbnail" alt="แต่งวิดีโอ AI">
+                <b>แต่งวิดีโอ AI</b><span>ปรับภาพ เสียง และโทนสีของคลิป</span>
               </article>
-              <a class="home-choice-card tone-video home-external-card-v1167" href="https://thanawid.github.io/tanjai-video-studio/?source=tanjai-ai-studio">
-                <img src="assets/previews/preview-video.jpg" class="preview-thumbnail" alt="สร้างวิดีโอใหม่ด้วย AI">
-                <b>สร้างวิดีโอ</b><span>เริ่มจากหัวข้อ บท หรือภาพ แล้วสร้างเรื่องใหม่ใน Tanjai Video Studio</span>
-              </a>
 
               <article class="home-choice-card tone-voice" data-view="voice">
                 <img src="assets/previews/preview-voice.jpg" class="preview-thumbnail" alt="เสียงพากย์">
-                <b>เสียงพากย์</b><span>เขียนสคริปต์ คุมเวลา จังหวะ อารมณ์ และคำอ่าน</span>
+                <b>เสียงพากย์</b><span>สคริปต์เสียงธรรมชาติ</span>
               </article>
-              </div>
-            </section>
 
-            <section class="home-category-v1167">
-              <div class="home-category-title-v1167"><span>03</span><div><b>วางแผนและนำเสนอ</b><small>เตรียมโครงงานให้พร้อมใช้งาน</small></div></div>
-              <div class="sample-grid home-tool-grid-v1167">
               <article class="home-choice-card tone-deck" data-view="deck">
                 <img src="assets/previews/preview-deck.jpg" class="preview-thumbnail" alt="ทำสไลด์">
-                <b>ทำสไลด์</b><span>วางโครงสไลด์ เนื้อหา หลักฐานภาพ และบันทึกผู้พูด</span>
+                <b>ทำสไลด์</b><span>โครงสไลด์ + บันทึกผู้พูด</span>
               </article>
 
               <article class="home-choice-card tone-post" data-view="mc">
                 <img src="assets/previews/preview-mc.jpg" class="preview-thumbnail" alt="งานพิธีกร">
-                <b>งานพิธีกร</b><span>จัดลำดับพิธี สคริปต์ คำเชิญ และบัตรคำพูด</span>
+                <b>งานพิธีกร</b><span>สคริปต์พิธีกร คำเชิญประธาน</span>
               </article>
-              </div>
-            </section>
-          </div>
-        </section>
+            </div>
+          </section>
+        </div>
 
-        <section class="home-return-v1167">
-          <div><p class="eyebrow">ทำงานต่อ</p><h3>กลับไปยังงานที่บันทึกไว้</h3><span>เปิดโปรเจกต์เดิม ตรวจงานต่อ หรือดูตัวอย่างก่อนเริ่มงานใหม่</span></div>
-          <div class="home-return-actions-v1167"><button class="btn primary" data-view="projects">โปรเจกต์ของฉัน</button><button class="btn secondary" data-view="library">ดูตัวอย่างงาน</button><button class="btn secondary" data-view="guide">คู่มือระบบ</button></div>
-        </section>
       </section>
 
       <section id="router" class="view">
