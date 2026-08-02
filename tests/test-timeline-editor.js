@@ -7,9 +7,10 @@ const prep = fs.readFileSync('js/video-editor.js','utf8');
 const css = fs.readFileSync('css/style.css','utf8');
 
 assert.match(index,/id="videoEditor"/);
-assert.match(index,/ui\.js\?v=11\.6\.7/);
-assert.match(index,/https:\/\/thanawid\.github\.io\/tanjai-video-studio\//);
-assert.match(index,/<a class="nav-link" href="https:\/\/thanawid\.github\.io\/tanjai-video-studio\/\?source=tanjai-ai-studio"><i>✨<\/i><b>สร้างวิดีโอ<\/b><\/a>/);
+assert.match(index,/ui\.js\?v=11\.6\.8/);
+assert.match(index,/https:\/\/tanjai-video-studio\.onrender\.com\//);
+assert.doesNotMatch(index,/https:\/\/thanawid\.github\.io\/tanjai-video-studio\//);
+assert.match(index,/<a class="nav-link" href="https:\/\/tanjai-video-studio\.onrender\.com\/\?source=tanjai-ai-studio"><i>✨<\/i><b>สร้างวิดีโอ<\/b><\/a>/);
 assert.doesNotMatch(index,/<button class="nav-link" data-view="videoEditor"><i>✂️<\/i>/);
 assert.match(ui,/"videoEditor"/);
 assert.doesNotMatch(index,/video-handoff-store\.js/);
@@ -24,7 +25,7 @@ assert.doesNotMatch(prep,/showAiDestinationsBtn|aiDestinations|continueAiBtn|dat
 assert.doesNotMatch(prep,/ให้ AI วางโครงคลิปนี้ต่อ|เลือกว่าจะนำคลิปไปทางไหน/);
 
 console.log(JSON.stringify({
-  version:'11.6.7',
+  version:'11.6.8',
   bridgeView:true,
   footageDownloadOnly:true,
   externalStudio:true,
