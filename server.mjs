@@ -14,6 +14,7 @@ const TEXT_MODEL = process.env.OPENAI_TEXT_MODEL || "gpt-4.1-mini";
 const VIDEO_MODEL = process.env.OPENAI_VIDEO_MODEL || "sora-2";
 const SPEECH_MODEL = process.env.OPENAI_SPEECH_MODEL || "gpt-4o-mini-tts";
 const jobs = new Map();
+const STUDIO_URL = "https://thanawid.github.io/tanjai-ai-studio/";
 
 async function loadLocalEnv() {
   try {
@@ -160,6 +161,9 @@ const server = http.createServer(async (req, res) => {
       return res.end();
     }
     if (req.method === "GET" && url.pathname === "/api/health") return send(res, 200, { ready: Boolean(API_KEY), videoModel: VIDEO_MODEL, message: API_KEY ? "พร้อมสร้างงาน" : "ยังไม่ได้เปิดระบบสร้างงาน" });
+    if (req.method === "GET" && url.pathname === "/") {
+      return send(res, 200, `<!doctype html><html lang="th"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ระบบวิดีโอทันใจ AI Studio</title><style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#070914;color:#f7f7ff;font-family:system-ui,sans-serif}.card{width:min(560px,calc(100% - 40px));padding:42px;border:1px solid #353958;border-radius:28px;background:#111528;text-align:center;box-shadow:0 24px 80px #0008}i{display:inline-block;width:12px;height:12px;border-radius:50%;background:#48d8af;box-shadow:0 0 18px #48d8af}h1{margin:18px 0 8px}p{color:#aeb6cc;line-height:1.7}a{display:inline-block;margin-top:16px;padding:13px 22px;border-radius:14px;background:linear-gradient(135deg,#7057ff,#e43fa7);color:white;text-decoration:none;font-weight:800}</style><main class="card"><i></i><h1>ระบบประมวลผลวิดีโอพร้อมทำงาน</h1><p>หน้านี้เป็นเครื่องยนต์เบื้องหลังของทันใจ AI Studio<br>กรุณาสร้างวิดีโอจากเว็บไซต์หลัก</p><a href="${STUDIO_URL}create-video/">เปิดทันใจ AI Studio</a></main></html>`, "text/html; charset=utf-8");
+    }
     if (req.method === "POST" && url.pathname === "/api/storyboard") return send(res, 200, await createStoryboard(await bodyJson(req)));
     if (req.method === "POST" && url.pathname === "/api/produce") return send(res, 202, startProduction(await bodyJson(req)));
     const jobMatch = url.pathname.match(/^\/api\/jobs\/([a-zA-Z0-9-]+)$/);

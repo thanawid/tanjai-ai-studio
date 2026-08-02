@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="th">
+<html lang="th" class="auth-checking">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -11,7 +11,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=12.0.0">
+  <link rel="stylesheet" href="styles.css?v=12.1.0">
+  <script src="../js/firebase-config.js?v=12.1.0"></script>
+  <script type="module" src="auth-guard.js?v=12.1.0"></script>
 </head>
 <body>
   <div class="aurora one"></div><div class="aurora two"></div>
@@ -19,20 +21,39 @@
   <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
   <aside class="sidebar" id="sidebar">
     <a class="brand" href="../"><img src="../assets/logo.jpg" alt="โลโก้ทันใจ AI Studio"><span><b>ทันใจ AI Studio</b><small>สร้างสื่อไว ด้วยพลัง AI</small></span></a>
-    <nav>
+    <nav class="full-menu" aria-label="เมนูทันใจ AI Studio">
+      <small>เริ่มต้น</small>
+      <a class="nav-item" href="../#dashboard"><span>🏠</span> หน้าหลัก</a>
+      <a class="nav-item" href="../#router"><span>🧭</span> AI Router</a>
+      <small>ภาพและเนื้อหา</small>
+      <a class="nav-item" href="../#image"><span>🖼️</span> สร้างภาพ</a>
+      <a class="nav-item" href="../#photoPro"><span>✨</span> แต่งภาพ AI</a>
+      <a class="nav-item" href="../#album"><span>🧷</span> ชุดภาพโพสต์ Facebook</a>
+      <a class="nav-item" href="../#post"><span>✍️</span> เรียบเรียงเนื้อหา</a>
+      <small>วิดีโอและเสียง</small>
+      <a class="nav-item" href="../#video"><span>🎬</span> แต่งวิดีโอ AI</a>
+      <a class="nav-item active" href="./"><span>✨</span> สร้างวิดีโอ</a>
+      <a class="nav-item" href="../#voice"><span>🎙️</span> เสียงพากย์</a>
+      <small>วางแผนและนำเสนอ</small>
+      <a class="nav-item" href="../#kit"><span>🧩</span> สร้างชุดสื่อ</a>
+      <a class="nav-item" href="../#deck"><span>📊</span> ทำสไลด์</a>
+      <a class="nav-item" href="../#mc"><span>🎤</span> งานพิธีกร</a>
+      <small>คลังงานและเครื่องมือ</small>
+      <a class="nav-item" href="../#projects"><span>📁</span> โปรเจกต์ของฉัน</a>
+      <a class="nav-item" href="../#library"><span>🗂️</span> ตัวอย่างงาน</a>
+      <a class="nav-item" href="../#promptHub"><span>⭐</span> คลัง Prompt</a>
+      <a class="nav-item" href="../#destinationHub"><span>🚀</span> เครื่องมือปลายทาง</a>
       <small>สร้างวิดีโอ</small>
-      <a class="nav-item active" href="./"><span>🎬</span> หน้าแรกวิดีโอ</a>
-      <button class="nav-item" type="button" data-start><span>✨</span> เริ่มสร้างวิดีโอ</button>
-      <button class="nav-item" id="openProjectsSide" type="button"><span>📁</span> งานที่บันทึกไว้</button>
+      <button class="nav-item" type="button" data-start><span>▶️</span> เริ่มสร้างวิดีโอ</button>
+      <button class="nav-item" id="openProjectsSide" type="button"><span>📂</span> งานวิดีโอที่บันทึกไว้</button>
     </nav>
-    <nav class="nav-bottom"><small>ทันใจ AI Studio</small><a class="nav-item" href="../#video"><span>↩</span> กลับหน้าหลัก</a></nav>
     <div class="system-note"><i></i><span><b>พร้อมช่วยสร้างงาน</b><small>ส่วนหนึ่งของทันใจ AI Studio</small></span></div>
   </aside>
 
   <div class="app-shell">
     <header class="topbar">
       <div><small>ทันใจ AI Studio</small><h1>สร้างวิดีโอ</h1></div>
-      <nav><button class="ghost compact" id="openProjects" type="button">งานที่บันทึกไว้</button><a class="ghost compact" href="../#video">กลับหน้าหลัก</a></nav>
+      <nav><button class="ghost compact" id="openProjects" type="button">งานที่บันทึกไว้</button><a class="ghost compact" href="../#dashboard">หน้าหลัก</a></nav>
     </header>
     <main>
       <section class="hero">
@@ -53,6 +74,6 @@
     <footer><span><b>© 2026 ทันใจ AI Studio</b><small>สร้างสื่อไว ด้วยพลัง AI</small></span><span><small>Developed by Thanawid Sangsakol · สำหรับผู้ใช้ที่ได้รับอนุญาต</small></span></footer>
   </div>
   <dialog id="projectDialog"><div class="dialog-head"><div><small>งานที่บันทึกไว้</small><h2>เปิดงานเดิม</h2></div><button class="icon-button" id="closeProjects" type="button">×</button></div><div id="projectList" class="project-list"></div></dialog>
-  <script src="app.js?v=12.0.0"></script>
+  <script src="app.js?v=12.1.0"></script>
 </body>
 </html>

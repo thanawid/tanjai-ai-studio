@@ -65,7 +65,7 @@
       save(); render();
     } catch (error) { if (button) { button.disabled = false; button.textContent = "ให้ทันใจวางฉาก"; } showMessage(error.message); }
   }
-  function projectPayload() { return { format: "tanjai-video-prompt-pack", version: "12.0.0", projectId: state.id, projectName: state.name, ...state.data, updatedAt: new Date(state.updatedAt).toISOString() }; }
+  function projectPayload() { return { format: "tanjai-video-prompt-pack", version: "12.1.0", projectId: state.id, projectName: state.name, ...state.data, updatedAt: new Date(state.updatedAt).toISOString() }; }
   function downloadJson() {
     const blob = new Blob([JSON.stringify(projectPayload(), null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob); const anchor = document.createElement("a");
