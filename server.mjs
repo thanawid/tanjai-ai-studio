@@ -86,7 +86,8 @@ async function createMovingClip(scene, project, target, onProgress) {
 }
 async function createSpeech(scene, project, target) {
   if (project.language === "ไม่มีเสียงพากย์" || !scene.narration?.trim()) return false;
-  const response = await openai("/audio/speech", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ model: SPEECH_MODEL, voice: "marin", input: scene.narration, instructions: "อ่านชัดเจน เป็นธรรมชาติ พอดีภายใน 8 วินาที", response_format: "mp3" }) });
+  const voice = String(project.language || "").includes("ผู้ชาย") ? "cedar" : "marin";
+  const response = await openai("/audio/speech", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ model: SPEECH_MODEL, voice, input: scene.narration, instructions: "อ่านภาษาไทยให้ชัดเจน เป็นธรรมชาติ ไม่ตะโกน และจบภายใน 8 วินาที", response_format: "mp3" }) });
   await writeFile(target, Buffer.from(await response.arrayBuffer())); return true;
 }
 function run(command, args) {

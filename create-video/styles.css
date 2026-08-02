@@ -38,3 +38,35 @@ textarea.short{min-height:82px}
 .workspace-actions{grid-template-columns:auto auto 1fr auto;background:#101728}.workspace-actions>span{display:block}
 @media(max-width:1120px){.studio-layout{grid-template-columns:1fr}.step-panel{border-right:0}.result-panel{position:static;max-height:none;border-top:1px solid var(--line)}}
 @media(max-width:640px){main{width:min(100% - 20px,1540px)}.workspace{margin-top:12px}.workspace-head{padding:17px}.workspace-head{display:grid}.autosave{justify-self:start}.stepper{grid-auto-columns:minmax(150px,1fr)}.step-panel,.result-panel{padding:17px}.video-style-grid{grid-template-columns:1fr}.workspace-actions{grid-template-columns:1fr 1fr}.workspace-actions>span{display:none}.workspace-actions .primary{grid-column:1/-1}.result-panel{padding-top:20px}.form-section{padding:14px}.topbar nav .compact:last-child{display:none}}
+
+/* V12.2.1 — complete video workflow */
+.auth-checking>*:not(.auth-screen){visibility:hidden}
+.auth-screen{position:fixed;z-index:999;inset:0;display:grid;place-items:center;align-content:center;gap:9px;background:#070a14;text-align:center}
+.auth-screen img{width:76px;height:76px;border-radius:22px}.auth-screen small{color:var(--muted)}
+.sidebar .full-nav{flex:1;align-content:start;margin-right:-8px;padding-right:7px;overflow-y:auto;scrollbar-width:thin}
+.sidebar .full-nav>small:not(:first-child){margin-top:14px}
+.sidebar .full-nav .nav-item{min-height:43px;padding:9px 12px;font-size:12px}
+.sidebar .full-nav .nav-item span{flex:0 0 22px;text-align:center}
+.system-note{flex:0 0 auto;margin-top:14px}
+.studio-layout.brief-mode{grid-template-columns:minmax(0,1fr)}
+.studio-layout.brief-mode .step-panel{border-right:0}
+.studio-layout.brief-mode .form-section{max-width:1120px;margin-right:auto;margin-left:auto}
+.studio-layout.brief-mode .identity-note,.studio-layout.brief-mode .advanced-options,.studio-layout.brief-mode .build-main,.studio-layout.brief-mode .api-result{width:min(100%,1120px);margin-right:auto;margin-left:auto}
+.section-heading:not(:has(>i)){display:block}
+.lead-field textarea{min-height:160px}
+.lead-field label b{color:#ff8fba}
+.field label small{color:var(--muted);font-weight:500}
+.advanced-options{margin:15px 0;border:1px solid #303c57;border-radius:16px;background:#111a2c;overflow:hidden}
+.advanced-options summary{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:16px 18px;cursor:pointer;list-style:none}
+.advanced-options summary::-webkit-details-marker{display:none}
+.advanced-options summary span{display:grid}
+.advanced-options summary small{color:var(--muted);font-size:11px}
+.advanced-options summary i{font-size:20px;font-style:normal;transition:transform .2s}
+.advanced-options[open] summary i{transform:rotate(45deg)}
+.advanced-body{padding:0 18px 18px}
+body,h1,h2,h3,h4,p,b,strong,small,span,label,button,a{word-break:normal;overflow-wrap:break-word;line-break:loose}
+h1,h2,h3,.workspace-head p{text-wrap:pretty}
+.step span,.primary,.ghost,.nav-item{word-break:keep-all;overflow-wrap:normal}
+.step span{white-space:nowrap}
+input,textarea,select{font-size:15px}
+@media(max-width:640px){input,textarea,select{font-size:16px}.sidebar .full-nav .nav-item{font-size:13px}.workspace-head h2{font-size:22px}.workspace-head p{font-size:12px}.stepper{grid-auto-columns:minmax(132px,1fr)}.step span{font-size:10px}.advanced-options summary{padding:14px}.advanced-body{padding:0 14px 14px}}
