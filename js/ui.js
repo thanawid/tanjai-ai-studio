@@ -59,9 +59,10 @@ TANJAI.downloadText = function(text, filename){
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 };
 
-TANJAI.validViews = ["dashboard","router","image","photoPro","album","post","mc","video","videoEditor","voice","deck","kit","promptHub","destinationHub","projects","library","guide"];
+TANJAI.validViews = ["dashboard","router","image","photoPro","album","post","mc","video","createVideo","videoEditor","voice","deck","kit","promptHub","destinationHub","projects","library","guide"];
 
 TANJAI.switchView = function(id, options = {}){
+  if(id === "videoEditor") id = "createVideo";
   if(!TANJAI.validViews.includes(id)) id = "dashboard";
   TANJAI.state = TANJAI.state || {};
   TANJAI.state.currentView = id;
@@ -88,6 +89,7 @@ TANJAI.switchView = function(id, options = {}){
     post:"เรียบเรียงเนื้อหา",
     mc:"งานพิธีกร",
     video:"แต่งวิดีโอ AI",
+    createVideo:"สร้างวิดีโอ",
     videoEditor:"ตัดต่อวิดีโอ",
     voice:"เสียงพากย์",
     deck:"ทำสไลด์",
@@ -122,6 +124,7 @@ TANJAI.switchView = function(id, options = {}){
 
 TANJAI.currentViewFromHash = function(){
   const id = (location.hash || "#dashboard").replace("#","");
+  if(id === "videoEditor") return "createVideo";
   return TANJAI.validViews.includes(id) ? id : "dashboard";
 };
 

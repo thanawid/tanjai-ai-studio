@@ -15,6 +15,7 @@
   <meta name="description" content="ทันใจ AI Studio V12.2.1">
   <link rel="stylesheet" href="css/style.css?v=12.2.1">
   <link rel="stylesheet" href="css/animations.css?v=12.2.1">
+  <link rel="stylesheet" href="css/create-video-module.css?v=12.2.1">
 </head>
 <body class="auth-locked">
   <a class="skip-link" href="#mainContent">ข้ามไปยังเนื้อหาหลัก</a>
@@ -78,7 +79,7 @@
 
         <span>วิดีโอและเสียง</span>
         <button class="nav-link" data-view="video"><i>🎬</i><b>แต่งวิดีโอ AI</b></button>
-        <a class="nav-link" href="create-video/"><i>✨</i><b>สร้างวิดีโอ</b></a>
+        <button class="nav-link" data-view="createVideo"><i>✨</i><b>สร้างวิดีโอ</b></button>
         <button class="nav-link" data-view="voice"><i>🎙️</i><b>เสียงพากย์</b></button>
 
         <span>วางแผนและนำเสนอ</span>
@@ -251,18 +252,31 @@
 
       <section id="video" class="view"><div class="studio-layout"><section class="panel form-panel"><div class="panel-head"><div><h3>🎬 แต่งวิดีโอ AI</h3><p>อัปโหลดคลิปจำนวนมาก ปรับคุณภาพภาพ เสียง และโทนสี แล้วดาวน์โหลดไปใช้ในโปรแกรมตัดต่อที่คุณถนัด</p></div></div><div id="videoForm"></div></section><aside class="panel result-panel"><div id="videoResult"></div></aside></div></section>
 
-      <section id="videoEditor" class="view">
-        <div class="panel video-studio-bridge">
-          <div class="video-studio-bridge-icon">✨</div>
-          <small>TANJAI AI VIDEO GENERATOR</small>
-          <h2>สร้างวิดีโอใหม่ด้วย AI</h2>
-          <p>เริ่มจากหัวข้อ บท หรือภาพ ให้ AI ช่วยเขียนเรื่อง แบ่งฉาก สร้างภาพ วิดีโอ และเสียง ผ่าน Tanjai Video Studio</p>
-          <div class="video-studio-bridge-grid">
-            <div><b>📝 เริ่มจากเรื่อง</b><span>ข่าวประชาสัมพันธ์ นิทาน MV หนังสั้น และโฆษณา</span></div>
-            <div><b>🎞️ สร้างรายฉาก</b><span>ตรวจ Storyboard และสั่งแก้เฉพาะฉากก่อนผลิตจริง</span></div>
+      <!-- Legacy route id="videoEditor" now resolves to this embedded module. -->
+      <section id="createVideo" class="view create-video-module" aria-labelledby="createVideoTitle">
+        <div class="video-workspace">
+          <div class="video-workspace-head">
+            <div>
+              <span>สร้างวิดีโอด้วย AI</span>
+              <h2 id="createVideoTitle">สร้างวิดีโอด้วย AI</h2>
+              <p>เล่าเรื่องหรือใส่ข้อมูลที่มี ทันใจจะช่วยวิเคราะห์ เขียนบท แบ่งฉาก และเตรียมวิดีโอให้ตรวจสอบก่อนสร้างจริง</p>
+            </div>
+            <div class="video-head-actions">
+              <span class="video-autosave" id="saveState">บันทึกร่างอัตโนมัติ</span>
+              <button class="btn secondary" id="openProjects" type="button">งานวิดีโอที่บันทึกไว้</button>
+            </div>
           </div>
-          <a class="btn primary" href="create-video/">เริ่มสร้างวิดีโอ</a>
-          <small>ส่วนหนึ่งของทันใจ AI Studio · การสร้างสื่อจริงต้องเชื่อมผู้ให้บริการ AI</small>
+          <div class="video-stepper" id="stepper" aria-label="ขั้นตอนสร้างวิดีโอ"></div>
+          <div class="video-studio-layout">
+            <div class="video-step-panel" id="stepPanel"></div>
+            <aside class="video-result-panel" id="resultPanel" aria-label="ผลการวิเคราะห์"></aside>
+          </div>
+          <div class="video-workspace-actions">
+            <button class="btn secondary" id="prevStep" type="button">ย้อนกลับ</button>
+            <button class="btn secondary" id="saveProject" type="button">บันทึกงาน</button>
+            <span></span>
+            <button class="btn primary" id="nextStep" type="button">ถัดไป: ตรวจฉาก</button>
+          </div>
         </div>
       </section>
 
@@ -399,6 +413,11 @@
 
   <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
+  <dialog id="videoProjectDialog" class="video-project-dialog">
+    <div class="video-dialog-head"><div><small>งานวิดีโอที่บันทึกไว้</small><h2>เปิดงานเดิม</h2></div><button class="video-icon-button" id="closeProjects" type="button" aria-label="ปิด">×</button></div>
+    <div id="projectList" class="video-project-list"></div>
+  </dialog>
+
   <script src="js/data.js?v=12.2.1"></script>
   <script src="js/generators.js?v=12.2.1"></script>
   <script src="js/voice.js?v=12.2.1"></script>
@@ -418,5 +437,6 @@
   <script src="js/album.js?v=12.2.1"></script>
   <script src="js/video-editor.js?v=12.2.1"></script>
   <script src="js/proofread.js?v=12.2.1"></script>
+  <script src="create-video/app.js?v=12.2.1"></script>
 </body>
 </html>

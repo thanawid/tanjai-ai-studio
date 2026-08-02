@@ -1,6 +1,8 @@
 (() => {
   "use strict";
-  const $ = (selector, root = document) => root.querySelector(selector);
+  const moduleRoot = document.querySelector("#createVideo");
+  if (!moduleRoot) return;
+  const $ = (selector, root = moduleRoot) => root.querySelector(selector);
   const STORAGE_KEY = "tanjai-ai-video-projects-v4";
   const ACTIVE_JOB_KEY = "tanjai-ai-video-active-job";
   const APP_META = { version: "12.2.1" };
@@ -55,8 +57,7 @@
   async function checkService() {
     try {
       const health = await requestJson("/api/health"); serviceReady = Boolean(health.ready);
-      $(".system-note small").textContent = serviceReady ? "ระบบสร้างวิดีโอพร้อมใช้งาน" : "ระบบสร้างวิดีโอยังไม่พร้อม";
-    } catch { serviceReady = false; $(".system-note small").textContent = "กำลังรอระบบออนไลน์"; }
+    } catch { serviceReady = false; }
     return serviceReady;
   }
   async function buildStoryboard() {
@@ -89,7 +90,7 @@
   }
   const panels = [briefPanel, storyboardPanel, methodPanel, productionPanel];
   function briefResult() {
-    return `<div class="result-card featured"><small>ผลลัพธ์พร้อมใช้</small><h3>ทันใจ Smart Video</h3><p>เมื่อกด “เตรียมวิดีโอพร้อมสร้าง” บทพากย์ แผนฉาก และ Prompt จะแสดงตรงนี้</p></div><div class="result-empty"><span>🎞️</span><b>${state.name ? escapeHtml(state.name) : "พร้อมเปลี่ยนเรื่องของคุณให้เคลื่อนไหว"}</b><p>${state.data.topic ? "ข้อมูลพร้อมแล้ว กดปุ่มด้านซ้ายเพื่อให้ AI วางฉาก" : "กรอกหัวข้อและรายละเอียดทางซ้าย เริ่มได้แม้ไม่รู้ศัพท์งานวิดีโอ"}</p></div><div class="quick-guide"><b>ระบบจะช่วยจัดการ</b><span>✓ เขียนบทพากย์</span><span>✓ แบ่งฉากและกำหนดภาพ</span><span>✓ วางการเคลื่อนไหวและ Prompt</span><span>✓ ประมาณค่าใช้จ่ายก่อนสร้างจริง</span></div>`;
+    return `<div class="result-card featured"><small>ผลการวิเคราะห์</small><h3>ทันใจ Smart Video</h3><p>บทพากย์ แผนฉาก และ Prompt จะแสดงที่นี่หลังระบบวิเคราะห์ข้อมูล</p></div><div class="result-empty"><span>🎞️</span><b>${state.name ? escapeHtml(state.name) : "ผลการวิเคราะห์จะแสดงที่นี่"}</b><p>${state.data.topic ? "ข้อมูลพร้อมแล้ว กดวิเคราะห์และวางแผนวิดีโอได้เลย" : "เล่าเรื่องหรือใส่ข้อมูลที่มี เริ่มได้แม้ไม่รู้ศัพท์งานวิดีโอ"}</p></div><div class="quick-guide"><b>ระบบจะช่วยจัดการ</b><span>✓ เขียนบทพากย์</span><span>✓ แบ่งฉากและกำหนดภาพ</span><span>✓ วางการเคลื่อนไหวและ Prompt</span><span>✓ ประมาณค่าใช้จ่ายก่อนสร้างจริง</span></div>`;
   }
   function sceneResult() {
     const scene = state.data.scenes[0];
@@ -99,9 +100,9 @@
   function render() {
     $("#stepper").innerHTML = steps.map((label, index) => `<div class="step ${index === state.step ? "active" : index < state.step ? "done" : ""}"><i>${index < state.step ? "✓" : index + 1}</i><span>${label}</span></div>`).join("");
     $("#stepPanel").innerHTML = panels[state.step](); $("#resultPanel").innerHTML = resultForStep();
-    $(".studio-layout").classList.toggle("brief-mode", state.step === 0);
+    $(".video-studio-layout").classList.toggle("brief-mode", state.step === 0);
     $("#resultPanel").hidden = state.step === 0;
-    $("#workspaceTitle").textContent = state.name || "สร้างวิดีโอด้วย AI";
+    $("#createVideoTitle").textContent = state.name || "สร้างวิดีโอด้วย AI";
     $("#prevStep").hidden = state.step === 0; $("#nextStep").hidden = state.step === 0 || state.step === steps.length - 1;
     $("#nextStep").disabled = state.step === 1 && !state.data.scenes.length;
     $("#nextStep").textContent = state.step === 1 ? "ถัดไป: ตรวจและสร้าง" : "ถัดไป: ผลงาน";
@@ -115,8 +116,8 @@
       const apply = () => { const key = control.dataset.key; if (key === "name") state.name = control.value; else state.data[key] = control.value; save(); if (control.type === "radio") render(); };
       control.addEventListener("change", apply); if (control.type !== "radio") control.addEventListener("input", apply);
     });
-    document.querySelectorAll("[data-scene]").forEach((control) => control.addEventListener("input", () => { const scene = state.data.scenes.find((item) => item.id === control.dataset.scene); if (scene) scene[control.dataset.sceneKey] = control.value; save(); }));
-    document.querySelectorAll("[data-copy-scene]").forEach((button) => button.addEventListener("click", () => { const scene = state.data.scenes.find((item) => item.id === button.dataset.copyScene); if (scene) copyText(scene.prompt, button); }));
+    moduleRoot.querySelectorAll("[data-scene]").forEach((control) => control.addEventListener("input", () => { const scene = state.data.scenes.find((item) => item.id === control.dataset.scene); if (scene) scene[control.dataset.sceneKey] = control.value; save(); }));
+    moduleRoot.querySelectorAll("[data-copy-scene]").forEach((button) => button.addEventListener("click", () => { const scene = state.data.scenes.find((item) => item.id === button.dataset.copyScene); if (scene) copyText(scene.prompt, button); }));
     $("#buildStoryboard")?.addEventListener("click", buildStoryboard); $("#startProduction")?.addEventListener("click", startProduction);
     $("#copyAllPrompts")?.addEventListener("click", (event) => copyText(promptText(), event.currentTarget));
     $("#downloadPrompts")?.addEventListener("click", () => { const blob = new Blob([promptText()], { type: "text/plain;charset=utf-8" }); const url = URL.createObjectURL(blob); const anchor = document.createElement("a"); anchor.href = url; anchor.download = `${(state.name || "tanjai-video").replace(/[\\/:*?"<>|]+/g, "-")}-prompts.txt`; anchor.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); });
@@ -154,16 +155,13 @@
     }
   }
   function renderProjects() {
-    const items = readProjects(); $("#projectList").innerHTML = items.length ? items.map((item) => `<button class="project-item ghost" type="button" data-project="${item.id}"><span><b>${escapeHtml(item.name || "งานไม่มีชื่อ")}</b><small>${escapeHtml(item.data?.visual || "วิดีโอ")}</small></span><small>${new Date(item.updatedAt).toLocaleString("th-TH")}</small></button>`).join("") : `<div class="empty-projects">ยังไม่มีงานที่บันทึกไว้</div>`;
-    $("#projectList").querySelectorAll("[data-project]").forEach((button) => button.addEventListener("click", () => { const item = items.find((project) => project.id === button.dataset.project); Object.assign(state, item); $("#projectDialog").close(); render(); }));
+    const items = readProjects(); $("#projectList", document).innerHTML = items.length ? items.map((item) => `<button class="video-project-item" type="button" data-project="${item.id}"><span><b>${escapeHtml(item.name || "งานไม่มีชื่อ")}</b><small>${escapeHtml(item.data?.visual || "วิดีโอ")}</small></span><small>${new Date(item.updatedAt).toLocaleString("th-TH")}</small></button>`).join("") : `<div class="empty-projects">ยังไม่มีงานที่บันทึกไว้</div>`;
+    $("#projectList", document).querySelectorAll("[data-project]").forEach((button) => button.addEventListener("click", () => { const item = items.find((project) => project.id === button.dataset.project); Object.assign(state, item); $("#videoProjectDialog", document).close(); render(); }));
   }
-  const closeSidebar = () => { $("#sidebar").classList.remove("open"); $("#sidebarBackdrop").classList.remove("show"); $("#mobileMenu").setAttribute("aria-expanded", "false"); };
   $("#prevStep").addEventListener("click", () => { if (state.step > 0) { state.step--; render(); scrollTo({ top: 0, behavior: "smooth" }); } });
   $("#nextStep").addEventListener("click", () => { if (state.step === 0 && !state.data.scenes.length) return buildStoryboard(); if (state.step < steps.length - 1) { state.step++; save(); render(); scrollTo({ top: 0, behavior: "smooth" }); } });
   $("#saveProject").addEventListener("click", (event) => { save(); const old = event.currentTarget.textContent; event.currentTarget.textContent = "บันทึกแล้ว ✓"; setTimeout(() => event.currentTarget.textContent = old, 1600); });
-  ["#openProjects", "#openProjectsSide"].forEach((id) => $(id).addEventListener("click", () => { renderProjects(); $("#projectDialog").showModal(); closeSidebar(); }));
-  $("#closeProjects").addEventListener("click", () => $("#projectDialog").close());
-  $("#mobileMenu").addEventListener("click", () => { const open = !$("#sidebar").classList.contains("open"); $("#sidebar").classList.toggle("open", open); $("#sidebarBackdrop").classList.toggle("show", open); $("#mobileMenu").setAttribute("aria-expanded", String(open)); });
-  $("#sidebarBackdrop").addEventListener("click", closeSidebar);
+  $("#openProjects").addEventListener("click", () => { renderProjects(); $("#videoProjectDialog", document).showModal(); });
+  $("#closeProjects", document).addEventListener("click", () => $("#videoProjectDialog", document).close());
   render(); checkService().then(() => { const jobId = localStorage.getItem(ACTIVE_JOB_KEY); if (jobId) { state.step = 3; render(); const box = $("#apiResult"); box.hidden = false; box.className = "api-result loading"; box.textContent = "พบงานเดิม กำลังตรวจสถานะต่อ…"; pollJob(jobId); } });
 })();
