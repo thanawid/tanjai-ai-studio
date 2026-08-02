@@ -58,7 +58,7 @@ const aiConfig = fs.readFileSync(path.join(root, "js", "ai-config.js"), "utf8");
 const index = fs.readFileSync(path.join(root, "index.html"), "utf8");
 const css = fs.readFileSync(path.join(root, "css", "style.css"), "utf8");
 assert.match(index, /js\/free-writing-team\.js/);
-assert.match(index, /V12\.1\.0/);
+assert.match(index, /V12\.2\.0/);
 assert.match(app, /V10 Smart Image/);
 assert.match(app, /generateCurrentImage/);
 assert.match(app, /generateImageWithAI/);

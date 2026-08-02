@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="th" class="auth-checking">
+<html lang="th">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -11,9 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=12.1.0">
-  <script src="../js/firebase-config.js?v=12.1.0"></script>
-  <script type="module" src="auth-guard.js?v=12.1.0"></script>
+  <link rel="stylesheet" href="styles.css?v=12.2.0">
 </head>
 <body>
   <div class="aurora one"></div><div class="aurora two"></div>
@@ -21,59 +19,34 @@
   <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
   <aside class="sidebar" id="sidebar">
     <a class="brand" href="../"><img src="../assets/logo.jpg" alt="โลโก้ทันใจ AI Studio"><span><b>ทันใจ AI Studio</b><small>สร้างสื่อไว ด้วยพลัง AI</small></span></a>
-    <nav class="full-menu" aria-label="เมนูทันใจ AI Studio">
-      <small>เริ่มต้น</small>
-      <a class="nav-item" href="../#dashboard"><span>🏠</span> หน้าหลัก</a>
-      <a class="nav-item" href="../#router"><span>🧭</span> AI Router</a>
-      <small>ภาพและเนื้อหา</small>
-      <a class="nav-item" href="../#image"><span>🖼️</span> สร้างภาพ</a>
-      <a class="nav-item" href="../#photoPro"><span>✨</span> แต่งภาพ AI</a>
-      <a class="nav-item" href="../#album"><span>🧷</span> ชุดภาพโพสต์ Facebook</a>
-      <a class="nav-item" href="../#post"><span>✍️</span> เรียบเรียงเนื้อหา</a>
-      <small>วิดีโอและเสียง</small>
-      <a class="nav-item" href="../#video"><span>🎬</span> แต่งวิดีโอ AI</a>
-      <a class="nav-item active" href="./"><span>✨</span> สร้างวิดีโอ</a>
-      <a class="nav-item" href="../#voice"><span>🎙️</span> เสียงพากย์</a>
-      <small>วางแผนและนำเสนอ</small>
-      <a class="nav-item" href="../#kit"><span>🧩</span> สร้างชุดสื่อ</a>
-      <a class="nav-item" href="../#deck"><span>📊</span> ทำสไลด์</a>
-      <a class="nav-item" href="../#mc"><span>🎤</span> งานพิธีกร</a>
-      <small>คลังงานและเครื่องมือ</small>
-      <a class="nav-item" href="../#projects"><span>📁</span> โปรเจกต์ของฉัน</a>
-      <a class="nav-item" href="../#library"><span>🗂️</span> ตัวอย่างงาน</a>
-      <a class="nav-item" href="../#promptHub"><span>⭐</span> คลัง Prompt</a>
-      <a class="nav-item" href="../#destinationHub"><span>🚀</span> เครื่องมือปลายทาง</a>
+    <nav>
       <small>สร้างวิดีโอ</small>
-      <button class="nav-item" type="button" data-start><span>▶️</span> เริ่มสร้างวิดีโอ</button>
-      <button class="nav-item" id="openProjectsSide" type="button"><span>📂</span> งานวิดีโอที่บันทึกไว้</button>
+      <a class="nav-item active" href="./"><span>✨</span> สร้างวิดีโอ</a>
+      <button class="nav-item" id="openProjectsSide" type="button"><span>📁</span> งานที่บันทึกไว้</button>
     </nav>
+    <nav class="nav-bottom"><small>ทันใจ AI Studio</small><a class="nav-item" href="../#video"><span>↩</span> กลับหน้าหลัก</a></nav>
     <div class="system-note"><i></i><span><b>พร้อมช่วยสร้างงาน</b><small>ส่วนหนึ่งของทันใจ AI Studio</small></span></div>
   </aside>
 
   <div class="app-shell">
     <header class="topbar">
       <div><small>ทันใจ AI Studio</small><h1>สร้างวิดีโอ</h1></div>
-      <nav><button class="ghost compact" id="openProjects" type="button">งานที่บันทึกไว้</button><a class="ghost compact" href="../#dashboard">หน้าหลัก</a></nav>
+      <nav><button class="ghost compact" id="openProjects" type="button">งานที่บันทึกไว้</button><a class="ghost compact" href="../#video">กลับหน้าหลัก</a></nav>
     </header>
     <main>
-      <section class="hero">
-        <div class="hero-copy"><span class="eyebrow">TANJAI VIDEO</span><h2>เปลี่ยนเรื่องที่คิด<br><em>ให้เคลื่อนไหว</em></h2><p>บอกเรื่องครั้งเดียว ทันใจช่วยวางฉาก สร้างภาพเคลื่อนไหว ใส่เสียง และรวมเป็นวิดีโอพร้อมใช้</p><div class="hero-actions"><button class="primary" data-start type="button">เริ่มสร้างวิดีโอ</button><button class="ghost" id="openProjectsHero" type="button">เปิดงานเดิม</button></div><div class="hero-points"><span>✓ แก้ได้ทุกฉาก</span><span>✓ เลือกแนวหรือกำหนดเอง</span><span>✓ ได้ทั้ง MP4 และชุด Prompt</span></div></div>
-        <div class="hero-mark"><div class="ring"></div><img src="../assets/logo.jpg" alt=""><b>ทันใจ VIDEO</b><small>คิดไว · ทำไว · ตรวจได้</small></div>
+      <section class="workspace" id="workspace">
+        <div class="workspace-head"><div><span>โหมดง่าย · Smart Video Brief</span><h2 id="workspaceTitle">บอกเรื่องครั้งเดียว ที่เหลือให้ทันใจช่วย</h2><p>กรอกเท่าที่มี ระบบจะช่วยเขียนบท แบ่งฉาก วางภาพ การเคลื่อนไหว และเสียงพากย์</p></div><span class="autosave" id="saveState">บันทึกร่างอัตโนมัติ</span></div>
+        <div class="stepper" id="stepper"></div>
+        <div class="studio-layout">
+          <div class="step-panel" id="stepPanel"></div>
+          <aside class="result-panel" id="resultPanel"></aside>
+        </div>
+        <div class="workspace-actions"><button class="ghost" id="prevStep" type="button">ย้อนกลับ</button><button class="ghost" id="saveProject" type="button">บันทึกงาน</button><span></span><button class="primary" id="nextStep" type="button">ถัดไป: ตรวจฉาก</button></div>
       </section>
-
-      <section class="idea-section"><div class="section-title"><small>เริ่มได้หลายทาง</small><h2>งานจริง หรือเรื่องใหม่ ก็เล่าในแบบของคุณได้</h2><p>ตัวเลือกด้านล่างเป็นเพียงจุดเริ่มต้น เปลี่ยน ผสม หรือกำหนดใหม่ได้เสมอ</p></div><div class="use-grid"><article><span>📣</span><b>ข่าวและประชาสัมพันธ์</b><small>ข่าว กิจกรรม รณรงค์ สรุปผลงาน</small></article><article><span>🎵</span><b>เพลงและเรื่องเล่า</b><small>MV นิทาน หนังสั้น สารคดี</small></article><article><span>🚀</span><b>งานสร้างสรรค์</b><small>โฆษณา ท่องเที่ยว อนิเมะ หรือแนวของคุณ</small></article></div></section>
-
-      <section class="workspace" id="workspace" hidden>
-        <div class="workspace-head"><div><span id="workspaceKicker">สร้างวิดีโอใหม่</span><h2 id="workspaceTitle">เริ่มจากเรื่องของคุณ</h2></div><button class="ghost compact" id="closeWorkspace" type="button">กลับหน้าแรก</button></div>
-        <div class="stepper" id="stepper"></div><div class="step-panel" id="stepPanel"></div>
-        <div class="workspace-actions"><button class="ghost" id="prevStep" type="button">ย้อนกลับ</button><span id="saveState">บันทึกร่างในเครื่องอัตโนมัติ</span><button class="primary" id="nextStep" type="button">ถัดไป</button></div>
-      </section>
-
-      <section class="promise"><div><b>1</b><span><strong>บอกเรื่องครั้งเดียว</strong><small>ข้อมูลซับซ้อนให้ระบบช่วยจัดการ</small></span></div><div><b>2</b><span><strong>ตรวจเฉพาะจุดสำคัญ</strong><small>แก้ภาพ การเคลื่อนไหว และเสียงรายฉาก</small></span></div><div><b>3</b><span><strong>เลือกวิธีไปต่อ</strong><small>สร้าง MP4 หรือเก็บ Prompt ไปใช้เอง</small></span></div></section>
     </main>
     <footer><span><b>© 2026 ทันใจ AI Studio</b><small>สร้างสื่อไว ด้วยพลัง AI</small></span><span><small>Developed by Thanawid Sangsakol · สำหรับผู้ใช้ที่ได้รับอนุญาต</small></span></footer>
   </div>
   <dialog id="projectDialog"><div class="dialog-head"><div><small>งานที่บันทึกไว้</small><h2>เปิดงานเดิม</h2></div><button class="icon-button" id="closeProjects" type="button">×</button></div><div id="projectList" class="project-list"></div></dialog>
-  <script src="app.js?v=12.1.0"></script>
+  <script src="app.js?v=12.2.0"></script>
 </body>
 </html>

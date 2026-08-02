@@ -12,11 +12,11 @@ assert.doesNotMatch(main, /tanjai-video-studio\.onrender\.com/);
 assert.doesNotMatch(video, /location\.replace/);
 assert.match(video, /href="\.\.\/#video"/);
 assert.match(app, /const API_BASE = location\.hostname\.endsWith\("github\.io"\)/);
-assert.match(app, /version: "12\.1\.0"/);
+assert.match(app, /version: "12\.2\.0"/);
 assert.match(server, /Access-Control-Allow-Origin/);
 assert.match(server, /req\.method === "OPTIONS"/);
 assert.match(server, /\/api\/storyboard/);
 assert.match(server, /\/api\/produce/);
 assert.match(dockerignore, /^\.env$/m);
 
-console.log(JSON.stringify({ version: "12.1.0", oneRepository: true, internalVideoPage: true, renderApiBridge: true, status: "PASS" }, null, 2));
+console.log(JSON.stringify({ version: "12.2.0", oneRepository: true, internalVideoPage: true, renderApiBridge: true, status: "PASS" }, null, 2));

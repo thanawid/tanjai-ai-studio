@@ -1,167 +1,151 @@
 (() => {
   "use strict";
   const $ = (selector, root = document) => root.querySelector(selector);
-  const STORAGE_KEY = "tanjai-ai-video-projects-v3";
+  const STORAGE_KEY = "tanjai-ai-video-projects-v4";
+  const ACTIVE_JOB_KEY = "tanjai-ai-video-active-job";
+  const APP_META = { version: "12.2.0" };
   const API_BASE = location.hostname.endsWith("github.io") ? "https://tanjai-video-studio.onrender.com" : "";
-  const steps = ["ตั้งค่างาน", "เล่าเรื่อง", "เลือกบรรยากาศ", "ตรวจฉาก", "เลือกวิธีสร้าง", "รับวิดีโอ"];
+  const steps = ["บอกงานและเลือกแนว", "ตรวจบทและฉาก", "เลือกวิธีสร้าง", "รับผลงาน"];
   const state = {
     id: crypto.randomUUID(), step: 0, name: "", updatedAt: Date.now(),
-    data: { genre: "ประชาสัมพันธ์", aspect: "16:9 แนวนอน", duration: "30 วินาที", language: "ภาษาไทย", visual: "ให้ทันใจแนะนำ", movement: "ให้ทันใจแนะนำ", scenes: [], method: "preview" }
+    data: { genre: "ให้ AI วิเคราะห์จากรายละเอียด", aspect: "16:9 แนวนอน", duration: "30 วินาที", language: "ภาษาไทย · ให้ AI เลือกเสียง", visual: "ให้ AI เลือกตามงาน", tone: "ให้ AI เลือกให้เหมาะสม", movement: "ให้ AI แนะนำ", scenes: [], method: "preview" }
   };
   let serviceReady = false;
 
   const escapeHtml = (value) => String(value || "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[char]));
   const readProjects = () => { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch { return []; } };
-  function save() {
+  function save(showTime = true) {
     state.updatedAt = Date.now();
     const projects = readProjects().filter((item) => item.id !== state.id);
     projects.unshift(structuredClone(state));
     localStorage.setItem(STORAGE_KEY, JSON.stringify(projects.slice(0, 30)));
-    $("#saveState").textContent = `บันทึกร่างแล้ว ${new Date().toLocaleTimeString("th-TH", { hour: "2-digit", minute: "2-digit" })}`;
+    if (showTime && $("#saveState")) $("#saveState").textContent = `บันทึกร่างแล้ว ${new Date().toLocaleTimeString("th-TH", { hour: "2-digit", minute: "2-digit" })}`;
   }
   const fields = (content) => `<div class="form-grid">${content}</div>`;
-  function choices(key, items) {
-    const selected = state.data[key] || items[0][0];
-    return `<div class="choice-grid">${items.map(([title, detail, icon]) => `<label class="choice"><input type="radio" name="${key}" data-key="${key}" value="${title}" ${selected === title ? "checked" : ""}><i>${icon}</i><b>${title}</b><span>${detail}</span></label>`).join("")}</div>`;
+  const options = (items) => items.map((item) => `<option>${item}</option>`).join("");
+  function trendChoices() {
+    const items = [
+      ["ให้ AI เลือกตามงาน", "วิเคราะห์เรื่องและเลือกแนวที่เหมาะที่สุด", "✨", "แนะนำ"],
+      ["ราชการ / PR Premium", "สุภาพ ทันสมัย น่าเชื่อถือ", "📣", "ยอดนิยม"],
+      ["Documentary Real", "ภาพจริง เล่าเรื่องชุมชนและกิจกรรม", "🎥", "กำลังนิยม"],
+      ["Cinematic AI", "แสงและมิติแบบภาพยนตร์", "🎬", "กำลังนิยม"],
+      ["Social Media Modern", "กระชับ เด่นบนมือถือ", "📱", "ยอดนิยม"],
+      ["Micro Story", "เรื่องสั้น ดึงความสนใจตั้งแต่ต้น", "⚡", "กำลังนิยม"],
+      ["MV เพลง", "ภาพตามอารมณ์และจังหวะดนตรี", "🎵", "ยอดนิยม"],
+      ["นิทาน / แอนิเมชัน", "เหมาะกับเด็กและเรื่องสร้างสรรค์", "🧸", ""],
+      ["3D Miniature World", "โลกจำลองสามมิติ สีสันสะดุดตา", "🏙️", "กำลังนิยม"],
+      ["กำหนดแนวเอง", "ผสมแนวหรือบอกภาพในแบบของคุณ", "⚙️", ""]
+    ];
+    return `<div class="video-style-grid">${items.map(([title, detail, icon, badge]) => `<label class="video-style"><input type="radio" name="visual" data-key="visual" value="${title}" ${state.data.visual === title ? "checked" : ""}><span class="style-icon">${icon}</span><b>${title}</b><small>${detail}</small>${badge ? `<em>${badge}</em>` : ""}</label>`).join("")}</div>`;
   }
   function showMessage(message, type = "error") {
     const box = $("#storyboardStatus") || $("#apiResult");
     if (box) { box.hidden = false; box.className = `api-result ${type}`; box.textContent = message; }
   }
   async function requestJson(path, options) {
-    const response = await fetch(`${API_BASE}${path}`, options);
+    let response;
+    try { response = await fetch(`${API_BASE}${path}`, options); }
+    catch { throw new Error("เชื่อมต่อระบบสร้างวิดีโอไม่ได้ กรุณารอสักครู่แล้วกดตรวจสถานะอีกครั้ง"); }
     const type = response.headers.get("content-type") || "";
     if (!type.includes("application/json")) throw new Error("ระบบตอบกลับไม่ครบ กรุณาลองใหม่หลังระบบออนไลน์แล้ว");
     const result = await response.json();
-    if (!response.ok) throw new Error(result.error || "ยังทำรายการไม่สำเร็จ");
+    if (!response.ok) throw new Error(result.error || "ยังทำรายการไม่สำเร็จ กรุณาลองอีกครั้ง");
     return result;
   }
   async function checkService() {
     try {
-      const health = await requestJson("/api/health");
-      serviceReady = Boolean(health.ready);
-      document.querySelectorAll("[data-start]").forEach((button) => { button.disabled = !serviceReady; });
-      const note = $(".system-note small");
-      if (note) note.textContent = serviceReady ? "ระบบสร้างวิดีโอพร้อมใช้งาน" : "ระบบสร้างวิดีโอยังไม่พร้อม";
-      return serviceReady;
-    } catch {
-      serviceReady = false;
-      document.querySelectorAll("[data-start]").forEach((button) => { button.disabled = true; });
-      const note = $(".system-note small");
-      if (note) note.textContent = "กำลังรอระบบออนไลน์";
-      return false;
-    }
+      const health = await requestJson("/api/health"); serviceReady = Boolean(health.ready);
+      $(".system-note small").textContent = serviceReady ? "ระบบสร้างวิดีโอพร้อมใช้งาน" : "ระบบสร้างวิดีโอยังไม่พร้อม";
+    } catch { serviceReady = false; $(".system-note small").textContent = "กำลังรอระบบออนไลน์"; }
+    return serviceReady;
   }
   async function buildStoryboard() {
     if (!state.data.topic?.trim()) return showMessage("กรุณาเล่าเรื่องที่ต้องการทำก่อนครับ");
     const button = $("#buildStoryboard");
-    if (button) { button.disabled = true; button.textContent = "กำลังวางฉาก…"; }
-    showMessage("กำลังแบ่งเรื่องเป็นฉากที่ต่อเนื่องกัน", "loading");
+    if (button) { button.disabled = true; button.textContent = "กำลังเขียนบทและวางฉาก…"; }
+    showMessage("ทันใจกำลังเรียบเรียงบท แบ่งฉาก และเตรียม Prompt", "loading");
     try {
       const result = await requestJson("/api/storyboard", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: state.name, ...state.data }) });
-      state.name ||= result.projectTitle;
-      state.data.summary = result.summary;
+      state.name ||= result.projectTitle; state.data.summary = result.summary;
       state.data.scenes = result.scenes.map((scene, index) => ({ ...scene, id: crypto.randomUUID(), order: index + 1 }));
-      save(); render();
-    } catch (error) { if (button) { button.disabled = false; button.textContent = "ให้ทันใจวางฉาก"; } showMessage(error.message); }
+      state.step = 1; save(); render();
+    } catch (error) { if (button) { button.disabled = false; button.textContent = "เตรียมวิดีโอพร้อมสร้าง"; } showMessage(error.message); }
   }
-  function projectPayload() { return { format: "tanjai-video-prompt-pack", version: "12.1.0", projectId: state.id, projectName: state.name, ...state.data, updatedAt: new Date(state.updatedAt).toISOString() }; }
-  function downloadJson() {
-    const blob = new Blob([JSON.stringify(projectPayload(), null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob); const anchor = document.createElement("a");
-    anchor.href = url; anchor.download = `${(state.name || "tanjai-video").replace(/[\\/:*?"<>|]+/g, "-")}-prompts.json`; anchor.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  function briefPanel() {
+    const genres = ["ให้ AI วิเคราะห์จากรายละเอียด", "ข่าว / รายงานกิจกรรม", "เชิญชวน / ประชาสัมพันธ์", "สารคดี / เรื่องเล่าองค์กร", "โฆษณาสินค้าและบริการ", "MV / เพลง", "นิทานเด็ก", "หนังสั้น", "ท่องเที่ยว", "กำหนดเอง"];
+    return `<section class="form-section"><div class="section-heading"><i>1</i><div><h3>บอกงานให้ชัด</h3><p>กรอกเฉพาะข้อมูลที่มี ระบบจะไม่แต่งข้อมูลสำคัญเพิ่ม</p></div></div>${fields(`<div class="field"><label>หัวข้อหรือชื่อวิดีโอ</label><input data-key="name" value="${escapeHtml(state.name)}" placeholder="เช่น เชิญชวนร่วมกิจกรรมออกกำลังกาย"></div><div class="field"><label>ประเภทงาน</label><select data-key="genre">${options(genres)}</select></div><div class="field full"><label>เรื่องที่อยากเล่า</label><textarea data-key="topic" placeholder="บอกเรื่องครั้งเดียว เช่น ทำวิดีโอเชิญชวนออกกำลังกายทุกวันพุธและศุกร์ ความยาว 30 วินาที">${escapeHtml(state.data.topic || "")}</textarea></div><div class="field full"><label>ข้อมูลจริงที่ห้ามเปลี่ยน</label><textarea class="short" data-key="facts" placeholder="ชื่อบุคคล วัน เวลา สถานที่ หน่วยงาน และตัวเลขสำคัญ">${escapeHtml(state.data.facts || "")}</textarea></div><div class="field"><label>กลุ่มผู้ชม</label><input data-key="audience" value="${escapeHtml(state.data.audience || "")}" placeholder="เช่น ประชาชนทั่วไป"></div><div class="field"><label>ความยาว</label><select data-key="duration">${options(["30 วินาที", "60 วินาที", "90 วินาที", "2 นาที", "3–4 นาที"])}</select></div><div class="field"><label>ขนาดวิดีโอ</label><select data-key="aspect">${options(["16:9 แนวนอน", "9:16 แนวตั้ง", "1:1 จัตุรัส", "4:5 โพสต์โซเชียล"])}</select></div><div class="field"><label>เสียงพากย์</label><select data-key="language">${options(["ภาษาไทย · ให้ AI เลือกเสียง", "ภาษาไทย · ผู้ชาย", "ภาษาไทย · ผู้หญิง", "ภาษาอังกฤษ", "ไม่มีเสียงพากย์"])}</select></div>`)}</section><section class="form-section"><div class="section-heading"><i>2</i><div><h3>เลือกแนววิดีโอ</h3><p>เลือกเพียงหนึ่งแนว หรือปล่อยให้ AI ตัดสินใจตามลักษณะงาน</p></div></div>${trendChoices()}${fields(`<div class="field"><label>อารมณ์และจังหวะ</label><select data-key="tone">${options(["ให้ AI เลือกให้เหมาะสม", "สุภาพและเป็นทางการ", "สดใส เป็นกันเอง", "อบอุ่นและประทับใจ", "สนุกและกระฉับกระเฉง", "จริงจังและน่าเชื่อถือ", "ลึกลับและน่าติดตาม"])}</select></div><div class="field"><label>รายละเอียดแนวเพิ่มเติม</label><input data-key="customStyle" value="${escapeHtml(state.data.customStyle || "")}" placeholder="เช่น ภาพจริง อบอุ่น จังหวะไม่เร็วเกินไป"></div>`)}</section><div class="identity-note"><b>คงอัตลักษณ์บุคคลจริง</b><span>ระบบจะไม่สร้างใบหน้าใหม่ ไม่เปลี่ยนใบหน้า และไม่ดัดแปลงลักษณะบุคคล โดยจะใช้ภาพต้นฉบับหรือภาพกิจกรรมที่เหมาะสมแทน</span></div><button class="primary build-main" id="buildStoryboard" type="button">✨ เตรียมวิดีโอพร้อมสร้าง</button><div class="api-result" id="storyboardStatus" hidden></div>`;
   }
   function storyboardPanel() {
-    if (!state.data.scenes.length) return `<div class="empty-storyboard"><span>🎬</span><h3>พร้อมช่วยวางฉาก</h3><p>ทันใจจะเรียบเรียงเรื่องเป็นฉาก กำหนดภาพ การเคลื่อนไหว และเสียงพากย์ให้ตรวจแก้ได้</p><button class="primary" id="buildStoryboard" type="button">ให้ทันใจวางฉาก</button><div class="api-result" id="storyboardStatus" hidden></div></div>`;
-    return `<div class="storyboard-head"><div><h3>${state.data.scenes.length} ฉาก พร้อมตรวจ</h3><small>แก้ภาพ การเคลื่อนไหว และเสียงพากย์ได้ก่อนสร้างจริง</small></div><button class="ghost compact" id="buildStoryboard" type="button">วางฉากใหม่</button></div><div class="api-result" id="storyboardStatus" hidden></div><div class="storyboard-grid">${state.data.scenes.map((scene, index) => `<article class="scene-card"><div class="scene-number">${String(index + 1).padStart(2, "0")}<small>${scene.duration} วิ</small></div><div class="scene-body"><label>ภาพในฉาก<input data-scene="${scene.id}" data-scene-key="visual" value="${escapeHtml(scene.visual)}"></label><label>การเคลื่อนไหว<input data-scene="${scene.id}" data-scene-key="motion" value="${escapeHtml(scene.motion)}"></label><label>เสียงพากย์<textarea data-scene="${scene.id}" data-scene-key="narration">${escapeHtml(scene.narration)}</textarea></label><label>Prompt สำหรับสร้างคลิป<textarea data-scene="${scene.id}" data-scene-key="prompt">${escapeHtml(scene.prompt)}</textarea></label></div></article>`).join("")}</div>`;
+    if (!state.data.scenes.length) return `<div class="empty-storyboard"><span>🎬</span><h3>ยังไม่มีฉาก</h3><p>ย้อนกลับไปเล่าเรื่อง แล้วให้ทันใจช่วยเขียนบทและแบ่งฉากให้ครับ</p></div>`;
+    return `<div class="storyboard-head"><div><h3>ตรวจบทและฉาก</h3><small>แก้เฉพาะจุดที่ต้องการ ทุกช่องบันทึกอัตโนมัติ</small></div><button class="ghost compact" id="buildStoryboard" type="button">วางฉากใหม่</button></div><div class="api-result" id="storyboardStatus" hidden></div><div class="storyboard-grid">${state.data.scenes.map((scene, index) => `<article class="scene-card"><div class="scene-number">${String(index + 1).padStart(2, "0")}<small>${scene.duration} วิ</small></div><div class="scene-body"><label>ภาพในฉาก<textarea data-scene="${scene.id}" data-scene-key="visual">${escapeHtml(scene.visual)}</textarea></label><label>การเคลื่อนไหว<textarea data-scene="${scene.id}" data-scene-key="motion">${escapeHtml(scene.motion)}</textarea></label><label>เสียงพากย์<textarea data-scene="${scene.id}" data-scene-key="narration">${escapeHtml(scene.narration)}</textarea></label><label>Prompt สำหรับสร้างคลิป<textarea data-scene="${scene.id}" data-scene-key="prompt">${escapeHtml(scene.prompt)}</textarea><button class="copy-scene" type="button" data-copy-scene="${scene.id}">คัดลอก Prompt ฉากนี้</button></label></div></article>`).join("")}</div>`;
   }
   function methodPanel() {
-    const method = state.data.method || "preview";
-    const count = state.data.scenes.length;
-    return `<div class="method-intro"><h3>อยากเริ่มสร้างแบบไหน?</h3><p>ทดลองหนึ่งฉากก่อนเพื่อดูแนวงาน หรือสร้างครบทุกฉากเมื่อพร้อม</p></div><div class="choice-grid method-grid"><label class="choice"><input type="radio" name="method" data-key="method" value="preview" ${method === "preview" ? "checked" : ""}><i>🧪</i><b>ทดลอง 1 ฉาก</b><span>วิดีโอเคลื่อนไหวจริงประมาณ 8 วินาที · ราว $0.80</span></label><label class="choice"><input type="radio" name="method" data-key="method" value="full" ${method === "full" ? "checked" : ""}><i>🎬</i><b>สร้างครบ ${count || 0} ฉาก</b><span>รวมเป็น MP4 เดียว · ราว $${(Math.max(count, 1) * 0.8).toFixed(2)}</span></label><label class="choice"><input type="radio" name="method" data-key="method" value="prompt" ${method === "prompt" ? "checked" : ""}><i>📦</i><b>รับชุด Prompt</b><span>นำไปสร้างต่อด้วยเครื่องมืออื่น โดยยังไม่เสียค่าสร้างคลิป</span></label></div><div class="method-note">ค่าใช้จ่ายเป็นการประมาณจากคลิปละ 8 วินาที ค่าใช้จริงขึ้นอยู่กับผู้ให้บริการ</div>`;
+    const count = state.data.scenes.length; const method = state.data.method;
+    return `<div class="method-intro"><h3>เลือกวิธีไปต่อ</h3><p>ตรวจค่าใช้จ่ายโดยประมาณก่อนสร้างจริงได้เสมอ</p></div><div class="choice-grid method-grid"><label class="choice"><input type="radio" name="method" data-key="method" value="preview" ${method === "preview" ? "checked" : ""}><i>🧪</i><b>ทดลองสร้าง 1 ฉาก</b><span>ดูแนวภาพและการเคลื่อนไหวก่อน · ประมาณ $0.80</span></label><label class="choice"><input type="radio" name="method" data-key="method" value="full" ${method === "full" ? "checked" : ""}><i>🎬</i><b>สร้างวิดีโอทั้งหมด</b><span>${count} ฉาก รวมเป็น MP4 · ประมาณ $${(Math.max(count, 1) * 0.8).toFixed(2)}</span></label><label class="choice"><input type="radio" name="method" data-key="method" value="prompt" ${method === "prompt" ? "checked" : ""}><i>📋</i><b>ดูและคัดลอก Prompt</b><span>อ่าน แก้ คัดลอก หรือดาวน์โหลดข้อความ โดยยังไม่สร้างคลิป</span></label></div><div class="method-note">ยอดเงินจริงอาจต่างจากประมาณการตามความยาวและผู้ให้บริการ ระบบจะไม่เริ่มคิดค่าบริการจนกดยืนยันสร้าง</div>`;
   }
   function productionPanel() {
-    const method = state.data.method || "preview";
-    const promptOnly = method === "prompt";
-    const scenes = method === "preview" ? Math.min(1, state.data.scenes.length) : state.data.scenes.length;
-    return `<div class="production-summary"><h3>${promptOnly ? "ชุด Prompt พร้อมดาวน์โหลด" : "พร้อมสร้างคลิปเคลื่อนไหว"}</h3><div class="summary-list"><div><small>ชื่อโครงการ</small><b>${escapeHtml(state.name || "ยังไม่ได้ตั้งชื่อ")}</b></div><div><small>รูปแบบ</small><b>${escapeHtml(state.data.genre)} · ${escapeHtml(state.data.aspect)}</b></div><div><small>จำนวนฉาก</small><b>${scenes} ฉาก</b></div><div><small>สิ่งที่จะได้รับ</small><b>${promptOnly ? "แผนเรื่องและ Prompt" : "วิดีโอ MP4 พร้อมเสียงพากย์"}</b></div></div><p>${promptOnly ? "เก็บแผนทั้งหมดไปใช้กับเครื่องมือที่คุณถนัดได้" : "ระบบจะสร้างการเคลื่อนไหวจริงทีละฉาก งานนี้อาจใช้เวลาหลายนาทีและมีค่าใช้จ่ายตามจำนวนฉาก"}</p></div><div class="production-actions"><button class="ghost" id="downloadProject" type="button">ดาวน์โหลดชุด Prompt</button>${promptOnly ? "" : `<button class="primary" id="startProduction" type="button" ${state.data.scenes.length ? "" : "disabled"}>${method === "preview" ? "ทดลองสร้าง 1 ฉาก" : "สร้างวิดีโอทั้งหมด"}</button>`}</div><div class="api-result" id="apiResult" hidden></div><div id="videoResult"></div>`;
+    const promptOnly = state.data.method === "prompt"; const scenes = state.data.method === "preview" ? Math.min(1, state.data.scenes.length) : state.data.scenes.length;
+    return `<div class="production-summary"><h3>${promptOnly ? "Prompt พร้อมใช้" : "พร้อมสร้างคลิปเคลื่อนไหว"}</h3><div class="summary-list"><div><small>ชื่อโครงการ</small><b>${escapeHtml(state.name || "ยังไม่ได้ตั้งชื่อ")}</b></div><div><small>รูปแบบ</small><b>${escapeHtml(state.data.visual)} · ${escapeHtml(state.data.aspect)}</b></div><div><small>จำนวนฉาก</small><b>${scenes} ฉาก</b></div><div><small>สิ่งที่จะได้รับ</small><b>${promptOnly ? "Prompt แบบข้อความ แยกตามฉาก" : "วิดีโอ MP4 พร้อมเสียงพากย์"}</b></div></div></div><div class="production-actions"><button class="ghost" id="copyAllPrompts" type="button">คัดลอก Prompt ทั้งหมด</button><button class="ghost" id="downloadPrompts" type="button">ดาวน์โหลดข้อความ (.txt)</button>${promptOnly ? "" : `<button class="primary" id="startProduction" type="button" ${state.data.scenes.length ? "" : "disabled"}>${state.data.method === "preview" ? "ทดลองสร้าง 1 ฉาก" : "สร้างวิดีโอทั้งหมด"}</button>`}</div><div class="api-result" id="apiResult" hidden></div><div id="videoResult"></div>`;
   }
-  const panels = [
-    () => fields(`<div class="field full"><label>ชื่อโครงการ</label><input data-key="name" value="${escapeHtml(state.name)}" placeholder="เช่น เชิญชวนร่วมกิจกรรมออกกำลังกาย"></div><div class="field"><label>ประเภทงาน</label><select data-key="genre"><option>ประชาสัมพันธ์</option><option>ข่าว / สรุปกิจกรรม</option><option>MV / เพลง</option><option>นิทาน</option><option>หนังสั้น</option><option>โฆษณา</option><option>สารคดี</option><option>ท่องเที่ยว</option><option>กำหนดเอง</option></select></div><div class="field"><label>สัดส่วนภาพ</label><select data-key="aspect"><option>16:9 แนวนอน</option><option>9:16 แนวตั้ง</option><option>1:1 จัตุรัส</option><option>4:5 โพสต์โซเชียล</option></select></div><div class="field"><label>ความยาวเป้าหมาย</label><select data-key="duration"><option>30 วินาที</option><option>60 วินาที</option><option>90 วินาที</option></select></div><div class="field"><label>ภาษา</label><select data-key="language"><option>ภาษาไทย</option><option>ภาษาอังกฤษ</option><option>ไม่มีเสียงพากย์</option></select></div>`),
-    () => fields(`<div class="field full"><label>เรื่องที่อยากเล่า</label><textarea data-key="topic" placeholder="ใคร ทำอะไร ที่ไหน และอยากให้คนดูรู้สึกอย่างไร">${escapeHtml(state.data.topic || "")}</textarea></div><div class="field full"><label>ข้อมูลที่ต้องใช้ตามจริง</label><textarea data-key="facts" placeholder="ชื่อ วันเวลา สถานที่ หน่วยงาน หรือตัวเลขที่ห้ามเปลี่ยน">${escapeHtml(state.data.facts || "")}</textarea></div><div class="field"><label>คนที่อยากให้ดู</label><input data-key="audience" value="${escapeHtml(state.data.audience || "")}" placeholder="เช่น ประชาชนทั่วไป"></div><div class="field"><label>น้ำเสียง</label><select data-key="tone"><option>สุภาพ ชัดเจน</option><option>อบอุ่น เป็นกันเอง</option><option>สนุก กระชับ</option><option>มีอารมณ์แบบภาพยนตร์</option><option>กำหนดเอง</option></select></div><div class="person-note full">หากเรื่องมีบุคคลจริง ระบบจะไม่สร้างใบหน้าปลอมแทนบุคคลนั้น แต่จะใช้ภาพกิจกรรม สถานที่ หรือภาพสื่อความหมาย พร้อมกล่าวชื่อในเสียงพากย์</div>`),
-    () => `<div class="style-intro"><h3>เลือกบรรยากาศเริ่มต้น</h3><p>นี่เป็นเพียงทางลัด คุณผสมแนวและบอกเพิ่มเติมได้</p></div>${choices("visual", [["ให้ทันใจแนะนำ","เลือกแนวที่เหมาะกับเรื่อง","✨"],["ภาพยนตร์สมจริง","แสงและมิติแบบภาพยนตร์","🎥"],["ข่าวและประชาสัมพันธ์","สะอาด สุภาพ น่าเชื่อถือ","📺"],["อบอุ่น","เป็นธรรมชาติ เป็นกันเอง","🌤️"],["สดใส","มีพลัง สีสันชัด","☀️"],["อนิเมะ","เลือกได้ทั้งน่ารักและภาพยนตร์","🌸"],["แฟนตาซี","โลกเหนือจริงและจินตนาการ","🪄"],["กำหนดเอง","บอกแนวของคุณได้เต็มที่","⚙️"]])}${fields(`<div class="field"><label>จังหวะการเคลื่อนไหว</label><select data-key="movement"><option>ให้ทันใจแนะนำ</option><option>นุ่มนวล</option><option>กระชับ</option><option>มีพลัง</option><option>สงบ</option></select></div><div class="field"><label>บอกสไตล์เพิ่มเติม</label><input data-key="customStyle" value="${escapeHtml(state.data.customStyle || "")}" placeholder="เช่น อบอุ่นแต่จังหวะสนุก"></div>`)}`,
-    storyboardPanel, methodPanel, productionPanel
-  ];
-
+  const panels = [briefPanel, storyboardPanel, methodPanel, productionPanel];
+  function briefResult() {
+    return `<div class="result-card featured"><small>ผลลัพธ์พร้อมใช้</small><h3>ทันใจ Smart Video</h3><p>เมื่อกด “เตรียมวิดีโอพร้อมสร้าง” บทพากย์ แผนฉาก และ Prompt จะแสดงตรงนี้</p></div><div class="result-empty"><span>🎞️</span><b>${state.name ? escapeHtml(state.name) : "พร้อมเปลี่ยนเรื่องของคุณให้เคลื่อนไหว"}</b><p>${state.data.topic ? "ข้อมูลพร้อมแล้ว กดปุ่มด้านซ้ายเพื่อให้ AI วางฉาก" : "กรอกหัวข้อและรายละเอียดทางซ้าย เริ่มได้แม้ไม่รู้ศัพท์งานวิดีโอ"}</p></div><div class="quick-guide"><b>ระบบจะช่วยจัดการ</b><span>✓ เขียนบทพากย์</span><span>✓ แบ่งฉากและกำหนดภาพ</span><span>✓ วางการเคลื่อนไหวและ Prompt</span><span>✓ ประมาณค่าใช้จ่ายก่อนสร้างจริง</span></div>`;
+  }
+  function sceneResult() {
+    const scene = state.data.scenes[0];
+    return `<div class="result-card featured"><small>ภาพรวมวิดีโอ</small><h3>${escapeHtml(state.name || "วิดีโอใหม่")}</h3><p>${escapeHtml(state.data.summary || "ตรวจแก้ฉากทางซ้ายก่อนเลือกวิธีสร้าง")}</p></div><div class="preview-frame"><span>🎬</span><b>${state.data.scenes.length} ฉาก · ${escapeHtml(state.data.duration)}</b><small>${escapeHtml(state.data.visual)} / ${escapeHtml(state.data.tone)}</small></div>${scene ? `<div class="prompt-preview"><small>ตัวอย่าง Prompt ฉากแรก</small><p>${escapeHtml(scene.prompt)}</p><button class="ghost compact" data-copy-scene="${scene.id}" type="button">คัดลอก Prompt</button></div>` : ""}`;
+  }
+  function resultForStep() { return state.step === 0 ? briefResult() : state.step === 1 ? sceneResult() : state.step === 2 ? `<div class="result-card featured"><small>สรุปก่อนสร้าง</small><h3>${escapeHtml(state.name || "วิดีโอใหม่")}</h3><p>${state.data.scenes.length} ฉาก · ${escapeHtml(state.data.aspect)} · ${escapeHtml(state.data.language)}</p></div><div class="cost-preview"><b>ค่าใช้จ่ายโดยประมาณ</b><strong>$${(Math.max(state.data.scenes.length, 1) * 0.8).toFixed(2)}</strong><small>ทดลองหนึ่งฉากประมาณ $0.80</small></div>${sceneResult()}` : sceneResult(); }
   function render() {
     $("#stepper").innerHTML = steps.map((label, index) => `<div class="step ${index === state.step ? "active" : index < state.step ? "done" : ""}"><i>${index < state.step ? "✓" : index + 1}</i><span>${label}</span></div>`).join("");
-    $("#stepPanel").innerHTML = panels[state.step]();
-    $("#workspaceTitle").textContent = state.name || "สร้างวิดีโอใหม่";
-    $("#prevStep").disabled = state.step === 0;
-    $("#nextStep").hidden = state.step === steps.length - 1;
-    $("#nextStep").disabled = state.step === 3 && !state.data.scenes.length;
+    $("#stepPanel").innerHTML = panels[state.step](); $("#resultPanel").innerHTML = resultForStep();
+    $("#workspaceTitle").textContent = state.name || "บอกเรื่องครั้งเดียว ที่เหลือให้ทันใจช่วย";
+    $("#prevStep").disabled = state.step === 0; $("#nextStep").hidden = state.step === steps.length - 1;
+    $("#nextStep").disabled = state.step === 1 && !state.data.scenes.length;
+    $("#nextStep").textContent = state.step === 0 ? "ถัดไป: ตรวจฉาก" : state.step === 1 ? "ถัดไป: เลือกวิธีสร้าง" : "ถัดไป: รับผลงาน";
     $("#stepPanel").querySelectorAll("[data-key]").forEach((control) => { const key = control.dataset.key; const value = key === "name" ? state.name : state.data[key]; if (value && control.tagName === "SELECT") control.value = value; });
-    bindPanel(); setActiveNav("start");
+    bindPanel();
   }
+  function promptText() { return [`ทันใจ AI Studio — ชุด Prompt วิดีโอ`, `ชื่อโครงการ: ${state.name || "วิดีโอใหม่"}`, `แนว: ${state.data.visual}`, `รูปแบบ: ${state.data.aspect}`, "", ...state.data.scenes.flatMap((scene, index) => [`ฉากที่ ${index + 1} (${scene.duration} วินาที)`, `ภาพ: ${scene.visual}`, `การเคลื่อนไหว: ${scene.motion}`, `เสียงพากย์: ${scene.narration}`, `Prompt: ${scene.prompt}`, ""] )].join("\n"); }
+  async function copyText(text, button) { try { await navigator.clipboard.writeText(text); const old = button.textContent; button.textContent = "คัดลอกแล้ว ✓"; setTimeout(() => button.textContent = old, 1800); } catch { showMessage("คัดลอกอัตโนมัติไม่ได้ กรุณาเลือกข้อความแล้วคัดลอกอีกครั้ง"); } }
   function bindPanel() {
     $("#stepPanel").querySelectorAll("[data-key]").forEach((control) => {
-      const apply = () => { const key = control.dataset.key; if (key === "name") state.name = control.value; else state.data[key] = control.value; save(); if (control.type === "radio" && state.step === 4) render(); };
+      const apply = () => { const key = control.dataset.key; if (key === "name") state.name = control.value; else state.data[key] = control.value; save(); if (control.type === "radio") render(); };
       control.addEventListener("change", apply); if (control.type !== "radio") control.addEventListener("input", apply);
     });
-    $("#stepPanel").querySelectorAll("[data-scene]").forEach((control) => control.addEventListener("input", () => { const scene = state.data.scenes.find((item) => item.id === control.dataset.scene); if (scene) scene[control.dataset.sceneKey] = control.value; save(); }));
-    $("#buildStoryboard")?.addEventListener("click", buildStoryboard);
-    $("#startProduction")?.addEventListener("click", startProduction);
-    $("#downloadProject")?.addEventListener("click", downloadJson);
+    document.querySelectorAll("[data-scene]").forEach((control) => control.addEventListener("input", () => { const scene = state.data.scenes.find((item) => item.id === control.dataset.scene); if (scene) scene[control.dataset.sceneKey] = control.value; save(); }));
+    document.querySelectorAll("[data-copy-scene]").forEach((button) => button.addEventListener("click", () => { const scene = state.data.scenes.find((item) => item.id === button.dataset.copyScene); if (scene) copyText(scene.prompt, button); }));
+    $("#buildStoryboard")?.addEventListener("click", buildStoryboard); $("#startProduction")?.addEventListener("click", startProduction);
+    $("#copyAllPrompts")?.addEventListener("click", (event) => copyText(promptText(), event.currentTarget));
+    $("#downloadPrompts")?.addEventListener("click", () => { const blob = new Blob([promptText()], { type: "text/plain;charset=utf-8" }); const url = URL.createObjectURL(blob); const anchor = document.createElement("a"); anchor.href = url; anchor.download = `${(state.name || "tanjai-video").replace(/[\\/:*?"<>|]+/g, "-")}-prompts.txt`; anchor.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); });
   }
   async function startProduction() {
-    const box = $("#apiResult"); const button = $("#startProduction"); if (!box || !button) return;
-    box.hidden = false; box.className = "api-result loading"; box.textContent = "กำลังเตรียมงาน กรุณาเปิดหน้านี้ไว้…";
-    button.disabled = true; button.textContent = "กำลังเริ่มสร้าง…";
-    try {
-      const result = await requestJson("/api/produce", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: state.name, ...state.data, scope: state.data.method }) });
-      pollJob(result.jobId);
-    } catch (error) { box.className = "api-result error"; box.textContent = error.message; button.disabled = false; button.textContent = "ลองอีกครั้ง"; }
+    const box = $("#apiResult"), button = $("#startProduction"); if (!box || !button) return;
+    if (!serviceReady && !(await checkService())) { box.hidden = false; box.className = "api-result error"; box.textContent = "ระบบสร้างวิดีโอยังไม่พร้อม กรุณารอสักครู่แล้วลองใหม่"; return; }
+    box.hidden = false; box.className = "api-result loading"; box.textContent = "กำลังส่งงานเข้าสู่ระบบ กรุณาอย่ากดสร้างซ้ำ…"; button.disabled = true;
+    try { const result = await requestJson("/api/produce", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: state.name, ...state.data, scope: state.data.method }) }); localStorage.setItem(ACTIVE_JOB_KEY, result.jobId); pollJob(result.jobId); }
+    catch (error) { box.className = "api-result error"; box.textContent = error.message; button.disabled = false; button.textContent = "ลองอีกครั้ง"; }
   }
   async function pollJob(jobId) {
-    const box = $("#apiResult"); const button = $("#startProduction");
+    const box = $("#apiResult"), button = $("#startProduction"); if (!box) return;
     try {
-      const job = await requestJson(`/api/jobs/${encodeURIComponent(jobId)}`);
-      box.className = `api-result ${job.status === "failed" ? "error" : job.status === "completed" ? "success" : "loading"}`;
-      box.textContent = `${job.message || "กำลังสร้างวิดีโอ"}${job.progress != null ? ` · ${job.progress}%` : ""}`;
-      if (job.status === "completed") {
-        button.textContent = "สร้างเรียบร้อย";
-        const downloadUrl = `${API_BASE}${job.downloadUrl}`;
-        $("#videoResult").innerHTML = `<video class="result-video" controls playsinline src="${escapeHtml(downloadUrl)}"></video><a class="primary result-download" href="${escapeHtml(downloadUrl)}" download>ดาวน์โหลดวิดีโอ MP4</a>`;
-        return;
-      }
-      if (job.status === "failed") { button.disabled = false; button.textContent = "ลองอีกครั้ง"; return; }
+      const job = await requestJson(`/api/jobs/${encodeURIComponent(jobId)}`); box.hidden = false; box.className = `api-result ${job.status === "failed" ? "error" : job.status === "completed" ? "success" : "loading"}`; box.textContent = `${job.message || "กำลังสร้างวิดีโอ"}${job.progress != null ? ` · ${job.progress}%` : ""}`;
+      if (job.status === "completed") { localStorage.removeItem(ACTIVE_JOB_KEY); if (button) button.textContent = "สร้างเรียบร้อย"; const url = `${API_BASE}${job.downloadUrl}`; $("#videoResult").innerHTML = `<video class="result-video" controls playsinline src="${escapeHtml(url)}"></video><a class="primary result-download" href="${escapeHtml(url)}" download>ดาวน์โหลดวิดีโอ MP4</a>`; return; }
+      if (job.status === "failed") { localStorage.removeItem(ACTIVE_JOB_KEY); if (button) { button.disabled = false; button.textContent = "ลองอีกครั้ง"; } return; }
       setTimeout(() => pollJob(jobId), 5000);
-    } catch (error) { box.className = "api-result error"; box.textContent = error.message; button.disabled = false; button.textContent = "ตรวจสถานะอีกครั้ง"; }
+    } catch { box.className = "api-result error"; box.innerHTML = `การเชื่อมต่อสะดุด แต่งานอาจยังทำต่ออยู่ <button class="ghost compact" id="retryStatus" type="button">ตรวจสถานะอีกครั้ง</button>`; $("#retryStatus")?.addEventListener("click", () => pollJob(jobId)); }
   }
-  function setActiveNav(mode) { document.querySelectorAll(".sidebar .nav-item").forEach((item) => item.classList.remove("active")); const target = mode === "start" ? $("[data-start].nav-item") : $(".sidebar a.nav-item"); target?.classList.add("active"); }
-  async function openGenerator() {
-    if (!serviceReady && !(await checkService())) {
-      alert("ระบบสร้างวิดีโอยังไม่พร้อม กรุณารอสักครู่แล้วลองใหม่ครับ");
-      return;
-    }
-    $("#workspace").hidden = false; render(); $("#workspace").scrollIntoView({ behavior: "smooth", block: "start" }); closeSidebar();
-  }
-  function closeSidebar() { $("#sidebar").classList.remove("open"); $("#sidebarBackdrop").classList.remove("show"); $("#mobileMenu").setAttribute("aria-expanded", "false"); }
   function renderProjects() {
-    const items = readProjects();
-    $("#projectList").innerHTML = items.length ? items.map((item) => `<button class="project-item ghost" type="button" data-project="${item.id}"><span><b>${escapeHtml(item.name || "งานไม่มีชื่อ")}</b><small>${escapeHtml(item.data?.genre || "วิดีโอ")}</small></span><small>${new Date(item.updatedAt).toLocaleString("th-TH")}</small></button>`).join("") : `<div class="empty-projects">ยังไม่มีงานที่บันทึกไว้</div>`;
-    $("#projectList").querySelectorAll("[data-project]").forEach((button) => button.addEventListener("click", () => { const item = items.find((project) => project.id === button.dataset.project); Object.assign(state, item); $("#projectDialog").close(); openGenerator(); }));
+    const items = readProjects(); $("#projectList").innerHTML = items.length ? items.map((item) => `<button class="project-item ghost" type="button" data-project="${item.id}"><span><b>${escapeHtml(item.name || "งานไม่มีชื่อ")}</b><small>${escapeHtml(item.data?.visual || "วิดีโอ")}</small></span><small>${new Date(item.updatedAt).toLocaleString("th-TH")}</small></button>`).join("") : `<div class="empty-projects">ยังไม่มีงานที่บันทึกไว้</div>`;
+    $("#projectList").querySelectorAll("[data-project]").forEach((button) => button.addEventListener("click", () => { const item = items.find((project) => project.id === button.dataset.project); Object.assign(state, item); $("#projectDialog").close(); render(); }));
   }
-  document.querySelectorAll("[data-start]").forEach((button) => button.addEventListener("click", openGenerator));
-  $("#prevStep").addEventListener("click", () => { if (state.step > 0) { state.step--; render(); } });
-  $("#nextStep").addEventListener("click", () => { if (state.step === 3 && !state.data.scenes.length) return showMessage("กรุณาให้ทันใจวางฉากก่อนครับ"); if (state.step < steps.length - 1) { state.step++; save(); render(); } });
-  $("#closeWorkspace").addEventListener("click", () => { $("#workspace").hidden = true; setActiveNav("home"); scrollTo({ top: 0, behavior: "smooth" }); });
-  ["#openProjects", "#openProjectsHero", "#openProjectsSide"].forEach((id) => $(id).addEventListener("click", () => { renderProjects(); $("#projectDialog").showModal(); closeSidebar(); }));
+  const closeSidebar = () => { $("#sidebar").classList.remove("open"); $("#sidebarBackdrop").classList.remove("show"); $("#mobileMenu").setAttribute("aria-expanded", "false"); };
+  $("#prevStep").addEventListener("click", () => { if (state.step > 0) { state.step--; render(); scrollTo({ top: 0, behavior: "smooth" }); } });
+  $("#nextStep").addEventListener("click", () => { if (state.step === 0 && !state.data.scenes.length) return buildStoryboard(); if (state.step < steps.length - 1) { state.step++; save(); render(); scrollTo({ top: 0, behavior: "smooth" }); } });
+  $("#saveProject").addEventListener("click", (event) => { save(); const old = event.currentTarget.textContent; event.currentTarget.textContent = "บันทึกแล้ว ✓"; setTimeout(() => event.currentTarget.textContent = old, 1600); });
+  ["#openProjects", "#openProjectsSide"].forEach((id) => $(id).addEventListener("click", () => { renderProjects(); $("#projectDialog").showModal(); closeSidebar(); }));
   $("#closeProjects").addEventListener("click", () => $("#projectDialog").close());
   $("#mobileMenu").addEventListener("click", () => { const open = !$("#sidebar").classList.contains("open"); $("#sidebar").classList.toggle("open", open); $("#sidebarBackdrop").classList.toggle("show", open); $("#mobileMenu").setAttribute("aria-expanded", String(open)); });
   $("#sidebarBackdrop").addEventListener("click", closeSidebar);
-  checkService().then(() => {
-    if (new URLSearchParams(location.search).get("source") === "tanjai-ai-studio") openGenerator();
-  });
+  render(); checkService().then(() => { const jobId = localStorage.getItem(ACTIVE_JOB_KEY); if (jobId) { state.step = 3; render(); const box = $("#apiResult"); box.hidden = false; box.className = "api-result loading"; box.textContent = "พบงานเดิม กำลังตรวจสถานะต่อ…"; pollJob(jobId); } });
 })();
