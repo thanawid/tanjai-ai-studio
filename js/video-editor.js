@@ -480,7 +480,7 @@ window.TANJAI = window.TANJAI || {};
       try { localStorage.setItem(`tanjai-video-handoff:${projectId}`, JSON.stringify(handoff)); } catch {}
       TANJAI.toast?.(`เตรียม ${records.length} คลิปแล้ว กำลังเปิด Tanjai Video Studio`);
       document.dispatchEvent(new CustomEvent('tanjai:video-continue', {detail:handoff}));
-      setTimeout(()=>{ window.location.href=`https://tanjai-video-studio.onrender.com/?source=tanjai-ai-studio&projectId=${encodeURIComponent(projectId)}`; },350);
+      setTimeout(()=>{ window.location.href=`create-video/?projectId=${encodeURIComponent(projectId)}`; },350);
     } catch (err) {
       console.error(err);
       await mediaStore.deleteProject(projectId).catch(() => {});

@@ -4,7 +4,7 @@ const index = fs.readFileSync('index.html','utf8');
 const js = fs.readFileSync('js/video-editor.js','utf8');
 const css = fs.readFileSync('css/style.css','utf8');
 const data = fs.readFileSync('js/data.js','utf8');
-assert.match(index,/video-editor\.js\?v=11\.6\.8/);
+assert.match(index,/video-editor\.js\?v=12\.0\.0/);
 assert.match(index,/อัปโหลดคลิปจำนวนมาก ปรับคุณภาพภาพ เสียง และโทนสี/);
 assert.match(index,/แต่งวิดีโอ AI/);
 assert.match(js,/videoFootageInput/);
@@ -20,4 +20,4 @@ assert.match(js,/ดาวน์โหลดคลิปที่ปรับแ
 assert.match(data,/อนิเมะร่วมสมัย/);
 assert.match(data,/อนิเมะภาพยนตร์/);
 assert.doesNotMatch(js,/Speech-to-Text API|Video AI API|Render Server/);
-console.log(JSON.stringify({version:'11.6.8',uploadMany:true,renderQueue:true,selectedClipExport:true,zipExport:true,downloadOnly:true,status:'PASS'},null,2));
+console.log(JSON.stringify({version:'12.0.0',uploadMany:true,renderQueue:true,selectedClipExport:true,zipExport:true,downloadOnly:true,status:'PASS'},null,2));
