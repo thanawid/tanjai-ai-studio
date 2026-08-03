@@ -7,12 +7,13 @@
   const ACTIVE_JOB_KEY = "tanjai-ai-video-active-job";
   const APP_META = { version: "12.2.1" };
   const API_BASE = location.hostname.endsWith("github.io") ? "https://tanjai-video-studio.onrender.com" : "";
-  const steps = ["ข้อมูลงาน", "บทและฉาก", "เลือกวิธีสร้าง", "ผลงาน"];
+  const steps = ["ข้อมูลงาน", "บทและฉาก", "เลือกวิธีสร้าง", "สร้างคลิปต่อ"];
   const state = {
     id: crypto.randomUUID(), step: 0, name: "", updatedAt: Date.now(),
     data: { genre: "ให้ AI วิเคราะห์จากรายละเอียด", aspect: "16:9 แนวนอน", duration: "30 วินาที", language: "ภาษาไทย · ให้ AI เลือกเสียง", visual: "ให้ AI เลือกตามงาน", tone: "ให้ AI เลือกให้เหมาะสม", movement: "ให้ AI แนะนำ", scenes: [], method: "prompt" }
   };
   let serviceReady = false;
+  const sceneFiles = new Map();
 
   const escapeHtml = (value) => String(value || "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[char]));
   const readProjects = () => { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch { return []; } };
@@ -67,14 +68,36 @@
   function cleanPromptLine(line) {
     return String(line || "").replace(/^\s*(?:[-*•]|\d+[.)]|ฉาก(?:ที่)?\s*\d+\s*[:：-]?|shot\s*\d+\s*[:：-]?)\s*/i, "").trim();
   }
+  const compact = (value, max = 260) => { const text = String(value || "").replace(/\s+/g, " ").trim(); return text.length > max ? `${text.slice(0, max).trim()}…` : text; };
+  function durationPlan(totalSeconds, count) {
+    const base = Math.floor(totalSeconds / count); const extra = totalSeconds % count;
+    return Array.from({ length: count }, (_, index) => base + (index < extra ? 1 : 0));
+  }
+  function flowPromptFor(scene, index) {
+    const aspect = String(state.data.aspect || "").startsWith("9:16") ? "vertical 9:16" : String(state.data.aspect || "").startsWith("4:5") ? "vertical 4:5" : String(state.data.aspect || "").startsWith("1:1") ? "square 1:1" : "landscape 16:9";
+    return [`Create a ${scene.duration || 8}-second realistic cinematic video, ${aspect}.`, `Scene ${index + 1}: ${compact(scene.visual, 220)}`, `Action: ${compact(scene.motion, 130)}`, `Camera: ${compact(scene.camera, 120)}`, "Natural movement, realistic lighting, clean composition.", "No on-screen text, no generated logos, no watermark, no distorted hands.", "Do not reconstruct, replace, modify, or drift the identity of any real person."].join("\n");
+  }
+  function normaliseScenes(scenes) {
+    const total = Number.parseInt(state.data.duration, 10) || 30;
+    const list = Array.isArray(scenes) && scenes.length ? scenes : [];
+    const durations = durationPlan(total, Math.max(1, list.length));
+    return list.map((scene, index) => {
+      const ready = { ...scene, id: scene.id || crypto.randomUUID(), order: index + 1, duration: durations[index] };
+      ready.flowPrompt = flowPromptFor(ready, index);
+      ready.uploadedName = "";
+      return ready;
+    });
+  }
   function packToStoryboard(text) {
     const seconds = Number.parseInt(state.data.duration, 10) || 30;
-    const count = Math.max(3, Math.min(12, Math.ceil(seconds / 8)));
+    const count = Math.max(3, Math.min(12, Math.round(seconds / 8)));
+    const durations = durationPlan(seconds, count);
     const promptBlock = extractBlock(text, "SHORT_SHOT_PROMPTS");
     const voiceBlock = extractBlock(text, "CAPCUT_VOICE_SCRIPT");
     let prompts = promptBlock.split(/\n{2,}|\n(?=\s*(?:[-*•]|\d+[.)]|ฉาก|shot))/i).map(cleanPromptLine).filter((line) => line.length > 20);
     if (!prompts.length) prompts = String(text || "").split(/\n{2,}/).map(cleanPromptLine).filter((line) => line.length > 40).slice(0, count);
     const narration = voiceBlock.split(/\n+/).map((line) => line.trim()).filter(Boolean);
+    const factParts = String(state.data.facts || state.data.topic || "").split(/\n|\s*[|•]\s*/).map((line) => compact(line, 130)).filter(Boolean);
     const fallbackPrompt = `สร้างคลิปตามเรื่อง ${state.data.topic || state.name || "วิดีโอใหม่"} แนว ${state.data.visual} สัดส่วน ${state.data.aspect} ภาพเคลื่อนไหวเป็นธรรมชาติ แสงสวย ไม่มีโลโก้และลายน้ำ`;
     return {
       projectTitle: state.name || String(state.data.topic || "วิดีโอใหม่").split(/[\n.!?]/)[0].slice(0, 70),
@@ -82,15 +105,16 @@
       productionPack: text,
       planner: "tanjai-gemini",
       scenes: Array.from({ length: count }, (_, index) => {
-        const prompt = prompts[index] || prompts[index % Math.max(prompts.length, 1)] || fallbackPrompt;
+        const prompt = compact(prompts[index] || prompts[index % Math.max(prompts.length, 1)] || fallbackPrompt, 420);
+        const factLine = factParts[index % Math.max(1, factParts.length)] || compact(state.data.topic, 120);
         return {
           title: `ฉากที่ ${index + 1}`,
-          duration: 8,
+          duration: durations[index],
           visual: prompt,
           motion: "การเคลื่อนไหวต่อเนื่องเป็นธรรมชาติ เหมาะกับสารของฉาก",
           camera: index === 0 ? "เปิดด้วยภาพที่ดึงความสนใจ แล้วเคลื่อนกล้องอย่างนุ่มนวล" : "เลือกมุมและการเคลื่อนกล้องให้ต่อเนื่องจากฉากก่อนหน้า",
-          onScreenText: "",
-          narration: narration[index] || "",
+          onScreenText: index === 0 ? compact(state.name || state.data.topic, 54) : compact(factLine, 58),
+          narration: narration[index] || compact(factLine, 145),
           imagePrompt: prompt,
           prompt,
           negativePrompt: "ห้ามสร้างใบหน้าใหม่ ห้ามเปลี่ยนใบหน้า ห้ามดัดแปลงบุคคลจริง ห้ามสร้างโลโก้ ตัวอักษร หรือลายน้ำผิดเพี้ยน"
@@ -100,7 +124,8 @@
   }
   function starterStoryboard() {
     const seconds = Number.parseInt(state.data.duration, 10) || 30;
-    const count = Math.max(3, Math.min(10, Math.ceil(seconds / 8)));
+    const count = Math.max(3, Math.min(10, Math.round(seconds / 8)));
+    const durations = durationPlan(seconds, count);
     const topic = String(state.data.topic || state.name || "วิดีโอใหม่").trim();
     const facts = String(state.data.facts || "").trim();
     const beats = [
@@ -120,9 +145,12 @@
       planner: "starter",
       scenes: Array.from({ length: count }, (_, index) => {
         const [title, visual, motion, narration] = beats[Math.round(index * (beats.length - 1) / Math.max(count - 1, 1))];
-        const factualContext = facts ? ` ข้อมูลจริงที่ต้องยึดตาม: ${facts}` : "";
-        const prompt = `${visual} เนื้อหาเกี่ยวกับ ${topic}.${factualContext} แนว ${state.data.visual} อารมณ์ ${state.data.tone} สัดส่วน ${state.data.aspect} ภาพสมจริง การเคลื่อนไหวเป็นธรรมชาติ องค์ประกอบอ่านง่าย ไม่มีลายน้ำ`;
-        return { title: `${title} · ฉากที่ ${index + 1}`, duration: Math.max(4, Math.round(seconds / count)), visual, motion, camera: index === 0 ? "เปิดด้วยภาพเด่นแล้วเคลื่อนกล้องเข้าอย่างนุ่มนวล" : "เลือกมุมที่ต่อเนื่องจากฉากก่อนหน้า", onScreenText: "", narration, imagePrompt: prompt, prompt, negativePrompt: "ห้ามสร้างใบหน้าใหม่ ห้ามเปลี่ยนใบหน้า ห้ามดัดแปลงลักษณะบุคคลจริง ห้ามแต่งข้อมูลสำคัญ ห้ามสร้างโลโก้ ตัวอักษร หรือลายน้ำผิดเพี้ยน" };
+        const factParts = facts.split(/\n|(?<=[.!?।])\s+|\s*[|•]\s*/).map((part) => part.trim()).filter(Boolean);
+        const factLine = factParts[index % Math.max(1, factParts.length)] || compact(topic, 110);
+        const spoken = index === 0 ? compact(topic, 135) : index === count - 1 ? `ขอเชิญชวนทุกท่านติดตามรายละเอียดและร่วมกิจกรรมตามวัน เวลา และสถานที่ที่กำหนด` : compact(factLine, 145);
+        const screenText = index === 0 ? compact(state.name || topic, 54) : compact(factLine, 58);
+        const prompt = `${visual} เรื่อง ${compact(topic, 120)} แนว ${state.data.visual} อารมณ์ ${state.data.tone} ภาพสมจริง การเคลื่อนไหวเป็นธรรมชาติ ไม่มีข้อความและลายน้ำ`;
+        return { title: `${title} · ฉากที่ ${index + 1}`, duration: durations[index], visual, motion, camera: index === 0 ? "เปิดด้วยภาพเด่นแล้วเคลื่อนกล้องเข้าอย่างนุ่มนวล" : "เลือกมุมที่ต่อเนื่องจากฉากก่อนหน้า", onScreenText: screenText, narration: spoken || narration, imagePrompt: prompt, prompt, negativePrompt: "ห้ามสร้างใบหน้าใหม่ ห้ามเปลี่ยนใบหน้า ห้ามดัดแปลงลักษณะบุคคลจริง ห้ามแต่งข้อมูลสำคัญ ห้ามสร้างโลโก้ ตัวอักษร หรือลายน้ำผิดเพี้ยน" };
       })
     };
   }
@@ -157,7 +185,9 @@
       state.name ||= result.projectTitle; state.data.summary = result.summary;
       state.data.productionPack = result.productionPack || "";
       state.data.planner = result.planner || "ai";
-      state.data.scenes = result.scenes.map((scene, index) => ({ ...scene, id: crypto.randomUUID(), order: index + 1 }));
+      state.data.method = "prompt";
+      sceneFiles.clear();
+      state.data.scenes = normaliseScenes(result.scenes);
       state.step = 1; save(); render();
     } catch (error) { if (button) { button.disabled = false; button.textContent = "วิเคราะห์และวางแผนวิดีโอ"; } showMessage(error.message); }
   }
@@ -168,17 +198,24 @@
   function storyboardPanel() {
     if (!state.data.scenes.length) return `<div class="empty-storyboard"><span>🎬</span><h3>ยังไม่มีฉาก</h3><p>ย้อนกลับไปเล่าเรื่อง แล้วให้ทันใจช่วยเขียนบทและแบ่งฉากให้ครับ</p></div>`;
     const starterNote = state.data.planner === "starter" ? `<div class="gentle-notice"><b>เตรียมโครงเริ่มต้นให้แล้ว</b><span>ระบบวิเคราะห์อัตโนมัติกำลังพักชั่วคราว คุณยังแก้บทและ Prompt ชุดนี้แล้วนำไปสร้างต่อได้ทันที</span></div>` : "";
-    return `<div class="storyboard-head"><div><h3>ตรวจบทและฉาก</h3><small>แก้เฉพาะจุดที่ต้องการ ทุกช่องบันทึกอัตโนมัติ</small></div><button class="ghost compact" id="buildStoryboard" type="button">วางฉากใหม่</button></div>${starterNote}<div class="api-result" id="storyboardStatus" hidden></div><div class="storyboard-grid">${state.data.scenes.map((scene, index) => `<article class="scene-card"><div class="scene-number">${String(index + 1).padStart(2, "0")}<small>${scene.duration} วิ</small></div><div class="scene-body"><label>ภาพในฉาก<textarea data-scene="${scene.id}" data-scene-key="visual">${escapeHtml(scene.visual)}</textarea></label><label>การเคลื่อนไหว<textarea data-scene="${scene.id}" data-scene-key="motion">${escapeHtml(scene.motion)}</textarea></label><label>มุมกล้อง<textarea data-scene="${scene.id}" data-scene-key="camera">${escapeHtml(scene.camera || "ให้ AI เลือกมุมที่เหมาะสม")}</textarea></label><label>ข้อความบนจอ<textarea data-scene="${scene.id}" data-scene-key="onScreenText">${escapeHtml(scene.onScreenText || "")}</textarea></label><label>เสียงพากย์<textarea data-scene="${scene.id}" data-scene-key="narration">${escapeHtml(scene.narration)}</textarea></label><label>Prompt สร้างภาพ<textarea data-scene="${scene.id}" data-scene-key="imagePrompt">${escapeHtml(scene.imagePrompt || scene.visual)}</textarea></label><label class="wide">Prompt สำหรับสร้างวิดีโอ<textarea data-scene="${scene.id}" data-scene-key="prompt">${escapeHtml(scene.prompt)}</textarea><button class="copy-scene" type="button" data-copy-scene="${scene.id}">คัดลอก Prompt ฉากนี้</button></label><label class="wide">ข้อห้ามในการสร้าง<textarea data-scene="${scene.id}" data-scene-key="negativePrompt">${escapeHtml(scene.negativePrompt || "ห้ามเปลี่ยนใบหน้า ห้ามสร้างใบหน้าใหม่ ห้ามสร้างโลโก้หรือตัวอักษรผิดเพี้ยน")}</textarea></label></div></article>`).join("")}</div>`;
+    const total = state.data.scenes.reduce((sum, scene) => sum + Number(scene.duration || 0), 0);
+    return `<div class="storyboard-head"><div><h3>ตรวจบทและฉาก</h3><small>${state.data.scenes.length} ฉาก · รวม ${total} วินาที · ทุกช่องขยายตามเนื้อหาและบันทึกอัตโนมัติ</small></div><button class="ghost compact" id="buildStoryboard" type="button">วิเคราะห์ใหม่</button></div>${starterNote}<div class="api-result" id="storyboardStatus" hidden></div><div class="storyboard-grid">${state.data.scenes.map((scene, index) => `<article class="scene-card compact-scene"><header class="scene-card-head"><div><span>ฉาก ${String(index + 1).padStart(2, "0")}</span><b>${escapeHtml(scene.title || `ฉากที่ ${index + 1}`)}</b></div><label>เวลา <input type="number" min="3" max="20" data-scene="${scene.id}" data-scene-key="duration" value="${Number(scene.duration || 8)}"> วินาที</label></header><div class="scene-core"><label>ภาพที่ต้องเห็น<textarea data-autogrow data-scene="${scene.id}" data-scene-key="visual">${escapeHtml(scene.visual)}</textarea></label><label>เสียงพากย์พร้อมอ่าน<textarea data-autogrow data-scene="${scene.id}" data-scene-key="narration">${escapeHtml(scene.narration)}</textarea></label><label class="wide">ข้อความบนจอ <small>ใส่ข้อความจริงภายหลัง ไม่ให้ AI วาดตัวอักษรลงในคลิป</small><textarea data-autogrow data-scene="${scene.id}" data-scene-key="onScreenText">${escapeHtml(scene.onScreenText || "")}</textarea></label></div><details class="scene-details"><summary><span>รายละเอียดและ Prompt</span><small>การเคลื่อนไหว · มุมกล้อง · Prompt สำหรับ Flow · ข้อห้าม</small></summary><div class="scene-detail-grid"><label>การเคลื่อนไหว<textarea data-autogrow data-scene="${scene.id}" data-scene-key="motion">${escapeHtml(scene.motion)}</textarea></label><label>มุมกล้อง<textarea data-autogrow data-scene="${scene.id}" data-scene-key="camera">${escapeHtml(scene.camera || "ให้ AI เลือกมุมที่เหมาะสม")}</textarea></label><label class="wide prompt-field"><span>Prompt สำหรับ Google Flow <button class="copy-scene" type="button" data-copy-flow="${scene.id}">คัดลอก Prompt</button></span><textarea data-autogrow data-scene="${scene.id}" data-scene-key="flowPrompt">${escapeHtml(scene.flowPrompt || flowPromptFor(scene, index))}</textarea></label><label>Prompt สร้างภาพ<textarea data-autogrow data-scene="${scene.id}" data-scene-key="imagePrompt">${escapeHtml(scene.imagePrompt || scene.visual)}</textarea></label><label>ข้อห้ามในการสร้าง<textarea data-autogrow data-scene="${scene.id}" data-scene-key="negativePrompt">${escapeHtml(scene.negativePrompt || "ห้ามสร้างหรือเปลี่ยนใบหน้าบุคคลจริง ห้ามสร้างข้อความและโลโก้ผิดเพี้ยน")}</textarea></label></div></details></article>`).join("")}</div>`;
   }
   function methodPanel() {
-    const count = state.data.scenes.length; const method = state.data.method;
-    return `<div class="method-intro"><h3>เลือกวิธีสร้างวิดีโอที่สะดวกสำหรับคุณ</h3><p>ทันใจเตรียมบท แผนฉาก และ Prompt พร้อมใช้ไว้ให้แล้ว จะนำไปสร้างต่อด้วยเครื่องมือที่ถนัด หรือสร้างภายในเว็บเมื่อพร้อมก็ได้</p></div><div class="choice-grid method-grid"><label class="choice choice-recommended"><input type="radio" name="method" data-key="method" value="prompt" ${method === "prompt" ? "checked" : ""}><i>📋</i><b>นำ Prompt ไปสร้างต่อ</b><span>คัดลอกหรือดาวน์โหลด Prompt แยกตามฉาก ใช้กับเครื่องมือที่คุณสะดวก</span><em>แนะนำ</em></label><label class="choice"><input type="radio" name="method" data-key="method" value="preview" ${method === "preview" ? "checked" : ""}><i>🧪</i><b>ทดลองสร้างฉากแรกในเว็บ</b><span>${serviceReady ? "ตรวจผลงานหนึ่งฉากก่อนสร้างทั้งหมด" : "เลือกไว้ก่อนได้ ระบบจะแจ้งอีกครั้งเมื่อพร้อมสร้าง"}</span></label><label class="choice"><input type="radio" name="method" data-key="method" value="full" ${method === "full" ? "checked" : ""}><i>🎬</i><b>สร้างวิดีโอทั้งหมดในเว็บ</b><span>${serviceReady ? `${count} ฉาก · ประมาณ ${count * 8} วินาที` : "ใช้บทและฉากชุดเดียวกันได้ทันทีเมื่อระบบพร้อม"}</span></label></div><div class="method-note soft">ไม่ว่าคุณจะเลือกทางไหน บท แผนฉาก และ Prompt ที่ตรวจไว้จะยังถูกบันทึกและนำกลับมาใช้ต่อได้เสมอ</div>`;
+    const count = state.data.scenes.length; const total = state.data.scenes.reduce((sum, scene) => sum + Number(scene.duration || 0), 0);
+    if (!serviceReady && state.data.method !== "prompt") state.data.method = "prompt";
+    const method = state.data.method;
+    return `<div class="method-intro"><h3>เลือกวิธีสร้างวิดีโอที่สะดวกสำหรับคุณ</h3><p>เส้นทาง Prompt ใช้งานได้เสมอ ส่วนการสร้างในเว็บจะเปิดให้เลือกเมื่อระบบพร้อมจริง</p></div><div class="choice-grid method-grid"><label class="choice choice-recommended"><input type="radio" name="method" data-key="method" value="prompt" ${method === "prompt" ? "checked" : ""}><i>📋</i><b>สร้างต่อด้วย Google Flow หรือเครื่องมืออื่น</b><span>คัดลอก Prompt ทีละฉาก แล้วนำคลิปที่ได้กลับเข้าเว็บ</span><em>แนะนำ</em></label><label class="choice ${serviceReady ? "" : "choice-disabled"}"><input type="radio" name="method" data-key="method" value="preview" ${method === "preview" ? "checked" : ""} ${serviceReady ? "" : "disabled"}><i>🧪</i><b>ทดลองสร้างฉากแรกในเว็บ</b><span>${serviceReady ? "ตรวจผลงานหนึ่งฉากก่อนสร้างทั้งหมด" : "ยังไม่พร้อมใช้งานในขณะนี้"}</span></label><label class="choice ${serviceReady ? "" : "choice-disabled"}"><input type="radio" name="method" data-key="method" value="full" ${method === "full" ? "checked" : ""} ${serviceReady ? "" : "disabled"}><i>🎬</i><b>สร้างวิดีโอทั้งหมดในเว็บ</b><span>${serviceReady ? `${count} ฉาก · รวม ${total} วินาที` : "ยังไม่พร้อมใช้งานในขณะนี้"}</span></label></div><div class="method-note soft">บทและ Prompt ถูกบันทึกไว้ ไม่ว่าคุณจะเลือกสร้างด้วยวิธีใด</div>`;
   }
   function productionPanel() {
-    const promptOnly = state.data.method === "prompt"; const scenes = state.data.method === "preview" ? Math.min(1, state.data.scenes.length) : state.data.scenes.length;
-    const webAction = !promptOnly ? `<button class="primary" id="startProduction" type="button" ${state.data.scenes.length && serviceReady ? "" : "disabled"}>${state.data.method === "preview" ? "ทดลองสร้างฉากแรก" : "สร้างวิดีโอทั้งหมด"}</button>` : "";
-    const gentleNotice = !promptOnly && !serviceReady ? `<div class="gentle-notice"><b>ขณะนี้ยังไม่สามารถเริ่มสร้างวิดีโอภายในเว็บได้</b><span>Prompt ของคุณพร้อมใช้งานแล้ว สามารถคัดลอกหรือดาวน์โหลดเพื่อนำไปสร้างต่อได้ตามปกติ</span><button class="ghost compact" id="usePromptInstead" type="button">ใช้ Prompt สร้างต่อ</button></div>` : "";
-    return `<div class="production-summary"><h3>${promptOnly ? "Prompt พร้อมนำไปสร้างต่อ" : "บทและฉากพร้อมแล้ว"}</h3><div class="summary-list"><div><small>ชื่อโครงการ</small><b>${escapeHtml(state.name || "ยังไม่ได้ตั้งชื่อ")}</b></div><div><small>รูปแบบ</small><b>${escapeHtml(state.data.visual)} · ${escapeHtml(state.data.aspect)}</b></div><div><small>จำนวนฉาก</small><b>${scenes} ฉาก</b></div><div><small>สิ่งที่เตรียมไว้</small><b>บท แผนฉาก Prompt ภาพและวิดีโอ</b></div></div></div>${gentleNotice}<div class="destination-box"><div><b>นำไปสร้างต่อด้วยเครื่องมือที่คุณสะดวก</b><span>คัดลอก Prompt ก่อน แล้วเปิดเครื่องมือที่ต้องการได้เลย</span></div><div class="destination-actions"><button class="ghost" id="copyAllPrompts" type="button">คัดลอก Prompt ทั้งหมด</button><button class="ghost" id="downloadPrompts" type="button">ดาวน์โหลดชุด Prompt</button><button class="ghost" id="openDestinations" type="button">เลือกเครื่องมือสร้างวิดีโอ</button>${webAction}</div><div class="destination-list" id="destinationList" hidden><a href="https://labs.google/fx/tools/flow" target="_blank" rel="noopener">Google Flow / Veo</a><a href="https://app.klingai.com/global/" target="_blank" rel="noopener">Kling AI</a><a href="https://app.runwayml.com/" target="_blank" rel="noopener">Runway</a></div></div><div class="api-result" id="apiResult" hidden></div><div id="videoResult"></div>`;
+    const promptOnly = state.data.method === "prompt";
+    if (!promptOnly) {
+      const scenes = state.data.method === "preview" ? 1 : state.data.scenes.length;
+      return `<div class="production-summary"><h3>บทและฉากพร้อมสร้างในเว็บ</h3><div class="summary-list"><div><small>ชื่อโครงการ</small><b>${escapeHtml(state.name || "ยังไม่ได้ตั้งชื่อ")}</b></div><div><small>จำนวนฉาก</small><b>${scenes} ฉาก</b></div></div><div class="production-actions"><button class="primary" id="startProduction" type="button" ${serviceReady ? "" : "disabled"}>${state.data.method === "preview" ? "ทดลองสร้างฉากแรก" : "สร้างวิดีโอทั้งหมด"}</button></div></div><div class="api-result" id="apiResult" hidden></div><div id="videoResult"></div>`;
+    }
+    const ready = state.data.scenes.filter((scene) => sceneFiles.has(scene.id)).length;
+    const allReady = ready === state.data.scenes.length && ready > 0;
+    return `<div class="production-summary handoff-summary"><div><small>เส้นทางสร้างคลิป</small><h3>${escapeHtml(state.name || "วิดีโอใหม่")}</h3><p>คัดลอก Prompt ไปสร้างทีละฉาก แล้วอัปโหลดคลิปที่ได้กลับมาตรงฉากเดิม</p></div><strong>${ready}/${state.data.scenes.length}<small>คลิปพร้อม</small></strong></div><div class="flow-mini-steps"><span><i>1</i> คัดลอก Prompt</span><span><i>2</i> เปิด Flow และเลือก Video</span><span><i>3</i> ตรวจสัดส่วนแล้วกด Generate</span><span><i>4</i> ดาวน์โหลดและอัปโหลดกลับ</span></div><div class="destination-actions handoff-tools"><button class="ghost" id="copyAllPrompts" type="button">คัดลอก Prompt ทั้งชุด</button><button class="ghost" id="downloadPrompts" type="button">ดาวน์โหลดชุด Prompt</button><a class="btn primary" href="https://labs.google/fx/tools/flow" target="_blank" rel="noopener">เปิด Google Flow ↗</a></div><div class="clip-handoff-list">${state.data.scenes.map((scene, index) => { const file = sceneFiles.get(scene.id); return `<article class="clip-handoff ${file ? "ready" : ""}"><header><div><span>ฉาก ${String(index + 1).padStart(2, "0")} · ${scene.duration} วินาที</span><b>${escapeHtml(scene.title || `ฉากที่ ${index + 1}`)}</b></div><em>${file ? "คลิปพร้อม ✓" : "รอคลิป"}</em></header><div class="flow-prompt-preview">${escapeHtml(scene.flowPrompt || flowPromptFor(scene, index))}</div><div class="clip-handoff-actions"><button class="ghost compact" type="button" data-copy-flow="${scene.id}">คัดลอก Prompt ฉากนี้</button><a class="btn secondary" href="https://labs.google/fx/tools/flow" target="_blank" rel="noopener">เปิด Flow</a><label class="btn ${file ? "secondary" : "primary"}">${file ? "เปลี่ยนคลิป" : "อัปโหลดคลิปที่ได้"}<input type="file" accept="video/*" data-scene-upload="${scene.id}" hidden></label></div>${file ? `<div class="uploaded-clip"><span>🎞️</span><div><b>${escapeHtml(file.name)}</b><small>${(file.size / 1048576).toFixed(1)} MB · พร้อมส่งไปแต่งวิดีโอ</small></div><button type="button" data-remove-upload="${scene.id}">นำออก</button></div>` : ""}</article>`; }).join("")}</div><div class="handoff-finish"><div><b>${allReady ? "คลิปครบแล้ว พร้อมไปแต่งวิดีโอ" : `เหลืออีก ${state.data.scenes.length - ready} คลิป`}</b><span>${allReady ? "ระบบจะส่งคลิปทั้งหมดเข้าเมนูแต่งวิดีโอให้ตามลำดับฉาก" : "สร้างและอัปโหลดคลิปให้ครบทุกฉากก่อน"}</span></div><button class="primary" id="handoffToEditor" type="button" ${allReady ? "" : "disabled"}>นำคลิปทั้งหมดไปแต่งวิดีโอ</button></div><div class="api-result" id="apiResult" hidden></div>`;
   }
   const panels = [briefPanel, storyboardPanel, methodPanel, productionPanel];
   function briefResult() {
@@ -188,33 +225,49 @@
     const scene = state.data.scenes[0];
     return `<div class="result-card featured"><small>ภาพรวมวิดีโอ</small><h3>${escapeHtml(state.name || "วิดีโอใหม่")}</h3><p>${escapeHtml(state.data.summary || "ตรวจแก้ฉากทางซ้ายก่อนเลือกวิธีสร้าง")}</p></div><div class="preview-frame"><span>🎬</span><b>${state.data.scenes.length} ฉาก · ${escapeHtml(state.data.duration)}</b><small>${escapeHtml(state.data.visual)} / ${escapeHtml(state.data.tone)}</small></div>${scene ? `<div class="prompt-preview"><small>ตัวอย่าง Prompt ฉากแรก</small><p>${escapeHtml(scene.prompt)}</p><button class="ghost compact" data-copy-scene="${scene.id}" type="button">คัดลอก Prompt</button></div>` : ""}`;
   }
-  function resultForStep() { return state.step === 0 ? briefResult() : state.step === 1 ? sceneResult() : state.step === 2 ? `<div class="result-card featured"><small>พร้อมเลือกเส้นทาง</small><h3>${escapeHtml(state.name || "วิดีโอใหม่")}</h3><p>${state.data.scenes.length} ฉาก · ${escapeHtml(state.data.aspect)} · ${escapeHtml(state.data.language)}</p></div><div class="path-preview"><b>ผลงานของคุณพร้อมใช้ต่อ</b><span>คัดลอก Prompt ไปสร้างที่อื่นได้ทันที หรือเลือกสร้างภายในเว็บเมื่อระบบพร้อม</span></div>${sceneResult()}` : sceneResult(); }
+  function resultForStep() { return state.step === 2 ? `<div class="result-card featured"><small>พร้อมเลือกเส้นทาง</small><h3>${escapeHtml(state.name || "วิดีโอใหม่")}</h3><p>${state.data.scenes.length} ฉาก · ${escapeHtml(state.data.duration)} · ${escapeHtml(state.data.aspect)}</p></div><div class="path-preview"><b>แนะนำ: สร้างต่อด้วย Prompt</b><span>สร้างคลิปทีละฉาก แล้วนำไฟล์กลับเข้ามารวมในเว็บได้</span></div>${sceneResult()}` : ""; }
   function render() {
+    state.data.scenes ||= [];
+    if (state.step >= 2 && !serviceReady) state.data.method = "prompt";
+    state.data.scenes.forEach((scene, index) => { scene.id ||= crypto.randomUUID(); scene.order = index + 1; scene.flowPrompt ||= flowPromptFor(scene, index); });
     $("#stepper").innerHTML = steps.map((label, index) => `<div class="step ${index === state.step ? "active" : index < state.step ? "done" : ""}"><i>${index < state.step ? "✓" : index + 1}</i><span>${label}</span></div>`).join("");
     $("#stepPanel").innerHTML = panels[state.step](); $("#resultPanel").innerHTML = resultForStep();
-    $(".video-studio-layout").classList.toggle("brief-mode", state.step === 0);
-    $("#resultPanel").hidden = state.step === 0;
+    $(".video-studio-layout").classList.toggle("full-mode", state.step !== 2);
+    $("#resultPanel").hidden = state.step !== 2;
     $("#createVideoTitle").textContent = state.name || "สร้างวิดีโอด้วย AI";
     $("#prevStep").hidden = state.step === 0; $("#nextStep").hidden = state.step === 0 || state.step === steps.length - 1;
     $("#nextStep").disabled = state.step === 1 && !state.data.scenes.length;
-    $("#nextStep").textContent = state.step === 1 ? "ถัดไป: เลือกวิธีสร้าง" : "ถัดไป: รับผลงาน";
+    $("#nextStep").textContent = state.step === 1 ? "ถัดไป: เลือกวิธีสร้าง" : "ถัดไป: สร้างคลิปต่อ";
     $("#stepPanel").querySelectorAll("[data-key]").forEach((control) => { const key = control.dataset.key; const value = key === "name" ? state.name : state.data[key]; if (value && control.tagName === "SELECT") control.value = value; });
     bindPanel();
   }
-  function promptText() { return [`ทันใจ AI Studio — ชุด Prompt วิดีโอพร้อมใช้`, `ชื่อโครงการ: ${state.name || "วิดีโอใหม่"}`, `แนว: ${state.data.visual}`, `รูปแบบ: ${state.data.aspect}`, `สรุป: ${state.data.summary || ""}`, "", ...state.data.scenes.flatMap((scene, index) => [`ฉากที่ ${index + 1} (${scene.duration} วินาที)`, `ภาพ: ${scene.visual}`, `การเคลื่อนไหว: ${scene.motion}`, `มุมกล้อง: ${scene.camera || "ให้เครื่องมือเลือกตามฉาก"}`, `ข้อความบนจอ: ${scene.onScreenText || "ไม่มี"}`, `เสียงพากย์: ${scene.narration}`, `Prompt สร้างภาพ: ${scene.imagePrompt || scene.visual}`, `Prompt สร้างวิดีโอ: ${scene.prompt}`, `ข้อห้าม: ${scene.negativePrompt || "ห้ามเปลี่ยนใบหน้า ห้ามสร้างใบหน้าใหม่ ห้ามสร้างโลโก้หรือตัวอักษรผิดเพี้ยน"}`, ""] ), state.data.productionPack ? `\nภาคผนวก — Production Pack ฉบับเต็ม\n${state.data.productionPack}` : ""].join("\n"); }
+  function promptText() { return [`ทันใจ AI Studio — ชุดสร้างวิดีโอ`, `ชื่อโครงการ: ${state.name || "วิดีโอใหม่"}`, `แนว: ${state.data.visual}`, `รูปแบบ: ${state.data.aspect}`, `ความยาวรวม: ${state.data.scenes.reduce((sum, scene) => sum + Number(scene.duration || 0), 0)} วินาที`, "", ...state.data.scenes.flatMap((scene, index) => [`ฉากที่ ${index + 1} (${scene.duration} วินาที)`, `ภาพ: ${scene.visual}`, `ข้อความบนจอ (ใส่ตอนตัดต่อ): ${scene.onScreenText || "ไม่มี"}`, `เสียงพากย์: ${scene.narration}`, `PROMPT สำหรับ GOOGLE FLOW:`, scene.flowPrompt || flowPromptFor(scene, index), `ข้อห้าม: ${scene.negativePrompt || "ห้ามสร้างหรือเปลี่ยนใบหน้าบุคคลจริง ห้ามสร้างข้อความและโลโก้ผิดเพี้ยน"}`, ""] )].join("\n"); }
   async function copyText(text, button) { try { await navigator.clipboard.writeText(text); const old = button.textContent; button.textContent = "คัดลอกแล้ว ✓"; setTimeout(() => button.textContent = old, 1800); } catch { showMessage("คัดลอกอัตโนมัติไม่ได้ กรุณาเลือกข้อความแล้วคัดลอกอีกครั้ง"); } }
   function bindPanel() {
     $("#stepPanel").querySelectorAll("[data-key]").forEach((control) => {
       const apply = () => { const key = control.dataset.key; if (key === "name") state.name = control.value; else state.data[key] = control.value; save(); if (control.type === "radio") render(); };
       control.addEventListener("change", apply); if (control.type !== "radio") control.addEventListener("input", apply);
     });
-    moduleRoot.querySelectorAll("[data-scene]").forEach((control) => control.addEventListener("input", () => { const scene = state.data.scenes.find((item) => item.id === control.dataset.scene); if (scene) scene[control.dataset.sceneKey] = control.value; save(); }));
+    moduleRoot.querySelectorAll("[data-scene]").forEach((control) => control.addEventListener("input", () => { const scene = state.data.scenes.find((item) => item.id === control.dataset.scene); if (scene) { const key = control.dataset.sceneKey; scene[key] = key === "duration" ? Number(control.value) : control.value; if (key === "flowPrompt") scene.flowCustom = true; else if (!scene.flowCustom && ["visual", "motion", "camera", "duration"].includes(key)) scene.flowPrompt = flowPromptFor(scene, state.data.scenes.indexOf(scene)); } save(); if (control.matches("textarea[data-autogrow]")) autoGrow(control); }));
     moduleRoot.querySelectorAll("[data-copy-scene]").forEach((button) => button.addEventListener("click", () => { const scene = state.data.scenes.find((item) => item.id === button.dataset.copyScene); if (scene) copyText(scene.prompt, button); }));
+    moduleRoot.querySelectorAll("[data-copy-flow]").forEach((button) => button.addEventListener("click", () => { const scene = state.data.scenes.find((item) => item.id === button.dataset.copyFlow); if (scene) copyText(scene.flowPrompt || flowPromptFor(scene, state.data.scenes.indexOf(scene)), button); }));
+    moduleRoot.querySelectorAll("textarea[data-autogrow]").forEach(autoGrow);
+    moduleRoot.querySelectorAll("[data-scene-upload]").forEach((input) => input.addEventListener("change", () => { const file = input.files?.[0]; const scene = state.data.scenes.find((item) => item.id === input.dataset.sceneUpload); if (!file || !scene) return; sceneFiles.set(scene.id, file); scene.uploadedName = file.name; save(); render(); }));
+    moduleRoot.querySelectorAll("[data-remove-upload]").forEach((button) => button.addEventListener("click", () => { const scene = state.data.scenes.find((item) => item.id === button.dataset.removeUpload); sceneFiles.delete(button.dataset.removeUpload); if (scene) scene.uploadedName = ""; save(); render(); }));
+    $("#handoffToEditor")?.addEventListener("click", handoffToEditor);
     $("#buildStoryboard")?.addEventListener("click", buildStoryboard); $("#startProduction")?.addEventListener("click", startProduction);
     $("#copyAllPrompts")?.addEventListener("click", (event) => copyText(promptText(), event.currentTarget));
     $("#downloadPrompts")?.addEventListener("click", () => { const blob = new Blob([promptText()], { type: "text/plain;charset=utf-8" }); const url = URL.createObjectURL(blob); const anchor = document.createElement("a"); anchor.href = url; anchor.download = `${(state.name || "tanjai-video").replace(/[\\/:*?"<>|]+/g, "-")}-prompts.txt`; anchor.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); });
     $("#openDestinations")?.addEventListener("click", () => { const list = $("#destinationList"); list.hidden = !list.hidden; });
     $("#usePromptInstead")?.addEventListener("click", () => { state.data.method = "prompt"; save(); render(); });
+  }
+  function autoGrow(textarea) { textarea.style.height = "auto"; textarea.style.height = `${Math.max(68, textarea.scrollHeight + 2)}px`; }
+  function handoffToEditor() {
+    const files = state.data.scenes.map((scene) => sceneFiles.get(scene.id)).filter(Boolean);
+    if (files.length !== state.data.scenes.length) return showMessage("กรุณาอัปโหลดคลิปให้ครบทุกฉากก่อนครับ");
+    const input = document.querySelector("#videoFootageInput");
+    if (!input) return showMessage("ยังเปิดพื้นที่แต่งวิดีโอไม่ได้ กรุณาลองใหม่อีกครั้ง");
+    const transfer = new DataTransfer(); files.forEach((file) => transfer.items.add(file)); input.files = transfer.files; input.dispatchEvent(new Event("change", { bubbles: true })); TANJAI.switchView("video");
   }
   async function startProduction() {
     const box = $("#apiResult"), button = $("#startProduction"); if (!box || !button) return;
