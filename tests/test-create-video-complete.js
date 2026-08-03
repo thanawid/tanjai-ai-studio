@@ -15,6 +15,8 @@ assert.match(app, /วิเคราะห์และวางแผนวิ�
 assert.match(app, /นำ Prompt ไปสร้างต่อ/);
 assert.match(app, /เลือกเครื่องมือสร้างวิดีโอ/);
 assert.match(app, /storyboardFromStudioAI/);
+assert.match(app, /starterStoryboard/);
+assert.match(app, /เตรียมโครงเริ่มต้นให้แล้ว/);
 assert.match(app, /CAPCUT_VOICE_SCRIPT/);
 assert.match(app, /Prompt สร้างภาพ/);
 assert.match(app, /ขณะนี้ยังไม่สามารถเริ่มสร้างวิดีโอภายในเว็บได้/);

@@ -98,6 +98,34 @@
       })
     };
   }
+  function starterStoryboard() {
+    const seconds = Number.parseInt(state.data.duration, 10) || 30;
+    const count = Math.max(3, Math.min(10, Math.ceil(seconds / 8)));
+    const topic = String(state.data.topic || state.name || "วิดีโอใหม่").trim();
+    const facts = String(state.data.facts || "").trim();
+    const beats = [
+      ["เปิดเรื่อง", "เปิดด้วยภาพที่สื่อสารหัวข้อได้ทันทีและดึงความสนใจภายใน 3 วินาที", "ค่อย ๆ เคลื่อนกล้องเข้าหาจุดสำคัญ", "เกริ่นประเด็นสำคัญของเรื่อง"],
+      ["ที่มา", "แสดงบรรยากาศ สถานที่ หรือภาพกิจกรรมที่เกี่ยวข้องกับเรื่อง", "เคลื่อนภาพอย่างนุ่มนวลและเป็นธรรมชาติ", "เล่าที่มาและเหตุผลสำคัญ"],
+      ["สารสำคัญ", "นำเสนอรายละเอียดหลักจากข้อมูลจริงอย่างชัดเจน", "สลับภาพกว้างและภาพรายละเอียด", "อธิบายข้อมูลสำคัญโดยไม่แต่งข้อเท็จจริงเพิ่ม"],
+      ["ผู้คนและบรรยากาศ", "ใช้ภาพกิจกรรมหรือภาพสื่อความหมาย โดยคงอัตลักษณ์บุคคลจริง", "แพนกล้องช้า ๆ ให้เห็นบรรยากาศ", "เชื่อมโยงเรื่องกับผู้ชม"],
+      ["รายละเอียด", "เน้นวัน เวลา สถานที่ หน่วยงาน หรือตัวเลขที่มีอยู่ในข้อมูลจริง", "เน้นจุดสำคัญทีละส่วน อ่านง่าย", "ย้ำรายละเอียดที่ผู้ชมควรรู้"],
+      ["ประโยชน์", "แสดงผลลัพธ์หรือประโยชน์ที่ผู้ชมจะได้รับ", "เคลื่อนไหวต่อเนื่องในจังหวะอบอุ่น", "สรุปประโยชน์อย่างกระชับ"],
+      ["เชิญชวน", "ภาพเชิญชวนที่เป็นมิตร พร้อมพื้นที่วางข้อความบนจอ", "ค่อย ๆ ดันกล้องเข้าหาจุดสนใจ", "เชิญชวนให้ผู้ชมดำเนินการตามวัตถุประสงค์"],
+      ["ปิดเรื่อง", "ปิดด้วยภาพบรรยากาศที่น่าจดจำและข้อมูลติดต่อที่ผู้ใช้ให้มาเท่านั้น", "จบภาพอย่างนุ่มนวล", "ทิ้งท้ายด้วยสารหลักของวิดีโอ"]
+    ];
+    return {
+      projectTitle: state.name || topic.split(/[\n.!?]/)[0].slice(0, 70),
+      summary: `โครงวิดีโอ ${count} ฉาก พร้อมแก้ไขและนำ Prompt ไปสร้างต่อได้`,
+      productionPack: "",
+      planner: "starter",
+      scenes: Array.from({ length: count }, (_, index) => {
+        const [title, visual, motion, narration] = beats[Math.round(index * (beats.length - 1) / Math.max(count - 1, 1))];
+        const factualContext = facts ? ` ข้อมูลจริงที่ต้องยึดตาม: ${facts}` : "";
+        const prompt = `${visual} เนื้อหาเกี่ยวกับ ${topic}.${factualContext} แนว ${state.data.visual} อารมณ์ ${state.data.tone} สัดส่วน ${state.data.aspect} ภาพสมจริง การเคลื่อนไหวเป็นธรรมชาติ องค์ประกอบอ่านง่าย ไม่มีลายน้ำ`;
+        return { title: `${title} · ฉากที่ ${index + 1}`, duration: Math.max(4, Math.round(seconds / count)), visual, motion, camera: index === 0 ? "เปิดด้วยภาพเด่นแล้วเคลื่อนกล้องเข้าอย่างนุ่มนวล" : "เลือกมุมที่ต่อเนื่องจากฉากก่อนหน้า", onScreenText: "", narration, imagePrompt: prompt, prompt, negativePrompt: "ห้ามสร้างใบหน้าใหม่ ห้ามเปลี่ยนใบหน้า ห้ามดัดแปลงลักษณะบุคคลจริง ห้ามแต่งข้อมูลสำคัญ ห้ามสร้างโลโก้ ตัวอักษร หรือลายน้ำผิดเพี้ยน" };
+      })
+    };
+  }
   async function storyboardFromStudioAI() {
     const endpoint = String(window.TANJAI_AI_CONFIG?.endpoint || "").trim().replace(/\/$/, "");
     if (!/^https:\/\//i.test(endpoint)) throw new Error("ยังไม่ได้เชื่อมระบบวางแผนวิดีโอ");
@@ -122,9 +150,13 @@
     try {
       let result;
       try { result = await storyboardFromStudioAI(); }
-      catch { result = await requestJson("/api/storyboard", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: state.name, ...state.data }) }); }
+      catch {
+        try { result = await requestJson("/api/storyboard", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: state.name, ...state.data }) }); }
+        catch { result = starterStoryboard(); }
+      }
       state.name ||= result.projectTitle; state.data.summary = result.summary;
       state.data.productionPack = result.productionPack || "";
+      state.data.planner = result.planner || "ai";
       state.data.scenes = result.scenes.map((scene, index) => ({ ...scene, id: crypto.randomUUID(), order: index + 1 }));
       state.step = 1; save(); render();
     } catch (error) { if (button) { button.disabled = false; button.textContent = "วิเคราะห์และวางแผนวิดีโอ"; } showMessage(error.message); }
@@ -135,7 +167,8 @@
   }
   function storyboardPanel() {
     if (!state.data.scenes.length) return `<div class="empty-storyboard"><span>🎬</span><h3>ยังไม่มีฉาก</h3><p>ย้อนกลับไปเล่าเรื่อง แล้วให้ทันใจช่วยเขียนบทและแบ่งฉากให้ครับ</p></div>`;
-    return `<div class="storyboard-head"><div><h3>ตรวจบทและฉาก</h3><small>แก้เฉพาะจุดที่ต้องการ ทุกช่องบันทึกอัตโนมัติ</small></div><button class="ghost compact" id="buildStoryboard" type="button">วางฉากใหม่</button></div><div class="api-result" id="storyboardStatus" hidden></div><div class="storyboard-grid">${state.data.scenes.map((scene, index) => `<article class="scene-card"><div class="scene-number">${String(index + 1).padStart(2, "0")}<small>${scene.duration} วิ</small></div><div class="scene-body"><label>ภาพในฉาก<textarea data-scene="${scene.id}" data-scene-key="visual">${escapeHtml(scene.visual)}</textarea></label><label>การเคลื่อนไหว<textarea data-scene="${scene.id}" data-scene-key="motion">${escapeHtml(scene.motion)}</textarea></label><label>มุมกล้อง<textarea data-scene="${scene.id}" data-scene-key="camera">${escapeHtml(scene.camera || "ให้ AI เลือกมุมที่เหมาะสม")}</textarea></label><label>ข้อความบนจอ<textarea data-scene="${scene.id}" data-scene-key="onScreenText">${escapeHtml(scene.onScreenText || "")}</textarea></label><label>เสียงพากย์<textarea data-scene="${scene.id}" data-scene-key="narration">${escapeHtml(scene.narration)}</textarea></label><label>Prompt สร้างภาพ<textarea data-scene="${scene.id}" data-scene-key="imagePrompt">${escapeHtml(scene.imagePrompt || scene.visual)}</textarea></label><label class="wide">Prompt สำหรับสร้างวิดีโอ<textarea data-scene="${scene.id}" data-scene-key="prompt">${escapeHtml(scene.prompt)}</textarea><button class="copy-scene" type="button" data-copy-scene="${scene.id}">คัดลอก Prompt ฉากนี้</button></label><label class="wide">ข้อห้ามในการสร้าง<textarea data-scene="${scene.id}" data-scene-key="negativePrompt">${escapeHtml(scene.negativePrompt || "ห้ามเปลี่ยนใบหน้า ห้ามสร้างใบหน้าใหม่ ห้ามสร้างโลโก้หรือตัวอักษรผิดเพี้ยน")}</textarea></label></div></article>`).join("")}</div>`;
+    const starterNote = state.data.planner === "starter" ? `<div class="gentle-notice"><b>เตรียมโครงเริ่มต้นให้แล้ว</b><span>ระบบวิเคราะห์อัตโนมัติกำลังพักชั่วคราว คุณยังแก้บทและ Prompt ชุดนี้แล้วนำไปสร้างต่อได้ทันที</span></div>` : "";
+    return `<div class="storyboard-head"><div><h3>ตรวจบทและฉาก</h3><small>แก้เฉพาะจุดที่ต้องการ ทุกช่องบันทึกอัตโนมัติ</small></div><button class="ghost compact" id="buildStoryboard" type="button">วางฉากใหม่</button></div>${starterNote}<div class="api-result" id="storyboardStatus" hidden></div><div class="storyboard-grid">${state.data.scenes.map((scene, index) => `<article class="scene-card"><div class="scene-number">${String(index + 1).padStart(2, "0")}<small>${scene.duration} วิ</small></div><div class="scene-body"><label>ภาพในฉาก<textarea data-scene="${scene.id}" data-scene-key="visual">${escapeHtml(scene.visual)}</textarea></label><label>การเคลื่อนไหว<textarea data-scene="${scene.id}" data-scene-key="motion">${escapeHtml(scene.motion)}</textarea></label><label>มุมกล้อง<textarea data-scene="${scene.id}" data-scene-key="camera">${escapeHtml(scene.camera || "ให้ AI เลือกมุมที่เหมาะสม")}</textarea></label><label>ข้อความบนจอ<textarea data-scene="${scene.id}" data-scene-key="onScreenText">${escapeHtml(scene.onScreenText || "")}</textarea></label><label>เสียงพากย์<textarea data-scene="${scene.id}" data-scene-key="narration">${escapeHtml(scene.narration)}</textarea></label><label>Prompt สร้างภาพ<textarea data-scene="${scene.id}" data-scene-key="imagePrompt">${escapeHtml(scene.imagePrompt || scene.visual)}</textarea></label><label class="wide">Prompt สำหรับสร้างวิดีโอ<textarea data-scene="${scene.id}" data-scene-key="prompt">${escapeHtml(scene.prompt)}</textarea><button class="copy-scene" type="button" data-copy-scene="${scene.id}">คัดลอก Prompt ฉากนี้</button></label><label class="wide">ข้อห้ามในการสร้าง<textarea data-scene="${scene.id}" data-scene-key="negativePrompt">${escapeHtml(scene.negativePrompt || "ห้ามเปลี่ยนใบหน้า ห้ามสร้างใบหน้าใหม่ ห้ามสร้างโลโก้หรือตัวอักษรผิดเพี้ยน")}</textarea></label></div></article>`).join("")}</div>`;
   }
   function methodPanel() {
     const count = state.data.scenes.length; const method = state.data.method;
