@@ -10,6 +10,8 @@ const OUTPUT_ROOT = join(ROOT, "generated");
 const PORT = Number(process.env.PORT || 4173);
 await loadLocalEnv();
 const API_KEY = process.env.OPENAI_API_KEY;
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const GEMINI_TEXT_MODEL = process.env.GEMINI_TEXT_MODEL || "gemini-2.5-flash";
 const TEXT_MODEL = process.env.OPENAI_TEXT_MODEL || "gpt-4.1-mini";
 const VIDEO_MODEL = process.env.OPENAI_VIDEO_MODEL || "sora-2";
 const SPEECH_MODEL = process.env.OPENAI_SPEECH_MODEL || "gpt-4o-mini-tts";
@@ -46,24 +48,47 @@ async function openai(path, options = {}) {
 function storyboardSchema() {
   return { type: "object", additionalProperties: false, required: ["projectTitle", "summary", "scenes"], properties: {
     projectTitle: { type: "string" }, summary: { type: "string" }, scenes: { type: "array", minItems: 3, maxItems: 12, items: { type: "object", additionalProperties: false,
-      required: ["title", "duration", "visual", "motion", "narration", "prompt"], properties: { title: { type: "string" }, duration: { type: "integer", minimum: 8, maximum: 8 }, visual: { type: "string" }, motion: { type: "string" }, narration: { type: "string" }, prompt: { type: "string" } } } }
+      required: ["title", "duration", "visual", "motion", "camera", "onScreenText", "narration", "imagePrompt", "prompt", "negativePrompt"], properties: { title: { type: "string" }, duration: { type: "integer", minimum: 8, maximum: 8 }, visual: { type: "string" }, motion: { type: "string" }, camera: { type: "string" }, onScreenText: { type: "string" }, narration: { type: "string" }, imagePrompt: { type: "string" }, prompt: { type: "string" }, negativePrompt: { type: "string" } } } }
   } };
+}
+async function geminiStoryboard(instructions, input) {
+  if (!GEMINI_API_KEY) return null;
+  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(GEMINI_TEXT_MODEL)}:generateContent`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "x-goog-api-key": GEMINI_API_KEY },
+    body: JSON.stringify({
+      systemInstruction: { parts: [{ text: instructions }] },
+      contents: [{ role: "user", parts: [{ text: input }] }],
+      generationConfig: { temperature: 0.65, maxOutputTokens: 8192, responseMimeType: "application/json", responseSchema: storyboardSchema() }
+    })
+  });
+  const detail = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const error = new Error(detail?.error?.message || `ระบบวางแผนวิดีโอตอบกลับ ${response.status}`);
+    error.status = response.status; error.provider = "gemini"; throw error;
+  }
+  const text = detail?.candidates?.[0]?.content?.parts?.map((part) => part.text || "").join("").trim();
+  if (!text) throw new Error("ยังไม่ได้รับแผนวิดีโอ กรุณาลองใหม่");
+  return JSON.parse(text);
 }
 async function createStoryboard(data) {
   const seconds = Number.parseInt(data.duration, 10) || 30;
   const count = Math.max(3, Math.min(12, Math.ceil(seconds / 8)));
   const instructions = `คุณคือทีมวางเรื่องวิดีโอของทันใจ AI Studio สร้างแผนจำนวน ${count} ฉาก ฉากละ 8 วินาที ให้เรื่องต่อเนื่องและไม่ซ้ำกัน
 ใช้ข้อมูลจริงเท่านั้น ห้ามแต่งชื่อบุคคล วันเวลา สถานที่ หรือตัวเลขเพิ่ม
-แต่ละฉากต้องมีภาพ การเคลื่อนไหวจริงของวัตถุหรือตัวละคร การเคลื่อนกล้อง เสียงพากย์สั้นที่อ่านจบภายใน 8 วินาที และ Prompt สำหรับสร้างวิดีโอ
+แต่ละฉากต้องมีภาพ การเคลื่อนไหว มุมกล้อง ข้อความบนจอ เสียงพากย์สั้นที่อ่านจบภายใน 8 วินาที Prompt สร้างภาพ Prompt สร้างวิดีโอ และ Negative Prompt
 แนวภาพเป็นจุดเริ่มต้น ผสมกับคำอธิบายเพิ่มเติมของผู้ใช้ได้ ไม่บังคับให้งานทุกประเภทหน้าตาเหมือนกัน
 หากข้อมูลกล่าวถึงบุคคลจริงหรือบุคคลสาธารณะ ห้ามสร้างหรือเลียนแบบใบหน้า ให้ใช้ภาพกิจกรรม สถานที่ มือ วัตถุ หรือภาพกว้างที่ไม่ระบุตัวบุคคล และกล่าวชื่อได้เฉพาะในเสียงพากย์
-Prompt ต้องบอกภาพ การเคลื่อนไหว กล้อง แสง อารมณ์ สัดส่วน และความต่อเนื่อง ห้ามตัวอักษร โลโก้ และลายน้ำ ตอบ JSON ตามโครงสร้างเท่านั้น`;
+Prompt ต้องบอกภาพ การเคลื่อนไหว กล้อง แสง อารมณ์ สัดส่วน และความต่อเนื่อง ห้ามตัวอักษร โลโก้ และลายน้ำ
+ห้ามสร้างใบหน้าใหม่ ห้ามเปลี่ยนใบหน้า ห้ามดัดแปลงลักษณะบุคคลจริง และให้ Negative Prompt ย้ำข้อห้ามนี้ทุกฉาก ตอบ JSON ตามโครงสร้างเท่านั้น`;
   const input = `ชื่องาน: ${data.name || "ยังไม่ได้ตั้งชื่อ"}\nประเภทงาน: ${data.genre || "กำหนดเอง"}\nสัดส่วน: ${data.aspect || "16:9 แนวนอน"}\nบรรยากาศ: ${data.visual || "ให้ทันใจแนะนำ"}\nจังหวะ: ${data.movement || "ให้ทันใจแนะนำ"}\nคำอธิบายเพิ่ม: ${data.customStyle || "ไม่มี"}\nผู้ชม: ${data.audience || "ประชาชนทั่วไป"}\nน้ำเสียง: ${data.tone || "สุภาพ ชัดเจน"}\nเรื่อง: ${data.topic || ""}\nข้อมูลตามจริง: ${data.facts || "ไม่มีข้อมูลเพิ่มเติม"}`;
+  const geminiResult = await geminiStoryboard(instructions, input);
+  if (geminiResult) return { ...geminiResult, planner: "gemini" };
   const response = await openai("/responses", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ model: TEXT_MODEL, store: false, instructions, input, text: { format: { type: "json_schema", name: "tanjai_video_plan", strict: true, schema: storyboardSchema() } } }) });
   const result = await response.json();
   const outputText = result.output_text || result.output?.flatMap((item) => item.content || []).find((item) => item.type === "output_text")?.text;
   if (!outputText) throw new Error("ยังไม่ได้รับแผนวิดีโอ กรุณาลองใหม่");
-  return JSON.parse(outputText);
+  return { ...JSON.parse(outputText), planner: "openai" };
 }
 function videoSettings(aspect = "16:9 แนวนอน") { return aspect.startsWith("16:9") ? { request: "1280x720", width: 1280, height: 720 } : { request: "720x1280", width: aspect.startsWith("1:1") ? 1080 : aspect.startsWith("4:5") ? 1080 : 720, height: aspect.startsWith("1:1") ? 1080 : aspect.startsWith("4:5") ? 1350 : 1280 }; }
 function videoPrompt(scene, project) {
@@ -126,7 +151,8 @@ async function runProduction(jobId, project) {
 }
 function friendlyError(error) {
   if (error.status === 401) return "สิทธิ์สร้างงานยังใช้ไม่ได้ กรุณาตรวจการตั้งค่าระบบ";
-  if (error.status === 429) return "วงเงินไม่พอหรือมีงานพร้อมกันมากเกินไป กรุณาตรวจยอดและลองใหม่";
+  if (error.status === 429 && error.provider === "gemini") return "ขณะนี้มีผู้ใช้งานระบบวางแผนจำนวนมาก กรุณารอสักครู่แล้วลองอีกครั้ง";
+  if (error.status === 429) return "ขณะนี้ยังไม่สามารถเริ่มสร้างวิดีโอภายในเว็บได้ คุณยังสามารถดาวน์โหลด Prompt ไปสร้างต่อได้ตามปกติ";
   if (error.status === 403) return "บัญชีนี้ยังไม่มีสิทธิ์สร้างวิดีโอด้วยรุ่นที่เลือก";
   if (/safety|policy|public figure|real people|face/i.test(error.message)) return "ฉากนี้มีบุคคลจริงหรือเนื้อหาที่ระบบสร้างแทนไม่ได้ กรุณาปรับเป็นภาพกิจกรรม สถานที่ หรือภาพสื่อความหมาย";
   return error.message || "ยังสร้างวิดีโอไม่สำเร็จ";
@@ -160,7 +186,13 @@ const server = http.createServer(async (req, res) => {
       res.writeHead(204, { "Access-Control-Allow-Origin": "https://thanawid.github.io", "Access-Control-Allow-Headers": "Content-Type", "Access-Control-Allow-Methods": "GET, POST, OPTIONS", "Access-Control-Max-Age": "86400" });
       return res.end();
     }
-    if (req.method === "GET" && url.pathname === "/api/health") return send(res, 200, { ready: Boolean(API_KEY), videoModel: VIDEO_MODEL, message: API_KEY ? "พร้อมสร้างงาน" : "ยังไม่ได้เปิดระบบสร้างงาน" });
+    if (req.method === "GET" && url.pathname === "/api/health") return send(res, 200, {
+      ready: Boolean(API_KEY),
+      plannerReady: Boolean(GEMINI_API_KEY || API_KEY),
+      planner: GEMINI_API_KEY ? "gemini" : API_KEY ? "openai" : "none",
+      videoModel: VIDEO_MODEL,
+      message: API_KEY ? "พร้อมสร้างวิดีโอภายในเว็บ" : "พร้อมเตรียม Prompt เพื่อนำไปสร้างต่อ"
+    });
     if (req.method === "POST" && url.pathname === "/api/storyboard") return send(res, 200, await createStoryboard(await bodyJson(req)));
     if (req.method === "POST" && url.pathname === "/api/produce") return send(res, 202, startProduction(await bodyJson(req)));
     const jobMatch = url.pathname.match(/^\/api\/jobs\/([a-zA-Z0-9-]+)$/);

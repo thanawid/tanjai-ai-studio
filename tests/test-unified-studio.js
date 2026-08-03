@@ -13,6 +13,8 @@ assert.match(app, /version: "12\.2\.1"/);
 assert.match(server, /Access-Control-Allow-Origin/);
 assert.match(server, /req\.method === "OPTIONS"/);
 assert.match(server, /\/api\/storyboard/);
+assert.match(server, /GEMINI_API_KEY/);
+assert.match(server, /geminiStoryboard/);
 assert.match(server, /\/api\/produce/);
 assert.match(dockerignore, /^\.env$/m);
 console.log(JSON.stringify({version:"12.2.1",oneRepository:true,embeddedVideoModule:true,sharedShell:true,renderApiBridge:true,status:"PASS"},null,2));
