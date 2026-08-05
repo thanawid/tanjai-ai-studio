@@ -39,7 +39,7 @@ textarea.short{min-height:82px}
 @media(max-width:1120px){.studio-layout{grid-template-columns:1fr}.step-panel{border-right:0}.result-panel{position:static;max-height:none;border-top:1px solid var(--line)}}
 @media(max-width:640px){main{width:min(100% - 20px,1540px)}.workspace{margin-top:12px}.workspace-head{padding:17px}.workspace-head{display:grid}.autosave{justify-self:start}.stepper{grid-auto-columns:minmax(150px,1fr)}.step-panel,.result-panel{padding:17px}.video-style-grid{grid-template-columns:1fr}.workspace-actions{grid-template-columns:1fr 1fr}.workspace-actions>span{display:none}.workspace-actions .primary{grid-column:1/-1}.result-panel{padding-top:20px}.form-section{padding:14px}.topbar nav .compact:last-child{display:none}}
 
-/* V12.2.1 — complete video workflow */
+/* V12.3.0 — complete video workflow */
 .auth-checking>*:not(.auth-screen){visibility:hidden}
 .auth-screen{position:fixed;z-index:999;inset:0;display:grid;place-items:center;align-content:center;gap:9px;background:#070a14;text-align:center}
 .auth-screen img{width:76px;height:76px;border-radius:22px}.auth-screen small{color:var(--muted)}
