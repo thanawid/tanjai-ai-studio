@@ -5,10 +5,16 @@ const root = path.resolve(__dirname, "..");
 const index = fs.readFileSync(path.join(root,"index.html"),"utf8");
 const app = fs.readFileSync(path.join(root,"js","app.js"),"utf8");
 const proofread = fs.readFileSync(path.join(root,"js","proofread.js"),"utf8");
+const css = fs.readFileSync(path.join(root,"css","style.css"),"utf8");
 const pkg = JSON.parse(fs.readFileSync(path.join(root,"package.json"),"utf8"));
 
 assert.strictEqual(pkg.version, "12.5.0");
 assert.match(index, /V12\.5\.0/);
+assert.match(app, /data-fab-view="router"/);
+assert.match(app, /data-fab-view="createVideo"/);
+assert.match(app, /data-fab-view="projects"/);
+assert.doesNotMatch(app, /data-fab-open="gpt"/);
+assert.match(css, /@media\(min-width:1181px\)\{\.fab-main,\.fab-menu\{display:none!important\}\}/);
 assert.match(index, /v=12\.5\.0/);
 assert.match(index, /id="sidebarLogoutBtn"/);
 assert.match(index, /id="openProofreadNav"/);

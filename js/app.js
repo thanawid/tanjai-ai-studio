@@ -545,15 +545,16 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "สคริปต์�
           <div class="command-foot">กด Ctrl + K เพื่อเปิดเมนูนี้ • Enter เพื่อเลือกคำสั่งแรก</div>
         </section>
       </div>
-      <button id="fabMain" class="fab-main" type="button" title="เมนูลัด" aria-expanded="false" aria-controls="fabMenu">＋</button>
-      <div id="fabMenu" class="fab-menu" hidden aria-hidden="true">
-        <button data-fab-view="kit" title="สร้างชุดสื่อ">🧩<span>ชุดสื่อ</span></button>
-        <button data-fab-view="post" title="เรียบเรียงเนื้อหา">✍️<span>เนื้อหา</span></button>
-        <button data-fab-view="mc" title="งานพิธีกร">🎤<span>พิธีกร</span></button>
-        <button data-fab-view="image" title="สร้างภาพ">🖼️<span>ภาพ</span></button>
-        <button data-fab-view="photoPro" title="แต่งภาพ AI">✨<span>แต่งรูป</span></button>
-        <button data-fab-view="video" title="วิดีโอ">🎬<span>วิดีโอ</span></button>
-        <button data-fab-open="gpt" title="เปิด GPT">🤖<span>GPT</span></button>
+      <button id="fabMain" class="fab-main" type="button" title="เริ่มงานใหม่" aria-label="เปิดเมนูเริ่มงานใหม่" aria-expanded="false" aria-controls="fabMenu">＋</button>
+      <div id="fabMenu" class="fab-menu" role="menu" aria-label="เริ่มงานใหม่" hidden aria-hidden="true">
+        <button data-fab-view="router" role="menuitem" title="ให้ AI ช่วยเลือกเมนู">🧭<span>ให้ AI ช่วยเลือก</span></button>
+        <button data-fab-view="post" role="menuitem" title="เขียนเนื้อหา">✍️<span>เขียนเนื้อหา</span></button>
+        <button data-fab-view="image" role="menuitem" title="สร้างภาพ">🖼️<span>สร้างภาพ</span></button>
+        <button data-fab-view="album" role="menuitem" title="สร้างชุดภาพ Facebook">🧷<span>ชุดภาพ Facebook</span></button>
+        <button data-fab-view="createVideo" role="menuitem" title="สร้างวิดีโอ">✨<span>สร้างวิดีโอ</span></button>
+        <button data-fab-view="voice" role="menuitem" title="สร้างเสียงพากย์">🎙️<span>เสียงพากย์</span></button>
+        <button data-fab-view="kit" role="menuitem" title="สร้างชุดสื่อ">🧩<span>สร้างชุดสื่อ</span></button>
+        <button data-fab-view="projects" role="menuitem" title="เปิดงานที่บันทึกไว้">📁<span>งานที่บันทึกไว้</span></button>
       </div>
       <nav class="mobile-tabbar" aria-label="เมนูลัดมือถือ">
         <button data-view="dashboard">🏠<span>หน้าแรก</span></button>
