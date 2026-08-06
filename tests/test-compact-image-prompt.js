@@ -67,6 +67,17 @@ assert(premium.length < 7000, `Premium prompt too long: ${premium.length}`);
 assert(premium.includes("Thai PR Premium — โปสเตอร์ประชาสัมพันธ์หลายชั้น"), "Explicit Premium selection was not honored");
 assert(!premium.includes("BALANCED CREATIVE PR PROFILE"), "Premium prompt contains a second profile");
 
+const vividAnimeComic = T.buildImageExecutionPrompt({
+  ...base,
+  title: "ภาพประกอบอิสระ",
+  detail: "สร้างตัวละครในสวนดอกไม้",
+  visualPreset: "อนิเมะคอมิกสีสด"
+});
+assert(vividAnimeComic.includes("Modern Anime Comic Illustration"), "Vivid anime comic direction missing");
+assert(vividAnimeComic.includes("cel shading"), "Cel-shading instruction missing");
+assert(vividAnimeComic.includes("ห้ามบังคับแบ่งช่อง"), "Comic style is incorrectly forcing a panel layout");
+assert(!vividAnimeComic.includes("Service Infographic"), "Comic style was incorrectly routed as an infographic");
+
 const attached = T.buildImageExecutionPrompt({
   ...base,
   useMode: "ใช้ภาพจริงเป็นต้นฉบับ",
@@ -82,6 +93,7 @@ assert(!attached.includes("กรุณากด +"), "Attachment prompt still b
 console.log(JSON.stringify({
   balancedChars: balanced.length,
   premiumChars: premium.length,
+  vividAnimeComicChars: vividAnimeComic.length,
   attachedChars: attached.length,
   status: "PASS"
 }, null, 2));

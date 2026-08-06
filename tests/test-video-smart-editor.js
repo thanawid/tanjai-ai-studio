@@ -19,5 +19,6 @@ assert.match(css,/AI Footage Assistant/);
 assert.match(js,/ดาวน์โหลดคลิปที่ปรับแล้ว/);
 assert.match(data,/อนิเมะร่วมสมัย/);
 assert.match(data,/อนิเมะภาพยนตร์/);
+assert.match(data,/อนิเมะร่วมสมัย[\s\S]*อนิเมะภาพยนตร์[\s\S]*อนิเมะน่ารัก[\s\S]*อนิเมะแฟนตาซี[\s\S]*อนิเมะคอมิกสีสด[\s\S]*มาสคอต 3D/);
 assert.doesNotMatch(js,/Speech-to-Text API|Video AI API|Render Server/);
 console.log(JSON.stringify({version:'12.5.0',uploadMany:true,renderQueue:true,selectedClipExport:true,zipExport:true,downloadOnly:true,status:'PASS'},null,2));

@@ -403,6 +403,7 @@ STOP RULE: เรียกเครื่องมือสร้างภาพ
     const infographic = !respectful && /Infographic|อินโฟกราฟิก|ขั้นตอนบริการ|วิธีใช้งาน|FAQ|ให้ความรู้/i.test(signals);
     const music = !respectful && /เพลง|ปกเพลง|ผลงานสร้างสรรค์|ศิลปิน|Cover Art/i.test(signals);
     const cartoon2d = !respectful && /การ์ตูน 2D|2D Cartoon|Cartoon 2D/i.test(signals);
+    const vividAnimeComic = !respectful && /อนิเมะคอมิกสีสด|Modern Anime Comic/i.test(signals);
     const mascot3d = !respectful && /มาสคอต 3D|Mascot 3D|คาแรกเตอร์/i.test(signals);
     const fantasy = !respectful && /แฟนตาซี|Fantasy/i.test(signals);
     const cinematic = !respectful && /โปสเตอร์หนัง|Cinematic Poster|ภาพยนตร์/i.test(signals);
@@ -444,6 +445,12 @@ STOP RULE: เรียกเครื่องมือสร้างภาพ
         "Music Campaign / Cover Art — ใช้อารมณ์เพลง ชื่อเพลง และภาพฮีโร่เป็นแกนหลัก",
         "สร้าง layered depth, controlled lighting และ signature visual ที่สัมพันธ์กับเพลง โดยไม่ยัดข้อมูลแบบอินโฟกราฟิก",
         "องค์ประกอบดนตรีเป็นภาพเชิงสร้างสรรค์ได้ แต่ห้ามสร้างชื่อศิลปิน โลโก้ รางวัล ยอดวิว หรือตัวเลขขึ้นเอง"
+      ];
+    }else if(vividAnimeComic){
+      direction = [
+        "Modern Anime Comic Illustration — ลายเส้นอนิเมะคอมิกร่วมสมัย เส้นขอบดำคม สะอาด และมีน้ำหนักชัดเจน",
+        "ใช้สีสด คอนทราสต์สูง และลงแสงเงาแบบ cel shading ให้ภาพคมชัด โดยปรับอารมณ์ ฉาก และองค์ประกอบตามเนื้อหาของงาน",
+        "คำว่า comic หมายถึงลักษณะลายเส้นเท่านั้น ห้ามบังคับแบ่งช่อง ใส่กรอบคำพูด เส้นพุ่ง หรือจัดเป็นอินโฟกราฟิก เว้นแต่โจทย์ระบุ"
       ];
     }else if(cartoon2d){
       direction = [
