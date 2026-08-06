@@ -110,6 +110,32 @@
     return [...new Set(items)].slice(0,5);
   }
 
+  function safeExpansion(b){
+    const source = `${b.title} ${b.detail}`;
+    const ideas = [];
+    if(/ยุงลาย|ไข้เลือดออก|แหล่งเพาะพันธุ์ยุง/.test(source)){
+      ideas.push("การป้องกันเริ่มได้จากการช่วยกันดูแลสภาพแวดล้อมรอบบ้านและชุมชน ไม่ให้มีภาชนะหรือจุดที่อาจกลายเป็นแหล่งน้ำขัง");
+      ideas.push("ความร่วมมืออย่างต่อเนื่องของทุกครัวเรือนช่วยลดจุดเสี่ยงใกล้ตัว และทำให้ชุมชนน่าอยู่ยิ่งขึ้น");
+    }
+    if(/ขยะ|ความสะอาด|คัดแยก|สิ่งปฏิกูล/.test(source)){
+      ideas.push("การจัดการตั้งแต่ต้นทางและการรักษาความสะอาดอย่างสม่ำเสมอ ช่วยลดผลกระทบต่อพื้นที่ส่วนรวมและสิ่งแวดล้อม");
+      ideas.push("ทุกคนสามารถมีส่วนร่วมได้จากการดูแลพื้นที่ของตนเองและปฏิบัติตามแนวทางของชุมชน");
+    }
+    if(/ถนน|จราจร|หมวกนิรภัย|อุบัติเหตุ|ความปลอดภัย/.test(source)){
+      ideas.push("การตระหนักถึงความปลอดภัยและเคารพกติกาในพื้นที่ร่วมกัน ช่วยลดความเสี่ยงที่อาจเกิดขึ้นกับตนเองและผู้อื่น");
+    }
+    if(/ต้นไม้|สิ่งแวดล้อม|พื้นที่สีเขียว|คลอง|น้ำเสีย/.test(source)){
+      ideas.push("การดูแลทรัพยากรและสภาพแวดล้อมในพื้นที่อย่างต่อเนื่อง เป็นส่วนหนึ่งของการสร้างคุณภาพชีวิตที่ดีให้ชุมชนในระยะยาว");
+    }
+    if(/ผู้สูงอายุ|ผู้สูงวัย|สุขภาพ/.test(source) && !/ยุงลาย|ไข้เลือดออก/.test(source)){
+      ideas.push("กิจกรรมด้านสุขภาพมุ่งส่งเสริมให้ประชาชนเห็นความสำคัญของการดูแลตนเอง และนำแนวทางที่เหมาะสมไปใช้ในชีวิตประจำวัน");
+    }
+    if(/อบรม|ฝึกอบรม|ให้ความรู้/.test(source)){
+      ideas.push("สาระของกิจกรรมเน้นความเข้าใจที่นำไปปฏิบัติได้จริง และเปิดโอกาสให้ผู้เข้าร่วมเชื่อมโยงความรู้กับบริบทของตนเอง");
+    }
+    return [...new Set(ideas)].slice(0,3);
+  }
+
   function rewriteCore(d={}, tool="post"){
     const b = contentBrain(d);
     const intent = detectIntent(d, tool);
@@ -146,6 +172,7 @@
     }
 
     extractHighlights(b).forEach(item => details.push(item));
+    safeExpansion(b).forEach(item => details.push(item));
     if(b.people && !/นายก|ผู้บริหาร|สมาชิกสภา|กำนัน|ผู้ใหญ่บ้าน|ผู้นำชุมชน|หัวหน้าส่วนราชการ|ประชาชน/.test(`${b.title} ${b.detail}`)) details.push(`ผู้เกี่ยวข้อง: ${b.people}`);
     return [...new Set(details.filter(Boolean))];
   }
@@ -225,7 +252,7 @@
     const merged = Object.assign({}, d, {
       channel: real(options.platform) || real(d.channel),
       tone: real(options.delivery) || real(d.tone),
-      action: real(options.purpose) || real(d.action),
+      workContext: real(options.purpose) || real(d.workContext),
       lockedFacts: real(options.lockedFacts) || real(d.lockedFacts),
       pronunciation: real(options.pronunciation) || real(d.pronunciation)
     });
@@ -259,6 +286,11 @@
     if(revision === "formal") return `ฉบับปรับเป็นทางการ\n\n${source.replace(/ครับ|ค่ะ|นะครับ|นะคะ/g, "").replace(/อยากให้/g,"ขอให้").replace(/ทุกคน/g,"ทุกท่าน")}`;
     if(revision === "natural") return `ฉบับอ่านเป็นธรรมชาติ\n\n${source.replace(/ดำเนินการ/g,"ทำ").replace(/ประชาชนทุกท่าน/g,"ทุกท่าน").replace(/ดังกล่าว/g,"นี้")}`;
     if(revision === "hook") return `ประโยคเปิดแนะนำ\nเรื่องสำคัญนี้เกี่ยวข้องกับคุณอย่างไร — อ่านรายละเอียดให้ครบก่อนตัดสินใจ\n\n${source}`;
+    if(revision === "expand") return `${source}\n\nรายละเอียดที่ช่วยให้เรื่องสมบูรณ์ขึ้น\nการสื่อสารอย่างต่อเนื่องและความร่วมมือจากผู้เกี่ยวข้อง ช่วยให้สารสำคัญถูกนำไปใช้ได้ชัดเจนและเกิดประโยชน์ต่อกลุ่มเป้าหมายมากขึ้น`;
+    if(revision === "variant"){
+      const paragraphs=source.split(/\n\s*\n/).filter(Boolean);
+      return `อีกฉบับสำหรับเลือกใช้\n\n${paragraphs.length > 2 ? [paragraphs[1],paragraphs[0],...paragraphs.slice(2)].join("\n\n") : source}`;
+    }
     if(revision === "proofread") return `ฉบับตรวจทานภาษาแล้ว\n\n${source.replace(/[ \t]+\n/g,"\n").replace(/\s+([,.!?])/g,"$1").replace(/\n{3,}/g,"\n\n")}`;
     return source;
   }

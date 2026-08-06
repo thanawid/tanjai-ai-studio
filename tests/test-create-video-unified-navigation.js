@@ -16,4 +16,4 @@ assert.match(server, /url\.pathname === "\/api\/health"/);
 assert.match(server, /พร้อมสร้างวิดีโอภายในเว็บ/);
 assert.match(server, /พร้อมเตรียม Prompt เพื่อนำไปสร้างต่อ/);
 
-console.log(JSON.stringify({ version: "12.4.0", embeddedModule: true, fullMenu: true, sharedLogin: true, backendOnlyRender: true, status: "PASS" }, null, 2));
+console.log(JSON.stringify({ version: "12.5.0", embeddedModule: true, fullMenu: true, sharedLogin: true, backendOnlyRender: true, status: "PASS" }, null, 2));

@@ -178,7 +178,7 @@ window.TANJAI = window.TANJAI || {};
 
   T.promptBrainReport = function(d = {}, tool = "image"){
     const a = T.proBriefAnalyze(d, tool);
-    return `Professional Brief-to-Prompt Output v9.3.9
+    return `Professional Brief-to-Prompt Output
 
 สถานะบรีฟ: ${a.readiness}
 ประเภทงานที่ระบบอ่านได้: ${a.label}
@@ -371,7 +371,7 @@ ${T.proOutputFormat(tool, d, extra)}`;
     return T.proPrompt("mc", d);
   };
   T.promptPack = function(d = {}){
-    return `Professional Brief-to-Prompt Pack v9.3.9
+    return `Professional Brief-to-Prompt Pack
 
 วิธีใช้: คัดลอกเฉพาะส่วนที่ต้องการไปวางใน AI ปลายทาง หรือใช้ทั้งชุดเมื่ออยากให้ AI ทำหลายสื่อจากบรีฟเดียว
 
@@ -412,7 +412,7 @@ ${T.promptBrainReport(d, type)}
   T.promptCritic = function(d = {}, tool = "image"){
     const a = T.proBriefAnalyze(d, tool);
     const level = a.score >= 85 ? "พร้อมมาก" : a.score >= 70 ? "ใช้ได้" : "ควรเติมข้อมูล";
-    return `Professional Output Check v9.3.9
+    return `Professional Output Check
 
 สถานะ: ${level}
 คำแนะนำ: ${a.readiness}

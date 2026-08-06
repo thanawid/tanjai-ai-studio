@@ -342,7 +342,7 @@ $("#albumForm").innerHTML = `
   TANJAI.simplifyExpertForms?.();
 
   // Results
-  $("#imageResult").innerHTML = TANJAI.readyOutputShell("image", "Prompt ภาพพร้อมใช้ — V10 Smart Image", "สร้าง Prompt ภาพพร้อมนำไปใช้กับ ทันใจ GPT, Canva หรือเครื่องมือสร้างภาพอื่น โดย AI เติมมุมสร้างสรรค์ได้แต่ไม่เดาข้อมูลจริง", "imageOut");
+  $("#imageResult").innerHTML = TANJAI.readyOutputShell("image", "Prompt ภาพพร้อมใช้ — ผู้กำกับภาพอัจฉริยะ", "สร้าง Prompt ภาพพร้อมนำไปใช้กับ ทันใจ GPT, Canva หรือเครื่องมือสร้างภาพอื่น โดย AI เติมมุมสร้างสรรค์ได้แต่ไม่เดาข้อมูลจริง", "imageOut");
 $("#albumResult").innerHTML = TANJAI.readyOutputShell("album", "ชุดภาพพร้อมโพสต์", "ปรับภาพจริง ใส่กรอบ และดาวน์โหลดเป็นภาพพร้อมลง Facebook", "albumOut");
 $("#postResult").innerHTML = TANJAI.readyOutputShell("post", "ผู้ช่วยเขียนงานประชาสัมพันธ์", "เลือกประเภทงาน วางข้อมูลจริง แล้วระบบจะสร้างฉบับพร้อมใช้และแยกจุดที่ต้องตรวจสอบ", "postOut") + `
   <section class="post-revision-tools" id="postRevisionTools" hidden>
@@ -352,6 +352,8 @@ $("#postResult").innerHTML = TANJAI.readyOutputShell("post", "ผู้ช่ว
       <button class="btn secondary" type="button" data-post-revise="formal">ทางการขึ้น</button>
       <button class="btn secondary" type="button" data-post-revise="natural">เป็นธรรมชาติขึ้น</button>
       <button class="btn secondary" type="button" data-post-revise="hook">เขียนหัวเปิดใหม่</button>
+      <button class="btn secondary" type="button" data-post-revise="expand">เพิ่มรายละเอียด</button>
+      <button class="btn secondary" type="button" data-post-revise="variant">สร้างอีกฉบับ</button>
       <button class="btn secondary" type="button" data-post-revise="proofread">ตรวจภาษาและชื่อเฉพาะ</button>
     </div>
   </section>`;
@@ -472,7 +474,7 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "สคริปต์�
       return;
     }
     TANJAI.setReadyOutput("image", {
-      title:"Prompt ภาพพร้อมใช้ — V10 Smart Image",
+      title:"Prompt ภาพพร้อมใช้ — ผู้กำกับภาพอัจฉริยะ",
       desc:"คัดลอก Prompt ไปใช้กับ ทันใจ GPT, Canva หรือเครื่องมือสร้างภาพอื่น หากมีไฟล์จริง ให้แนบไฟล์จริงซ้ำก่อนวาง Prompt",
       main:executeText,
       advancedTitle1:"Prompt มืออาชีพสำหรับตรวจและปรับต่อ",
@@ -1461,6 +1463,8 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "สคริปต์�
         formal:"ปรับเป็นภาษาทางการที่อ่านลื่น",
         natural:"ปรับให้เป็นธรรมชาติ ลดภาษาราชการที่ไม่จำเป็น",
         hook:"เขียนหัวเปิดใหม่ให้น่าสนใจ โดยไม่กล่าวเกินจริง",
+        expand:"เพิ่มรายละเอียดและประโยชน์ทั่วไปที่ปลอดภัย โดยไม่สร้างข้อเท็จจริงใหม่",
+        variant:"เขียนอีกฉบับด้วยมุมเล่าและโครงประโยคใหม่ แต่ใช้ข้อเท็จจริงชุดเดิม",
         proofread:"ตรวจคำสะกด การตัดคำ ชื่อเฉพาะ และความสอดคล้องของข้อมูล"
       };
       const originalData=TANJAI.state.lastPostData || TANJAI.commonData("post");
@@ -1486,12 +1490,50 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "สคริปต์�
       TANJAI.toast("ปรับงานเขียนให้แล้ว");
     });
   });
+  const specialistRevisionLabels={
+    shorter:"ทำให้กระชับขึ้นตามรูปแบบงาน โดยไม่ตัดข้อมูลจริงที่จำเป็น",
+    formal:"ปรับให้เป็นทางการและน่าเชื่อถือขึ้น โดยยังเป็นภาษาธรรมชาติ",
+    natural:"ปรับให้อ่านหรือฟังเป็นธรรมชาติ ลดภาษาสำเร็จรูป",
+    hook:"ออกแบบการเปิดเรื่องและลำดับการนำเสนอใหม่ให้น่าสนใจ โดยไม่กล่าวเกินจริง",
+    proofread:"ตรวจภาษา ชื่อเฉพาะ ลำดับ ข้อมูลซ้ำ และความสอดคล้อง โดยห้ามเปลี่ยนข้อเท็จจริง"
+  };
+  document.querySelectorAll("[data-specialist-revise]").forEach(button => {
+    button.addEventListener("click", async () => {
+      const tool=button.dataset.specialistTool;
+      const revision=button.dataset.specialistRevise;
+      const current=$(`#${tool}Out`)?.textContent?.trim() || "";
+      const saved=TANJAI.state.specialistJobs?.[tool];
+      if(!current || !saved){TANJAI.toast("สร้างผลงานก่อน แล้วจึงให้ผู้เชี่ยวชาญปรับต่อได้");return;}
+      const aiResult=await TANJAI.generateWritingWithAI({
+        tool,
+        data:{...saved.data, originalText:current},
+        options:{...saved.options, revision:specialistRevisionLabels[revision], preserveFacts:true},
+        fallback:()=>TANJAI.freeWritingTeam.reviseWriting(current, revision),
+        button
+      });
+      TANJAI.setReadyOutput(tool,{
+        title:saved.title,
+        desc:`ผู้เชี่ยวชาญปรับงานแล้ว: ${specialistRevisionLabels[revision]}`,
+        main:aiResult.text,
+        advancedTitle1:"ตรวจข้อเท็จจริงก่อนใช้งาน",
+        advanced1:TANJAI.freeWritingTeam.factGuard(saved.data),
+        advancedTitle2:"ต้นฉบับก่อนปรับ",
+        advanced2:current
+      });
+      TANJAI.toast("ผู้เชี่ยวชาญปรับผลงานให้แล้ว");
+    });
+  });
+  TANJAI.rememberSpecialistJob=function(tool,data,options,title){
+    TANJAI.state.specialistJobs=TANJAI.state.specialistJobs || {};
+    TANJAI.state.specialistJobs[tool]={data:{...data},options:{...options},title};
+  };
   $("#makeMC").onclick = async () => {
     const d=TANJAI.commonData("mc");
     const team=TANJAI.freeWritingTeam;
+    const options={channel:$("#mc-channel")?.value, length:$("#mc-length")?.value, style:$("#mc-style")?.value, extra:$("#mc-extra")?.value};
     const aiResult=await TANJAI.generateWritingWithAI({
       tool:"mc", data:d,
-      options:{channel:$("#mc-channel")?.value, length:$("#mc-length")?.value, style:$("#mc-style")?.value, extra:$("#mc-extra")?.value},
+      options,
       fallback:()=>team.mcWriter(d), button:$("#makeMC")
     });
     const executeOut=aiResult.text;
@@ -1505,6 +1547,7 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "สคริปต์�
       advanced2:`หัวข้องาน: ${d.title || "[เติมหัวข้องาน]"}\nลำดับพิธีจริง: ${d.expertAgenda || "[เติมลำดับพิธีจริง]"}\nชื่อและตำแหน่ง: ${d.people || "[เติมชื่อและตำแหน่ง]"}\nคำอ่านชื่อเฉพาะ: ${d.expertPronunciation || "[เติมคำอ่านชื่อเฉพาะ]"}`
     });
     TANJAI.state.lastMC=executeOut;
+    TANJAI.rememberSpecialistJob("mc",d,options,"สคริปต์พิธีกรพร้อมใช้ — ผู้เชี่ยวชาญงานเวที");
     TANJAI.toast("สร้างสคริปต์พิธีกรพร้อมใช้แล้ว");
     window.TANJAI_AUTH?.trackUsage("mc");
   };
@@ -1536,6 +1579,7 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "สคริปต์�
       advanced2:TANJAI.executionPrompt("video", d, {length, format, channel, aspectRatio, videoStyle, outputPack, voiceMode, destination})
     });
     TANJAI.state.lastVideo=executeOut;
+    TANJAI.rememberSpecialistJob("video",d,{length,format,channel,aspectRatio,videoStyle,outputPack,voiceMode,destination},"Video Production Pack — ผู้กำกับวิดีโอ");
     TANJAI.toast("สร้าง Video Production Pack พร้อมผลิตแล้ว");
     window.TANJAI_AUTH?.trackUsage("video");
   };
@@ -1544,9 +1588,10 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "สคริปต์�
     const length=$("#voice-length").value;
     const style=$("#voice-style").value;
     const team=TANJAI.freeWritingTeam;
+    const options={length, style, channel:$("#voice-channel")?.value};
     const aiResult=await TANJAI.generateWritingWithAI({
       tool:"voice", data:d,
-      options:{length, style, channel:$("#voice-channel")?.value},
+      options,
       fallback:()=>team.voiceWriter(d, length, style), button:$("#makeVoice")
     });
     const executeOut=aiResult.text;
@@ -1560,6 +1605,7 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "สคริปต์�
       advanced2:TANJAI.executionPrompt("voice", d, {length, style})
     });
     TANJAI.state.lastVoice=executeOut;
+    TANJAI.rememberSpecialistJob("voice",d,options,"สคริปต์เสียงพร้อมอ่าน — ผู้กำกับเสียง");
     TANJAI.toast("สร้างสคริปต์เสียงพร้อมอ่านแล้ว");
     window.TANJAI_AUTH?.trackUsage("voice");
   };
@@ -1567,9 +1613,10 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "สคริปต์�
     const d=TANJAI.commonData("deck");
     const count=Number($("#deck-count").value);
     const team=TANJAI.freeWritingTeam;
+    const options={count, format:$("#deck-format")?.value};
     const aiResult=await TANJAI.generateWritingWithAI({
       tool:"deck", data:d,
-      options:{count, format:$("#deck-format")?.value},
+      options,
       fallback:()=>team.slideWriter(d, count), button:$("#makeDeck")
     });
     const executeOut=aiResult.text;
@@ -1583,13 +1630,16 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "สคริปต์�
       advanced2:TANJAI.executionPrompt("deck", d, {count})
     });
     TANJAI.state.lastDeck=executeOut;
+    TANJAI.rememberSpecialistJob("deck",d,options,"เนื้อหาสไลด์พร้อมใช้ — นักวางโครงนำเสนอ");
     TANJAI.toast("สร้างเนื้อหาสไลด์พร้อมใช้แล้ว");
     window.TANJAI_AUTH?.trackUsage("deck");
   };
-  $("#makeKit").onclick = () => {
+  $("#makeKit").onclick = async () => {
     const d=TANJAI.commonData("kit");
     const team=TANJAI.freeWritingTeam;
-    const out = team.kitProducer ? team.kitProducer(d) : TANJAI.promptPack(d);
+    const options={mode:"Integrated Specialist Campaign", channel:"ใช้หลายช่องทาง"};
+    const aiResult=await TANJAI.generateWritingWithAI({tool:"kit",data:d,options,fallback:()=>team.kitProducer ? team.kitProducer(d) : TANJAI.promptPack(d),button:$("#makeKit")});
+    const out = aiResult.text;
     const discussOut = TANJAI.discussPrompt("kit", d);
     const advancedOut = `Campaign Director Handoff Note
 
@@ -1614,6 +1664,7 @@ ${TANJAI.outputDeliveryGuard("ชุดไฟล์สื่อ")}`;
 ${advancedOut}`
     });
     TANJAI.state.lastKit=out;
+    TANJAI.rememberSpecialistJob("kit",d,options,"ชุดสื่อพร้อมใช้ — ผู้อำนวยการสื่อสาร");
     TANJAI.toast("สร้างชุดสื่อด้วย Specialist Output Engine แล้ว");
     window.TANJAI_AUTH?.trackUsage("kit");
   };

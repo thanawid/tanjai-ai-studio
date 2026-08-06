@@ -291,6 +291,19 @@ TANJAI.outputEditor = function(tool, bodyId){
     </div>`;
 };
 
+TANJAI.specialistRevisionTools = function(tool){
+  const maps = {
+    mc:[["shorter","ทำบัตรถืออ่าน"],["natural","ภาษาพูดลื่นขึ้น"],["formal","เป็นพิธีการขึ้น"],["proofread","ตรวจชื่อและลำดับ"]],
+    video:[["shorter","ลดฉากให้กระชับ"],["hook","เปลี่ยน Hook"],["natural","บทพากย์ธรรมชาติขึ้น"],["proofread","ตรวจความต่อเนื่อง"]],
+    voice:[["shorter","ย่อให้ตรงเวลา"],["natural","อ่านเป็นธรรมชาติขึ้น"],["formal","ทางการขึ้น"],["proofread","ตรวจคำอ่าน"]],
+    deck:[["shorter","ลดข้อความบนสไลด์"],["hook","ปรับเส้นเรื่องใหม่"],["formal","ภาษาผู้บริหาร"],["proofread","ตรวจความสอดคล้อง"]],
+    kit:[["shorter","ย่อชุดสื่อ"],["natural","เข้าถึงง่ายขึ้น"],["formal","ทางการขึ้น"],["proofread","ตรวจสารทุกช่องทาง"]]
+  };
+  const items = maps[tool];
+  if(!items) return "";
+  return `<section class="specialist-revision-tools" id="${tool}RevisionTools" hidden><div><b>ให้ผู้เชี่ยวชาญปรับงานต่อ</b><span>แก้จากฉบับนี้โดยรักษาข้อมูลจริง</span></div><div class="specialist-revision-buttons">${items.map(([key,label])=>`<button class="btn secondary" type="button" data-specialist-revise="${key}" data-specialist-tool="${tool}">${label}</button>`).join("")}</div></section>`;
+};
+
 TANJAI.readyOutputShell = function(tool, recommended, desc, bodyId){
   const destinations = TANJAI.getToolDestinations(tool).map(item => `<button class="btn ghost" data-open="${item.url}">${item.label}</button>`).join("");
   return `
@@ -305,6 +318,7 @@ TANJAI.readyOutputShell = function(tool, recommended, desc, bodyId){
       </div>
     </div>
     ${TANJAI.outputEditor(tool, bodyId)}
+    ${TANJAI.specialistRevisionTools(tool)}
     <details class="advanced-output-wrap" id="${tool}AdvancedWrap">
       <summary>ดูรายละเอียดเพิ่มเติม</summary>
       <div class="advanced-output-grid">
@@ -362,6 +376,10 @@ TANJAI.setReadyOutput = function(tool, options={}){
       el.classList.toggle("stable-empty", !has);
     }
   });
+  const revisionTools = TANJAI.$(`#${tool}RevisionTools`);
+  if(revisionTools) revisionTools.hidden = !(options.main && String(options.main).trim());
+  const view = mainEl?.closest?.(".view");
+  if(view && options.main && String(options.main).trim()) view.classList.add("has-output");
 };
 
 TANJAI.extractMarkedBlock = function(text, marker){

@@ -67,6 +67,14 @@ const missing = team.factGuard({});
 assert.match(missing, /หัวข้องาน/);
 assert.match(missing, /รายละเอียดเนื้อหา/);
 
+const shortHealthBrief=team.prWriter({
+  title:"รณรงค์ป้องกันยุงลาย",
+  orgName:"หน่วยงานตัวอย่าง",
+  detail:"ลงพื้นที่รณรงค์ป้องกันยุงลาย"
+},{channel:"โพสต์ Facebook พร้อมเผยแพร่"});
+assert.match(shortHealthBrief,/แหล่งน้ำขัง/);
+assert.match(shortHealthBrief,/ทุกครัวเรือน/);
+
 const root = path.resolve(__dirname, "..");
 const app = fs.readFileSync(path.join(root, "js", "app.js"), "utf8");
 const ui = fs.readFileSync(path.join(root, "js", "ui.js"), "utf8");
@@ -74,12 +82,14 @@ const aiConfig = fs.readFileSync(path.join(root, "js", "ai-config.js"), "utf8");
 const index = fs.readFileSync(path.join(root, "index.html"), "utf8");
 const css = fs.readFileSync(path.join(root, "css", "style.css"), "utf8");
 assert.match(index, /js\/free-writing-team\.js/);
-assert.match(index, /V12\.4\.0/);
-assert.match(app, /V10 Smart Image/);
+assert.match(index, /V12\.5\.0/);
+assert.match(app, /ผู้กำกับภาพอัจฉริยะ/);
 assert.match(app, /generateCurrentImage/);
 assert.match(app, /generateImageWithAI/);
 assert.match(app, /team\.prWriter\(d, options\)/);
 assert.match(app, /data-post-revise="proofread"/);
+assert.match(app, /data-post-revise="expand"/);
+assert.match(app, /data-specialist-revise/);
 assert.match(app, /team\.mcWriter\(d\)/);
 assert.match(app, /team\.videoWriter\(d, length\)/);
 assert.match(app, /videoVoiceModes/);
@@ -111,5 +121,8 @@ assert.match(css, /data-primary-actions="video"/);
 assert.match(css, /grid-template-columns:1fr 1fr/);
 assert.match(css, /generated-image-card-v10/);
 assert.match(css, /#post \.post-writer-modes/);
+assert.match(css, /view\.active:not\(\.has-output\)/);
+assert.match(css, /position:static;bottom:auto/);
+assert.doesNotMatch(app, /V10 Smart Image/);
 
 console.log(JSON.stringify({roles:6, directOutputs:true, smartImage:true, factGuard:true, status:"PASS"}, null, 2));

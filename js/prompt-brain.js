@@ -233,12 +233,12 @@ window.TANJAI = window.TANJAI || {};
 
   T.promptBrainReport = function(d = {}, tool = "image"){
     const a = T.promptBrainAnalyze(d, tool);
-    return `Prompt Brain Engine v9.1.4\n\nสถานะบรีฟ: ${a.readiness}\nคะแนนความพร้อม: ${a.score}/100\nประเภทงานที่ระบบอ่านได้: ${a.label}\n\nข้อมูลจริงที่พบ:\n${bullet(a.facts, "- ยังมีข้อมูลจริงน้อยมาก")}\n\nข้อมูลที่ยังไม่ระบุและห้ามแต่งเอง:\n${bullet(a.missing, "- ไม่พบข้อมูลจำเป็นที่ขาดชัดเจน")}\n\nสิ่งที่ระบบคิดต่อได้อย่างปลอดภัย:\n${bullet(a.assumptions, "- เลือกเฉพาะโทนและการจัดวางให้เหมาะสม")}\n\nCreative Direction:\n- Style: ${a.design.style}\n- Color: ${a.design.color}\n- Layout: ${a.design.layout}\n- Mood: ${a.design.mood}\n- Visual: ${a.design.visual}\n\nลำดับความสำคัญบนงาน:\n${bullet(a.design.hierarchy)}\n\nข้อความบนภาพ / ข้อความหลักที่แนะนำ:\n${bullet(a.textOnImage)}\n\nข้อเท็จจริงที่ห้ามแต่งเพิ่ม:\n${bullet(a.forbidden)}`;
+    return `ระบบวิเคราะห์บรีฟเฉพาะทาง\n\nสถานะบรีฟ: ${a.readiness}\nคะแนนความพร้อม: ${a.score}/100\nประเภทงานที่ระบบอ่านได้: ${a.label}\n\nข้อมูลจริงที่พบ:\n${bullet(a.facts, "- ยังมีข้อมูลจริงน้อยมาก")}\n\nข้อมูลที่ยังไม่ระบุและห้ามแต่งเอง:\n${bullet(a.missing, "- ไม่พบข้อมูลจำเป็นที่ขาดชัดเจน")}\n\nสิ่งที่ระบบคิดต่อได้อย่างปลอดภัย:\n${bullet(a.assumptions, "- เลือกเฉพาะโทนและการจัดวางให้เหมาะสม")}\n\nCreative Direction:\n- Style: ${a.design.style}\n- Color: ${a.design.color}\n- Layout: ${a.design.layout}\n- Mood: ${a.design.mood}\n- Visual: ${a.design.visual}\n\nลำดับความสำคัญบนงาน:\n${bullet(a.design.hierarchy)}\n\nข้อความบนภาพ / ข้อความหลักที่แนะนำ:\n${bullet(a.textOnImage)}\n\nข้อเท็จจริงที่ห้ามแต่งเพิ่ม:\n${bullet(a.forbidden)}`;
   };
 
   T.brainBriefBlock = function(d = {}, tool = "image"){
     const a = T.promptBrainAnalyze(d, tool);
-    return `[Prompt Brain Engine v9.1.4]\n- ประเภทงานที่วิเคราะห์ได้: ${a.label}\n- สถานะบรีฟ: ${a.readiness}\n- คะแนนความพร้อม: ${a.score}/100\n\nข้อมูลจริงที่ให้มา:\n${bullet(a.facts, "- จากข้อมูลเบื้องต้น: ยังมีข้อมูลจริงไม่มาก")}\n\nข้อมูลที่ยังไม่ระบุ ห้ามแต่งเอง:\n${bullet(a.missing, "- ไม่มีข้อมูลจำเป็นที่ขาดชัดเจน")}\n\nสิ่งที่ AI คิดต่อได้อย่างปลอดภัย:\n${bullet(a.assumptions, "- คิดเฉพาะโทน สี Layout และการจัดวางให้เหมาะสม")}\n\nทิศทางออกแบบ / การสื่อสาร:\n- Style: ${a.design.style}\n- Color Tone: ${a.design.color}\n- Layout: ${a.design.layout}\n- Mood: ${a.design.mood}\n- Visual Guide: ${a.design.visual}`;
+    return `[ระบบวิเคราะห์บรีฟเฉพาะทาง]\n- ประเภทงานที่วิเคราะห์ได้: ${a.label}\n- สถานะบรีฟ: ${a.readiness}\n- คะแนนความพร้อม: ${a.score}/100\n\nข้อมูลจริงที่ให้มา:\n${bullet(a.facts, "- จากข้อมูลเบื้องต้น: ยังมีข้อมูลจริงไม่มาก")}\n\nข้อมูลที่ยังไม่ระบุ ห้ามแต่งเอง:\n${bullet(a.missing, "- ไม่มีข้อมูลจำเป็นที่ขาดชัดเจน")}\n\nสิ่งที่ AI คิดต่อได้อย่างปลอดภัย:\n${bullet(a.assumptions, "- คิดเฉพาะโทน สี Layout และการจัดวางให้เหมาะสม")}\n\nทิศทางออกแบบ / การสื่อสาร:\n- Style: ${a.design.style}\n- Color Tone: ${a.design.color}\n- Layout: ${a.design.layout}\n- Mood: ${a.design.mood}\n- Visual Guide: ${a.design.visual}`;
   };
 
   T.brainExecutionHeader = function(taskName){
@@ -319,7 +319,7 @@ window.TANJAI = window.TANJAI || {};
   };
 
   T.promptPack = function(d = {}){
-    return `Universal Execution Prompt Pack — Prompt Brain Engine v9.1.4\n\n${T.promptBrainReport(d, "kit")}\n\n========== 1) PROMPT ภาพ ==========${"\n"}${T.imagePrompt(d)}\n\n========== 2) PROMPT โพสต์ ==========${"\n"}${T.postPrompt(d)}\n\n========== 3) PROMPT วิดีโอ ==========${"\n"}${T.videoPrompt(d, {length: d.length || "60 วินาที"})}\n\n========== 4) PROMPT เสียงพากย์ ==========${"\n"}${T.voicePrompt(d, {length: d.length || "60 วินาที", style: d.tone || "ทางการ สุภาพ"})}\n\n========== 5) PROMPT สไลด์ ==========${"\n"}${T.deckPrompt(d, {count: 8})}`;
+    return `Universal Execution Prompt Pack — ระบบวิเคราะห์บรีฟเฉพาะทาง\n\n${T.promptBrainReport(d, "kit")}\n\n========== 1) PROMPT ภาพ ==========${"\n"}${T.imagePrompt(d)}\n\n========== 2) PROMPT โพสต์ ==========${"\n"}${T.postPrompt(d)}\n\n========== 3) PROMPT วิดีโอ ==========${"\n"}${T.videoPrompt(d, {length: d.length || "60 วินาที"})}\n\n========== 4) PROMPT เสียงพากย์ ==========${"\n"}${T.voicePrompt(d, {length: d.length || "60 วินาที", style: d.tone || "ทางการ สุภาพ"})}\n\n========== 5) PROMPT สไลด์ ==========${"\n"}${T.deckPrompt(d, {count: 8})}`;
   };
 
   T.discussPrompt = function(type, d = {}){

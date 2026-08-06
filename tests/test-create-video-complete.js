@@ -38,4 +38,4 @@ assert.match(css, /word-break:keep-all/);
 assert.doesNotMatch(app, /#sidebar|#mobileMenu|#sidebarBackdrop/);
 assert.doesNotMatch(app, /downloadJson|prompts\.json/);
 
-console.log(JSON.stringify({ version: "12.4.0", embeddedModule: true, sharedLoginAndShell: true, completeVideoFlow: true, thaiWrapping: true, status: "PASS" }, null, 2));
+console.log(JSON.stringify({ version: "12.5.0", embeddedModule: true, sharedLoginAndShell: true, completeVideoFlow: true, thaiWrapping: true, status: "PASS" }, null, 2));

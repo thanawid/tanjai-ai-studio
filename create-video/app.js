@@ -5,7 +5,7 @@
   const $ = (selector, root = moduleRoot) => root.querySelector(selector);
   const STORAGE_KEY = "tanjai-ai-video-projects-v4";
   const ACTIVE_JOB_KEY = "tanjai-ai-video-active-job";
-  const APP_META = { version: "12.4.0" };
+  const APP_META = { version: "12.5.0" };
   const API_BASE = location.hostname.endsWith("github.io") ? "https://tanjai-video-studio.onrender.com" : "";
   const steps = ["ข้อมูลงาน", "บทและฉาก", "เลือกวิธีสร้าง", "สร้างคลิปต่อ"];
   const state = {

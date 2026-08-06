@@ -5626,3 +5626,32 @@ input:focus,select:focus,textarea:focus{border-color:#a78bfa!important;box-shado
 #post .post-revision-buttons .btn{min-height:36px;padding:7px 11px;font-size:12px}
 @media(max-width:900px){#post .post-writer-modes{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:560px){#post .post-writer-modes{grid-template-columns:1fr}#post .post-revision-tools>div:first-child{align-items:flex-start;flex-direction:column}#post .post-revision-tools span{text-align:left}}
+
+/* Outcome-first tool layout: full form first, split only after a result exists. */
+#image.view.active:not(.has-output) .studio-layout,
+#post.view.active:not(.has-output) .studio-layout,
+#mc.view.active:not(.has-output) .studio-layout,
+#video.view.active:not(.has-output) .studio-layout,
+#voice.view.active:not(.has-output) .studio-layout,
+#deck.view.active:not(.has-output) .studio-layout,
+#kit.view.active:not(.has-output) .studio-layout{grid-template-columns:minmax(0,1fr)}
+#image.view.active:not(.has-output) .result-panel,
+#post.view.active:not(.has-output) .result-panel,
+#mc.view.active:not(.has-output) .result-panel,
+#video.view.active:not(.has-output) .result-panel,
+#voice.view.active:not(.has-output) .result-panel,
+#deck.view.active:not(.has-output) .result-panel,
+#kit.view.active:not(.has-output) .result-panel{display:none}
+.form-panel > div[id$="Form"] > .button-row{position:static;bottom:auto;margin-top:18px}
+.view{scroll-margin-top:108px}
+html{scroll-padding-top:108px}
+.specialist-revision-tools{margin-top:14px;padding:14px;border:1px solid var(--line);border-radius:14px;background:rgba(7,11,23,.35)}
+.specialist-revision-tools>div:first-child{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:10px}
+.specialist-revision-tools span{color:var(--muted);font-size:12px}
+.specialist-revision-buttons{display:flex;flex-wrap:wrap;gap:8px}
+.specialist-revision-buttons .btn{min-height:36px;padding:7px 11px;font-size:12px}
+@media(max-width:720px){
+  .form-panel > div[id$="Form"] > .button-row{position:static;bottom:auto;grid-template-columns:1fr!important}
+  .specialist-revision-tools>div:first-child{align-items:flex-start;flex-direction:column}
+  .specialist-revision-buttons{display:grid;grid-template-columns:1fr 1fr}
+}
