@@ -254,8 +254,8 @@ window.TANJAI = window.TANJAI || {};
         <div class="section-title"><b>🧠</b><h4>Professional Brief-to-Prompt</h4></div>
         <p class="mini-note">ระบบจะวิเคราะห์บรีฟ แยกข้อมูลจริง / ข้อมูลที่ยังไม่ระบุ / สิ่งที่ AI ช่วยคิดได้ แล้วสร้าง Prompt พร้อมใช้จริง</p>
         <div class="form-grid">
-          <label>เป้าหมายผลลัพธ์<input id="${prefix}-brainGoal" placeholder="เช่น อยากให้คนสนใจเข้าร่วม / อ่านแล้วเข้าใจเร็ว / ใช้เป็นภาพทางการ"></label>
-          <label>เน้นเด่นที่สุด<input id="${prefix}-brainFocus" placeholder="เช่น ชื่องาน / วันที่ / สถานที่ / ข้อความเตือน"></label>
+          <label>เป้าหมายผลลัพธ์<input id="${prefix}-brainGoal" placeholder="ระบุหน้าที่หรือผลลัพธ์ที่ต้องการจากชิ้นงาน"></label>
+          <label>เน้นเด่นที่สุด<input id="${prefix}-brainFocus" placeholder="ระบุสารหรือข้อมูลที่ต้องเด่นที่สุด"></label>
           <label class="full">ข้อมูลที่ห้าม AI แต่งเพิ่ม<input id="${prefix}-brainNoInvent" value="วันที่, เวลา, สถานที่, ค่าสมัคร, เบอร์ติดต่อ, QR Code, โลโก้"></label>
           <label class="checkline full"><input id="${prefix}-brainEnabled" type="checkbox" checked> เปิดระบบวิเคราะห์บรีฟแบบมืออาชีพ</label>
         </div>

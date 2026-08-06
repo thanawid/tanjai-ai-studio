@@ -176,18 +176,18 @@ TANJAI.field = function(prefix, data){
     kit:   "(ใช้สร้าง Prompt ครบชุดทุกสื่อ)"
   };
   const titlePlaceholders = {
-    image: "เช่น  ประชาสัมพันธ์ภาษีที่ดินและสิ่งปลูกสร้าง / เชิญร่วมกิจกรรมวันเด็ก 2569 / แจ้งปิดถนนชั่วคราว",
-    post:  "เช่น  สรุปผลการประชุมสภา / ประกาศรับสมัครงาน / แจ้งผลการคัดเลือก",
-    mc:    "เช่น  พิธีเปิดโครงการ... / งานมอบรางวัล... / การประชุมสัมมนา...",
-    video: "เช่น  แนะนำบริการงานทะเบียน / สรุปกิจกรรมวันเด็ก / ขั้นตอนการชำระภาษี",
-    voice: "เช่น  ประชาสัมพันธ์โครงการ... / แจ้งกำหนดชำระภาษี / เชิญร่วมกิจกรรม...",
-    deck:  "เช่น  รายงานผลการดำเนินงานปี 2568 / แผนพัฒนา 5 ปี / สรุปโครงการ...",
-    kit:   "เช่น  งานวันเด็กแห่งชาติ 2569 / โครงการปลูกต้นไม้ / กิจกรรมประจำปี..."
+    image: "ระบุหัวข้อหลักที่ต้องการให้ปรากฏบนภาพ",
+    post:  "ระบุหัวข้อหลักหรือเรื่องที่ต้องการสื่อสาร",
+    mc:    "ระบุชื่องานที่พิธีกรจะใช้อ้างอิง",
+    video: "ระบุชื่อเรื่องหรือหัวข้อหลักของวิดีโอ",
+    voice: "ระบุหัวข้อหลักของข้อความเสียง",
+    deck:  "ระบุชื่อเรื่องของงานนำเสนอ",
+    kit:   "ระบุหัวข้อกลางที่ทุกสื่อต้องสื่อสารตรงกัน"
   };
 
   const titleLabel    = titleLabels[prefix]    || "หัวข้องาน / ชื่อเรื่อง";
   const titleHint     = titleHints[prefix]     || "(จะใช้เป็นหัวข้อหลักใน Prompt)";
-  const titlePh       = titlePlaceholders[prefix] || "เช่น ชื่องาน / ประกาศ / กิจกรรม / แคมเปญ";
+  const titlePh       = titlePlaceholders[prefix] || "ระบุหัวข้อหลักของงาน";
 
   return `
     <div class="form-section">
@@ -200,18 +200,18 @@ TANJAI.field = function(prefix, data){
         </label>
         <label>
           ชื่อหน่วยงาน / องค์กร / แบรนด์
-          <input id="${prefix}-orgName" placeholder="เช่น  เทศบาลเมืองบางรักน้อย / โรงพยาบาล... / ร้าน... / เพจ...">
+          <input id="${prefix}-orgName" placeholder="ระบุชื่อหน่วยงาน องค์กร แบรนด์ หรือเพจ หากต้องการให้แสดง">
         </label>
         <label>กลุ่มเป้าหมาย<select id="${prefix}-audience">${opts(c.audiences)}</select></label>
         <label>โทนภาษา<select id="${prefix}-tone">${opts(c.tones)}</select></label>
         <label class="full">
           รายละเอียดงาน
           <small class="field-hint">(ใส่ข้อมูลจริงเท่าที่มี — ระบบจะไม่แต่งข้อมูลเพิ่มเอง)</small>
-          <textarea id="${prefix}-detail" placeholder="เช่น  ใคร ทำอะไร ที่ไหน เมื่อไหร่ มีวัตถุประสงค์อะไร / ข้อความที่ต้องการสื่อ / ขั้นตอน / ช่องทางติดต่อ"></textarea>
+          <textarea id="${prefix}-detail" placeholder="วางข้อมูลจริงทั้งหมดที่ต้องการให้ระบบนำไปใช้"></textarea>
         </label>
-        <label>วัน / เวลา<input id="${prefix}-dateTime" placeholder="เช่น  30 มิถุนายน 2569 / ทุกวันจันทร์–ศุกร์ 08.30–16.30 น."></label>
-        <label>สถานที่<input id="${prefix}-place" placeholder="เช่น  ห้องประชุมสำนักงานเทศบาล / ออนไลน์ผ่าน Zoom"></label>
-        <label class="full">บุคคล / หน่วยงานที่เกี่ยวข้อง<input id="${prefix}-people" placeholder="เช่น  นายกเทศมนตรี / คณะกรรมการ / วิทยากร / ผู้ประสานงาน (ถ้ามี)"></label>
+        <label>วัน / เวลา<input id="${prefix}-dateTime" placeholder="ระบุวันและเวลาตามข้อมูลจริง หากมี"></label>
+        <label>สถานที่<input id="${prefix}-place" placeholder="ระบุสถานที่หรือช่องทางจัดงาน หากมี"></label>
+        <label class="full">บุคคล / หน่วยงานที่เกี่ยวข้อง<input id="${prefix}-people" placeholder="ระบุชื่อ บุคคล ตำแหน่ง หรือหน่วยงานที่เกี่ยวข้อง หากมี"></label>
       </div>
     </div>`;
 };

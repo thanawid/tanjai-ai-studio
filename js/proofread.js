@@ -191,7 +191,7 @@
         </div>
         <p class="proofread-help">ระบบจะแก้เฉพาะคำที่มั่นใจ ส่วนชื่อหน่วยงาน ชื่อคน ชื่อสถานที่ หรือชื่อโครงการ ให้เพิ่มไว้ใน “คำสำคัญของลูกค้า” เพื่อไม่ให้ระบบแก้อัตโนมัติ</p>
         <label class="proofread-label">คำสำคัญของลูกค้า / องค์กร <span>ใส่คำละ 1 บรรทัด</span>
-          <textarea id="protectedWordsInput" data-proofread-skip="1" rows="7" placeholder="เช่น&#10;ชื่อหน่วยงาน&#10;ชื่อผู้บริหาร&#10;ชื่อโครงการ&#10;ชื่อสถานที่"></textarea>
+          <textarea id="protectedWordsInput" data-proofread-skip="1" rows="7" placeholder="พิมพ์คำหรือชื่อเฉพาะที่ห้ามระบบแก้ไข แยกบรรทัดละหนึ่งรายการ"></textarea>
         </label>
         <div class="proofread-actions">
           <button type="button" class="btn primary" id="proofreadRun">ตรวจคำผิดหน้านี้</button>

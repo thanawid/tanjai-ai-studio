@@ -989,7 +989,7 @@ ${bullet(reviewLenses[tool] || ["ความชัดเจน", "ความ�
       <div class="form-section expert-menu-section" data-expert-menu="post">
         <div class="section-title"><b>✍️</b><h4>คำถามเฉพาะงานเขียน</h4></div>
         <div class="form-grid">
-          <label>อ่านจบแล้วอยากให้คนทำอะไร<input id="post-expertAction" placeholder="เช่น รับทราบ / สมัคร / เข้าร่วม / ติดต่อ / แชร์ต่อ"></label>
+          <label>อ่านจบแล้วอยากให้คนทำอะไร<input id="post-expertAction" placeholder="ระบุการกระทำที่ต้องการหลังอ่านจบ"></label>
           <label>หนึ่งประโยคที่คนต้องจำ<input id="post-expertKeyMessage" placeholder="สารหลักที่ห้ามหลุดประเด็น"></label>
         </div>
       </div>`,
@@ -998,7 +998,7 @@ ${bullet(reviewLenses[tool] || ["ความชัดเจน", "ความ�
         <div class="section-title"><b>🎤</b><h4>คำถามเฉพาะงานเวที</h4></div>
         <div class="form-grid">
           <label class="full">ลำดับพิธีจริง<textarea id="mc-expertAgenda" placeholder="เรียงช่วงตามกำหนดการจริง ห้ามให้ AI สลับเอง"></textarea></label>
-          <label>คำเรียกผู้ร่วมงาน<input id="mc-expertAddress" placeholder="เช่น ท่านประธาน แขกผู้มีเกียรติ ผู้เข้าร่วมอบรม"></label>
+          <label>คำเรียกผู้ร่วมงาน<input id="mc-expertAddress" placeholder="ระบุคำเรียกผู้ร่วมงานตามพิธีจริง"></label>
           <label>คำอ่านชื่อเฉพาะ<input id="mc-expertPronunciation" placeholder="ชื่อ — คำอ่าน (ถ้ามี)"></label>
         </div>
       </div>`,
@@ -1007,16 +1007,16 @@ ${bullet(reviewLenses[tool] || ["ความชัดเจน", "ความ�
         <div class="section-title"><b>🎬</b><h4>คำถามเฉพาะงานวิดีโอ</h4></div>
         <div class="form-grid">
           <label>CTA ตอนจบ<input id="video-expertCTA" placeholder="อยากให้คนดูทำอะไรต่อ"></label>
-          <label>จังหวะคลิป<input id="video-expertPace" placeholder="เช่น เร็ว กระชับ / อบอุ่น / สารคดีสั้น"></label>
-          <label class="full">ภาพหรือวัตถุดิบที่มี<textarea id="video-expertAssets" placeholder="เช่น ภาพลงพื้นที่ 12 คลิป, ภาพโดรน, บทสัมภาษณ์, โลโก้จริง"></textarea></label>
+          <label>จังหวะคลิป<input id="video-expertPace" placeholder="อธิบายความเร็ว อารมณ์ และจังหวะของคลิป"></label>
+          <label class="full">ภาพหรือวัตถุดิบที่มี<textarea id="video-expertAssets" placeholder="ระบุภาพ คลิป เสียงสัมภาษณ์ หรือโลโก้จริงที่มี"></textarea></label>
         </div>
       </div>`,
     voice: `
       <div class="form-section expert-menu-section" data-expert-menu="voice">
         <div class="section-title"><b>🎙️</b><h4>คำถามเฉพาะงานเสียง</h4></div>
         <div class="form-grid">
-          <label>อารมณ์การส่งเสียง<input id="voice-expertDelivery" placeholder="เช่น อบอุ่น จริงใจ / เร่งด่วนแต่ไม่กดดัน"></label>
-          <label>ความเร็วและจังหวะ<input id="voice-expertPace" placeholder="เช่น ช้า ชัด / ธรรมชาติ / กระชับ"></label>
+          <label>อารมณ์การส่งเสียง<input id="voice-expertDelivery" placeholder="อธิบายอารมณ์และน้ำเสียงที่ต้องการ"></label>
+          <label>ความเร็วและจังหวะ<input id="voice-expertPace" placeholder="อธิบายความเร็วและจังหวะการอ่าน"></label>
           <label class="full">คำอ่านชื่อเฉพาะ<input id="voice-expertPronunciation" placeholder="ชื่อ — คำอ่าน (ถ้ามี)"></label>
         </div>
       </div>`,
@@ -1024,8 +1024,8 @@ ${bullet(reviewLenses[tool] || ["ความชัดเจน", "ความ�
       <div class="form-section expert-menu-section" data-expert-menu="deck">
         <div class="section-title"><b>📊</b><h4>คำถามเฉพาะงานนำเสนอ</h4></div>
         <div class="form-grid">
-          <label>ต้องการให้ผู้ฟังตัดสินใจอะไร<input id="deck-expertGoal" placeholder="เช่น อนุมัติโครงการ / รับทราบผล / เห็นชอบแผน"></label>
-          <label>ทิศทางภาพ<input id="deck-expertVisual" placeholder="เช่น Executive clean / ภาพจริง / data-driven"></label>
+          <label>ต้องการให้ผู้ฟังตัดสินใจอะไร<input id="deck-expertGoal" placeholder="ระบุสิ่งที่ต้องการให้ผู้ฟังตัดสินใจ"></label>
+          <label>ทิศทางภาพ<input id="deck-expertVisual" placeholder="อธิบายทิศทางภาพและระดับความเป็นทางการ"></label>
           <label class="full">ข้อมูล ตัวเลข หรือหลักฐานที่มี<textarea id="deck-expertEvidence" placeholder="ระบุเฉพาะข้อมูลจริง ถ้าไม่มีให้เว้นว่าง"></textarea></label>
         </div>
       </div>`,
@@ -1035,7 +1035,7 @@ ${bullet(reviewLenses[tool] || ["ความชัดเจน", "ความ�
         <div class="form-grid">
           <label>Core Message<input id="kit-expertCoreMessage" placeholder="หนึ่งประโยคที่ทุกสื่อต้องพูดตรงกัน"></label>
           <label>Campaign CTA<input id="kit-expertCTA" placeholder="การกระทำถัดไปที่ต้องการ"></label>
-          <label class="full">Campaign Tone<input id="kit-expertCampaignTone" placeholder="เช่น ทางการแต่เข้าถึงง่าย / อบอุ่น จริงใจ / พรีเมียม"></label>
+          <label class="full">Campaign Tone<input id="kit-expertCampaignTone" placeholder="อธิบายน้ำเสียงกลางที่ทุกสื่อต้องใช้ร่วมกัน"></label>
         </div>
       </div>`
   };
@@ -1066,10 +1066,10 @@ ${bullet(reviewLenses[tool] || ["ความชัดเจน", "ความ�
       <label class="full">ลำดับพิธีจริง<textarea id="mc-expertAgenda" placeholder="เรียงช่วงตามกำหนดการจริง"></textarea></label>`,
     video:`
       <label>CTA ตอนจบ<input id="video-expertCTA" placeholder="อยากให้คนดูทำอะไรต่อ"></label>
-      <label class="full">ภาพหรือวัตถุดิบที่มี<textarea id="video-expertAssets" placeholder="เช่น ภาพลงพื้นที่ คลิปสัมภาษณ์ โลโก้จริง"></textarea></label>
+      <label class="full">ภาพหรือวัตถุดิบที่มี<textarea id="video-expertAssets" placeholder="ระบุภาพ คลิป เสียงสัมภาษณ์ หรือโลโก้จริงที่มี"></textarea></label>
       <label class="full">เนื้อเพลง / บทพูด / ข้อความอ้างอิง<textarea id="video-expertLyrics" placeholder="ใช้กับ MV, Lyric Video, นิทาน, หนังสั้น หรือสคริปต์ที่มีข้อความเฉพาะ"></textarea></label>`,
     voice:`
-      <label>อารมณ์การส่งเสียง<input id="voice-expertDelivery" placeholder="เช่น อบอุ่น จริงใจ / เร่งด่วนแต่ชัดเจน"></label>`,
+      <label>อารมณ์การส่งเสียง<input id="voice-expertDelivery" placeholder="อธิบายอารมณ์และน้ำเสียงที่ต้องการ"></label>`,
     deck:`
       <label>ต้องการให้ผู้ฟังตัดสินใจอะไร<input id="deck-expertGoal" placeholder="อนุมัติ / รับทราบ / เห็นชอบ"></label>
       <label class="full">ข้อมูล ตัวเลข หรือหลักฐานที่มี<textarea id="deck-expertEvidence" placeholder="ระบุเฉพาะข้อมูลจริง"></textarea></label>`,

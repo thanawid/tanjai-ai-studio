@@ -1,4 +1,4 @@
-/* Tanjai AI Studio V12.3.0 — embedded video creator; intentionally scoped. */
+/* Tanjai AI Studio V12.4.0 — embedded video creator; intentionally scoped. */
 .create-video-module{--video-panel:#101728;--video-panel2:#151d30;--video-line:#2a344d;--video-muted:#9ba5ba;--video-purple:#7558f6;--video-pink:#df3cae;--video-green:#52ddb0;--video-gold:#ffb84c}
 .create-video-module *{box-sizing:border-box}
 .video-workspace{margin:0 0 28px;border:1px solid var(--video-line);border-radius:24px;background:rgba(15,22,39,.97);box-shadow:0 24px 70px rgba(0,0,0,.28);overflow:hidden}

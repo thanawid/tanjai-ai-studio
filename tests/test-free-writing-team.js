@@ -30,6 +30,15 @@ const outputs = {
   guard: team.factGuard(data)
 };
 
+const prModes = {
+  video: team.prWriter(data, {channel:"สคริปต์วิดีโอประชาสัมพันธ์", length:"30 วินาที"}),
+  voice: team.prWriter(data, {channel:"บทพากย์และข้อความสำหรับทำเสียง", length:"30 วินาที"}),
+  facebook: team.prWriter(data, {channel:"โพสต์ Facebook พร้อมเผยแพร่"}),
+  news: team.prWriter(data, {channel:"ข่าวประชาสัมพันธ์"}),
+  clip: team.prWriter(data, {channel:"แคปชั่น YouTube Reels TikTok"}),
+  complete: team.prWriter(data, {channel:"สร้างครบชุดจากข้อมูลเดียว", length:"30 วินาที"})
+};
+
 assert.match(outputs.caption, /โพสต์พร้อมเผยแพร่|โพสต์ Facebook พร้อมใช้/);
 assert.match(outputs.article, /บทความ \/ ข่าวประชาสัมพันธ์พร้อมใช้|ข่าวประชาสัมพันธ์พร้อมใช้|ข่าวประชาสัมพันธ์พร้อมเผยแพร่/);
 assert.match(outputs.mc, /สคริปต์พิธีกรพร้อมใช้/);
@@ -44,6 +53,13 @@ assert.match(outputs.video, /SCENE 6/);
 assert.match(outputs.voice, /สคริปต์เสียงพร้อมอ่าน/);
 assert.match(outputs.slides, /SLIDE 8/);
 assert.match(outputs.guard, /FACT GUARD/);
+assert.match(prModes.video, /Video Production Pack/);
+assert.match(prModes.voice, /สคริปต์เสียงพร้อมอ่าน/);
+assert.match(prModes.facebook, /โพสต์พร้อมเผยแพร่/);
+assert.match(prModes.news, /ข่าวประชาสัมพันธ์พร้อมเผยแพร่/);
+assert.match(prModes.clip, /ชุดข้อความประกอบคลิปพร้อมใช้/);
+assert.match(prModes.complete, /=== 4\. ข้อความประกอบคลิป ===/);
+assert.match(team.reviseWriting(outputs.caption,"proofread"), /ฉบับตรวจทานภาษาแล้ว/);
 assert.doesNotMatch(outputs.caption, /Prompt/);
 assert.doesNotMatch(outputs.mc, /Prompt/);
 
@@ -58,11 +74,12 @@ const aiConfig = fs.readFileSync(path.join(root, "js", "ai-config.js"), "utf8");
 const index = fs.readFileSync(path.join(root, "index.html"), "utf8");
 const css = fs.readFileSync(path.join(root, "css", "style.css"), "utf8");
 assert.match(index, /js\/free-writing-team\.js/);
-assert.match(index, /V12\.3\.0/);
+assert.match(index, /V12\.4\.0/);
 assert.match(app, /V10 Smart Image/);
 assert.match(app, /generateCurrentImage/);
 assert.match(app, /generateImageWithAI/);
-assert.match(app, /team\.captionWriter\(d\)/);
+assert.match(app, /team\.prWriter\(d, options\)/);
+assert.match(app, /data-post-revise="proofread"/);
 assert.match(app, /team\.mcWriter\(d\)/);
 assert.match(app, /team\.videoWriter\(d, length\)/);
 assert.match(app, /videoVoiceModes/);
@@ -93,5 +110,6 @@ assert.match(ui, /data-reset-output/);
 assert.match(css, /data-primary-actions="video"/);
 assert.match(css, /grid-template-columns:1fr 1fr/);
 assert.match(css, /generated-image-card-v10/);
+assert.match(css, /#post \.post-writer-modes/);
 
 console.log(JSON.stringify({roles:6, directOutputs:true, smartImage:true, factGuard:true, status:"PASS"}, null, 2));

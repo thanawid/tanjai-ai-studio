@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
 // Render forms
-  $("#routerForm").innerHTML = `<div class="form-section"><div class="section-title"><b>?</b><h4>อยากทำอะไรครับ?</h4></div><label class="full">พิมพ์โจทย์ของพี่<textarea id="router-query" placeholder="เช่น อยากทำโพสต์ประชาสัมพันธ์โครงการปลูกต้นไม้ / อยากทำเสียงพากย์คลิปแจ้งข่าว / อยากทำสไลด์นำเสนอ"></textarea></label></div><div class="button-row"><button class="btn primary" id="askRouter">ให้ Router แนะนำ</button><button class="btn secondary" id="goRecommended">ไปที่เมนูที่แนะนำ</button></div>`;
+  $("#routerForm").innerHTML = `<div class="form-section"><div class="section-title"><b>?</b><h4>อยากทำอะไรครับ?</h4></div><label class="full">พิมพ์โจทย์ของพี่<textarea id="router-query" placeholder="อธิบายสิ่งที่ต้องการทำและผลลัพธ์ที่อยากได้"></textarea></label></div><div class="button-row"><button class="btn primary" id="askRouter">ให้ Router แนะนำ</button><button class="btn secondary" id="goRecommended">ไปที่เมนูที่แนะนำ</button></div>`;
   $("#routerResult").innerHTML = TANJAI.resultShell("router", "คำแนะนำจาก AI Router", "ระบบจะแนะนำเมนูและปลายทางที่เหมาะกับโจทย์", "routerOut", `<button class="btn primary" data-copybox="routerOut">คัดลอกคำแนะนำ</button>`);
 
   $("#imageForm").innerHTML = TANJAI.field("image") + `
@@ -89,7 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <label>ความหนาแน่น<select id="image-density">${opts(toolOptions.densities)}</select></label>
             <label>จุดเด่นของภาพ<select id="image-focus">${opts(toolOptions.focuses)}</select></label>
             <label>โทนภาษา<select id="image-tone">${opts(TANJAI.categories.tones)}</select></label>
-            <label class="full">ข้อห้าม / หมายเหตุ<textarea id="image-avoid" placeholder="เช่น ห้ามสร้าง QR ปลอม ห้ามวาดโลโก้ใหม่ เว้นพื้นที่ด้านบน ใช้รูปจริงตามแนบ"></textarea></label>
+            <label class="full">ข้อห้าม / หมายเหตุ<textarea id="image-avoid" placeholder="ระบุสิ่งที่ห้ามสร้าง ห้ามเปลี่ยน หรือจำเป็นต้องเว้นพื้นที่ไว้"></textarea></label>
           </div>
         </div>
       </details>
@@ -192,21 +192,21 @@ $("#albumForm").innerHTML = `
     </div>
     <div class="form-section"><div class="section-title"><b>2</b><h4>บอกว่างานอะไร (กรอกแค่ที่มี)</h4></div>
       <div class="form-grid">
-        <label>หัวข้องาน<input id="album-title" placeholder="เช่น ชื่องาน / กิจกรรม / ประกาศ / แคมเปญ"></label>
-        <label>หน่วยงาน<input id="album-orgName" placeholder="เช่น ชื่อหน่วยงาน / องค์กร / ร้านค้า / เพจ / แบรนด์"></label>
-        <label class="full">ใคร / ทำอะไร<textarea id="album-detail" placeholder="เช่น ใคร / ทำอะไร / เพื่ออะไร / มีประเด็นสำคัญอะไร"></textarea></label>
-        <label class="full">ข้อความปิดท้าย<input id="album-footer" placeholder="เช่น สโลแกน / ข้อความปิดท้าย / แฮชแท็ก / คำเชิญชวน"></label>
+        <label>หัวข้องาน<input id="album-title" placeholder="ระบุหัวข้อหลักของชุดภาพ"></label>
+        <label>หน่วยงาน<input id="album-orgName" placeholder="ระบุชื่อเจ้าของงาน หากต้องการให้แสดง"></label>
+        <label class="full">ใคร / ทำอะไร<textarea id="album-detail" placeholder="วางข้อมูลจริงและประเด็นสำคัญของงาน"></textarea></label>
+        <label class="full">ข้อความปิดท้าย<input id="album-footer" placeholder="ระบุข้อความปิดท้ายที่ต้องการ หากมี"></label>
       </div>
       <details class="quick-advanced">
         <summary><span>ปรับละเอียด</span><small>ไม่บังคับ — วันที่ สถานที่ และข้อความบนภาพรอง</small></summary>
         <div class="quick-advanced-body">
           <div class="form-grid quick-advanced-grid">
-            <label>ป้ายหมวดด้านบน<input id="album-categoryLabel" placeholder="เช่น ประชาสัมพันธ์ / แจ้งข่าว / กิจกรรม / ลงพื้นที่ — ไม่ใส่ก็ไม่แสดง"></label>
-            <label>วันที่<input id="album-dateTime" placeholder="เช่น วันที่จัดกิจกรรม / วันที่เผยแพร่"></label>
-            <label>สถานที่<input id="album-place" placeholder="เช่น สถานที่จัดงาน / พื้นที่ / ช่องทาง / สาขา"></label>
+            <label>ป้ายหมวดด้านบน<input id="album-categoryLabel" placeholder="ระบุชื่อหมวด หากต้องการให้แสดง"></label>
+            <label>วันที่<input id="album-dateTime" placeholder="ระบุวันที่ตามข้อมูลจริง หากมี"></label>
+            <label>สถานที่<input id="album-place" placeholder="ระบุสถานที่หรือช่องทางตามข้อมูลจริง หากมี"></label>
             <label class="full">ข้อความภาพ 2 (ไม่บังคับ)<input id="album-lite2" placeholder="ถ้าไม่กรอก ระบบจะสรุปจากข้อมูลหลักให้"></label>
-            <label class="full">ข้อความภาพ 3 (ไม่บังคับ)<input id="album-lite3" placeholder="เช่น บรรยากาศการประชุม / รับฟังความคิดเห็น / ผู้เข้าร่วม"></label>
-            <label class="full">ข้อความภาพ 4 (ไม่บังคับ)<input id="album-lite4" placeholder="เช่น ร่วมติดตามและขับเคลื่อนงาน / สรุปผล / เชิญติดตาม"></label>
+            <label class="full">ข้อความภาพ 3 (ไม่บังคับ)<input id="album-lite3" placeholder="ระบุประเด็นของภาพนี้ หรือเว้นว่างให้ระบบสรุป"></label>
+            <label class="full">ข้อความภาพ 4 (ไม่บังคับ)<input id="album-lite4" placeholder="ระบุประเด็นปิดท้าย หรือเว้นว่างให้ระบบสรุป"></label>
           </div>
         </div>
       </details>
@@ -249,22 +249,36 @@ $("#albumForm").innerHTML = `
   `;
 
   $("#postForm").innerHTML = TANJAI.field("post") + `
-    <div class="form-note">ผู้เชี่ยวชาญงานเขียนสำหรับสรุปงาน ข่าวประชาสัมพันธ์ โพสต์ Facebook ข้อความ Line และแคปชั่นโดยเฉพาะ</div>
-    <div class="form-section"><div class="section-title"><b>2</b><h4>ตั้งค่าการเรียบเรียงเนื้อหา</h4></div>
-      <div class="form-grid">
-        <label>ประเภทงาน<select id="post-workType">${opts((toolOptions.workTypes || ["นายกลงพื้นที่","กิจกรรมเทศบาล","อื่น ๆ"]).filter(x => !/พิธีกร|พิธีเปิด|พิธีปิด/.test(x)))}</select></label>
-        <label>ต้องการเรียบเรียงเป็น<select id="post-channel"><option>สรุปงาน</option><option>เรียบเรียงข้อมูล</option><option>บทความ</option><option>ข่าวประชาสัมพันธ์</option><option>โพสต์ Facebook</option><option>ข้อความ Line</option><option>แคปชั่น</option></select></label>
-        <label>ความยาว<select id="post-length">${opts(toolOptions.postLengths)}</select></label>
-        <label>หมวดงาน<select id="post-mainCategory">${opts(toolOptions.mainCategories)}</select></label>
+    <div class="form-note post-writer-note"><b>ผู้ช่วยเขียนงานประชาสัมพันธ์</b><span>เลือกชิ้นงานที่ต้องการ แล้วระบบจะปรับโครง ความยาว และน้ำเสียงให้เหมาะกับการใช้งานจริง</span></div>
+    <div class="form-section post-writer-section"><div class="section-title"><b>2</b><h4>เลือกงานที่จะเขียน</h4></div>
+      <div class="post-writer-modes" role="radiogroup" aria-label="ประเภทงานเขียน">
+        <label class="post-writer-mode active"><input type="radio" name="post-writer-mode" value="สคริปต์วิดีโอประชาสัมพันธ์" checked><i>🎬</i><b>สคริปต์วิดีโอ</b><span>บทเปิด บทพากย์ ภาพ และข้อความบนจอ</span></label>
+        <label class="post-writer-mode"><input type="radio" name="post-writer-mode" value="บทพากย์และข้อความสำหรับทำเสียง"><i>🎙️</i><b>บทพากย์ / ทำเสียง</b><span>คุมเวลาพูด จังหวะ และคำอ่าน</span></label>
+        <label class="post-writer-mode"><input type="radio" name="post-writer-mode" value="โพสต์ Facebook พร้อมเผยแพร่"><i>📣</i><b>โพสต์ Facebook</b><span>หัวเปิด เนื้อหา CTA และแฮชแท็ก</span></label>
+        <label class="post-writer-mode"><input type="radio" name="post-writer-mode" value="ข่าวประชาสัมพันธ์"><i>📰</i><b>ข่าวประชาสัมพันธ์</b><span>พาดหัว โปรยข่าว และเนื้อข่าว</span></label>
+        <label class="post-writer-mode"><input type="radio" name="post-writer-mode" value="แคปชั่น YouTube Reels TikTok"><i>📱</i><b>แคปชั่นคลิป</b><span>YouTube, Reels และ TikTok</span></label>
+        <label class="post-writer-mode"><input type="radio" name="post-writer-mode" value="สร้างครบชุดจากข้อมูลเดียว"><i>✨</i><b>สร้างครบชุด</b><span>วิดีโอ เสียง Facebook และแคปชั่น</span></label>
+      </div>
+      <select id="post-channel" hidden aria-hidden="true"><option selected>สคริปต์วิดีโอประชาสัมพันธ์</option><option>บทพากย์และข้อความสำหรับทำเสียง</option><option>โพสต์ Facebook พร้อมเผยแพร่</option><option>ข่าวประชาสัมพันธ์</option><option>แคปชั่น YouTube Reels TikTok</option><option>สร้างครบชุดจากข้อมูลเดียว</option></select>
+      <div class="post-mode-guidance" id="postModeGuidance">ได้โครงเรื่องตามเวลา บทพากย์พร้อมอ่าน คำแนะนำภาพ และข้อความบนจอ</div>
+      <div class="form-grid post-writer-options">
+        <label>ความยาวเป้าหมาย<select id="post-length"><option>30 วินาที</option><option selected>60 วินาที</option><option>90 วินาที</option><option>2 นาที</option><option>3–4 นาที</option><option>5 นาที</option></select></label>
+        <label>ช่องทางใช้งาน<select id="post-platform"><option selected>Facebook</option><option>YouTube</option><option>Reels / TikTok</option><option>LINE</option><option>เสียงตามสาย / รถประชาสัมพันธ์</option><option>เว็บไซต์ / ข่าวองค์กร</option><option>ใช้หลายช่องทาง</option></select></label>
+        <label>เป้าหมายการสื่อสาร<select id="post-purpose"><option selected>ให้ข้อมูลและสร้างความเข้าใจ</option><option>เชิญชวนให้เข้าร่วม</option><option>สรุปผลการดำเนินงาน</option><option>แจ้งข่าวหรือประกาศ</option><option>สร้างการรับรู้และจดจำ</option><option>ให้ AI วิเคราะห์จากข้อมูล</option></select></label>
+        <label>น้ำเสียงของชิ้นงาน<select id="post-delivery"><option selected>สุภาพ เป็นธรรมชาติ อ่านง่าย</option><option>ทางการแบบข่าวประชาสัมพันธ์</option><option>อบอุ่น เข้าถึงง่าย</option><option>กระชับ มีพลัง</option><option>จริงจัง น่าเชื่อถือ</option><option>สนุกและเป็นกันเอง</option></select></label>
+        <label>อีโมจิ<select id="post-emoji"><option selected>ใช้เท่าที่จำเป็น</option><option>ไม่ใช้อีโมจิ</option><option>ใช้เพื่อช่วยแบ่งข้อมูล</option></select></label>
+        <label>แฮชแท็ก<select id="post-hashtags"><option selected>สร้างเฉพาะที่เกี่ยวข้อง</option><option>ไม่ต้องมีแฮชแท็ก</option><option>สร้าง 3–5 แฮชแท็ก</option></select></label>
+        <label class="full">ข้อมูลจริงที่ห้ามเปลี่ยน<textarea id="post-lockedFacts" placeholder="ระบุชื่อ วัน เวลา สถานที่ ตัวเลข หรือข้อความที่ต้องใช้ตามต้นฉบับ"></textarea></label>
+        <label class="full">คำอ่านชื่อเฉพาะ / ข้อความที่ต้องออกเสียงให้ถูก<input id="post-pronunciation" placeholder="ระบุเฉพาะคำที่อาจอ่านผิด หากไม่มีให้เว้นว่าง"></label>
         <label class="full">แนบรูปประกอบ / รูปเอกสาร / รูปลงพื้นที่
           <input id="post-photos" type="file" accept="image/*" multiple>
-          <small>ระบบเขียนฟรีจะไม่เดาข้อมูลจากภาพ กรุณากรอกสาระสำคัญจากเอกสารในช่องรายละเอียด เพื่อป้องกันข้อมูลผิด</small>
+          <small>ระบบจะไม่เดาข้อความจากภาพ กรุณาวางสาระสำคัญจากเอกสารในช่องรายละเอียดเพื่อป้องกันข้อมูลผิด</small>
           <div id="post-photoPreview" class="upload-preview-grid"></div>
         </label>
-        <label class="full">สิ่งที่อยากให้เน้นเพิ่มเติม<textarea id="post-extra" placeholder="เช่น เน้นผลต่อประชาชน / เปิดเรื่องให้ตรงประเด็น / ลดภาษาราชการ / CTA ชัด"></textarea></label>
+        <label class="full">ข้อกำชับเพิ่มเติม<textarea id="post-extra" placeholder="บอกสิ่งที่ต้องเน้น สิ่งที่ควรหลีกเลี่ยง หรือรูปแบบที่ต้องการเพิ่มเติม"></textarea></label>
       </div>
     </div>
-    <div class="button-row"><button class="btn primary" id="makePost">✨ สร้างด้วย AI นักเขียน</button><button class="btn secondary" id="savePost">บันทึก</button></div>`;
+    <div class="button-row post-writer-actions"><button class="btn primary" id="makePost">✨ เขียนผลงานพร้อมใช้</button><button class="btn secondary" id="savePost">บันทึก</button></div>`;
 
   $("#mcForm").innerHTML = TANJAI.field("mc") + `
     <div class="form-note mc-note-v895">ใช้สำหรับสคริปต์พิธีกร คำเชิญประธาน คำเชิญผู้กล่าวรายงาน คำกล่าวรายงาน คำกล่าวประธาน คำเชื่อมช่วง สคริปต์เปิด / ปิดงาน และเวอร์ชันย่อถืออ่าน</div>
@@ -279,7 +293,7 @@ $("#albumForm").innerHTML = `
           <small>ระบบจะไม่อ่านข้อความในภาพอัตโนมัติ กรุณากรอกลำดับพิธีจริงเพื่อป้องกันชื่อและกำหนดการผิด</small>
           <div id="mc-photoPreview" class="upload-preview-grid"></div>
         </label>
-        <label class="full">ข้อมูลพิธี / สิ่งที่อยากให้เน้น<textarea id="mc-extra" placeholder="เช่น ประธานในพิธี / ผู้กล่าวรายงาน / ลำดับพิธี / ช่วงมอบรางวัล / ถ่ายภาพร่วมกัน / คำเรียกแขกผู้มีเกียรติ"></textarea></label>
+        <label class="full">ข้อมูลพิธี / สิ่งที่อยากให้เน้น<textarea id="mc-extra" placeholder="วางลำดับพิธี ชื่อ ตำแหน่ง และรายละเอียดที่ต้องใช้ตามจริง"></textarea></label>
       </div>
     </div>
     <div class="button-row"><button class="btn primary" id="makeMC">✨ สร้างด้วย AI พิธีกร</button><button class="btn secondary" id="saveMC">บันทึก</button></div>`;
@@ -330,12 +344,110 @@ $("#albumForm").innerHTML = `
   // Results
   $("#imageResult").innerHTML = TANJAI.readyOutputShell("image", "Prompt ภาพพร้อมใช้ — V10 Smart Image", "สร้าง Prompt ภาพพร้อมนำไปใช้กับ ทันใจ GPT, Canva หรือเครื่องมือสร้างภาพอื่น โดย AI เติมมุมสร้างสรรค์ได้แต่ไม่เดาข้อมูลจริง", "imageOut");
 $("#albumResult").innerHTML = TANJAI.readyOutputShell("album", "ชุดภาพพร้อมโพสต์", "ปรับภาพจริง ใส่กรอบ และดาวน์โหลดเป็นภาพพร้อมลง Facebook", "albumOut");
-$("#postResult").innerHTML = TANJAI.readyOutputShell("post", "งานเขียนพร้อมใช้ — V10 Smart Writer", "กรอกรายละเอียดน้อยได้ AI ช่วยขยายสำนวนและโครงโพสต์ โดยแยกข้อมูลที่ต้องยืนยัน", "postOut");
+$("#postResult").innerHTML = TANJAI.readyOutputShell("post", "ผู้ช่วยเขียนงานประชาสัมพันธ์", "เลือกประเภทงาน วางข้อมูลจริง แล้วระบบจะสร้างฉบับพร้อมใช้และแยกจุดที่ต้องตรวจสอบ", "postOut") + `
+  <section class="post-revision-tools" id="postRevisionTools" hidden>
+    <div><b>ปรับงานต่อ</b><span id="postWordStats">ยังไม่มีผลลัพธ์</span></div>
+    <div class="post-revision-buttons">
+      <button class="btn secondary" type="button" data-post-revise="shorter">กระชับลง</button>
+      <button class="btn secondary" type="button" data-post-revise="formal">ทางการขึ้น</button>
+      <button class="btn secondary" type="button" data-post-revise="natural">เป็นธรรมชาติขึ้น</button>
+      <button class="btn secondary" type="button" data-post-revise="hook">เขียนหัวเปิดใหม่</button>
+      <button class="btn secondary" type="button" data-post-revise="proofread">ตรวจภาษาและชื่อเฉพาะ</button>
+    </div>
+  </section>`;
 $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "สคริปต์พิธีกรพร้อมใช้ — MC Writer", "คุมลำดับพิธี ชื่อ ตำแหน่ง คำเชื่อม และบัตรเตือนพิธีกร", "mcOut");
   $("#videoResult").innerHTML = TANJAI.readyOutputShell("video", "บทวิดีโอพร้อมผลิต — Video Script Writer", "ได้ Hook, Storyboard, บทพากย์ และข้อความบนจอทันที", "videoOut");
   $("#voiceResult").innerHTML = TANJAI.readyOutputShell("voice", "สคริปต์เสียงพร้อมอ่าน — Voice Script Writer", "คุมเวลาพูด จังหวะ คำเน้น และคำอ่าน", "voiceOut");
   $("#deckResult").innerHTML = TANJAI.readyOutputShell("deck", "เนื้อหาสไลด์พร้อมใช้ — Slide Writer", "ได้โครงเรื่อง เนื้อหาบนสไลด์ และ Speaker Notes", "deckOut");
   $("#kitResult").innerHTML = TANJAI.readyOutputShell("kit", "Prompt ชุดสื่อพร้อมใช้ — ผู้กำกับชุดสื่อ", "สร้างแกนเนื้อหาเดียว แล้วแยกบทบาทของแต่ละสื่อโดยไม่ใช้ข้อความซ้ำกัน", "kitOut");
+
+  const postWriterProfiles = {
+    "สคริปต์วิดีโอประชาสัมพันธ์":{
+      guide:"ได้โครงเรื่องตามเวลา บทพากย์พร้อมอ่าน คำแนะนำภาพ และข้อความบนจอ",
+      lengths:["30 วินาที","60 วินาที","90 วินาที","2 นาที","3–4 นาที","5 นาที"],
+      defaultLength:"60 วินาที",
+      title:"สคริปต์วิดีโอประชาสัมพันธ์พร้อมผลิต"
+    },
+    "บทพากย์และข้อความสำหรับทำเสียง":{
+      guide:"ได้บทอ่านสะอาด คุมเวลาพูด จังหวะหยุด คำเน้น และคำอ่านชื่อเฉพาะ",
+      lengths:["15 วินาที","30 วินาที","60 วินาที","90 วินาที","2 นาที","3–4 นาที"],
+      defaultLength:"60 วินาที",
+      title:"บทพากย์พร้อมบันทึกเสียง"
+    },
+    "โพสต์ Facebook พร้อมเผยแพร่":{
+      guide:"ได้หัวเปิด เนื้อหา CTA แฮชแท็ก และฉบับสั้นสำหรับแชร์ต่อ",
+      lengths:["แคปชั่นสั้นมาก","สั้น กระชับ","มาตรฐาน อ่านง่าย","ละเอียดครบถ้วน"],
+      defaultLength:"มาตรฐาน อ่านง่าย",
+      title:"โพสต์ Facebook พร้อมเผยแพร่"
+    },
+    "ข่าวประชาสัมพันธ์":{
+      guide:"ได้พาดหัว โปรยข่าว เนื้อข่าวตามข้อมูลจริง และข้อความย่อสำหรับเผยแพร่",
+      lengths:["ข่าวสั้น","มาตรฐาน อ่านง่าย","ละเอียดครบถ้วน"],
+      defaultLength:"มาตรฐาน อ่านง่าย",
+      title:"ข่าวประชาสัมพันธ์พร้อมเผยแพร่"
+    },
+    "แคปชั่น YouTube Reels TikTok":{
+      guide:"ได้ชื่อคลิป คำอธิบาย แคปชั่นสั้น Hook และแฮชแท็กตามแพลตฟอร์ม",
+      lengths:["สั้นมาก 1–2 บรรทัด","สั้น กระชับ","มาตรฐาน อ่านง่าย"],
+      defaultLength:"สั้น กระชับ",
+      title:"แคปชั่นคลิปพร้อมโพสต์"
+    },
+    "สร้างครบชุดจากข้อมูลเดียว":{
+      guide:"ได้สคริปต์วิดีโอ บทพากย์ โพสต์ Facebook และแคปชั่น โดยปรับภาษาแยกตามหน้าที่ของแต่ละสื่อ",
+      lengths:["30 วินาที","60 วินาที","90 วินาที","2 นาที","3–4 นาที"],
+      defaultLength:"60 วินาที",
+      title:"ชุดงานเขียนประชาสัมพันธ์พร้อมใช้"
+    }
+  };
+
+  TANJAI.setPostWriterMode = function(mode){
+    const profile = postWriterProfiles[mode] || postWriterProfiles["สคริปต์วิดีโอประชาสัมพันธ์"];
+    const channel = $("#post-channel");
+    const length = $("#post-length");
+    if(channel) channel.value = mode;
+    if(length){
+      length.innerHTML = profile.lengths.map(value => `<option${value === profile.defaultLength ? " selected" : ""}>${value}</option>`).join("");
+    }
+    const guidance = $("#postModeGuidance");
+    if(guidance) guidance.textContent = profile.guide;
+    document.querySelectorAll(".post-writer-mode").forEach(label => {
+      const input = label.querySelector("input");
+      label.classList.toggle("active", input?.value === mode);
+    });
+  };
+
+  TANJAI.collectPostOptions = function(){
+    const value = id => $(`#post-${id}`)?.value || "";
+    return {
+      channel:value("channel"),
+      length:value("length"),
+      platform:value("platform"),
+      purpose:value("purpose"),
+      delivery:value("delivery"),
+      emoji:value("emoji"),
+      hashtags:value("hashtags"),
+      lockedFacts:value("lockedFacts"),
+      pronunciation:value("pronunciation"),
+      extra:value("extra")
+    };
+  };
+
+  TANJAI.updatePostStats = function(text=""){
+    const clean = String(text || "").trim();
+    const chars = clean.replace(/\s/g,"").length;
+    const words = clean ? clean.split(/\s+/).filter(Boolean).length : 0;
+    const seconds = Math.max(0, Math.round(chars / 11));
+    const stat = $("#postWordStats");
+    if(stat) stat.textContent = clean ? `ประมาณ ${words.toLocaleString("th-TH")} คำ • ${chars.toLocaleString("th-TH")} ตัวอักษร • เวลาอ่านราว ${seconds < 60 ? `${seconds} วินาที` : `${Math.floor(seconds/60)} นาที ${seconds%60} วินาที`}` : "ยังไม่มีผลลัพธ์";
+    const tools = $("#postRevisionTools");
+    if(tools) tools.hidden = !clean;
+  };
+
+  document.querySelectorAll('input[name="post-writer-mode"]').forEach(input => {
+    input.addEventListener("change", () => TANJAI.setPostWriterMode(input.value));
+  });
+  $("#postOut")?.addEventListener("input", event => TANJAI.updatePostStats(event.currentTarget.textContent));
+  TANJAI.setPostWriterMode("สคริปต์วิดีโอประชาสัมพันธ์");
 
   TANJAI.renderLibrary();
   TANJAI.renderPromptHub();
@@ -1300,25 +1412,80 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "สคริปต์�
   $("#makePost").onclick = async () => {
     const d=TANJAI.commonData("post");
     const team=TANJAI.freeWritingTeam;
+    const options=TANJAI.collectPostOptions();
+    Object.assign(d, {
+      channel:options.channel,
+      length:options.length,
+      platform:options.platform,
+      purpose:options.purpose,
+      delivery:options.delivery,
+      emoji:options.emoji,
+      hashtags:options.hashtags,
+      lockedFacts:options.lockedFacts,
+      pronunciation:options.pronunciation,
+      extra:options.extra
+    });
     const aiResult=await TANJAI.generateWritingWithAI({
       tool:"post", data:d,
-      options:{channel:$("#post-channel")?.value, length:$("#post-length")?.value, extra:$("#post-extra")?.value},
-      fallback:()=>team.captionWriter(d), button:$("#makePost")
+      options,
+      fallback:()=>team.prWriter(d, options), button:$("#makePost")
     });
     const executeOut=aiResult.text;
+    const profile=postWriterProfiles[options.channel] || postWriterProfiles["สคริปต์วิดีโอประชาสัมพันธ์"];
     TANJAI.setReadyOutput("post", {
-      title:"งานเขียนพร้อมใช้ — Caption & Article Writer",
-      desc:aiResult.source === "ai" ? "AI วิเคราะห์ เรียบเรียง และปรับโทนจากข้อมูลที่กรอกแล้ว" : "สร้างด้วยระบบสำรอง พร้อมตรวจข้อเท็จจริงก่อนเผยแพร่",
+      title:profile.title,
+      desc:aiResult.source === "ai" ? `AI เขียนตามรูปแบบ ${options.channel} และคุมเป้าหมาย ${options.length} แล้ว` : "สร้างด้วยระบบนักเขียนสำรองในเว็บ พร้อมตรวจข้อเท็จจริงก่อนเผยแพร่",
       main:executeOut,
       advancedTitle1:"ตรวจข้อเท็จจริงก่อนเผยแพร่",
       advanced1:team.factGuard(d),
-      advancedTitle2:"เวอร์ชันบทความ / ข่าว",
-      advanced2:team.articleWriter(d)
+      advancedTitle2:"ฉบับใช้ต่ออีกช่องทาง",
+      advanced2:team.supportingVariant(d, options)
     });
     TANJAI.state.lastPost=executeOut;
+    TANJAI.state.lastPostData=d;
+    TANJAI.state.lastPostOptions=options;
+    TANJAI.updatePostStats(executeOut);
     TANJAI.toast("สร้างงานเขียนพร้อมใช้แล้ว");
     window.TANJAI_AUTH?.trackUsage("post");
   };
+  document.querySelectorAll("[data-post-revise]").forEach(button => {
+    button.addEventListener("click", async () => {
+      const current=$("#postOut")?.textContent?.trim() || "";
+      if(!current || /กดปุ่มสร้าง/.test(current)){
+        TANJAI.toast("สร้างงานเขียนก่อน แล้วจึงปรับสำนวนต่อได้");
+        return;
+      }
+      const revision=button.dataset.postRevise;
+      const revisionLabels={
+        shorter:"กระชับลงโดยรักษาข้อมูลจริงครบถ้วน",
+        formal:"ปรับเป็นภาษาทางการที่อ่านลื่น",
+        natural:"ปรับให้เป็นธรรมชาติ ลดภาษาราชการที่ไม่จำเป็น",
+        hook:"เขียนหัวเปิดใหม่ให้น่าสนใจ โดยไม่กล่าวเกินจริง",
+        proofread:"ตรวจคำสะกด การตัดคำ ชื่อเฉพาะ และความสอดคล้องของข้อมูล"
+      };
+      const originalData=TANJAI.state.lastPostData || TANJAI.commonData("post");
+      const originalOptions=TANJAI.state.lastPostOptions || TANJAI.collectPostOptions();
+      const aiResult=await TANJAI.generateWritingWithAI({
+        tool:"post",
+        data:{...originalData, detail:current, originalText:current},
+        options:{...originalOptions, revision:revisionLabels[revision], preserveFacts:true},
+        fallback:()=>TANJAI.freeWritingTeam.reviseWriting(current, revision),
+        button
+      });
+      TANJAI.setReadyOutput("post", {
+        title:(postWriterProfiles[originalOptions.channel] || {}).title || "งานเขียนฉบับปรับแล้ว",
+        desc:`ปรับงานแล้ว: ${revisionLabels[revision]}`,
+        main:aiResult.text,
+        advancedTitle1:"ตรวจข้อเท็จจริงก่อนเผยแพร่",
+        advanced1:TANJAI.freeWritingTeam.factGuard(originalData),
+        advancedTitle2:"ต้นฉบับก่อนปรับ",
+        advanced2:current
+      });
+      TANJAI.state.lastPost=aiResult.text;
+      TANJAI.updatePostStats(aiResult.text);
+      TANJAI.toast("ปรับงานเขียนให้แล้ว");
+    });
+  });
   $("#makeMC").onclick = async () => {
     const d=TANJAI.commonData("mc");
     const team=TANJAI.freeWritingTeam;

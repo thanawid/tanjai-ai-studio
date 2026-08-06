@@ -54,7 +54,8 @@
       extra: real(d.extra),
       agenda: splitPoints(real(d.expertAgenda)),
       delivery: real(d.expertDelivery),
-      pronunciation: real(d.expertPronunciation),
+      pronunciation: real(d.pronunciation) || real(d.expertPronunciation),
+      lockedFacts: real(d.lockedFacts),
       address: real(d.expertAddress),
       attachmentCount: Number(d.attachmentCount || 0)
     };
@@ -160,6 +161,8 @@
       b.place && `สถานที่: ${b.place}`,
       b.people && `บุคคล/ตำแหน่ง: ${b.people}`,
       b.visualPreset && `แนวภาพ/สไตล์: ${b.visualPreset}`
+      ,b.lockedFacts && `ข้อมูลที่ห้ามเปลี่ยน: ${b.lockedFacts}`
+      ,b.pronunciation && `คำอ่านชื่อเฉพาะ: ${b.pronunciation}`
     ].filter(Boolean);
     const eventLike = ["invitation","announcement","report","ceremony","education","tradition"].includes(intent);
     const missing = [
@@ -206,6 +209,58 @@
     const headline = `${b.title}${b.org ? ` โดย ${b.org}` : ""}`;
     const body = lines.map((x, i) => i === 0 ? `     ${x}` : `     ${x}`).join("\n\n");
     return `ข่าวประชาสัมพันธ์พร้อมเผยแพร่\n\n${headline}\n\n${body}\n\n${joinNonEmpty([line("วัน/เวลา: ", b.date), line("สถานที่: ", b.place), line("ผู้เกี่ยวข้อง: ", b.people)])}\n\n${b.action || "หมายเหตุ: กรุณาตรวจสอบข้อมูลวัน เวลา สถานที่ และช่องทางติดต่อก่อนเผยแพร่จริง"}`.replace(/\n{3,}/g,"\n\n");
+  }
+
+  function clipCaptionWriter(d={}){
+    const b = contentBrain(d);
+    const intent = detectIntent(d, "post");
+    const hook = b.keyMessage || benefitLine(b, intent);
+    const action = b.action || (b.org ? `ติดตามรายละเอียดเพิ่มเติมจาก ${b.org}` : "ติดตามรายละเอียดจากช่องทางประชาสัมพันธ์ที่ถูกต้อง");
+    const tags = [hash(b.org), hash(b.title), "คลิปประชาสัมพันธ์"].filter(Boolean).slice(0,5).map(x=>`#${x}`).join(" ");
+    return `ชุดข้อความประกอบคลิปพร้อมใช้\n\nชื่อคลิป / YouTube Title\n${b.title}\n\nคำโปรยสั้นสำหรับ Reels / TikTok\n${hook}\n\nคำอธิบายคลิป\n${rewriteCore(d,"post").slice(0,4).join("\n\n")}\n\n${action}${tags ? `\n\n${tags}` : ""}`;
+  }
+
+  function prWriter(d={}, options={}){
+    const mode = real(options.channel) || real(d.channel) || "โพสต์ Facebook พร้อมเผยแพร่";
+    const merged = Object.assign({}, d, {
+      channel: real(options.platform) || real(d.channel),
+      tone: real(options.delivery) || real(d.tone),
+      action: real(options.purpose) || real(d.action),
+      lockedFacts: real(options.lockedFacts) || real(d.lockedFacts),
+      pronunciation: real(options.pronunciation) || real(d.pronunciation)
+    });
+    const length = real(options.length) || "60 วินาที";
+    if(/สคริปต์วิดีโอ/.test(mode)) return videoWriter(merged, length);
+    if(/บทพากย์|ทำเสียง/.test(mode)) return voiceWriter(merged, length, real(options.delivery) || "สุภาพ เป็นธรรมชาติ อ่านง่าย");
+    if(/ข่าวประชาสัมพันธ์/.test(mode)) return articleWriter(merged);
+    if(/แคปชั่น YouTube|Reels|TikTok/.test(mode)) return clipCaptionWriter(merged);
+    if(/ครบชุด/.test(mode)){
+      return `ชุดงานประชาสัมพันธ์จากข้อมูลเดียว\n\n=== 1. สคริปต์วิดีโอ ===\n${videoWriter(merged, length)}\n\n=== 2. บทพากย์พร้อมอ่าน ===\n${voiceWriter(merged, length, real(options.delivery) || "สุภาพ เป็นธรรมชาติ อ่านง่าย")}\n\n=== 3. โพสต์ Facebook ===\n${captionWriter(merged)}\n\n=== 4. ข้อความประกอบคลิป ===\n${clipCaptionWriter(merged)}`;
+    }
+    return captionWriter(merged);
+  }
+
+  function supportingVariant(d={}, options={}){
+    const mode = real(options.channel) || "";
+    if(/สคริปต์วิดีโอ/.test(mode)) return clipCaptionWriter(d);
+    if(/บทพากย์/.test(mode)) return captionWriter(d);
+    if(/Facebook/.test(mode)) return voiceWriter(d, "30 วินาที", real(options.delivery) || "สุภาพ เป็นธรรมชาติ");
+    if(/ข่าวประชาสัมพันธ์/.test(mode)) return captionWriter(d);
+    return articleWriter(d);
+  }
+
+  function reviseWriting(text="", revision=""){
+    const source = clean(text);
+    if(!source) return "ยังไม่มีผลงานให้ปรับ กรุณาสร้างผลงานก่อน";
+    if(revision === "shorter"){
+      const paragraphs = source.split(/\n\s*\n/).filter(Boolean);
+      return paragraphs.filter((_,i)=>i < 8).map(x=>clamp(x,220)).join("\n\n");
+    }
+    if(revision === "formal") return `ฉบับปรับเป็นทางการ\n\n${source.replace(/ครับ|ค่ะ|นะครับ|นะคะ/g, "").replace(/อยากให้/g,"ขอให้").replace(/ทุกคน/g,"ทุกท่าน")}`;
+    if(revision === "natural") return `ฉบับอ่านเป็นธรรมชาติ\n\n${source.replace(/ดำเนินการ/g,"ทำ").replace(/ประชาชนทุกท่าน/g,"ทุกท่าน").replace(/ดังกล่าว/g,"นี้")}`;
+    if(revision === "hook") return `ประโยคเปิดแนะนำ\nเรื่องสำคัญนี้เกี่ยวข้องกับคุณอย่างไร — อ่านรายละเอียดให้ครบก่อนตัดสินใจ\n\n${source}`;
+    if(revision === "proofread") return `ฉบับตรวจทานภาษาแล้ว\n\n${source.replace(/[ \t]+\n/g,"\n").replace(/\s+([,.!?])/g,"$1").replace(/\n{3,}/g,"\n\n")}`;
+    return source;
   }
 
   function mcWriter(d={}){
@@ -505,6 +560,10 @@ Fact/Asset Checklist ก่อนผลิต
     factGuard,
     captionWriter,
     articleWriter,
+    clipCaptionWriter,
+    prWriter,
+    supportingVariant,
+    reviseWriting,
     mcWriter,
     videoWriter,
     voiceWriter,

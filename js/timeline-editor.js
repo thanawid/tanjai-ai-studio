@@ -48,7 +48,7 @@ window.TANJAI = window.TANJAI || {};
             <select id="teAspect"><option>16:9</option><option>9:16</option><option>1:1</option></select>
           </label>
           <label class="te-title-field">ชื่อเรื่อง
-            <input id="teTitle" type="text" placeholder="เช่น สรุปกิจกรรมเทศบาลเมืองบางรักน้อย">
+            <input id="teTitle" type="text" placeholder="ตั้งชื่อโปรเจกต์เพื่อกลับมาแก้ไขภายหลัง">
           </label>
           <label class="te-check"><input id="teShowTitle" type="checkbox" checked> แสดงชื่อเรื่องบนวิดีโอ</label>
         </div>
