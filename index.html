@@ -13,7 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700;800;900&family=Noto+Sans+Thai:wght@400;500;600;700;800;900&family=Prompt:wght@500;600;700;800;900&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
   <meta name="theme-color" content="#070a15">
   <meta name="description" content="ทันใจ AI Studio V12.5.0">
-  <link rel="stylesheet" href="css/style.css?v=12.5.0">
+  <link rel="stylesheet" href="css/style.css?v=12.5.0-layout-watermark-fix">
   <link rel="stylesheet" href="css/animations.css?v=12.5.0">
   <link rel="stylesheet" href="css/create-video-module.css?v=12.5.0-video-handoff">
 </head>
@@ -75,7 +75,7 @@
         <button class="nav-link" data-view="image"><i>🖼️</i><b>สร้างภาพ</b></button>
         <button class="nav-link" data-view="photoPro"><i>✨</i><b>แต่งภาพ AI</b></button>
         <button class="nav-link" data-view="album"><i>🧷</i><b>ชุดภาพโพสต์ Facebook</b></button>
-        <button class="nav-link" data-view="post"><i>✍️</i><b>เรียบเรียงเนื้อหา</b></button>
+        <button class="nav-link" data-view="post"><i>✍️</i><b>เขียนสคริปต์และเนื้อหา</b></button>
 
         <span>วิดีโอและเสียง</span>
         <button class="nav-link" data-view="video"><i>🎬</i><b>แต่งวิดีโอ AI</b></button>
@@ -246,7 +246,7 @@
 
       <section id="album" class="view"><div class="studio-layout"><section class="panel form-panel"><div class="panel-head"><div><h3>🧷 ชุดภาพโพสต์ Facebook</h3><p>อัปโหลดหลายภาพ ปรับแสงสี ครอป ใส่กรอบข้อความ และดาวน์โหลดภาพพร้อมโพสต์ โดยไม่สร้างภาพใหม่</p></div></div><div id="albumForm"></div></section><aside class="panel result-panel"><div id="albumResult"></div></aside></div></section>
 
-      <section id="post" class="view"><div class="studio-layout"><section class="panel form-panel"><div class="panel-head"><div><h3>✍️ เรียบเรียงเนื้อหา</h3><p>ผู้เชี่ยวชาญงานเขียนสำหรับสรุปงาน ข่าวประชาสัมพันธ์ โพสต์ Facebook ข้อความ Line และแคปชั่นโดยเฉพาะ</p></div></div><div id="postForm"></div></section><aside class="panel result-panel"><div id="postResult"></div></aside></div></section>
+      <section id="post" class="view"><div class="studio-layout"><section class="panel form-panel"><div class="panel-head"><div><h3>✍️ เขียนสคริปต์และเนื้อหา</h3><p>วางข้อมูลที่มี ระบบจะวิเคราะห์ประเภทงาน แล้วเขียนสคริปต์ บทพากย์ ข่าว โพสต์ และแคปชั่นให้เหมาะกับการใช้งานจริง</p></div></div><div id="postForm"></div></section><aside class="panel result-panel"><div id="postResult"></div></aside></div></section>
 
       <section id="mc" class="view"><div class="studio-layout"><section class="panel form-panel"><div class="panel-head"><div><h3>🎤 งานพิธีกร</h3><p>ผู้กำกับงานเวที: คุมลำดับพิธี ชื่อ ตำแหน่ง คำเชื่อม คำกำกับเวที และบัตรคำพูด</p></div></div><div id="mcForm"></div></section><aside class="panel result-panel"><div id="mcResult"></div></aside></div></section>
 
@@ -399,11 +399,6 @@
         </div>
       </footer>
     </main>
-  </div>
-
-  <div class="owner-watermark" aria-hidden="true">
-    <span>ทันใจ AI Studio</span>
-    <small>Developed by Thanawid Sangsakol</small>
   </div>
 
   <div id="mobileQuickNav" class="mobile-quick-nav" aria-label="ปุ่มนำทางด่วน">

@@ -73,10 +73,21 @@ const vividAnimeComic = T.buildImageExecutionPrompt({
   detail: "สร้างตัวละครในสวนดอกไม้",
   visualPreset: "อนิเมะคอมิกสีสด"
 });
-assert(vividAnimeComic.includes("Modern Anime Comic Illustration"), "Vivid anime comic direction missing");
+assert(vividAnimeComic.includes("Modern Vivid Anime Comic Illustration"), "Vivid anime comic direction missing");
 assert(vividAnimeComic.includes("cel shading"), "Cel-shading instruction missing");
 assert(vividAnimeComic.includes("ห้ามบังคับแบ่งช่อง"), "Comic style is incorrectly forcing a panel layout");
 assert(!vividAnimeComic.includes("Service Infographic"), "Comic style was incorrectly routed as an infographic");
+
+const vividAnimeInfographic = T.buildImageExecutionPrompt({
+  ...base,
+  title: "ความรู้เรื่องคัดแยกขยะ",
+  contentType: "รณรงค์ / ให้ความรู้",
+  imageType: "อินโฟกราฟิก",
+  visualPreset: "อนิเมะคอมิกสีสด"
+});
+assert(vividAnimeInfographic.includes("Modern Vivid Anime Comic Illustration"), "Infographic context overrode the selected anime comic style");
+assert(vividAnimeInfographic.includes("จัดข้อมูลเป็นบล็อกหรือช่อง"), "Infographic layout guidance missing from anime comic style");
+assert(!vividAnimeInfographic.includes("Service Infographic"), "Generic infographic direction overrode the selected visual preset");
 
 const attached = T.buildImageExecutionPrompt({
   ...base,
@@ -94,6 +105,7 @@ console.log(JSON.stringify({
   balancedChars: balanced.length,
   premiumChars: premium.length,
   vividAnimeComicChars: vividAnimeComic.length,
+  vividAnimeInfographicChars: vividAnimeInfographic.length,
   attachedChars: attached.length,
   status: "PASS"
 }, null, 2));

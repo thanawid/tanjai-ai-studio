@@ -257,7 +257,18 @@
       pronunciation: real(options.pronunciation) || real(d.pronunciation)
     });
     const length = real(options.length) || "60 วินาที";
+    if(/ให้ AI วิเคราะห์/.test(mode)){
+      const intent = detectIntent(merged, "post");
+      const detail = `${merged.title || ""} ${merged.detail || ""} ${merged.workContext || ""}`;
+      if(/สรุป|ผลการดำเนิน|ดำเนินงาน|ประธานเปิด|ร่วมกิจกรรม|เมื่อวันที่/.test(detail) || intent === "report") return videoWriter({...merged, format:"สคริปต์สรุปกิจกรรม"}, length === "ให้ AI กำหนด" ? "3–4 นาที" : length);
+      if(/เสียงตามสาย|รถประชาสัมพันธ์|ประกาศเสียง|หอกระจายข่าว/.test(detail)) return voiceWriter(merged, length === "ให้ AI กำหนด" ? "60 วินาที" : length, "ประกาศชัดเจน ฟังเข้าใจในครั้งเดียว และวนซ้ำได้");
+      if(/เชิญ|สมัคร|เข้าร่วม|เปิดรับ|กำหนดจัด/.test(detail) || intent === "invitation") return videoWriter({...merged, format:"สคริปต์เชิญชวนประชาสัมพันธ์"}, length === "ให้ AI กำหนด" ? "60 วินาที" : length);
+      return captionWriter(merged);
+    }
     if(/สคริปต์วิดีโอ/.test(mode)) return videoWriter(merged, length);
+    if(/สคริปต์สรุปกิจกรรม/.test(mode)) return videoWriter({...merged, format:"สคริปต์สรุปกิจกรรม"}, length);
+    if(/สคริปต์เชิญชวน/.test(mode)) return videoWriter({...merged, format:"สคริปต์เชิญชวนประชาสัมพันธ์"}, length);
+    if(/เสียงตามสาย|รถประชาสัมพันธ์/.test(mode)) return voiceWriter(merged, length, "ประกาศชัดเจน ฟังเข้าใจในครั้งเดียว และวนซ้ำได้");
     if(/บทพากย์|ทำเสียง/.test(mode)) return voiceWriter(merged, length, real(options.delivery) || "สุภาพ เป็นธรรมชาติ อ่านง่าย");
     if(/ข่าวประชาสัมพันธ์/.test(mode)) return articleWriter(merged);
     if(/แคปชั่น YouTube|Reels|TikTok/.test(mode)) return clipCaptionWriter(merged);
@@ -291,6 +302,10 @@
       const paragraphs=source.split(/\n\s*\n/).filter(Boolean);
       return `อีกฉบับสำหรับเลือกใช้\n\n${paragraphs.length > 2 ? [paragraphs[1],paragraphs[0],...paragraphs.slice(2)].join("\n\n") : source}`;
     }
+    if(revision === "thirtySeconds") return `ฉบับย่อประมาณ 30 วินาที\n\n${source.split(/\n\s*\n/).filter(Boolean).slice(0,5).map(x=>clamp(x,150)).join("\n\n")}`;
+    if(revision === "threeMinutes") return `${source}\n\n[ช่วงขยายความ]\nเรียบเรียงคำเชื่อมและรายละเอียดจากข้อมูลจริงข้างต้นให้ต่อเนื่อง โดยตรวจชื่อ วัน เวลา สถานที่ และตัวเลขก่อนนำไปใช้`;
+    if(revision === "toVoice") return `บทพากย์พร้อมอ่าน\n\n${source.replace(/\[(?:ภาพ|ข้อความบนจอ|เวลา)[^\]]*\][^\n]*/g,"").replace(/\n{3,}/g,"\n\n")}`;
+    if(revision === "toCaption") return `แคปชั่นจากชิ้นงาน\n\n${source.split(/\n\s*\n/).filter(Boolean).slice(0,5).map(x=>clamp(x,180)).join("\n\n")}`;
     if(revision === "proofread") return `ฉบับตรวจทานภาษาแล้ว\n\n${source.replace(/[ \t]+\n/g,"\n").replace(/\s+([,.!?])/g,"$1").replace(/\n{3,}/g,"\n\n")}`;
     return source;
   }

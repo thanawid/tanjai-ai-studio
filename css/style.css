@@ -2625,7 +2625,7 @@ body:not(.auth-locked) .login-gate{
 }
 
 
-/* v8.6.6 Owner Watermark + Footer */
+/* v8.6.6 Owner Footer */
 .owner-footer{
   margin-top:22px;
   padding:18px 22px;
@@ -2652,36 +2652,6 @@ body:not(.auth-locked) .login-gate{
   font-size:12px;
   line-height:1.5;
 }
-.owner-watermark{
-  position:fixed;
-  right:18px;
-  bottom:18px;
-  z-index:18;
-  pointer-events:none;
-  user-select:none;
-  display:grid;
-  gap:2px;
-  padding:10px 12px;
-  border-radius:18px;
-  border:1px solid rgba(255,255,255,.08);
-  background:rgba(7,10,25,.28);
-  backdrop-filter:blur(10px);
-  box-shadow:0 14px 44px rgba(0,0,0,.16);
-  opacity:.42;
-}
-.owner-watermark span{
-  font-size:12px;
-  font-weight:1000;
-  letter-spacing:.02em;
-  color:rgba(255,255,255,.88);
-}
-.owner-watermark small{
-  font-size:10px;
-  color:rgba(219,234,254,.82);
-}
-body.auth-locked .owner-watermark{
-  opacity:.20;
-}
 @media(max-width:720px){
   .owner-footer{
     padding:16px 18px;
@@ -2690,12 +2660,6 @@ body.auth-locked .owner-watermark{
   .owner-footer-copy{
     flex-direction:column;
     align-items:flex-start;
-  }
-  .owner-watermark{
-    right:14px;
-    bottom:86px;
-    max-width:calc(100vw - 28px);
-    opacity:.34;
   }
 }
 
@@ -3996,9 +3960,6 @@ body.auth-locked .owner-watermark{
   /* มือถือมี bottom tabbar แล้ว ไม่ต้องมีปุ่ม + ลอยทับ */
   .fab-main,
   .fab-menu{
-    display:none !important;
-  }
-  .owner-watermark{
     display:none !important;
   }
   .mobile-tabbar{

@@ -121,7 +121,8 @@ assert.match(css, /data-primary-actions="video"/);
 assert.match(css, /grid-template-columns:1fr 1fr/);
 assert.match(css, /generated-image-card-v10/);
 assert.match(css, /#post \.post-writer-modes/);
-assert.match(css, /view\.active:not\(\.has-output\)/);
+assert.match(css, /grid-template-columns:minmax\(0,1\.03fr\) minmax\(440px,\.97fr\)/);
+assert.doesNotMatch(css, /view\.active:not\(\.has-output\)[^\{]*result-panel[^\{]*\{display:none\}/);
 assert.match(css, /position:static;bottom:auto/);
 assert.doesNotMatch(app, /V10 Smart Image/);
 
