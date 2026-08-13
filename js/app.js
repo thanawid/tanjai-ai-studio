@@ -282,6 +282,8 @@ $("#albumForm").innerHTML = `
       </div>
     </div>
     <div class="button-row post-writer-actions"><button class="btn primary" id="makePost">✨ เขียนงานพร้อมใช้</button><button class="btn secondary" id="retryPostAI" type="button" hidden>ลองสร้างอีกครั้ง</button><button class="btn secondary" id="savePost">บันทึก</button></div>`;
+  const postDetailHint=$("#post-detail")?.closest("label")?.querySelector(".field-hint");
+  if(postDetailHint) postDetailHint.textContent="(ใส่ข้อมูลจริงเท่าที่มี — ระบบจะช่วยคิดและแต่งส่วนงานเขียนให้สมบูรณ์ โดยไม่เดาข้อเท็จจริงสำคัญ)";
 
   $("#mcForm").innerHTML = TANJAI.field("mc") + `
     <div class="form-note mc-note-v895">ใช้สำหรับสคริปต์พิธีกร คำเชิญประธาน คำเชิญผู้กล่าวรายงาน คำกล่าวรายงาน คำกล่าวประธาน คำเชื่อมช่วง สคริปต์เปิด / ปิดงาน และเวอร์ชันย่อถืออ่าน</div>
@@ -377,7 +379,7 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "สคริปต์�
       guide:"AI จะอ่านข้อมูลก่อน แล้วเลือกชิ้นงาน โครงเรื่อง ความยาว และน้ำเสียงที่เหมาะสม",
       lengths:["ให้ AI กำหนด","30 วินาที","60 วินาที","90 วินาที","2 นาที","3–4 นาที","5 นาที"],
       defaultLength:"ให้ AI กำหนด",
-      title:"ฉบับร่างที่ AI เลือกให้พร้อมตรวจ"
+      title:"เนื้อหาพร้อมใช้"
     },
     "สคริปต์วิดีโอประชาสัมพันธ์":{
       guide:"ได้โครงเรื่องตามเวลา บทพากย์พร้อมอ่าน คำแนะนำภาพ และข้อความบนจอ",
@@ -421,6 +423,15 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "สคริปต์�
       defaultLength:"60 วินาที",
       title:"ชุดงานเขียนประชาสัมพันธ์พร้อมใช้"
     }
+  };
+
+  TANJAI.postOutputTitle = function(data={}, options={}){
+    const resolved=TANJAI.freeWritingTeam.resolvePostOutput?.(data,options) || options.channel;
+    const titles={
+      "เนื้อหาตั้งต้นสำหรับโครงการ":"เนื้อหาตั้งต้นสำหรับโครงการ",
+      "สรุปกิจกรรมพร้อมเผยแพร่":"สรุปกิจกรรมพร้อมเผยแพร่"
+    };
+    return titles[resolved] || postWriterProfiles[resolved]?.title || resolved || "งานเขียนพร้อมใช้";
   };
 
   TANJAI.setPostWriterMode = function(mode){
@@ -1466,9 +1477,8 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "สคริปต์�
       fallback:()=>team.prWriter(d, options), button:$("#makePost")
     });
     const executeOut=aiResult.text;
-    const profile=postWriterProfiles[options.channel] || postWriterProfiles["ให้ AI วิเคราะห์และเลือกผลงาน"];
     TANJAI.setReadyOutput("post", {
-      title:profile.title,
+      title:TANJAI.postOutputTitle(d,options),
       desc:"อ่าน แก้ไข หรือคัดลอกไปใช้งานได้ทันที ข้อมูลที่ไม่ได้ระบุจะไม่ถูกแต่งขึ้นเป็นข้อเท็จจริง",
       main:executeOut,
       advancedTitle1:"ข้อมูลสำคัญที่ควรตรวจ",
@@ -1518,7 +1528,7 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "สคริปต์�
         button
       });
       TANJAI.setReadyOutput("post", {
-        title:(postWriterProfiles[originalOptions.channel] || {}).title || "งานเขียนฉบับปรับแล้ว",
+        title:TANJAI.postOutputTitle(originalData,originalOptions),
         desc:"ปรับข้อความให้แล้ว โดยรักษาข้อมูลจริงจากต้นฉบับ",
         main:aiResult.text,
         advancedTitle1:"ข้อมูลสำคัญที่ควรตรวจ",

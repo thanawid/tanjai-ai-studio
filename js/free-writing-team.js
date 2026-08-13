@@ -68,7 +68,7 @@
     if(/ประเพณี|แห่เทียน|เทียนพรรษา|เข้าพรรษา|ออกพรรษา|กฐิน|ผ้าป่า|สงกรานต์|ลอยกระทง|บุญบั้งไฟ|ทำบุญ|ตักบาตร|เวียนเทียน|วิสาขบูชา|มาฆบูชา|อาสาฬหบูชา|สวดมนต์|ปฏิบัติธรรม|ไหว้พระ|ทอดถวาย|บรรพชา|อุปสมบท|สรงน้ำ|รดน้ำดำหัว/.test(text)) return "tradition";
     if(/เพลง|ศิลปิน|ซิงเกิล|อัลบั้ม|MV|มิวสิก|Cover Art/i.test(text)) return "music";
     if(/สินค้า|บริการ|โปรโมชัน|โปรโมชั่น|ร้าน|อาหาร|OTOP|ขาย/.test(text)) return "commercial";
-    if(/ประชุม|ประชาคม|ประชุมสภา|สัมมนา|อบรม|โครงการ|กิจกรรม|เชิญ|ขอเชิญ|เปิดรับ|รับสมัคร/.test(text)) return "invitation";
+    if(/ขอเชิญ|เชิญชวน|เปิดรับ|รับสมัคร|ลงทะเบียน|กำหนดจัด|จะจัด/.test(text)) return "invitation";
     if(/แจ้ง|ประกาศ|งด|ปิด|หยุด|เตือน|ระวัง|ไฟดับ|ปิดถนน|มิจฉาชีพ/.test(text)) return "announcement";
     if(/ลงพื้นที่|รายงานผล|สรุปผล|สรุปกิจกรรม|ติดตาม|ตรวจงาน|มอบ|ช่วยเหลือ/.test(text)) return "report";
     if(/ขั้นตอน|วิธี|ข้อมูลควรรู้|FAQ|อินโฟกราฟิก|infographic/i.test(text)) return "education";
@@ -136,6 +136,10 @@
     if(/อบรม|ฝึกอบรม|ให้ความรู้/.test(source)){
       ideas.push("สาระของกิจกรรมเน้นความเข้าใจที่นำไปปฏิบัติได้จริง และเปิดโอกาสให้ผู้เข้าร่วมเชื่อมโยงความรู้กับบริบทของตนเอง");
     }
+    if(/ฝึกซ้อม.*ป้องกัน|ป้องกันและบรรเทาสาธารณภัย|แผนฉุกเฉิน|สาธารณภัย/.test(source)){
+      ideas.push("การฝึกซ้อมช่วยให้ผู้เกี่ยวข้องเข้าใจบทบาท ลำดับการประสานงาน และแนวทางปฏิบัติเมื่อเกิดเหตุฉุกเฉินได้ชัดเจนขึ้น");
+      ideas.push("การทบทวนแผนร่วมกันช่วยลดความสับสน เสริมความพร้อม และทำให้การรับมือสถานการณ์จริงเป็นระบบมากขึ้น");
+    }
     return [...new Set(ideas)].slice(0,3);
   }
 
@@ -163,6 +167,50 @@
     if(stage === "completed") return "report";
     if(stage === "upcoming") return "invitation";
     return detectIntent(d,"post");
+  }
+
+  function compactComparable(value=""){
+    return clean(value).toLowerCase().replace(/ประจำปี\s*[0-9๐-๙]{4}/g, "").replace(/[^\u0E00-\u0E7Fa-z0-9]/g, "");
+  }
+
+  function isSparsePostBrief(d={}){
+    const title=compactComparable(real(d.title));
+    const detail=compactComparable(real(d.detail));
+    const meaningfulPoints=splitPoints(real(d.detail)).filter(point=>{
+      const normalized=compactComparable(point);
+      return normalized && normalized !== title && !normalized.startsWith(title) && !title.startsWith(normalized);
+    });
+    return !meaningfulPoints.length && (!detail || detail === title || detail.startsWith(title) || title.startsWith(detail));
+  }
+
+  function projectFoundationWriter(d={}){
+    const b=contentBrain(d);
+    const suppliedDetail=real(d.detail);
+    const displayTitle=suppliedDetail && compactComparable(suppliedDetail).startsWith(compactComparable(b.title)) && suppliedDetail.length <= b.title.length + 40 ? suppliedDetail : b.title;
+    const ideas=editorialExpansion(b,"general",creativeLevel(d));
+    const purpose=/ฝึกซ้อม.*ป้องกัน|ป้องกันและบรรเทาสาธารณภัย|แผนฉุกเฉิน|สาธารณภัย/.test(`${b.title} ${b.detail}`)
+      ? "มุ่งเตรียมความพร้อมให้ผู้เกี่ยวข้องเข้าใจบทบาท การประสานงาน และแนวทางปฏิบัติเมื่อเกิดเหตุฉุกเฉิน"
+      : benefitLine(b,"general");
+    const lines=[
+      `${b.org ? `${b.org} ให้ความสำคัญกับ` : "แนวทางของ"} “${displayTitle}” ซึ่ง${purpose}`,
+      ...ideas,
+      "เมื่อมีรายละเอียดครบ เนื้อหานี้สามารถปรับต่อเป็นโพสต์เชิญชวน ข่าวประชาสัมพันธ์ บทพากย์ หรือสรุปผลหลังจบงานได้ทันที"
+    ];
+    return `เนื้อหาตั้งต้นสำหรับโครงการ\n\n${[...new Set(lines.filter(Boolean))].join("\n\n")}`;
+  }
+
+  function resolvePostOutput(d={}, options={}){
+    const requested=real(options.channel) || real(d.channel) || "ให้ AI วิเคราะห์และเลือกผลงาน";
+    if(!/ให้ AI วิเคราะห์/.test(requested)) return requested;
+    const merged={...d, workContext:real(options.purpose) || real(d.workContext)};
+    const purpose=real(options.purpose);
+    const platform=real(options.platform);
+    if(/เสียงตามสาย|รถประชาสัมพันธ์/.test(`${platform} ${purpose}`)) return "สคริปต์เสียงตามสายและรถประชาสัมพันธ์";
+    if(/YouTube|Reels|TikTok|วิดีโอ|วีดีโอ|คลิป/.test(`${platform} ${merged.title || ""} ${merged.detail || ""}`)) return "สคริปต์วิดีโอประชาสัมพันธ์";
+    if(isSparsePostBrief(merged) && /ให้ AI วิเคราะห์|สร้างการรับรู้ทั่วไป|^$/.test(purpose)) return "เนื้อหาตั้งต้นสำหรับโครงการ";
+    if(/สรุป.*กิจกรรม|รายงาน.*ผล|ดำเนินงานแล้ว/.test(purpose)) return "สรุปกิจกรรมพร้อมเผยแพร่";
+    if(/แจ้งข่าว|ประกาศ/.test(purpose)) return "ข่าวประชาสัมพันธ์";
+    return "โพสต์ Facebook พร้อมเผยแพร่";
   }
 
   function editorialExpansion(b, intent, level="ช่วยคิดและแต่งให้สมบูรณ์"){
@@ -297,7 +345,7 @@
     const b = contentBrain(d);
     const intent = d._postStrict ? postIntent(d) : detectIntent(d, "post");
     const channel = real(d.channel) || "โพสต์ Facebook";
-    const lines = d._postStrict ? postCreativeLines(d) : rewriteCore(d, "post");
+    const lines = d._postStrict ? postCreativeLines(d).filter(line=>compactComparable(line) !== compactComparable(b.title)) : rewriteCore(d, "post");
     const hookMap = {
       tradition:"ขอเชิญร่วมสืบสานประเพณีอันดีงาม",
       invitation:"ขอเชิญร่วมเป็นส่วนหนึ่งของการพัฒนา",
@@ -311,7 +359,8 @@
     };
     const hook = b.keyMessage || (d._postStrict ? creativeHook(b,intent) : (hookMap[intent] || hookMap.general));
     const cta = d._postStrict ? safePostClosing(b,intent,creativeLevel(d)) : (b.action || (intent === "tradition" ? "ขอเชิญชวนทุกท่านร่วมงานตามวันเวลาและสถานที่ที่ประกาศ ร่วมกันสืบสานประเพณีให้คงอยู่คู่ท้องถิ่นสืบไป" : intent === "invitation" ? "ผู้สนใจสามารถติดตามรายละเอียดและเข้าร่วมตามข้อมูลที่ประกาศ" : b.org ? `ติดตามข้อมูลเพิ่มเติมจาก ${b.org}` : "โปรดตรวจสอบช่องทางติดต่อจริงก่อนเผยแพร่"));
-    const tags = [hash(b.org), hash(b.title), intent === "music" ? "เพลงใหม่" : "ประชาสัมพันธ์"].filter(Boolean).slice(0,4).map(x=>`#${x}`).join(" ");
+    const topicTag=/สาธารณภัย|ป้องกัน.*ภัย/.test(`${b.title} ${b.detail}`) ? "ป้องกันและบรรเทาสาธารณภัย" : hash(b.title).slice(0,36);
+    const tags = [hash(b.org), topicTag, intent === "music" ? "เพลงใหม่" : "ประชาสัมพันธ์"].filter(Boolean).slice(0,3).map(x=>`#${x}`).join(" ");
 
     if(/Line/.test(channel)){
       return `ข้อความ LINE พร้อมส่ง\n\n${hook}\n\n${lines.slice(0,3).join("\n\n")}\n\n${joinNonEmpty([line("วัน/เวลา: ", b.date), line("สถานที่: ", b.place)])}\n\n${cta}`.replace(/\n{3,}/g,"\n\n");
@@ -409,6 +458,8 @@
     });
     const length = real(options.length) || "60 วินาที";
     if(/ให้ AI วิเคราะห์/.test(mode)){
+      const resolved=resolvePostOutput(merged,options);
+      if(resolved === "เนื้อหาตั้งต้นสำหรับโครงการ") return projectFoundationWriter(merged);
       const intent = detectIntent(merged, "post");
       const detail = `${merged.title || ""} ${merged.detail || ""} ${merged.workContext || ""}`;
       const platform=`${real(options.platform)} ${real(options.purpose)}`;
@@ -418,6 +469,7 @@
       const isInvitation=/เชิญ|สมัคร|เข้าร่วม|เปิดรับ|กำหนดจัด/.test(detail) || intent === "invitation";
       if(wantsAudio) return postVoiceWriter(merged, length === "ให้ AI กำหนด" ? "60 วินาที" : length, "ประกาศชัดเจน ฟังเข้าใจในครั้งเดียว และวนซ้ำได้", true);
       if(wantsVideo && (isCompleted || isInvitation)) return postVideoScriptWriter(merged, length === "ให้ AI กำหนด" ? "60 วินาที" : length);
+      if(resolved === "ข่าวประชาสัมพันธ์") return articleWriter(merged);
       return captionWriter(merged);
     }
     if(/สคริปต์วิดีโอ/.test(mode)) return postVideoScriptWriter(merged, length);
@@ -762,6 +814,9 @@ Fact/Asset Checklist ก่อนผลิต
     articleWriter,
     clipCaptionWriter,
     prWriter,
+    resolvePostOutput,
+    isSparsePostBrief,
+    projectFoundationWriter,
     supportingVariant,
     reviseWriting,
     mcWriter,
