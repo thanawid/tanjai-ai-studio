@@ -136,6 +136,88 @@
     return [...new Set(ideas)].slice(0,3);
   }
 
+  function postStage(b){
+    const source=`${b.title} ${b.detail}`;
+    if(/เมื่อวันที่|ที่ผ่านมา|ได้จัด|ดำเนินการแล้ว|เป็นประธานเปิด|ร่วมกิจกรรม|ลงพื้นที่|สรุปผล|ผลการดำเนินงาน/.test(source)) return "completed";
+    if(/ขอเชิญ|จะจัด|กำหนดจัด|เปิดรับ|รับสมัคร/.test(source)) return "upcoming";
+    if(/แจ้ง|ประกาศ|งด|ปิด|หยุด|เตือน/.test(source)) return "announcement";
+    return "general";
+  }
+
+  function creativeLevel(d={}){
+    return real(d.creativity) || "ช่วยคิดและแต่งให้สมบูรณ์";
+  }
+
+  function postIntent(d={}){
+    const b=contentBrain(d);
+    const stage=postStage(b);
+    if(stage === "announcement") return "announcement";
+    if(stage === "completed") return "report";
+    if(stage === "upcoming") return "invitation";
+    return detectIntent(d,"post");
+  }
+
+  function editorialExpansion(b, intent, level="ช่วยคิดและแต่งให้สมบูรณ์"){
+    if(/รักษาข้อมูลเป็นหลัก/.test(level)) return [];
+    const topicIdeas=safeExpansion(b);
+    const ideas=[...topicIdeas];
+    if(!ideas.length){
+      if(intent === "report") ideas.push("เบื้องหลังการดำเนินงานคือความร่วมมือของผู้เกี่ยวข้อง เพื่อให้งานเดินหน้าอย่างต่อเนื่องและตอบโจทย์พื้นที่ได้ชัดเจนขึ้น");
+      else if(intent === "invitation") ideas.push("การเข้าร่วมไม่เพียงช่วยให้ได้รับข้อมูลที่ครบถ้วน แต่ยังเปิดพื้นที่ให้เกิดการเรียนรู้และความร่วมมือระหว่างผู้เกี่ยวข้อง");
+      else if(intent === "announcement") ideas.push("การรับทราบข้อมูลล่วงหน้าช่วยลดความสับสน และทำให้ผู้เกี่ยวข้องสามารถเตรียมตัวได้เหมาะสม");
+      else if(intent === "education") ideas.push("เมื่อเข้าใจประเด็นสำคัญอย่างถูกต้อง ทุกคนจะสามารถนำข้อมูลไปปรับใช้และตัดสินใจได้เหมาะกับบริบทของตนเอง");
+      else ideas.push("เนื้อหานี้มุ่งทำให้เรื่องที่อาจดูซับซ้อนเข้าใจง่ายขึ้น และเชื่อมโยงกับสิ่งที่ผู้รับสารนำไปใช้ได้จริง");
+    }
+    if(/สร้างสรรค์มากขึ้น/.test(level)){
+      ideas.push("เพราะการเปลี่ยนแปลงที่เห็นผล มักเริ่มจากความเข้าใจเล็ก ๆ และการลงมือทำร่วมกันอย่างต่อเนื่อง");
+    }
+    return [...new Set(ideas)].slice(0,/สร้างสรรค์มากขึ้น/.test(level) ? 3 : 2);
+  }
+
+  function safePostClosing(b, intent, level="ช่วยคิดและแต่งให้สมบูรณ์"){
+    if(b.action) return b.action;
+    if(/รักษาข้อมูลเป็นหลัก/.test(level)) return "";
+    const source=`${b.title} ${b.detail}`;
+    if(/ยุงลาย|ไข้เลือดออก/.test(source)) return "มาร่วมกันสำรวจและลดจุดเสี่ยงรอบตัว เพื่อให้บ้านและชุมชนปลอดภัยยิ่งขึ้น";
+    if(/ขยะ|คัดแยก|ความสะอาด/.test(source)) return "เริ่มได้จากสิ่งใกล้ตัว ร่วมกันดูแลพื้นที่ของเราให้สะอาดและน่าอยู่อย่างต่อเนื่อง";
+    if(intent === "invitation") return "ขอเชิญผู้สนใจร่วมเป็นส่วนหนึ่งของกิจกรรม และร่วมสร้างประโยชน์ไปด้วยกัน";
+    if(intent === "announcement") return "โปรดอ่านรายละเอียดให้ครบถ้วน และเตรียมตัวให้เหมาะสมกับข้อมูลที่ประกาศ";
+    if(intent === "report") return "ทุกความร่วมมือคือแรงสำคัญที่ทำให้งานเดินหน้าต่อไปได้อย่างมีความหมาย";
+    if(intent === "education") return "ลองนำแนวทางที่เหมาะสมไปปรับใช้ แล้วเริ่มต้นจากสิ่งที่ทำได้ใกล้ตัว";
+    return "ร่วมทำความเข้าใจ และนำข้อมูลนี้ไปใช้ให้เกิดประโยชน์ในชีวิตประจำวัน";
+  }
+
+  function creativeHook(b,intent){
+    const source=`${b.title} ${b.detail}`;
+    if(/ยุงลาย|ไข้เลือดออก/.test(source)) return "จุดเสี่ยงเล็ก ๆ รอบบ้าน อาจกลายเป็นแหล่งเพาะพันธุ์ยุงลายได้โดยไม่ทันสังเกต";
+    if(/ขยะ|คัดแยก|ความสะอาด/.test(source)) return "เมืองที่น่าอยู่ เริ่มจากการจัดการสิ่งใกล้ตัวให้ถูกวิธี";
+    if(/ออกกำลังกาย|แอโรบิค|สุขภาพ/.test(source)) return "สุขภาพที่ดีเริ่มต้นได้จากการขยับร่างกาย และกำลังใจที่ส่งต่อถึงกัน";
+    if(/สิ่งแวดล้อม|พื้นที่สีเขียว|คลอง|น้ำเสีย/.test(source)) return "ทุกพื้นที่ที่ได้รับการดูแล คือคุณภาพชีวิตที่ดีขึ้นของคนในชุมชน";
+    if(/ประชาคม|แผนพัฒนา/.test(source)) return "ทุกความคิดเห็นจากพื้นที่ มีความหมายต่อทิศทางการพัฒนาท้องถิ่น";
+    if(intent === "announcement") return `เรื่อง “${b.title}” มีรายละเอียดสำคัญที่ผู้เกี่ยวข้องควรทราบ`;
+    if(intent === "invitation") return `มาร่วมเป็นส่วนหนึ่งของ “${b.title}” และเปลี่ยนความสนใจให้เป็นการลงมือทำ`;
+    if(intent === "report") return `อีกหนึ่งความเคลื่อนไหวของ “${b.title}” ที่สะท้อนการทำงานร่วมกันในพื้นที่`;
+    if(intent === "education") return `เรื่อง “${b.title}” เข้าใจได้ง่ายขึ้น เมื่อเริ่มจากประเด็นที่เกี่ยวข้องกับชีวิตประจำวัน`;
+    return `เรื่อง “${b.title}” อาจใกล้ตัวและเกี่ยวข้องกับเรามากกว่าที่คิด`;
+  }
+
+  function postCreativeLines(d={}){
+    const b=contentBrain(d);
+    const intent=postIntent(d);
+    const stage=postStage(b);
+    const level=creativeLevel(d);
+    const org=b.org || "หน่วยงานผู้จัด";
+    const factual=b.points.filter(Boolean).map(point=>clamp(point,360));
+    const intro=stage === "completed"
+      ? `${org} ถ่ายทอดเรื่องราวของ “${b.title}” จากการดำเนินงานที่เกิดขึ้น พร้อมสื่อสารสาระสำคัญให้ประชาชนเข้าใจได้ง่าย`
+      : stage === "upcoming"
+        ? `${org} ขอเชิญชวนผู้สนใจร่วม “${b.title}” และร่วมเป็นส่วนหนึ่งของกิจกรรมที่เชื่อมโยงผู้คนกับประโยชน์ของส่วนรวม`
+        : stage === "announcement"
+          ? `${org} ขอแจ้งประชาสัมพันธ์เรื่อง “${b.title}” เพื่อให้ผู้เกี่ยวข้องรับทราบข้อมูลอย่างชัดเจนและเตรียมตัวได้ถูกต้อง`
+          : `${org} นำเสนอเรื่อง “${b.title}” เพื่อถ่ายทอดประเด็นสำคัญให้เข้าใจง่ายและนำไปใช้ประโยชน์ได้จริง`;
+    return [...new Set([intro,...factual,...editorialExpansion(b,intent,level)].filter(Boolean))];
+  }
+
   function rewriteCore(d={}, tool="post"){
     const b = contentBrain(d);
     const intent = detectIntent(d, tool);
@@ -204,9 +286,9 @@
 
   function captionWriter(d={}){
     const b = contentBrain(d);
-    const intent = detectIntent(d, "post");
+    const intent = d._postStrict ? postIntent(d) : detectIntent(d, "post");
     const channel = real(d.channel) || "โพสต์ Facebook";
-    const lines = rewriteCore(d, "post");
+    const lines = d._postStrict ? postCreativeLines(d) : rewriteCore(d, "post");
     const hookMap = {
       tradition:"ขอเชิญร่วมสืบสานประเพณีอันดีงาม",
       invitation:"ขอเชิญร่วมเป็นส่วนหนึ่งของการพัฒนา",
@@ -218,8 +300,8 @@
       respectful:"ด้วยความเคารพและระลึกถึง",
       general:"สื่อสารเรื่องสำคัญให้เข้าใจง่าย"
     };
-    const hook = b.keyMessage || hookMap[intent] || hookMap.general;
-    const cta = b.action || (d._postStrict ? "" : (intent === "tradition" ? "ขอเชิญชวนทุกท่านร่วมงานตามวันเวลาและสถานที่ที่ประกาศ ร่วมกันสืบสานประเพณีให้คงอยู่คู่ท้องถิ่นสืบไป" : intent === "invitation" ? "ผู้สนใจสามารถติดตามรายละเอียดและเข้าร่วมตามข้อมูลที่ประกาศ" : b.org ? `ติดตามข้อมูลเพิ่มเติมจาก ${b.org}` : "โปรดตรวจสอบช่องทางติดต่อจริงก่อนเผยแพร่"));
+    const hook = b.keyMessage || (d._postStrict ? creativeHook(b,intent) : (hookMap[intent] || hookMap.general));
+    const cta = d._postStrict ? safePostClosing(b,intent,creativeLevel(d)) : (b.action || (intent === "tradition" ? "ขอเชิญชวนทุกท่านร่วมงานตามวันเวลาและสถานที่ที่ประกาศ ร่วมกันสืบสานประเพณีให้คงอยู่คู่ท้องถิ่นสืบไป" : intent === "invitation" ? "ผู้สนใจสามารถติดตามรายละเอียดและเข้าร่วมตามข้อมูลที่ประกาศ" : b.org ? `ติดตามข้อมูลเพิ่มเติมจาก ${b.org}` : "โปรดตรวจสอบช่องทางติดต่อจริงก่อนเผยแพร่"));
     const tags = [hash(b.org), hash(b.title), intent === "music" ? "เพลงใหม่" : "ประชาสัมพันธ์"].filter(Boolean).slice(0,4).map(x=>`#${x}`).join(" ");
 
     if(/Line/.test(channel)){
@@ -232,17 +314,17 @@
 
   function articleWriter(d={}){
     const b = contentBrain(d);
-    const lines = rewriteCore(d, "post");
+    const lines = d._postStrict ? postCreativeLines(d) : rewriteCore(d, "post");
     const headline = `${b.title}${b.org ? ` โดย ${b.org}` : ""}`;
     const body = lines.map((x, i) => i === 0 ? `     ${x}` : `     ${x}`).join("\n\n");
-    return `ข่าวประชาสัมพันธ์พร้อมเผยแพร่\n\n${headline}\n\n${body}\n\n${joinNonEmpty([line("วัน/เวลา: ", b.date), line("สถานที่: ", b.place), line("ผู้เกี่ยวข้อง: ", b.people)])}\n\n${b.action || "หมายเหตุ: กรุณาตรวจสอบข้อมูลวัน เวลา สถานที่ และช่องทางติดต่อก่อนเผยแพร่จริง"}`.replace(/\n{3,}/g,"\n\n");
+    return `ข่าวประชาสัมพันธ์พร้อมเผยแพร่\n\n${headline}\n\n${body}\n\n${joinNonEmpty([line("วัน/เวลา: ", b.date), line("สถานที่: ", b.place), line("ผู้เกี่ยวข้อง: ", b.people)])}\n\n${d._postStrict ? safePostClosing(b,postIntent(d),creativeLevel(d)) : (b.action || "หมายเหตุ: กรุณาตรวจสอบข้อมูลวัน เวลา สถานที่ และช่องทางติดต่อก่อนเผยแพร่จริง")}`.replace(/\n{3,}/g,"\n\n");
   }
 
   function clipCaptionWriter(d={}){
     const b = contentBrain(d);
-    const intent = detectIntent(d, "post");
+    const intent = d._postStrict ? postIntent(d) : detectIntent(d, "post");
     const hook = b.keyMessage || benefitLine(b, intent);
-    const action = b.action || (d._postStrict ? "" : (b.org ? `ติดตามรายละเอียดเพิ่มเติมจาก ${b.org}` : "ติดตามรายละเอียดจากช่องทางประชาสัมพันธ์ที่ถูกต้อง"));
+    const action = d._postStrict ? safePostClosing(b,intent,creativeLevel(d)) : (b.action || (b.org ? `ติดตามรายละเอียดเพิ่มเติมจาก ${b.org}` : "ติดตามรายละเอียดจากช่องทางประชาสัมพันธ์ที่ถูกต้อง"));
     const tags = [hash(b.org), hash(b.title), "คลิปประชาสัมพันธ์"].filter(Boolean).slice(0,5).map(x=>`#${x}`).join(" ");
     return `ชุดข้อความประกอบคลิปพร้อมใช้\n\nชื่อคลิป / YouTube Title\n${b.title}\n\nคำโปรยสั้นสำหรับ Reels / TikTok\n${hook}\n\nคำอธิบายคลิป\n${rewriteCore(d,"post").slice(0,4).join("\n\n")}\n\n${action}${tags ? `\n\n${tags}` : ""}`;
   }
@@ -281,7 +363,7 @@
             ? `${b.org ? `${b.org} ` : ""}ขอเชิญชวนร่วม “${b.title}”`
             : `ขอนำเสนอเรื่อง “${b.title}”`;
     const factualBody=facts.map(point=>clamp(point,320));
-    const safeIdeas=safeExpansion(b);
+    const safeIdeas=editorialExpansion(b,intent,creativeLevel(d));
     const datePlace=[b.date && `วันและเวลา ${b.date}`,b.place && `สถานที่ ${b.place}`].filter(Boolean);
     const closing=b.action ? b.action : "";
     const blocks=[opening,...factualBody,...safeIdeas,...datePlace,closing].filter(Boolean);
@@ -306,14 +388,20 @@
       workContext: real(options.purpose) || real(d.workContext),
       lockedFacts: real(options.lockedFacts) || real(d.lockedFacts),
       pronunciation: real(options.pronunciation) || real(d.pronunciation)
+      ,creativity: real(options.creativity) || real(d.creativity) || "ช่วยคิดและแต่งให้สมบูรณ์"
     });
     const length = real(options.length) || "60 วินาที";
     if(/ให้ AI วิเคราะห์/.test(mode)){
       const intent = detectIntent(merged, "post");
       const detail = `${merged.title || ""} ${merged.detail || ""} ${merged.workContext || ""}`;
-      if(/สรุป|ผลการดำเนิน|ดำเนินงาน|ประธานเปิด|ร่วมกิจกรรม|เมื่อวันที่/.test(detail) || intent === "report") return videoWriter({...merged, format:"สคริปต์สรุปกิจกรรม"}, length === "ให้ AI กำหนด" ? "3–4 นาที" : length);
-      if(/เสียงตามสาย|รถประชาสัมพันธ์|ประกาศเสียง|หอกระจายข่าว/.test(detail)) return postVoiceWriter(merged, length === "ให้ AI กำหนด" ? "60 วินาที" : length, "ประกาศชัดเจน ฟังเข้าใจในครั้งเดียว และวนซ้ำได้", true);
-      if(/เชิญ|สมัคร|เข้าร่วม|เปิดรับ|กำหนดจัด/.test(detail) || intent === "invitation") return videoWriter({...merged, format:"สคริปต์เชิญชวนประชาสัมพันธ์"}, length === "ให้ AI กำหนด" ? "60 วินาที" : length);
+      const platform=`${real(options.platform)} ${real(options.purpose)}`;
+      const wantsAudio=/เสียงตามสาย|รถประชาสัมพันธ์|ประกาศเสียง|หอกระจายข่าว/.test(`${detail} ${platform}`);
+      const wantsVideo=/YouTube|Reels|TikTok|วิดีโอ|วีดีโอ|คลิป/.test(`${detail} ${platform}`);
+      const isCompleted=/สรุป|ผลการดำเนิน|ดำเนินงาน|ประธานเปิด|ร่วมกิจกรรม|เมื่อวันที่|ลงพื้นที่/.test(detail) || intent === "report";
+      const isInvitation=/เชิญ|สมัคร|เข้าร่วม|เปิดรับ|กำหนดจัด/.test(detail) || intent === "invitation";
+      if(wantsAudio) return postVoiceWriter(merged, length === "ให้ AI กำหนด" ? "60 วินาที" : length, "ประกาศชัดเจน ฟังเข้าใจในครั้งเดียว และวนซ้ำได้", true);
+      if(wantsVideo && isCompleted) return videoWriter({...merged, format:"สคริปต์สรุปกิจกรรม"}, length === "ให้ AI กำหนด" ? "3–4 นาที" : length);
+      if(wantsVideo && isInvitation) return videoWriter({...merged, format:"สคริปต์เชิญชวนประชาสัมพันธ์"}, length === "ให้ AI กำหนด" ? "60 วินาที" : length);
       return captionWriter(merged);
     }
     if(/สคริปต์วิดีโอ/.test(mode)) return videoWriter(merged, length);

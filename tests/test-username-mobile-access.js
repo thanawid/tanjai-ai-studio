@@ -8,8 +8,8 @@ const proofread = fs.readFileSync(path.join(root,"js","proofread.js"),"utf8");
 const css = fs.readFileSync(path.join(root,"css","style.css"),"utf8");
 const pkg = JSON.parse(fs.readFileSync(path.join(root,"package.json"),"utf8"));
 
-assert.strictEqual(pkg.version, "12.5.2");
-assert.match(index, /V12\.5\.2/);
+assert.strictEqual(pkg.version, "12.5.3");
+assert.match(index, /V12\.5\.3/);
 assert.match(app, /data-fab-view="router"/);
 assert.match(app, /data-fab-view="createVideo"/);
 assert.match(app, /data-fab-view="projects"/);

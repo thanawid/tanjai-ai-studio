@@ -76,6 +76,40 @@ const shortHealthBrief=team.prWriter({
 },{channel:"โพสต์ Facebook พร้อมเผยแพร่"});
 assert.match(shortHealthBrief,/แหล่งน้ำขัง/);
 assert.match(shortHealthBrief,/ทุกครัวเรือน/);
+assert.match(shortHealthBrief,/จุดเสี่ยงเล็ก ๆ รอบบ้าน/);
+
+const creativeHealthBrief=team.prWriter({
+  title:"ลงพื้นที่รณรงค์ป้องกันยุงลาย",
+  orgName:"เทศบาลตัวอย่าง",
+  detail:"ลงพื้นที่รณรงค์ป้องกันยุงลาย หมู่ที่ 6"
+},{channel:"โพสต์ Facebook พร้อมเผยแพร่",creativity:"สร้างสรรค์มากขึ้น"});
+assert.match(creativeHealthBrief,/ภาชนะหรือจุดที่อาจกลายเป็นแหล่งน้ำขัง/);
+assert.match(creativeHealthBrief,/การเปลี่ยนแปลงที่เห็นผล/);
+assert.match(creativeHealthBrief,/มาร่วมกันสำรวจและลดจุดเสี่ยง/);
+assert.doesNotMatch(creativeHealthBrief,/จำนวนผู้เข้าร่วม|เบอร์โทร|https?:\/\//);
+
+const autoFacebook=team.prWriter({
+  title:"ลงพื้นที่รณรงค์ป้องกันยุงลาย",
+  orgName:"เทศบาลตัวอย่าง",
+  detail:"เมื่อวันที่ 5 สิงหาคม 2569 ลงพื้นที่หมู่ที่ 6"
+},{channel:"ให้ AI วิเคราะห์และเลือกผลงาน",platform:"Facebook",purpose:"สรุปผลการดำเนินงาน"});
+assert.match(autoFacebook,/โพสต์พร้อมเผยแพร่/);
+
+const autoYoutube=team.prWriter({
+  title:"ลงพื้นที่รณรงค์ป้องกันยุงลาย",
+  orgName:"เทศบาลตัวอย่าง",
+  detail:"เมื่อวันที่ 5 สิงหาคม 2569 ลงพื้นที่หมู่ที่ 6"
+},{channel:"ให้ AI วิเคราะห์และเลือกผลงาน",platform:"YouTube",purpose:"สรุปผลการดำเนินงาน",length:"60 วินาที"});
+assert.match(autoYoutube,/Video Production Pack/);
+
+const cancellationPost=team.prWriter({
+  title:"งดกิจกรรมเต้นแอโรบิค",
+  orgName:"เทศบาลตัวอย่าง",
+  detail:"งดกิจกรรม 1 วัน เนื่องจากเป็นวันหยุดราชการ"
+},{channel:"โพสต์ Facebook พร้อมเผยแพร่"});
+assert.match(cancellationPost,/ขอแจ้งประชาสัมพันธ์/);
+assert.match(cancellationPost,/โปรดอ่านรายละเอียดให้ครบถ้วน/);
+assert.doesNotMatch(cancellationPost,/ขอเชิญผู้สนใจร่วมเป็นส่วนหนึ่ง/);
 
 const shortVoice=team.prWriter({
   title:"กิจกรรมส่งเสริมสุขภาพ",
@@ -106,7 +140,7 @@ const aiConfig = fs.readFileSync(path.join(root, "js", "ai-config.js"), "utf8");
 const index = fs.readFileSync(path.join(root, "index.html"), "utf8");
 const css = fs.readFileSync(path.join(root, "css", "style.css"), "utf8");
 assert.match(index, /js\/free-writing-team\.js/);
-assert.match(index, /V12\.5\.2/);
+assert.match(index, /V12\.5\.3/);
 assert.match(app, /ผู้กำกับภาพอัจฉริยะ/);
 assert.match(app, /generateCurrentImage/);
 assert.match(app, /generateImageWithAI/);

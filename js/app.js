@@ -270,6 +270,7 @@ $("#albumForm").innerHTML = `
         <label>ช่องทางใช้งาน<select id="post-platform"><option selected>Facebook</option><option>YouTube</option><option>Reels / TikTok</option><option>LINE</option><option>เสียงตามสาย / รถประชาสัมพันธ์</option><option>เว็บไซต์ / ข่าวองค์กร</option><option>ใช้หลายช่องทาง</option></select></label>
         <label>เป้าหมายการสื่อสาร<select id="post-purpose"><option selected>ให้ข้อมูลและสร้างความเข้าใจ</option><option>เชิญชวนให้เข้าร่วม</option><option>สรุปผลการดำเนินงาน</option><option>แจ้งข่าวหรือประกาศ</option><option>สร้างการรับรู้และจดจำ</option><option>ให้ AI วิเคราะห์จากข้อมูล</option></select></label>
         <label>น้ำเสียงของชิ้นงาน<select id="post-delivery"><option selected>สุภาพ เป็นธรรมชาติ อ่านง่าย</option><option>ทางการแบบข่าวประชาสัมพันธ์</option><option>อบอุ่น เข้าถึงง่าย</option><option>กระชับ มีพลัง</option><option>จริงจัง น่าเชื่อถือ</option><option>สนุกและเป็นกันเอง</option></select></label>
+        <label>ระดับการช่วยคิด<select id="post-creativity"><option selected>ช่วยคิดและแต่งให้สมบูรณ์</option><option>สร้างสรรค์มากขึ้น</option><option>รักษาข้อมูลเป็นหลัก</option></select></label>
         <label>อีโมจิ<select id="post-emoji"><option selected>ใช้เท่าที่จำเป็น</option><option>ไม่ใช้อีโมจิ</option><option>ใช้เพื่อช่วยแบ่งข้อมูล</option></select></label>
         <label>แฮชแท็ก<select id="post-hashtags"><option selected>สร้างเฉพาะที่เกี่ยวข้อง</option><option>ไม่ต้องมีแฮชแท็ก</option><option>สร้าง 3–5 แฮชแท็ก</option></select></label>
         <label class="full">ข้อมูลจริงที่ห้ามเปลี่ยน<textarea id="post-lockedFacts" placeholder="ระบุชื่อ วัน เวลา สถานที่ ตัวเลข หรือข้อความที่ต้องใช้ตามต้นฉบับ"></textarea></label>
@@ -460,6 +461,7 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "สคริปต์�
       platform:value("platform"),
       purpose:value("purpose"),
       delivery:value("delivery"),
+      creativity:value("creativity"),
       emoji:value("emoji"),
       hashtags:value("hashtags"),
       lockedFacts:value("lockedFacts"),
