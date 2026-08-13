@@ -219,7 +219,7 @@
       general:"สื่อสารเรื่องสำคัญให้เข้าใจง่าย"
     };
     const hook = b.keyMessage || hookMap[intent] || hookMap.general;
-    const cta = b.action || (intent === "tradition" ? "ขอเชิญชวนทุกท่านร่วมงานตามวันเวลาและสถานที่ที่ประกาศ ร่วมกันสืบสานประเพณีให้คงอยู่คู่ท้องถิ่นสืบไป" : intent === "invitation" ? "ผู้สนใจสามารถติดตามรายละเอียดและเข้าร่วมตามข้อมูลที่ประกาศ" : b.org ? `ติดตามข้อมูลเพิ่มเติมจาก ${b.org}` : "โปรดตรวจสอบช่องทางติดต่อจริงก่อนเผยแพร่");
+    const cta = b.action || (d._postStrict ? "" : (intent === "tradition" ? "ขอเชิญชวนทุกท่านร่วมงานตามวันเวลาและสถานที่ที่ประกาศ ร่วมกันสืบสานประเพณีให้คงอยู่คู่ท้องถิ่นสืบไป" : intent === "invitation" ? "ผู้สนใจสามารถติดตามรายละเอียดและเข้าร่วมตามข้อมูลที่ประกาศ" : b.org ? `ติดตามข้อมูลเพิ่มเติมจาก ${b.org}` : "โปรดตรวจสอบช่องทางติดต่อจริงก่อนเผยแพร่"));
     const tags = [hash(b.org), hash(b.title), intent === "music" ? "เพลงใหม่" : "ประชาสัมพันธ์"].filter(Boolean).slice(0,4).map(x=>`#${x}`).join(" ");
 
     if(/Line/.test(channel)){
@@ -242,14 +242,65 @@
     const b = contentBrain(d);
     const intent = detectIntent(d, "post");
     const hook = b.keyMessage || benefitLine(b, intent);
-    const action = b.action || (b.org ? `ติดตามรายละเอียดเพิ่มเติมจาก ${b.org}` : "ติดตามรายละเอียดจากช่องทางประชาสัมพันธ์ที่ถูกต้อง");
+    const action = b.action || (d._postStrict ? "" : (b.org ? `ติดตามรายละเอียดเพิ่มเติมจาก ${b.org}` : "ติดตามรายละเอียดจากช่องทางประชาสัมพันธ์ที่ถูกต้อง"));
     const tags = [hash(b.org), hash(b.title), "คลิปประชาสัมพันธ์"].filter(Boolean).slice(0,5).map(x=>`#${x}`).join(" ");
     return `ชุดข้อความประกอบคลิปพร้อมใช้\n\nชื่อคลิป / YouTube Title\n${b.title}\n\nคำโปรยสั้นสำหรับ Reels / TikTok\n${hook}\n\nคำอธิบายคลิป\n${rewriteCore(d,"post").slice(0,4).join("\n\n")}\n\n${action}${tags ? `\n\n${tags}` : ""}`;
+  }
+
+  function targetSeconds(length="60 วินาที"){
+    if(/15/.test(length)) return 15;
+    if(/30/.test(length)) return 30;
+    if(/90/.test(length)) return 90;
+    if(/2\s*นาที/.test(length)) return 120;
+    if(/3/.test(length)) return 180;
+    if(/4/.test(length)) return 240;
+    if(/5/.test(length)) return 300;
+    return 60;
+  }
+
+  function spokenSeconds(text=""){
+    return Math.max(1, Math.round(clean(text).replace(/\s/g, "").length / 10));
+  }
+
+  function postVoiceWriter(d={}, length="60 วินาที", style="สุภาพ เป็นธรรมชาติ อ่านง่าย", publicAddress=false){
+    const b=contentBrain(d);
+    const intent=detectIntent(d,"post");
+    const sourceText=`${real(d.title)} ${real(d.detail)} ${real(d.workContext)}`;
+    const completedWork=/เมื่อวันที่|ที่ผ่านมา|ได้จัด|ดำเนินการแล้ว|เป็นประธานเปิด|ร่วมกิจกรรม|สรุปผล|ผลการดำเนินงาน/.test(sourceText);
+    const upcomingWork=/ขอเชิญ|จะจัด|กำหนดจัด|เปิดรับ|รับสมัคร/.test(sourceText);
+    const rawPoints=splitPoints(real(d.detail));
+    const facts=[...rawPoints];
+    if(!facts.length && real(d.detail)) facts.push(real(d.detail));
+    const opening=publicAddress
+      ? `ประกาศประชาสัมพันธ์จาก${b.org || "[ต้องระบุ: ชื่อหน่วยงาน]"} เรื่อง “${b.title}”`
+      : completedWork || intent === "report"
+        ? `เรื่องราวของ “${b.title}” สะท้อนการดำเนินงานจากข้อมูลจริงที่เกิดขึ้น`
+        : intent === "announcement"
+          ? `${b.org ? `${b.org} ` : ""}ขอแจ้งเรื่อง “${b.title}”`
+          : upcomingWork || intent === "invitation"
+            ? `${b.org ? `${b.org} ` : ""}ขอเชิญชวนร่วม “${b.title}”`
+            : `ขอนำเสนอเรื่อง “${b.title}”`;
+    const factualBody=facts.map(point=>clamp(point,320));
+    const safeIdeas=safeExpansion(b);
+    const datePlace=[b.date && `วันและเวลา ${b.date}`,b.place && `สถานที่ ${b.place}`].filter(Boolean);
+    const closing=b.action ? b.action : "";
+    const blocks=[opening,...factualBody,...safeIdeas,...datePlace,closing].filter(Boolean);
+    let speech=blocks.join("\n\n");
+    const target=targetSeconds(length);
+    const actual=spokenSeconds(speech);
+    const timing=actual < target * .72
+      ? `ข้อมูลที่มีเพียงพอสำหรับประมาณ ${actual} วินาที หากต้องการให้ครบ ${target} วินาที ควรเติมรายละเอียดกิจกรรม ผลที่เกิดขึ้น หรือบุคคลที่เกี่ยวข้อง โดยระบบจะไม่แต่งขึ้นเอง`
+      : actual > target * 1.18
+        ? `บทนี้ยาวประมาณ ${actual} วินาที ควรกด “กระชับลง” เพื่อให้ใกล้ ${target} วินาที`
+        : `เวลาอ่านโดยประมาณ ${actual} วินาที ใกล้เป้าหมาย ${target} วินาที`;
+    const pronunciation=b.pronunciation ? `\n\nคำอ่านชื่อเฉพาะ\n${b.pronunciation}` : "";
+    return `${publicAddress ? "สคริปต์เสียงตามสาย / รถประชาสัมพันธ์" : "บทพากย์ฉบับร่าง"}\n\n[น้ำเสียง: ${style}]\n\n${speech}${pronunciation}\n\nตรวจเวลาและความครบถ้วน\n${timing}`.replace(/\n{3,}/g,"\n\n");
   }
 
   function prWriter(d={}, options={}){
     const mode = real(options.channel) || real(d.channel) || "โพสต์ Facebook พร้อมเผยแพร่";
     const merged = Object.assign({}, d, {
+      _postStrict:true,
       channel: real(options.platform) || real(d.channel),
       tone: real(options.delivery) || real(d.tone),
       workContext: real(options.purpose) || real(d.workContext),
@@ -261,15 +312,15 @@
       const intent = detectIntent(merged, "post");
       const detail = `${merged.title || ""} ${merged.detail || ""} ${merged.workContext || ""}`;
       if(/สรุป|ผลการดำเนิน|ดำเนินงาน|ประธานเปิด|ร่วมกิจกรรม|เมื่อวันที่/.test(detail) || intent === "report") return videoWriter({...merged, format:"สคริปต์สรุปกิจกรรม"}, length === "ให้ AI กำหนด" ? "3–4 นาที" : length);
-      if(/เสียงตามสาย|รถประชาสัมพันธ์|ประกาศเสียง|หอกระจายข่าว/.test(detail)) return voiceWriter(merged, length === "ให้ AI กำหนด" ? "60 วินาที" : length, "ประกาศชัดเจน ฟังเข้าใจในครั้งเดียว และวนซ้ำได้");
+      if(/เสียงตามสาย|รถประชาสัมพันธ์|ประกาศเสียง|หอกระจายข่าว/.test(detail)) return postVoiceWriter(merged, length === "ให้ AI กำหนด" ? "60 วินาที" : length, "ประกาศชัดเจน ฟังเข้าใจในครั้งเดียว และวนซ้ำได้", true);
       if(/เชิญ|สมัคร|เข้าร่วม|เปิดรับ|กำหนดจัด/.test(detail) || intent === "invitation") return videoWriter({...merged, format:"สคริปต์เชิญชวนประชาสัมพันธ์"}, length === "ให้ AI กำหนด" ? "60 วินาที" : length);
       return captionWriter(merged);
     }
     if(/สคริปต์วิดีโอ/.test(mode)) return videoWriter(merged, length);
     if(/สคริปต์สรุปกิจกรรม/.test(mode)) return videoWriter({...merged, format:"สคริปต์สรุปกิจกรรม"}, length);
     if(/สคริปต์เชิญชวน/.test(mode)) return videoWriter({...merged, format:"สคริปต์เชิญชวนประชาสัมพันธ์"}, length);
-    if(/เสียงตามสาย|รถประชาสัมพันธ์/.test(mode)) return voiceWriter(merged, length, "ประกาศชัดเจน ฟังเข้าใจในครั้งเดียว และวนซ้ำได้");
-    if(/บทพากย์|ทำเสียง/.test(mode)) return voiceWriter(merged, length, real(options.delivery) || "สุภาพ เป็นธรรมชาติ อ่านง่าย");
+    if(/เสียงตามสาย|รถประชาสัมพันธ์/.test(mode)) return postVoiceWriter(merged, length, "ประกาศชัดเจน ฟังเข้าใจในครั้งเดียว และวนซ้ำได้", true);
+    if(/บทพากย์|ทำเสียง/.test(mode)) return postVoiceWriter(merged, length, real(options.delivery) || "สุภาพ เป็นธรรมชาติ อ่านง่าย");
     if(/ข่าวประชาสัมพันธ์/.test(mode)) return articleWriter(merged);
     if(/แคปชั่น YouTube|Reels|TikTok/.test(mode)) return clipCaptionWriter(merged);
     if(/ครบชุด/.test(mode)){
@@ -282,7 +333,7 @@
     const mode = real(options.channel) || "";
     if(/สคริปต์วิดีโอ/.test(mode)) return clipCaptionWriter(d);
     if(/บทพากย์/.test(mode)) return captionWriter(d);
-    if(/Facebook/.test(mode)) return voiceWriter(d, "30 วินาที", real(options.delivery) || "สุภาพ เป็นธรรมชาติ");
+    if(/Facebook/.test(mode)) return postVoiceWriter(d, "30 วินาที", real(options.delivery) || "สุภาพ เป็นธรรมชาติ");
     if(/ข่าวประชาสัมพันธ์/.test(mode)) return captionWriter(d);
     return articleWriter(d);
   }
@@ -297,7 +348,7 @@
     if(revision === "formal") return `ฉบับปรับเป็นทางการ\n\n${source.replace(/ครับ|ค่ะ|นะครับ|นะคะ/g, "").replace(/อยากให้/g,"ขอให้").replace(/ทุกคน/g,"ทุกท่าน")}`;
     if(revision === "natural") return `ฉบับอ่านเป็นธรรมชาติ\n\n${source.replace(/ดำเนินการ/g,"ทำ").replace(/ประชาชนทุกท่าน/g,"ทุกท่าน").replace(/ดังกล่าว/g,"นี้")}`;
     if(revision === "hook") return `ประโยคเปิดแนะนำ\nเรื่องสำคัญนี้เกี่ยวข้องกับคุณอย่างไร — อ่านรายละเอียดให้ครบก่อนตัดสินใจ\n\n${source}`;
-    if(revision === "expand") return `${source}\n\nรายละเอียดที่ช่วยให้เรื่องสมบูรณ์ขึ้น\nการสื่อสารอย่างต่อเนื่องและความร่วมมือจากผู้เกี่ยวข้อง ช่วยให้สารสำคัญถูกนำไปใช้ได้ชัดเจนและเกิดประโยชน์ต่อกลุ่มเป้าหมายมากขึ้น`;
+    if(revision === "expand") return `${source}\n\nข้อมูลที่ควรเติมเพื่อขยายงานโดยไม่แต่งข้อเท็จจริง\n• สิ่งที่เกิดขึ้นหรือขั้นตอนของงาน\n• ผู้เกี่ยวข้องและบทบาทตามข้อมูลจริง\n• ผลที่เกิดขึ้นหรือประโยชน์ที่ตรวจสอบได้\n• วัน เวลา สถานที่ และช่องทางดำเนินการ หากเกี่ยวข้อง`;
     if(revision === "variant"){
       const paragraphs=source.split(/\n\s*\n/).filter(Boolean);
       return `อีกฉบับสำหรับเลือกใช้\n\n${paragraphs.length > 2 ? [paragraphs[1],paragraphs[0],...paragraphs.slice(2)].join("\n\n") : source}`;

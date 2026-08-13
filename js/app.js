@@ -282,7 +282,7 @@ $("#albumForm").innerHTML = `
         <label class="full">ข้อกำชับเพิ่มเติม<textarea id="post-extra" placeholder="บอกสิ่งที่ต้องเน้น สิ่งที่ควรหลีกเลี่ยง หรือรูปแบบที่ต้องการเพิ่มเติม"></textarea></label>
       </div>
     </div>
-    <div class="button-row post-writer-actions"><button class="btn primary" id="makePost">✨ เขียนผลงานพร้อมใช้</button><button class="btn secondary" id="savePost">บันทึก</button></div>`;
+    <div class="button-row post-writer-actions"><button class="btn primary" id="makePost">✨ เขียนฉบับร่าง</button><button class="btn secondary" id="retryPostAI" type="button" hidden>ลอง AI ออนไลน์อีกครั้ง</button><button class="btn secondary" id="savePost">บันทึก</button></div>`;
 
   $("#mcForm").innerHTML = TANJAI.field("mc") + `
     <div class="form-note mc-note-v895">ใช้สำหรับสคริปต์พิธีกร คำเชิญประธาน คำเชิญผู้กล่าวรายงาน คำกล่าวรายงาน คำกล่าวประธาน คำเชื่อมช่วง สคริปต์เปิด / ปิดงาน และเวอร์ชันย่อถืออ่าน</div>
@@ -552,7 +552,7 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "สคริปต์�
     {label:"สร้างภาพ", icon:"🖼️", view:"image", hint:"Prompt ภาพพร้อมใช้"},
     {label:"แต่งภาพ AI", icon:"✨", view:"photoPro", hint:"ปรับแสง สี เงา ความคมชัดหลายภาพ"},
     {label:"ชุดภาพโพสต์ Facebook", icon:"🧷", view:"album", hint:"อัปโหลดรูป ใส่กรอบ แคปชั่น ZIP"},
-    {label:"เรียบเรียงเนื้อหา", icon:"✍️", view:"post", hint:"สรุปงาน ข่าว โพสต์ Line และแคปชั่น"},
+    {label:"เขียนสคริปต์และเนื้อหา", icon:"✍️", view:"post", hint:"สคริปต์ บทพากย์ ข่าว โพสต์ และแคปชั่น"},
     {label:"งานพิธีกร", icon:"🎤", view:"mc", hint:"สคริปต์พิธีกร คำเชิญประธาน คำกล่าว คำเชื่อมช่วง"},
     {label:"ทำวิดีโอ", icon:"🎬", view:"video", hint:"Storyboard / Hook / Voice Over"},
     {label:"เสียงพากย์", icon:"🎙️", view:"voice", hint:"สคริปต์เสียงอ่าน"},
@@ -1470,8 +1470,8 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "สคริปต์�
     const executeOut=aiResult.text;
     const profile=postWriterProfiles[options.channel] || postWriterProfiles["ให้ AI วิเคราะห์และเลือกผลงาน"];
     TANJAI.setReadyOutput("post", {
-      title:profile.title,
-      desc:aiResult.source === "ai" ? `AI วิเคราะห์และเขียนตามรูปแบบ ${options.channel} โดยรักษาข้อมูลจริงแล้ว` : "ระบบนักเขียนสำรองจัดโครงให้แล้ว กรุณาตรวจข้อมูลจริงก่อนนำไปใช้",
+      title:aiResult.source === "ai" ? profile.title : `ฉบับสำรอง: ${options.channel === "ให้ AI วิเคราะห์และเลือกผลงาน" ? "งานเขียนที่ระบบเลือกให้" : options.channel}`,
+      desc:aiResult.source === "ai" ? `AI ออนไลน์วิเคราะห์และเขียนตามรูปแบบ ${options.channel} โดยรักษาข้อมูลจริงแล้ว` : `AI ออนไลน์ยังไม่สำเร็จ: ${aiResult.error || "ไม่ทราบสาเหตุ"} ระบบสำรองเฉพาะงานเขียนสร้างฉบับให้ก่อน คุณสามารถกดลอง AI อีกครั้งได้`,
       main:executeOut,
       advancedTitle1:"ตรวจข้อเท็จจริงก่อนเผยแพร่",
       advanced1:team.factGuard(d),
@@ -1479,12 +1479,16 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "สคริปต์�
       advanced2:team.supportingVariant(d, options)
     });
     TANJAI.state.lastPost=executeOut;
+    TANJAI.state.lastPostSource=aiResult.source;
     TANJAI.state.lastPostData=d;
     TANJAI.state.lastPostOptions=options;
     TANJAI.updatePostStats(executeOut);
-    TANJAI.toast("สร้างงานเขียนพร้อมใช้แล้ว");
+    TANJAI.toast(aiResult.source === "ai" ? "AI ออนไลน์สร้างงานเขียนให้แล้ว" : "AI ออนไลน์ยังไม่สำเร็จ — แสดงฉบับสำรองให้ก่อน");
+    const retryButton=$("#retryPostAI");
+    if(retryButton) retryButton.hidden=aiResult.source === "ai";
     window.TANJAI_AUTH?.trackUsage("post");
   };
+  $("#retryPostAI").onclick = () => $("#makePost").click();
   document.querySelectorAll("[data-post-revise]").forEach(button => {
     button.addEventListener("click", async () => {
       const current=$("#postOut")?.textContent?.trim() || "";
@@ -1722,7 +1726,7 @@ ${advancedOut}`
       "สร้างภาพ"
     );
   };
-  $("#savePost").onclick = () => TANJAI.saveProject($("#post-title").value || "เรียบเรียงเนื้อหา", $("#postOut").textContent, "เรียบเรียงเนื้อหา");
+  $("#savePost").onclick = () => TANJAI.saveProject($("#post-title").value || "เขียนสคริปต์และเนื้อหา", $("#postOut").textContent, "เขียนสคริปต์และเนื้อหา");
   $("#saveMC").onclick = () => TANJAI.saveProject($("#mc-title").value || "งานพิธีกร", $("#mcOut").textContent, "งานพิธีกร");
   $("#saveVideo").onclick = () => TANJAI.saveProject($("#video-title").value || "ทำวิดีโอ", $("#videoOut").textContent, "ทำวิดีโอ");
   $("#saveVoice").onclick = () => TANJAI.saveProject($("#voice-title").value || "เสียงพากย์", $("#voiceOut").textContent, "เสียงพากย์");

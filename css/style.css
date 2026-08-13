@@ -5588,6 +5588,7 @@ input:focus,select:focus,textarea:focus{border-color:#a78bfa!important;box-shado
 #post .post-writer-mode span{min-width:0;color:var(--muted);font-size:12px;line-height:1.5}
 #post .post-writer-mode:hover{border-color:rgba(167,139,250,.5);transform:translateY(-1px)}
 #post .post-writer-mode.active{border-color:#d946b8;background:linear-gradient(135deg,rgba(124,58,237,.2),rgba(217,70,184,.12));box-shadow:0 0 0 2px rgba(217,70,184,.08)}
+#post .post-writer-actions{align-items:center}
 #post .post-mode-guidance{margin:0 0 14px;padding:11px 13px;border:1px solid rgba(56,189,248,.24);border-radius:12px;background:rgba(14,116,144,.09);color:#c8e9f4;line-height:1.6}
 #post .post-revision-tools{margin-top:14px;padding:14px;border:1px solid var(--line);border-radius:14px;background:rgba(7,11,23,.35)}
 #post .post-revision-tools>div:first-child{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:10px}

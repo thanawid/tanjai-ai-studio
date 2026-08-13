@@ -1,6 +1,6 @@
 {
   "name": "tanjai-ai-studio",
-  "version": "12.5.1",
+  "version": "12.5.2",
   "private": true,
   "description": "ทันใจ AI Studio — เว็บเดียวสำหรับสร้างภาพ เนื้อหา เสียง สไลด์ แต่งวิดีโอ และสร้างวิดีโอ AI",
   "scripts": {
