@@ -4,7 +4,7 @@ const fs = require("fs");
 const page = fs.readFileSync("index.html", "utf8");
 const css = fs.readFileSync("css/style.css", "utf8");
 
-assert.match(page, /V12\.5\.0/);
+assert.match(page, /V12\.5\.1/);
 assert.match(page, /css\/style\.css\?v=12\.5\.0-layout-watermark-fix/);
 assert.match(page, /class="hero-card sales-dashboard-hero">/);
 assert.doesNotMatch(page, /class="hero-card sales-dashboard-hero" style=/);

@@ -82,7 +82,7 @@ const aiConfig = fs.readFileSync(path.join(root, "js", "ai-config.js"), "utf8");
 const index = fs.readFileSync(path.join(root, "index.html"), "utf8");
 const css = fs.readFileSync(path.join(root, "css", "style.css"), "utf8");
 assert.match(index, /js\/free-writing-team\.js/);
-assert.match(index, /V12\.5\.0/);
+assert.match(index, /V12\.5\.1/);
 assert.match(app, /ผู้กำกับภาพอัจฉริยะ/);
 assert.match(app, /generateCurrentImage/);
 assert.match(app, /generateImageWithAI/);
