@@ -254,8 +254,6 @@ $("#albumForm").innerHTML = `
       <div class="post-writer-modes" role="radiogroup" aria-label="ประเภทงานเขียน">
         <label class="post-writer-mode active"><input type="radio" name="post-writer-mode" value="ให้ AI วิเคราะห์และเลือกผลงาน" checked><i>✨</i><b>ให้ AI เลือกให้</b><span>วิเคราะห์ข้อมูล จุดประสงค์ และรูปแบบที่เหมาะที่สุด</span></label>
         <label class="post-writer-mode"><input type="radio" name="post-writer-mode" value="สคริปต์วิดีโอประชาสัมพันธ์"><i>🎬</i><b>สคริปต์วิดีโอ</b><span>แบ่งช่วงเวลา ภาพ บทพากย์ และข้อความบนจอ</span></label>
-        <label class="post-writer-mode"><input type="radio" name="post-writer-mode" value="สคริปต์สรุปกิจกรรม"><i>🎞️</i><b>สรุปกิจกรรม</b><span>เล่าหลังจบงาน ตั้งแต่เปิดเรื่องถึงผลที่ได้รับ</span></label>
-        <label class="post-writer-mode"><input type="radio" name="post-writer-mode" value="สคริปต์เชิญชวนประชาสัมพันธ์"><i>📢</i><b>สคริปต์เชิญชวน</b><span>ดึงความสนใจ บอกรายละเอียด และชวนลงมือทำ</span></label>
         <label class="post-writer-mode"><input type="radio" name="post-writer-mode" value="บทพากย์และข้อความสำหรับทำเสียง"><i>🎙️</i><b>บทพากย์ / ทำเสียง</b><span>คุมเวลาพูด จังหวะ และคำอ่าน</span></label>
         <label class="post-writer-mode"><input type="radio" name="post-writer-mode" value="สคริปต์เสียงตามสายและรถประชาสัมพันธ์"><i>📻</i><b>เสียงตามสาย / รถประชาสัมพันธ์</b><span>เปิดเรียกความสนใจ อ่านชัด และวนประกาศได้</span></label>
         <label class="post-writer-mode"><input type="radio" name="post-writer-mode" value="โพสต์ Facebook พร้อมเผยแพร่"><i>📣</i><b>โพสต์ Facebook</b><span>หัวเปิด เนื้อหา CTA และแฮชแท็ก</span></label>
@@ -263,12 +261,12 @@ $("#albumForm").innerHTML = `
         <label class="post-writer-mode"><input type="radio" name="post-writer-mode" value="แคปชั่น YouTube Reels TikTok"><i>📱</i><b>แคปชั่นคลิป</b><span>YouTube, Reels และ TikTok</span></label>
         <label class="post-writer-mode"><input type="radio" name="post-writer-mode" value="สร้างครบชุดจากข้อมูลเดียว"><i>✨</i><b>สร้างครบชุด</b><span>วิดีโอ เสียง Facebook และแคปชั่น</span></label>
       </div>
-      <select id="post-channel" hidden aria-hidden="true"><option selected>ให้ AI วิเคราะห์และเลือกผลงาน</option><option>สคริปต์วิดีโอประชาสัมพันธ์</option><option>สคริปต์สรุปกิจกรรม</option><option>สคริปต์เชิญชวนประชาสัมพันธ์</option><option>บทพากย์และข้อความสำหรับทำเสียง</option><option>สคริปต์เสียงตามสายและรถประชาสัมพันธ์</option><option>โพสต์ Facebook พร้อมเผยแพร่</option><option>ข่าวประชาสัมพันธ์</option><option>แคปชั่น YouTube Reels TikTok</option><option>สร้างครบชุดจากข้อมูลเดียว</option></select>
+      <select id="post-channel" hidden aria-hidden="true"><option selected>ให้ AI วิเคราะห์และเลือกผลงาน</option><option>สคริปต์วิดีโอประชาสัมพันธ์</option><option>บทพากย์และข้อความสำหรับทำเสียง</option><option>สคริปต์เสียงตามสายและรถประชาสัมพันธ์</option><option>โพสต์ Facebook พร้อมเผยแพร่</option><option>ข่าวประชาสัมพันธ์</option><option>แคปชั่น YouTube Reels TikTok</option><option>สร้างครบชุดจากข้อมูลเดียว</option></select>
       <div class="post-mode-guidance" id="postModeGuidance">AI จะอ่านข้อมูลก่อน แล้วเลือกชิ้นงาน โครงเรื่อง ความยาว และน้ำเสียงที่เหมาะสม</div>
       <div class="form-grid post-writer-options">
         <label>ความยาวเป้าหมาย<select id="post-length"><option>30 วินาที</option><option selected>60 วินาที</option><option>90 วินาที</option><option>2 นาที</option><option>3–4 นาที</option><option>5 นาที</option></select></label>
         <label>ช่องทางใช้งาน<select id="post-platform"><option selected>Facebook</option><option>YouTube</option><option>Reels / TikTok</option><option>LINE</option><option>เสียงตามสาย / รถประชาสัมพันธ์</option><option>เว็บไซต์ / ข่าวองค์กร</option><option>ใช้หลายช่องทาง</option></select></label>
-        <label>เป้าหมายการสื่อสาร<select id="post-purpose"><option selected>ให้ข้อมูลและสร้างความเข้าใจ</option><option>เชิญชวนให้เข้าร่วม</option><option>สรุปผลการดำเนินงาน</option><option>แจ้งข่าวหรือประกาศ</option><option>สร้างการรับรู้และจดจำ</option><option>ให้ AI วิเคราะห์จากข้อมูล</option></select></label>
+        <label>งานนี้ต้องการสื่ออะไร<select id="post-purpose"><option selected>ให้ AI วิเคราะห์จากข้อมูล</option><option>เชิญชวนก่อนจัดงาน</option><option>สรุปกิจกรรมที่ดำเนินงานแล้ว</option><option>แจ้งข่าวหรือประกาศ</option><option>ให้ความรู้หรือรณรงค์</option><option>รายงานความคืบหน้าหรือผลการดำเนินงาน</option><option>สร้างการรับรู้ทั่วไป</option></select></label>
         <label>น้ำเสียงของชิ้นงาน<select id="post-delivery"><option selected>สุภาพ เป็นธรรมชาติ อ่านง่าย</option><option>ทางการแบบข่าวประชาสัมพันธ์</option><option>อบอุ่น เข้าถึงง่าย</option><option>กระชับ มีพลัง</option><option>จริงจัง น่าเชื่อถือ</option><option>สนุกและเป็นกันเอง</option></select></label>
         <label>ระดับการช่วยคิด<select id="post-creativity"><option selected>ช่วยคิดและแต่งให้สมบูรณ์</option><option>สร้างสรรค์มากขึ้น</option><option>รักษาข้อมูลเป็นหลัก</option></select></label>
         <label>อีโมจิ<select id="post-emoji"><option selected>ใช้เท่าที่จำเป็น</option><option>ไม่ใช้อีโมจิ</option><option>ใช้เพื่อช่วยแบ่งข้อมูล</option></select></label>
@@ -283,7 +281,7 @@ $("#albumForm").innerHTML = `
         <label class="full">ข้อกำชับเพิ่มเติม<textarea id="post-extra" placeholder="บอกสิ่งที่ต้องเน้น สิ่งที่ควรหลีกเลี่ยง หรือรูปแบบที่ต้องการเพิ่มเติม"></textarea></label>
       </div>
     </div>
-    <div class="button-row post-writer-actions"><button class="btn primary" id="makePost">✨ เขียนฉบับร่าง</button><button class="btn secondary" id="retryPostAI" type="button" hidden>ลอง AI ออนไลน์อีกครั้ง</button><button class="btn secondary" id="savePost">บันทึก</button></div>`;
+    <div class="button-row post-writer-actions"><button class="btn primary" id="makePost">✨ เขียนงานพร้อมใช้</button><button class="btn secondary" id="retryPostAI" type="button" hidden>ลองสร้างอีกครั้ง</button><button class="btn secondary" id="savePost">บันทึก</button></div>`;
 
   $("#mcForm").innerHTML = TANJAI.field("mc") + `
     <div class="form-note mc-note-v895">ใช้สำหรับสคริปต์พิธีกร คำเชิญประธาน คำเชิญผู้กล่าวรายงาน คำกล่าวรายงาน คำกล่าวประธาน คำเชื่อมช่วง สคริปต์เปิด / ปิดงาน และเวอร์ชันย่อถืออ่าน</div>
@@ -367,7 +365,7 @@ $("#postResult").innerHTML = TANJAI.readyOutputShell("post", "ผู้ช่ว
     </div>
   </section>`;
   const postStatusLabel = $("#postResult .result-title-block small");
-  if(postStatusLabel) postStatusLabel.textContent = "ฉบับร่างพร้อมตรวจ";
+  if(postStatusLabel) postStatusLabel.textContent = "ผลงานพร้อมใช้";
 $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "สคริปต์พิธีกรพร้อมใช้ — MC Writer", "คุมลำดับพิธี ชื่อ ตำแหน่ง คำเชื่อม และบัตรเตือนพิธีกร", "mcOut");
   $("#videoResult").innerHTML = TANJAI.readyOutputShell("video", "บทวิดีโอพร้อมผลิต — Video Script Writer", "ได้ Hook, Storyboard, บทพากย์ และข้อความบนจอทันที", "videoOut");
   $("#voiceResult").innerHTML = TANJAI.readyOutputShell("voice", "สคริปต์เสียงพร้อมอ่าน — Voice Script Writer", "คุมเวลาพูด จังหวะ คำเน้น และคำอ่าน", "voiceOut");
@@ -386,18 +384,6 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "สคริปต์�
       lengths:["30 วินาที","60 วินาที","90 วินาที","2 นาที","3–4 นาที","5 นาที"],
       defaultLength:"60 วินาที",
       title:"สคริปต์วิดีโอประชาสัมพันธ์พร้อมผลิต"
-    },
-    "สคริปต์สรุปกิจกรรม":{
-      guide:"ได้สคริปต์เล่าหลังจบงาน มีภาพเปิด บรรยากาศ การดำเนินงาน ผลที่เกิดขึ้น และฉากปิด",
-      lengths:["60 วินาที","90 วินาที","2 นาที","3–4 นาที","5 นาที"],
-      defaultLength:"3–4 นาที",
-      title:"สคริปต์สรุปกิจกรรมพร้อมตัดต่อ"
-    },
-    "สคริปต์เชิญชวนประชาสัมพันธ์":{
-      guide:"ได้ Hook รายละเอียดที่ต้องรู้ เหตุผลที่ควรเข้าร่วม และคำเชิญชวนที่ไม่กล่าวเกินจริง",
-      lengths:["15 วินาที","30 วินาที","60 วินาที","90 วินาที","2 นาที"],
-      defaultLength:"60 วินาที",
-      title:"สคริปต์เชิญชวนพร้อมใช้งาน"
     },
     "บทพากย์และข้อความสำหรับทำเสียง":{
       guide:"ได้บทอ่านสะอาด คุมเวลาพูด จังหวะหยุด คำเน้น และคำอ่านชื่อเฉพาะ",
@@ -451,6 +437,15 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "สคริปต์�
       const input = label.querySelector("input");
       label.classList.toggle("active", input?.value === mode);
     });
+    const revisionSets={
+      video:new Set(["shorter","natural","hook","thirtySeconds","threeMinutes","toVoice","toCaption","proofread"]),
+      voice:new Set(["shorter","formal","natural","hook","thirtySeconds","toCaption","proofread"]),
+      social:new Set(["shorter","formal","natural","hook","expand","variant","proofread"]),
+      news:new Set(["shorter","formal","natural","hook","expand","variant","toCaption","proofread"]),
+      complete:new Set(["shorter","formal","natural","proofread"])
+    };
+    const group=/สคริปต์วิดีโอ/.test(mode) ? "video" : /บทพากย์|เสียงตามสาย|รถประชาสัมพันธ์/.test(mode) ? "voice" : /ข่าวประชาสัมพันธ์/.test(mode) ? "news" : /ครบชุด/.test(mode) ? "complete" : "social";
+    document.querySelectorAll("[data-post-revise]").forEach(button=>{button.hidden=!revisionSets[group].has(button.dataset.postRevise);});
   };
 
   TANJAI.collectPostOptions = function(){
@@ -1452,6 +1447,7 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "สคริปต์�
     const d=TANJAI.commonData("post");
     const team=TANJAI.freeWritingTeam;
     const options=TANJAI.collectPostOptions();
+    options.silentStatus=true;
     Object.assign(d, {
       channel:options.channel,
       length:options.length,
@@ -1472,22 +1468,22 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "สคริปต์�
     const executeOut=aiResult.text;
     const profile=postWriterProfiles[options.channel] || postWriterProfiles["ให้ AI วิเคราะห์และเลือกผลงาน"];
     TANJAI.setReadyOutput("post", {
-      title:aiResult.source === "ai" ? profile.title : `ฉบับสำรอง: ${options.channel === "ให้ AI วิเคราะห์และเลือกผลงาน" ? "งานเขียนที่ระบบเลือกให้" : options.channel}`,
-      desc:aiResult.source === "ai" ? `AI ออนไลน์วิเคราะห์และเขียนตามรูปแบบ ${options.channel} โดยรักษาข้อมูลจริงแล้ว` : `AI ออนไลน์ยังไม่สำเร็จ: ${aiResult.error || "ไม่ทราบสาเหตุ"} ระบบสำรองเฉพาะงานเขียนสร้างฉบับให้ก่อน คุณสามารถกดลอง AI อีกครั้งได้`,
+      title:profile.title,
+      desc:"อ่าน แก้ไข หรือคัดลอกไปใช้งานได้ทันที ข้อมูลที่ไม่ได้ระบุจะไม่ถูกแต่งขึ้นเป็นข้อเท็จจริง",
       main:executeOut,
-      advancedTitle1:"ตรวจข้อเท็จจริงก่อนเผยแพร่",
+      advancedTitle1:"ข้อมูลสำคัญที่ควรตรวจ",
       advanced1:team.factGuard(d),
-      advancedTitle2:"ฉบับใช้ต่ออีกช่องทาง",
-      advanced2:team.supportingVariant(d, options)
+      advancedTitle2:"",
+      advanced2:""
     });
     TANJAI.state.lastPost=executeOut;
     TANJAI.state.lastPostSource=aiResult.source;
     TANJAI.state.lastPostData=d;
     TANJAI.state.lastPostOptions=options;
     TANJAI.updatePostStats(executeOut);
-    TANJAI.toast(aiResult.source === "ai" ? "AI ออนไลน์สร้างงานเขียนให้แล้ว" : "AI ออนไลน์ยังไม่สำเร็จ — แสดงฉบับสำรองให้ก่อน");
+    TANJAI.toast("สร้างงานเขียนพร้อมใช้ให้แล้ว");
     const retryButton=$("#retryPostAI");
-    if(retryButton) retryButton.hidden=aiResult.source === "ai";
+    if(retryButton) retryButton.hidden=true;
     window.TANJAI_AUTH?.trackUsage("post");
   };
   $("#retryPostAI").onclick = () => $("#makePost").click();
@@ -1517,18 +1513,18 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "สคริปต์�
       const aiResult=await TANJAI.generateWritingWithAI({
         tool:"post",
         data:{...originalData, detail:current, originalText:current},
-        options:{...originalOptions, revision:revisionLabels[revision], preserveFacts:true},
+        options:{...originalOptions, revision:revisionLabels[revision], preserveFacts:true, silentStatus:true},
         fallback:()=>TANJAI.freeWritingTeam.reviseWriting(current, revision),
         button
       });
       TANJAI.setReadyOutput("post", {
         title:(postWriterProfiles[originalOptions.channel] || {}).title || "งานเขียนฉบับปรับแล้ว",
-        desc:`ปรับงานแล้ว: ${revisionLabels[revision]}`,
+        desc:"ปรับข้อความให้แล้ว โดยรักษาข้อมูลจริงจากต้นฉบับ",
         main:aiResult.text,
-        advancedTitle1:"ตรวจข้อเท็จจริงก่อนเผยแพร่",
+        advancedTitle1:"ข้อมูลสำคัญที่ควรตรวจ",
         advanced1:TANJAI.freeWritingTeam.factGuard(originalData),
-        advancedTitle2:"ต้นฉบับก่อนปรับ",
-        advanced2:current
+        advancedTitle2:"",
+        advanced2:""
       });
       TANJAI.state.lastPost=aiResult.text;
       TANJAI.updatePostStats(aiResult.text);

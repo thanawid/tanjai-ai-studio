@@ -13,8 +13,6 @@ assert(app.includes('id="post-creativity"'), "post should let users control the 
 assert(app.includes('<option selected>ช่วยคิดและแต่งให้สมบูรณ์</option>'), "complete creative assistance should be the default");
 [
   "สคริปต์วิดีโอประชาสัมพันธ์",
-  "สคริปต์สรุปกิจกรรม",
-  "สคริปต์เชิญชวนประชาสัมพันธ์",
   "บทพากย์และข้อความสำหรับทำเสียง",
   "สคริปต์เสียงตามสายและรถประชาสัมพันธ์",
   "โพสต์ Facebook พร้อมเผยแพร่",
@@ -22,11 +20,16 @@ assert(app.includes('<option selected>ช่วยคิดและแต่ง
   "แคปชั่น YouTube Reels TikTok",
   "สร้างครบชุดจากข้อมูลเดียว"
 ].forEach(mode => assert(app.includes(mode), `missing post mode: ${mode}`));
+assert(!app.includes('name="post-writer-mode" value="สคริปต์สรุปกิจกรรม"'), "recap is a purpose, not a writing format");
+assert(!app.includes('name="post-writer-mode" value="สคริปต์เชิญชวนประชาสัมพันธ์"'), "invitation is a purpose, not a writing format");
+assert(app.includes("สรุปกิจกรรมที่ดำเนินงานแล้ว"), "content purpose should include completed activity");
+assert(!app.includes("ฉบับสำรอง:"), "backend fallback state must stay hidden from users");
+assert(!app.includes("AI ออนไลน์ยังไม่สำเร็จ"), "backend AI status must stay hidden from users");
 
 [worker, edgeWorker].forEach((source, index) => {
   assert(source.includes("จากข้อมูลที่ให้มา"), `worker ${index + 1} needs an anti-meta-writing rule`);
   assert(source.includes("เสียงตามสาย"), `worker ${index + 1} needs public-address script rules`);
-  assert(source.includes("สคริปต์สรุปกิจกรรม"), `worker ${index + 1} needs recap-script rules`);
+  assert(source.includes("สรุปกิจกรรม"), `worker ${index + 1} needs recap context rules`);
   assert(source.includes("ห้ามสร้าง CTA ที่อ้างข้อเท็จจริงเฉพาะ") || source.includes("ห้ามสร้างผลลัพธ์"), `worker ${index + 1} needs CTA fact safety`);
 });
 
@@ -40,7 +43,7 @@ assert(app.includes("ย่อเป็น 30 วินาที") && app.includ
 console.log(JSON.stringify({
   menu:"เขียนสคริปต์และเนื้อหา",
   defaultMode:"AI วิเคราะห์และเลือกผลงาน",
-  specialistModes:9,
+  specialistModes:7,
   onlineAndFallbackBrains:true,
   contextualRevisions:true,
   status:"PASS"

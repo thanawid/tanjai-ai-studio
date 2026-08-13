@@ -26,7 +26,7 @@
     const text = clean(value);
     if(!text) return [];
     return text
-      .split(/\n+|[•▪●]|(?:\s+-\s+)|(?:\s*[0-9]+[.)]\s*)/g)
+      .split(/\n+|[•▪●]|(?:\s+-\s+)|(?:^|\n)\s*[0-9]+[.)]\s+/g)
       .map(x => clean(x.replace(/^[-–—]+\s*/, "")))
       .filter(Boolean)
       .slice(0, 8);
@@ -130,6 +130,9 @@
     if(/ผู้สูงอายุ|ผู้สูงวัย|สุขภาพ/.test(source) && !/ยุงลาย|ไข้เลือดออก/.test(source)){
       ideas.push("กิจกรรมด้านสุขภาพมุ่งส่งเสริมให้ประชาชนเห็นความสำคัญของการดูแลตนเอง และนำแนวทางที่เหมาะสมไปใช้ในชีวิตประจำวัน");
     }
+    if(/ออกกำลังกาย|แอโรบิก|แอโรบิค|เต้น|สุขภาพ/.test(source) && !/ยุงลาย|ไข้เลือดออก/.test(source)){
+      ideas.push("การขยับร่างกายอย่างสม่ำเสมอช่วยสร้างเสริมสุขภาพ และทำให้การออกกำลังกายเป็นกิจกรรมที่สนุกเมื่อได้ทำร่วมกัน");
+    }
     if(/อบรม|ฝึกอบรม|ให้ความรู้/.test(source)){
       ideas.push("สาระของกิจกรรมเน้นความเข้าใจที่นำไปปฏิบัติได้จริง และเปิดโอกาสให้ผู้เข้าร่วมเชื่อมโยงความรู้กับบริบทของตนเอง");
     }
@@ -149,6 +152,11 @@
   }
 
   function postIntent(d={}){
+    const selected=real(d.workContext);
+    if(/เชิญชวน|ก่อนจัดงาน/.test(selected)) return "invitation";
+    if(/สรุป.*กิจกรรม|ดำเนินงานแล้ว|รายงานความคืบหน้า|รายงานผล/.test(selected)) return "report";
+    if(/แจ้งข่าว|ประกาศ/.test(selected)) return "announcement";
+    if(/ให้ความรู้|รณรงค์/.test(selected)) return "education";
     const b=contentBrain(d);
     const stage=postStage(b);
     if(stage === "announcement") return "announcement";
@@ -180,6 +188,7 @@
     const source=`${b.title} ${b.detail}`;
     if(/ยุงลาย|ไข้เลือดออก/.test(source)) return "มาร่วมกันสำรวจและลดจุดเสี่ยงรอบตัว เพื่อให้บ้านและชุมชนปลอดภัยยิ่งขึ้น";
     if(/ขยะ|คัดแยก|ความสะอาด/.test(source)) return "เริ่มได้จากสิ่งใกล้ตัว ร่วมกันดูแลพื้นที่ของเราให้สะอาดและน่าอยู่อย่างต่อเนื่อง";
+    if(/ออกกำลังกาย|แอโรบิก|แอโรบิค|เต้น|สุขภาพ/.test(source) && intent === "invitation") return "ชวนคนที่คุณรักมาขยับร่างกาย สนุกไปด้วยกัน และเริ่มดูแลสุขภาพจากก้าวเล็ก ๆ ในวันนี้";
     if(intent === "invitation") return "ขอเชิญผู้สนใจร่วมเป็นส่วนหนึ่งของกิจกรรม และร่วมสร้างประโยชน์ไปด้วยกัน";
     if(intent === "announcement") return "โปรดอ่านรายละเอียดให้ครบถ้วน และเตรียมตัวให้เหมาะสมกับข้อมูลที่ประกาศ";
     if(intent === "report") return "ทุกความร่วมมือคือแรงสำคัญที่ทำให้งานเดินหน้าต่อไปได้อย่างมีความหมาย";
@@ -346,7 +355,7 @@
 
   function postVoiceWriter(d={}, length="60 วินาที", style="สุภาพ เป็นธรรมชาติ อ่านง่าย", publicAddress=false){
     const b=contentBrain(d);
-    const intent=detectIntent(d,"post");
+    const intent=postIntent(d);
     const sourceText=`${real(d.title)} ${real(d.detail)} ${real(d.workContext)}`;
     const completedWork=/เมื่อวันที่|ที่ผ่านมา|ได้จัด|ดำเนินการแล้ว|เป็นประธานเปิด|ร่วมกิจกรรม|สรุปผล|ผลการดำเนินงาน/.test(sourceText);
     const upcomingWork=/ขอเชิญ|จะจัด|กำหนดจัด|เปิดรับ|รับสมัคร/.test(sourceText);
@@ -370,13 +379,21 @@
     let speech=blocks.join("\n\n");
     const target=targetSeconds(length);
     const actual=spokenSeconds(speech);
-    const timing=actual < target * .72
-      ? `ข้อมูลที่มีเพียงพอสำหรับประมาณ ${actual} วินาที หากต้องการให้ครบ ${target} วินาที ควรเติมรายละเอียดกิจกรรม ผลที่เกิดขึ้น หรือบุคคลที่เกี่ยวข้อง โดยระบบจะไม่แต่งขึ้นเอง`
-      : actual > target * 1.18
-        ? `บทนี้ยาวประมาณ ${actual} วินาที ควรกด “กระชับลง” เพื่อให้ใกล้ ${target} วินาที`
-        : `เวลาอ่านโดยประมาณ ${actual} วินาที ใกล้เป้าหมาย ${target} วินาที`;
+    const timing=`เวลาอ่านโดยประมาณ ${actual} วินาที${Math.abs(actual-target) <= Math.max(8,target*.2) ? ` • ใกล้เป้าหมาย ${target} วินาที` : ""}`;
     const pronunciation=b.pronunciation ? `\n\nคำอ่านชื่อเฉพาะ\n${b.pronunciation}` : "";
-    return `${publicAddress ? "สคริปต์เสียงตามสาย / รถประชาสัมพันธ์" : "บทพากย์ฉบับร่าง"}\n\n[น้ำเสียง: ${style}]\n\n${speech}${pronunciation}\n\nตรวจเวลาและความครบถ้วน\n${timing}`.replace(/\n{3,}/g,"\n\n");
+    return `${publicAddress ? "ข้อความประชาสัมพันธ์พร้อมอ่าน" : "บทพากย์พร้อมบันทึกเสียง"}\n\nน้ำเสียง: ${style}\n\n${speech}${pronunciation}\n\n${timing}`.replace(/\n{3,}/g,"\n\n");
+  }
+
+  function postVideoScriptWriter(d={}, length="60 วินาที"){
+    const b=contentBrain(d);
+    const intent=postIntent(d);
+    const facts=splitPoints(real(d.detail));
+    const ideas=editorialExpansion(b,intent,creativeLevel(d));
+    const opening=creativeHook(b,intent);
+    const body=[...(facts.length ? facts : [b.detail]),...ideas].filter(Boolean).join(" ");
+    const close=safePostClosing(b,intent,creativeLevel(d));
+    const duration=targetSeconds(length);
+    return `สคริปต์วิดีโอพร้อมนำไปผลิต\n\nความยาวเป้าหมาย: ${length}\n\nช่วงเปิด 0–${Math.min(5,duration)} วินาที\nภาพ: ภาพเปิดที่สื่อหัวข้อ “${b.title}” ได้ทันที\nบทพากย์: ${opening}\nข้อความบนจอ: ${b.title}\n\nช่วงเนื้อหา\nภาพ: ภาพกิจกรรมหรือภาพประกอบตามข้อมูลจริง เรียงจากภาพรวมสู่รายละเอียด\nบทพากย์: ${body}\nข้อความบนจอ: ${[b.date,b.place].filter(Boolean).join(" • ") || "ใช้เฉพาะข้อมูลสำคัญที่ยืนยันแล้ว"}\n\nช่วงปิด\nภาพ: ภาพสรุปบรรยากาศหรือภาพหน่วยงาน\nบทพากย์: ${close}\nข้อความบนจอ: ${b.org || b.title}`.replace(/\n{3,}/g,"\n\n");
   }
 
   function prWriter(d={}, options={}){
@@ -400,19 +417,16 @@
       const isCompleted=/สรุป|ผลการดำเนิน|ดำเนินงาน|ประธานเปิด|ร่วมกิจกรรม|เมื่อวันที่|ลงพื้นที่/.test(detail) || intent === "report";
       const isInvitation=/เชิญ|สมัคร|เข้าร่วม|เปิดรับ|กำหนดจัด/.test(detail) || intent === "invitation";
       if(wantsAudio) return postVoiceWriter(merged, length === "ให้ AI กำหนด" ? "60 วินาที" : length, "ประกาศชัดเจน ฟังเข้าใจในครั้งเดียว และวนซ้ำได้", true);
-      if(wantsVideo && isCompleted) return videoWriter({...merged, format:"สคริปต์สรุปกิจกรรม"}, length === "ให้ AI กำหนด" ? "3–4 นาที" : length);
-      if(wantsVideo && isInvitation) return videoWriter({...merged, format:"สคริปต์เชิญชวนประชาสัมพันธ์"}, length === "ให้ AI กำหนด" ? "60 วินาที" : length);
+      if(wantsVideo && (isCompleted || isInvitation)) return postVideoScriptWriter(merged, length === "ให้ AI กำหนด" ? "60 วินาที" : length);
       return captionWriter(merged);
     }
-    if(/สคริปต์วิดีโอ/.test(mode)) return videoWriter(merged, length);
-    if(/สคริปต์สรุปกิจกรรม/.test(mode)) return videoWriter({...merged, format:"สคริปต์สรุปกิจกรรม"}, length);
-    if(/สคริปต์เชิญชวน/.test(mode)) return videoWriter({...merged, format:"สคริปต์เชิญชวนประชาสัมพันธ์"}, length);
+    if(/สคริปต์วิดีโอ/.test(mode)) return postVideoScriptWriter(merged, length);
     if(/เสียงตามสาย|รถประชาสัมพันธ์/.test(mode)) return postVoiceWriter(merged, length, "ประกาศชัดเจน ฟังเข้าใจในครั้งเดียว และวนซ้ำได้", true);
     if(/บทพากย์|ทำเสียง/.test(mode)) return postVoiceWriter(merged, length, real(options.delivery) || "สุภาพ เป็นธรรมชาติ อ่านง่าย");
     if(/ข่าวประชาสัมพันธ์/.test(mode)) return articleWriter(merged);
     if(/แคปชั่น YouTube|Reels|TikTok/.test(mode)) return clipCaptionWriter(merged);
     if(/ครบชุด/.test(mode)){
-      return `ชุดงานประชาสัมพันธ์จากข้อมูลเดียว\n\n=== 1. สคริปต์วิดีโอ ===\n${videoWriter(merged, length)}\n\n=== 2. บทพากย์พร้อมอ่าน ===\n${voiceWriter(merged, length, real(options.delivery) || "สุภาพ เป็นธรรมชาติ อ่านง่าย")}\n\n=== 3. โพสต์ Facebook ===\n${captionWriter(merged)}\n\n=== 4. ข้อความประกอบคลิป ===\n${clipCaptionWriter(merged)}`;
+      return `ชุดงานเขียนประชาสัมพันธ์พร้อมใช้\n\n=== 1. โพสต์ Facebook ===\n${captionWriter(merged)}\n\n=== 2. ข่าวประชาสัมพันธ์ ===\n${articleWriter(merged)}\n\n=== 3. บทพากย์ ===\n${postVoiceWriter(merged, length, real(options.delivery) || "สุภาพ เป็นธรรมชาติ อ่านง่าย")}\n\n=== 4. แคปชั่นคลิป ===\n${clipCaptionWriter(merged)}`;
     }
     return captionWriter(merged);
   }

@@ -53,12 +53,13 @@ assert.match(outputs.video, /SCENE 6/);
 assert.match(outputs.voice, /สคริปต์เสียงพร้อมอ่าน/);
 assert.match(outputs.slides, /SLIDE 8/);
 assert.match(outputs.guard, /FACT GUARD/);
-assert.match(prModes.video, /Video Production Pack/);
-assert.match(prModes.voice, /บทพากย์ฉบับร่าง/);
+assert.match(prModes.video, /สคริปต์วิดีโอพร้อมนำไปผลิต/);
+assert.doesNotMatch(prModes.video, /Video Production Pack|SHORT_SHOT_PROMPTS|CAPCUT/);
+assert.match(prModes.voice, /บทพากย์พร้อมบันทึกเสียง/);
 assert.match(prModes.facebook, /โพสต์พร้อมเผยแพร่/);
 assert.match(prModes.news, /ข่าวประชาสัมพันธ์พร้อมเผยแพร่/);
 assert.match(prModes.clip, /ชุดข้อความประกอบคลิปพร้อมใช้/);
-assert.match(prModes.complete, /=== 4\. ข้อความประกอบคลิป ===/);
+assert.match(prModes.complete, /=== 4\. แคปชั่นคลิป ===/);
 assert.match(team.reviseWriting(outputs.caption,"proofread"), /ฉบับตรวจทานภาษาแล้ว/);
 assert.match(team.reviseWriting(outputs.caption,"expand"), /ข้อมูลที่ควรเติมเพื่อขยายงานโดยไม่แต่งข้อเท็จจริง/);
 assert.doesNotMatch(team.reviseWriting(outputs.caption,"expand"), /การสื่อสารอย่างต่อเนื่องและความร่วมมือ/);
@@ -100,7 +101,8 @@ const autoYoutube=team.prWriter({
   orgName:"เทศบาลตัวอย่าง",
   detail:"เมื่อวันที่ 5 สิงหาคม 2569 ลงพื้นที่หมู่ที่ 6"
 },{channel:"ให้ AI วิเคราะห์และเลือกผลงาน",platform:"YouTube",purpose:"สรุปผลการดำเนินงาน",length:"60 วินาที"});
-assert.match(autoYoutube,/Video Production Pack/);
+assert.match(autoYoutube,/สคริปต์วิดีโอพร้อมนำไปผลิต/);
+assert.doesNotMatch(autoYoutube,/Video Production Pack|SHORT_SHOT_PROMPTS|CAPCUT/);
 
 const cancellationPost=team.prWriter({
   title:"งดกิจกรรมเต้นแอโรบิค",
@@ -116,10 +118,17 @@ const shortVoice=team.prWriter({
   orgName:"เทศบาลตัวอย่าง",
   detail:"เมื่อวันที่ 5 สิงหาคม 2569 นายกเทศมนตรีเป็นประธานเปิดกิจกรรม และประชาชนร่วมออกกำลังกาย"
 },{channel:"บทพากย์และข้อความสำหรับทำเสียง",length:"60 วินาที"});
-assert.match(shortVoice,/บทพากย์ฉบับร่าง/);
-assert.match(shortVoice,/ข้อมูลที่มีเพียงพอสำหรับประมาณ/);
+assert.match(shortVoice,/บทพากย์พร้อมบันทึกเสียง/);
 assert.doesNotMatch(shortVoice,/ขอเชิญชวน/);
 assert.doesNotMatch(shortVoice,/ติดตามข้อมูลเพิ่มเติม/);
+
+const exactTime=team.prWriter({
+  title:"เสียเหงื่อ กันหน่อยไหม",
+  orgName:"เทศบาลเมืองบางรักน้อย",
+  detail:"กิจกรรมเต้นแอโรบิก ทุกวันพุธและวันศุกร์ ตั้งแต่เวลา 17.00 น. เป็นต้นไป ณ เทศบาลเมืองบางรักน้อย"
+},{channel:"บทพากย์และข้อความสำหรับทำเสียง",length:"60 วินาที"});
+assert.match(exactTime,/17\.00 น\./);
+assert.doesNotMatch(exactTime,/\n00 น\./);
 
 const publicAddress=team.prWriter({
   title:"รับสมัครอาสาสมัคร",
@@ -127,7 +136,7 @@ const publicAddress=team.prWriter({
   detail:"เปิดรับสมัครอาสาสมัครดูแลชุมชน",
   expertAction:"สมัครได้ที่สำนักปลัดเทศบาล"
 },{channel:"สคริปต์เสียงตามสายและรถประชาสัมพันธ์",length:"30 วินาที"});
-assert.match(publicAddress,/สคริปต์เสียงตามสาย \/ รถประชาสัมพันธ์/);
+assert.match(publicAddress,/ข้อความประชาสัมพันธ์พร้อมอ่าน/);
 assert.match(publicAddress,/สมัครได้ที่สำนักปลัดเทศบาล/);
 assert.doesNotMatch(publicAddress,/\[ต้องระบุ: วัน/);
 
@@ -140,7 +149,7 @@ const aiConfig = fs.readFileSync(path.join(root, "js", "ai-config.js"), "utf8");
 const index = fs.readFileSync(path.join(root, "index.html"), "utf8");
 const css = fs.readFileSync(path.join(root, "css", "style.css"), "utf8");
 assert.match(index, /js\/free-writing-team\.js/);
-assert.match(index, /V12\.5\.3/);
+assert.match(index, /V12\.5\.4/);
 assert.match(app, /ผู้กำกับภาพอัจฉริยะ/);
 assert.match(app, /generateCurrentImage/);
 assert.match(app, /generateImageWithAI/);
