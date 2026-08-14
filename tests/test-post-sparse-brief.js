@@ -25,4 +25,35 @@ const explicit = {...brief, dateTime:'14 สิงหาคม 2569', place:'ห
 assert.match(team.factGuard(explicit), /14 สิงหาคม 2569/);
 assert.match(team.factGuard(explicit), /ห้องประชุม/);
 
-console.log(JSON.stringify({sparseBriefFoundation:true,noInventedEventFacts:true,explicitFactsPreserved:true,status:'PASS'},null,2));
+const inspection = team.prWriter({
+  title:'ตรวจสถานประกอบการ',
+  detail:'ตรวจสถานประกอบการสระน้ำบางกอกคิดส์? ออกใบอนุญาตตามพรบ.สาธารณสุข2535'
+}, {
+  channel:'โพสต์ Facebook พร้อมเผยแพร่',
+  purpose:'ให้ AI วิเคราะห์จากข้อมูล',
+  platform:'Facebook'
+});
+assert.match(inspection, /สระว่ายน้ำบางกอกคิดส์/);
+assert.match(inspection, /พระราชบัญญัติการสาธารณสุข พ\.ศ\. 2535/);
+assert.match(inspection, /สุขลักษณะ.*ความสะอาด.*คุณภาพน้ำ.*ความปลอดภัย/);
+assert.match(inspection, /ลดปัจจัยเสี่ยง.*สุขภาพ/);
+assert.doesNotMatch(inspection, /Thai PR Copywriter|ใกล้ตัว|ชีวิตประจำวัน|ได้รับอนุญาตแล้ว|ผ่านการตรวจ/);
+
+const inspectionVideo = team.prWriter({
+  title:'ตรวจสถานประกอบการ',
+  detail:'ตรวจสถานประกอบการสระน้ำบางกอกคิดส์? ออกใบอนุญาตตามพรบ.สาธารณสุข2535'
+}, {
+  channel:'สคริปต์วิดีโอประชาสัมพันธ์',
+  length:'60 วินาที',
+  purpose:'ให้ AI วิเคราะห์จากข้อมูล'
+});
+assert.match(inspectionVideo, /สคริปต์วิดีโอประชาสัมพันธ์พร้อมผลิต/);
+assert.match(inspectionVideo, /ช่วงเปิด 0–/);
+assert.match(inspectionVideo, /ภาพ:.*สระว่ายน้ำบางกอกคิดส์/);
+assert.match(inspectionVideo, /บทพากย์:/);
+assert.match(inspectionVideo, /ข้อความบนจอ:/);
+assert.match(inspectionVideo, /คุณภาพน้ำ/);
+assert.match(inspectionVideo, /พระราชบัญญัติการสาธารณสุข พ\.ศ\. 2535/);
+assert.doesNotMatch(inspectionVideo, /โพสต์ Facebook/);
+
+console.log(JSON.stringify({sparseBriefFoundation:true,noInventedEventFacts:true,explicitFactsPreserved:true,regulatoryInspectionPost:true,regulatoryInspectionVideo:true,status:'PASS'},null,2));

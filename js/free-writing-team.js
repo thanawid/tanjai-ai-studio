@@ -140,6 +140,10 @@
       ideas.push("การฝึกซ้อมช่วยให้ผู้เกี่ยวข้องเข้าใจบทบาท ลำดับการประสานงาน และแนวทางปฏิบัติเมื่อเกิดเหตุฉุกเฉินได้ชัดเจนขึ้น");
       ideas.push("การทบทวนแผนร่วมกันช่วยลดความสับสน เสริมความพร้อม และทำให้การรับมือสถานการณ์จริงเป็นระบบมากขึ้น");
     }
+    if(/ตรวจสถานประกอบการ|ตรวจสุขลักษณะ|ออกใบอนุญาต|พ\.?ร\.?บ\.?\s*.*สาธารณสุข/.test(source)){
+      ideas.push("การตรวจสถานประกอบการเป็นส่วนหนึ่งของกระบวนการกำกับดูแลให้การประกอบกิจการเป็นไปตามหลักเกณฑ์และข้อกำหนดที่เกี่ยวข้อง");
+      ideas.push("ขั้นตอนดังกล่าวช่วยพิจารณาความพร้อมด้านสุขลักษณะและความปลอดภัยก่อนดำเนินการตามกระบวนการอนุญาต");
+    }
     return [...new Set(ideas)].slice(0,3);
   }
 
@@ -211,6 +215,59 @@
     if(/สรุป.*กิจกรรม|รายงาน.*ผล|ดำเนินงานแล้ว/.test(purpose)) return "สรุปกิจกรรมพร้อมเผยแพร่";
     if(/แจ้งข่าว|ประกาศ/.test(purpose)) return "ข่าวประชาสัมพันธ์";
     return "โพสต์ Facebook พร้อมเผยแพร่";
+  }
+
+  function isRegulatoryInspection(b={}){
+    return /ตรวจสถานประกอบการ|ตรวจสุขลักษณะ|ออกใบอนุญาต|พ\.?ร\.?บ\.?\s*.*สาธารณสุข/.test(`${b.title || ""} ${b.detail || ""}`);
+  }
+
+  function normalizeHealthAct(text=""){
+    return clean(text)
+      .replace(/พรบ\.?\s*สาธารณสุข\s*([0-9๐-๙]{4})/gi, "พระราชบัญญัติการสาธารณสุข พ.ศ. $1")
+      .replace(/พ\.?ร\.?บ\.?\s*การสาธารณสุข\s*พ\.?ศ\.?\s*([0-9๐-๙]{4})/gi, "พระราชบัญญัติการสาธารณสุข พ.ศ. $1");
+  }
+
+  function inspectionFocus(source=""){
+    if(/สระน้ำ|สระว่ายน้ำ/.test(source)) return "สุขลักษณะ ความสะอาด คุณภาพน้ำ และความปลอดภัยภายในสถานประกอบการ";
+    if(/ร้านอาหาร|อาหาร|ตลาด|แผงลอย/.test(source)) return "สุขลักษณะอาหาร ความสะอาดของสถานที่ การจัดเก็บวัตถุดิบ และการจัดการของเสีย";
+    if(/เสริมสวย|แต่งผม|สปา|นวด/.test(source)) return "สุขลักษณะของสถานที่ อุปกรณ์ที่ให้บริการ ความสะอาด และความปลอดภัยของผู้ใช้บริการ";
+    return "สุขลักษณะ ความสะอาด ความปลอดภัย และการจัดการภายในสถานประกอบการ";
+  }
+
+  function regulatoryInspectionPost(d={}){
+    const b=contentBrain(d);
+    const detail=normalizeHealthAct(real(d.detail));
+    const target=(detail.match(/ตรวจสถานประกอบการ\s*([^?\n]+?)(?=\s*(?:\?|เพื่อ|ออกใบอนุญาต|ตามพ\.?ร\.?บ|$))/i)?.[1] || "").trim().replace(/\s+/g," ");
+    const law=detail.match(/พระราชบัญญัติการสาธารณสุข พ\.ศ\. [0-9๐-๙]{4}/i)?.[0] || "";
+    const purpose=law ? `เพื่อประกอบการพิจารณาออกใบอนุญาตตาม${law}` : "เพื่อประกอบการพิจารณาตามหลักเกณฑ์ที่เกี่ยวข้อง";
+    const displayTarget=/^สระน้ำ\s*/.test(target) ? target.replace(/^สระน้ำ\s*/,"สระว่ายน้ำ") : target;
+    const heading=displayTarget ? `ลงพื้นที่ตรวจสถานประกอบการ “${displayTarget}”` : normalizeHealthAct(b.title);
+    const actor=b.org ? `${b.org} ลงพื้นที่` : "เจ้าหน้าที่ลงพื้นที่";
+    const tags=[hash(b.org),"ตรวจสถานประกอบการ","สาธารณสุข","สุขลักษณะสถานประกอบการ"].filter(Boolean).slice(0,4).map(x=>`#${x}`).join(" ");
+    const publicClose=b.org ? `${b.org} มุ่งกำกับดูแลสถานประกอบการในพื้นที่ให้เป็นไปตามมาตรฐานด้านสาธารณสุข เพื่อสุขภาพและคุณภาพชีวิตที่ดีของประชาชน` : "การกำกับดูแลสถานประกอบการอย่างเหมาะสมช่วยคุ้มครองสุขภาพและสร้างความมั่นใจแก่ประชาชนผู้ใช้บริการ";
+    return `🔎 ${heading}\n\n${actor}ตรวจ${displayTarget ? ` “${displayTarget}”` : "สถานประกอบการ"} เพื่อตรวจสอบ${inspectionFocus(detail)} ให้เป็นไปตามหลักเกณฑ์ที่เกี่ยวข้อง และ${purpose}\n\n✅ ส่งเสริมให้สถานประกอบการมีมาตรฐาน\n✅ ลดปัจจัยเสี่ยงที่อาจส่งผลกระทบต่อสุขภาพ\n✅ สร้างความมั่นใจและความปลอดภัยแก่ผู้ใช้บริการ\n\n${publicClose}\n\n${tags}`.replace(/\n{3,}/g,"\n\n");
+  }
+
+  function inspectionDetails(d={}){
+    const b=contentBrain(d);
+    const detail=normalizeHealthAct(real(d.detail));
+    const target=(detail.match(/ตรวจสถานประกอบการ\s*([^?\n]+?)(?=\s*(?:\?|เพื่อ|ออกใบอนุญาต|ตามพ\.?ร\.?บ|$))/i)?.[1] || "").trim().replace(/\s+/g," ");
+    const displayTarget=/^สระน้ำ\s*/.test(target) ? target.replace(/^สระน้ำ\s*/,"สระว่ายน้ำ") : target;
+    const law=detail.match(/พระราชบัญญัติการสาธารณสุข พ\.ศ\. [0-9๐-๙]{4}/i)?.[0] || "";
+    return {b,detail,displayTarget,law,focus:inspectionFocus(detail)};
+  }
+
+  function regulatoryInspectionVideoScript(d={}, length="60 วินาที"){
+    const {b,displayTarget,law,focus}=inspectionDetails(d);
+    const duration=targetSeconds(length);
+    const end=Math.max(30,duration);
+    const first=Math.min(5,Math.max(3,Math.round(end*.08)));
+    const second=Math.max(first+8,Math.round(end*.42));
+    const third=Math.max(second+8,Math.round(end*.78));
+    const place=displayTarget || "สถานประกอบการในพื้นที่";
+    const actor=b.org || "เจ้าหน้าที่ผู้รับผิดชอบ";
+    const legalPurpose=law ? `เพื่อประกอบการพิจารณาออกใบอนุญาตตาม${law}` : "เพื่อประกอบการพิจารณาตามหลักเกณฑ์ที่เกี่ยวข้อง";
+    return `สคริปต์วิดีโอประชาสัมพันธ์พร้อมผลิต\n\nหัวข้อ: ลงพื้นที่ตรวจสถานประกอบการ “${place}”\nความยาวเป้าหมาย: ${length}\nโทน: สุภาพ กระชับ น่าเชื่อถือ และสะท้อนการปฏิบัติงานจริง\n\nช่วงเปิด 0–${first} วินาที\nภาพ: ป้ายหรือภาพรวมของ${place} แล้วตัดเข้าสู่ภาพเจ้าหน้าที่ลงพื้นที่\nบทพากย์: เพื่อสร้างความมั่นใจด้านสุขอนามัยและความปลอดภัยในการใช้บริการของประชาชน\nข้อความบนจอ: ลงพื้นที่ตรวจสถานประกอบการ\n\nช่วงที่ 2 ${first}–${second} วินาที\nภาพ: เจ้าหน้าที่ตรวจพื้นที่โดยรอบ จุดให้บริการ และองค์ประกอบที่เกี่ยวข้อง โดยใช้เฉพาะภาพที่บันทึกจากการลงพื้นที่จริง\nบทพากย์: ${actor} ลงพื้นที่ตรวจ${place} ${legalPurpose}\nข้อความบนจอ: ตรวจตามหลักเกณฑ์ด้านสาธารณสุข\n\nช่วงที่ 3 ${second}–${third} วินาที\nภาพ: เจ้าหน้าที่ตรวจรายละเอียดและพูดคุยกับผู้ประกอบการ โดยหลีกเลี่ยงการเผยข้อมูลส่วนบุคคลในเอกสาร\nบทพากย์: การตรวจครั้งนี้ครอบคลุม${focus} พร้อมให้คำแนะนำแก่ผู้ประกอบการเพื่อนำไปใช้ดูแลสถานที่และการให้บริการอย่างเหมาะสม\nข้อความบนจอ: สุขลักษณะ • ความสะอาด • ความปลอดภัย\n\nช่วงปิด ${third}–${end} วินาที\nภาพ: ภาพมุมกว้างของสถานที่และเจ้าหน้าที่ปฏิบัติงาน ปิดด้วยชื่อหน่วยงานจากไฟล์จริง\nบทพากย์: การกำกับดูแลสถานประกอบการอย่างต่อเนื่อง ช่วยลดปัจจัยเสี่ยงด้านสุขภาพ และสร้างความมั่นใจแก่ประชาชนผู้ใช้บริการ\nข้อความบนจอ: ดูแลมาตรฐาน เพื่อคุณภาพชีวิตของประชาชน\n\nตรวจสอบก่อนเผยแพร่: ใช้เฉพาะภาพจากการตรวจจริง และไม่ใส่ข้อความว่า “ผ่านการตรวจ” หรือ “ได้รับใบอนุญาตแล้ว” หากยังไม่มีผลยืนยัน`.replace(/\n{3,}/g,"\n\n");
   }
 
   function editorialExpansion(b, intent, level="ช่วยคิดและแต่งให้สมบูรณ์"){
@@ -343,6 +400,7 @@
 
   function captionWriter(d={}){
     const b = contentBrain(d);
+    if(isRegulatoryInspection(b)) return regulatoryInspectionPost(d);
     const intent = d._postStrict ? postIntent(d) : detectIntent(d, "post");
     const channel = real(d.channel) || "โพสต์ Facebook";
     const lines = d._postStrict ? postCreativeLines(d).filter(line=>compactComparable(line) !== compactComparable(b.title)) : rewriteCore(d, "post");
@@ -367,7 +425,7 @@
     }
     if(/ข่าว|บทความ|เรียบเรียง/.test(channel)) return articleWriter(d);
 
-    return `โพสต์พร้อมเผยแพร่ — Thai PR Copywriter\n\n${hook}\n\n${lines.join("\n\n")}\n\n${joinNonEmpty([line("📅 ", b.date), line("📍 ", b.place)])}\n\n${cta}${tags ? `\n\n${tags}` : ""}`.replace(/\n{3,}/g,"\n\n");
+    return `${hook}\n\n${lines.join("\n\n")}\n\n${joinNonEmpty([line("📅 ", b.date), line("📍 ", b.place)])}\n\n${cta}${tags ? `\n\n${tags}` : ""}`.replace(/\n{3,}/g,"\n\n");
   }
 
   function articleWriter(d={}){
@@ -435,6 +493,7 @@
 
   function postVideoScriptWriter(d={}, length="60 วินาที"){
     const b=contentBrain(d);
+    if(isRegulatoryInspection(b)) return regulatoryInspectionVideoScript(d,length);
     const intent=postIntent(d);
     const facts=splitPoints(real(d.detail));
     const ideas=editorialExpansion(b,intent,creativeLevel(d));
@@ -817,6 +876,8 @@ Fact/Asset Checklist ก่อนผลิต
     resolvePostOutput,
     isSparsePostBrief,
     projectFoundationWriter,
+    regulatoryInspectionPost,
+    regulatoryInspectionVideoScript,
     supportingVariant,
     reviseWriting,
     mcWriter,

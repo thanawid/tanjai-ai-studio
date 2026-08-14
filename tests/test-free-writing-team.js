@@ -39,7 +39,8 @@ const prModes = {
   complete: team.prWriter(data, {channel:"สร้างครบชุดจากข้อมูลเดียว", length:"30 วินาที"})
 };
 
-assert.match(outputs.caption, /โพสต์พร้อมเผยแพร่|โพสต์ Facebook พร้อมใช้/);
+assert.match(outputs.caption, /ร่วมคิด ร่วมทำ เพื่อชุมชน/);
+assert.doesNotMatch(outputs.caption, /Thai PR Copywriter|Voice Script Director|AI เลือก/);
 assert.match(outputs.article, /บทความ \/ ข่าวประชาสัมพันธ์พร้อมใช้|ข่าวประชาสัมพันธ์พร้อมใช้|ข่าวประชาสัมพันธ์พร้อมเผยแพร่/);
 assert.match(outputs.mc, /สคริปต์พิธีกรพร้อมใช้/);
 assert.match(outputs.mc, /รับฟังความคิดเห็น/);
@@ -56,7 +57,8 @@ assert.match(outputs.guard, /FACT GUARD/);
 assert.match(prModes.video, /สคริปต์วิดีโอพร้อมนำไปผลิต/);
 assert.doesNotMatch(prModes.video, /Video Production Pack|SHORT_SHOT_PROMPTS|CAPCUT/);
 assert.match(prModes.voice, /บทพากย์พร้อมบันทึกเสียง/);
-assert.match(prModes.facebook, /โพสต์พร้อมเผยแพร่/);
+assert.match(prModes.facebook, /ร่วมคิด ร่วมทำ เพื่อชุมชน/);
+assert.doesNotMatch(prModes.facebook, /Thai PR Copywriter|โพสต์พร้อมเผยแพร่ —/);
 assert.match(prModes.news, /ข่าวประชาสัมพันธ์พร้อมเผยแพร่/);
 assert.match(prModes.clip, /ชุดข้อความประกอบคลิปพร้อมใช้/);
 assert.match(prModes.complete, /=== 4\. แคปชั่นคลิป ===/);
@@ -94,7 +96,8 @@ const autoFacebook=team.prWriter({
   orgName:"เทศบาลตัวอย่าง",
   detail:"เมื่อวันที่ 5 สิงหาคม 2569 ลงพื้นที่หมู่ที่ 6"
 },{channel:"ให้ AI วิเคราะห์และเลือกผลงาน",platform:"Facebook",purpose:"สรุปผลการดำเนินงาน"});
-assert.match(autoFacebook,/โพสต์พร้อมเผยแพร่/);
+assert.match(autoFacebook,/รณรงค์ป้องกันยุงลาย/);
+assert.doesNotMatch(autoFacebook,/Thai PR Copywriter|โพสต์พร้อมเผยแพร่ —/);
 
 const autoYoutube=team.prWriter({
   title:"ลงพื้นที่รณรงค์ป้องกันยุงลาย",
@@ -149,7 +152,7 @@ const aiConfig = fs.readFileSync(path.join(root, "js", "ai-config.js"), "utf8");
 const index = fs.readFileSync(path.join(root, "index.html"), "utf8");
 const css = fs.readFileSync(path.join(root, "css", "style.css"), "utf8");
 assert.match(index, /js\/free-writing-team\.js/);
-assert.match(index, /V12\.5\.5/);
+assert.match(index, /V12\.5\.6/);
 assert.match(app, /ผู้กำกับภาพอัจฉริยะ/);
 assert.match(app, /generateCurrentImage/);
 assert.match(app, /generateImageWithAI/);
