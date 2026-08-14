@@ -5598,6 +5598,37 @@ input:focus,select:focus,textarea:focus{border-color:#a78bfa!important;box-shado
 @media(max-width:900px){#post .post-writer-modes{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:560px){#post .post-writer-modes{grid-template-columns:1fr}#post .post-revision-tools>div:first-child{align-items:flex-start;flex-direction:column}#post .post-revision-tools span{text-align:left}}
 
+/* V12.5.6 — อ่านข้อมูลจากไฟล์เฉพาะเมนูงานเขียน */
+#post .post-attachment-reader{display:grid;gap:10px;border:1px solid rgba(34,211,238,.24);border-radius:16px;padding:15px;background:rgba(34,211,238,.045)}
+#post .post-attachment-reader>label{font-weight:800;color:#e5e7eb}
+#post .post-attachment-reader>p{margin:0;color:var(--muted);font-size:13px;line-height:1.6}
+#post .post-attachment-reader>small{color:var(--muted);line-height:1.5}
+#post .post-file-list{display:grid;gap:8px}
+#post .post-file-list:empty{display:none}
+#post .post-file-item{display:grid;grid-template-columns:38px minmax(0,1fr);gap:10px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:9px 11px;background:rgba(7,11,23,.48)}
+#post .post-file-item>span{display:grid;place-items:center;width:38px;height:38px;border-radius:10px;background:rgba(139,92,246,.14);font-size:20px}
+#post .post-file-item>div{display:grid;min-width:0;gap:2px}
+#post .post-file-item b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}
+#post .post-file-item small{color:var(--muted);font-size:11px}
+#post .post-attachment-actions{display:flex;gap:8px;flex-wrap:wrap}
+#post .post-attachment-actions .btn{margin:0}
+#post .post-file-status{border:1px solid var(--line);border-radius:12px;padding:11px 13px;font-size:13px;line-height:1.55;background:rgba(255,255,255,.035)}
+#post .post-file-status.ready,#post .post-file-status.success{border-color:rgba(16,185,129,.36);background:rgba(16,185,129,.08);color:#d1fae5}
+#post .post-file-status.loading{border-color:rgba(34,211,238,.36);background:rgba(34,211,238,.08);color:#cffafe}
+#post .post-file-status.error{border-color:rgba(244,63,94,.42);background:rgba(244,63,94,.08);color:#fecdd3}
+#post .post-file-review{display:grid;gap:13px;border:1px solid rgba(16,185,129,.34);border-radius:15px;padding:14px;background:linear-gradient(135deg,rgba(16,185,129,.07),rgba(34,211,238,.045))}
+#post .post-file-review-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+#post .post-file-review-head>div{display:grid;gap:3px}
+#post .post-file-review-head b{color:#d1fae5}
+#post .post-file-review-head span{color:var(--muted);font-size:12px;line-height:1.45}
+#post .post-file-review-head>span{white-space:nowrap;border:1px solid rgba(16,185,129,.3);border-radius:999px;padding:5px 8px;color:#a7f3d0}
+#post .post-file-review-fields{margin:0}
+#post .post-file-review-fields textarea{min-height:96px}
+#post .post-file-uncertain{border:1px solid rgba(245,158,11,.32);border-radius:12px;padding:11px 13px;background:rgba(245,158,11,.07);color:#fde68a;font-size:12px;line-height:1.55}
+#post .post-file-uncertain ul{margin:6px 0 0;padding-left:20px;color:#fef3c7}
+#post #applyPostFacts{justify-self:start;margin:0}
+@media(max-width:560px){#post .post-attachment-actions{display:grid;grid-template-columns:1fr}#post .post-file-review-head{flex-direction:column}#post #applyPostFacts{width:100%}}
+
 /* Desktop keeps the original two-column studio layout so form and result are visible together.
    The existing responsive rules stack both panels below 1180px. */
 .form-panel > div[id$="Form"] > .button-row{position:static;bottom:auto;margin-top:18px}

@@ -54,6 +54,82 @@
     }
   };
 
+  const POST_ATTACHMENT_TYPES = new Set([
+    "image/jpeg", "image/png", "image/webp", "application/pdf",
+    "text/plain", "text/csv",
+    "audio/mpeg", "audio/mp3", "audio/wav", "audio/x-wav",
+    "audio/aac", "audio/ogg", "audio/flac", "audio/x-flac"
+  ]);
+
+  function readAsBase64(file){
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || "").split(",")[1] || "");
+      reader.onerror = () => reject(new Error(`อ่านไฟล์ ${file.name} ไม่สำเร็จ`));
+      reader.readAsDataURL(file);
+    });
+  }
+
+  T.validatePostAttachments = function(files=[]){
+    const list = Array.from(files || []);
+    if(!list.length) return {ok:false, error:"กรุณาเลือกไฟล์ก่อน"};
+    if(list.length > 5) return {ok:false, error:"แนบได้ไม่เกิน 5 ไฟล์ต่อครั้ง"};
+    const unsupported = list.find(file => !POST_ATTACHMENT_TYPES.has(String(file.type || "").toLowerCase()));
+    if(unsupported) return {ok:false, error:`ยังอ่านไฟล์ ${unsupported.name} ไม่ได้ กรุณาใช้ JPG, PNG, WEBP, PDF, TXT, CSV, MP3 หรือ WAV`};
+    const tooLarge = list.find(file => file.size > 6 * 1024 * 1024);
+    if(tooLarge) return {ok:false, error:`ไฟล์ ${tooLarge.name} ใหญ่เกิน 6 MB`};
+    const total = list.reduce((sum, file) => sum + Number(file.size || 0), 0);
+    if(total > 8 * 1024 * 1024) return {ok:false, error:"ไฟล์รวมกันใหญ่เกิน 8 MB กรุณาแบ่งอ่านทีละชุด"};
+    return {ok:true, files:list, total};
+  };
+
+  T.analyzePostAttachments = async function({files, button}={}){
+    const checked = T.validatePostAttachments(files);
+    if(!checked.ok) throw new Error(checked.error);
+    if(!T.aiIsConfigured()) throw new Error("ยังไม่ได้เชื่อม AI สำหรับอ่านไฟล์");
+
+    const originalLabel = button?.textContent || "";
+    if(button){
+      button.disabled = true;
+      button.classList.add("is-ai-loading");
+      button.textContent = "กำลังอ่านและแยกข้อมูล…";
+    }
+
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 90000);
+    try{
+      const attachments = [];
+      for(const file of checked.files){
+        const mimeType = String(file.type || "text/plain").toLowerCase();
+        if(mimeType === "text/plain" || mimeType === "text/csv"){
+          attachments.push({name:file.name, mimeType, text:await file.text()});
+        }else{
+          attachments.push({name:file.name, mimeType, data:await readAsBase64(file)});
+        }
+      }
+      const response = await fetch(`${endpoint()}/analyze-post-attachments`, {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({attachments}),
+        signal:controller.signal
+      });
+      const payload = await response.json().catch(() => ({}));
+      if(!response.ok) throw new Error(payload.error || `อ่านไฟล์ไม่สำเร็จ (${response.status})`);
+      if(!payload.analysis || typeof payload.analysis !== "object") throw new Error("AI ไม่ได้ส่งข้อมูลที่อ่านกลับมา");
+      return {analysis:payload.analysis, source:payload.source || "gemini-file-analysis"};
+    }catch(error){
+      if(error?.name === "AbortError") throw new Error("อ่านไฟล์ใช้เวลานานเกินไป กรุณาลองใหม่");
+      throw error;
+    }finally{
+      clearTimeout(timer);
+      if(button){
+        button.disabled = false;
+        button.classList.remove("is-ai-loading");
+        button.textContent = originalLabel;
+      }
+    }
+  };
+
   T.generateImageWithAI = async function({prompt, data={}, options={}, fallback, button}){
     const fallbackText = typeof fallback === "function" ? fallback() : String(fallback || prompt || "");
     if(!T.aiIsConfigured()){

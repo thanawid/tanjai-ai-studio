@@ -221,10 +221,6 @@ ${SMART_FILL_POLICY}
 - ถ้ามีเพียงชื่อโครงการ หน่วยงาน หรือปี แต่ยังไม่รู้สถานะ วัน เวลา และสถานที่ ให้เขียน “เนื้อหาตั้งต้นสำหรับโครงการ” ที่อธิบายเป้าหมาย ประโยชน์ และภาพรวมอย่างปลอดภัย ห้ามเชิญชวน ห้ามสรุปว่าเกิดขึ้นแล้ว และห้ามใส่วันหรือสถานที่
 - ห้ามนำวัน เวลา สถานที่ หรือรายละเอียดจากงานก่อนหน้า/บริบทอื่นมาใช้ ต้องใช้เฉพาะข้อมูลตั้งต้นของคำขอปัจจุบัน
 - ไม่เขียนชื่อโครงการซ้ำหลายย่อหน้าโดยไม่เพิ่มสาระ
-- ถ้าเป็นงานตรวจสถานประกอบการหรือประกอบการออกใบอนุญาต ให้เขียนเป็นข่าวการปฏิบัติงานที่ระบุเรื่องที่ตรวจ วัตถุประสงค์ และกฎหมายตามข้อมูลจริง อธิบายความสำคัญด้านสุขลักษณะได้ แต่ห้ามแต่งผลตรวจ ห้ามกล่าวว่าผ่าน และห้ามกล่าวว่าได้รับใบอนุญาต
-- ถ้าเลือกสคริปต์วิดีโอสำหรับงานตรวจสถานประกอบการ ต้องแยกช่วงเวลา ภาพที่ถ่ายได้จริง บทพากย์ และข้อความบนจอ โดยเรียงจากภาพสถานที่ การลงพื้นที่ ประเด็นตรวจ การให้คำแนะนำ และภาพปิด ห้ามตอบเป็นโพสต์ Facebook หรือย่อหน้าข่าว
-- ประเด็นตรวจต้องสัมพันธ์กับสถานประกอบการ เช่น สระว่ายน้ำให้กล่าวถึงสุขลักษณะ ความสะอาด คุณภาพน้ำ และความปลอดภัย ร้านอาหารให้กล่าวถึงสุขลักษณะอาหาร วัตถุดิบ และของเสีย โดยไม่แต่งผลการตรวจ
-- ผลงานสำหรับผู้ใช้ต้องไม่มีชื่อบทบาทของ AI เช่น Thai PR Copywriter, Voice Script Director หรือข้อความสถานะของระบบ
 - สร้างบทสรุปหรือ CTA เชิงเนื้อหาได้ เช่น ชวนร่วมมือ ชวนดูแลพื้นที่ หรือชวนอ่านรายละเอียด แต่ห้ามสร้างผลลัพธ์ จำนวนผู้เข้าร่วม เงื่อนไขสมัคร ช่องทางติดต่อ เบอร์โทร หรือลิงก์ที่ไม่มีในข้อมูล
 - แฮชแท็กต้องสั้น อ่านได้ 2–4 แท็ก ห้ามนำประโยคทั้งประโยคมาต่อเป็นแฮชแท็ก
 - ปรับความยาว ช่องทาง เป้าหมาย น้ำเสียง อีโมจิ และแฮชแท็กตามตัวเลือก
@@ -291,6 +287,71 @@ function findGeneratedImage(value){
   return null;
 }
 
+const POST_ATTACHMENT_MIME_TYPES = new Set([
+  "image/jpeg", "image/png", "image/webp", "application/pdf",
+  "text/plain", "text/csv", "audio/mpeg", "audio/mp3", "audio/wav",
+  "audio/x-wav", "audio/aac", "audio/ogg", "audio/flac", "audio/x-flac"
+]);
+
+function buildPostAttachmentParts(attachments=[]){
+  const instruction = `อ่านไฟล์แนบเพื่อเตรียมข้อมูลสำหรับงานเขียนประชาสัมพันธ์ภาษาไทย
+
+กติกาบังคับ:
+- ถอดเฉพาะข้อมูลที่พบจริงในไฟล์ ห้ามเดาชื่อ วัน เวลา สถานที่ บุคคล หน่วยงาน ตัวเลข หรือผลลัพธ์
+- รักษาการสะกดชื่อเฉพาะและตัวเลขตามต้นฉบับ
+- ถ้าอ่านไม่ชัดหรือข้อมูลขัดกัน ให้ใส่ไว้ใน uncertain ห้ามเลือกคำตอบแทนผู้ใช้
+- summary เป็นสาระสำคัญแบบภาษากลาง ยังไม่ต้องเขียนโพสต์ ข่าว หรือสคริปต์
+- schedule เรียงกำหนดการตามต้นฉบับ ถ้าไม่มีให้เป็นอาร์เรย์ว่าง
+- lockedFacts เก็บข้อความที่ไม่ควรถูกเปลี่ยน เช่น ชื่อโครงการ วัน เวลา สถานที่ ตัวเลข ชื่อบุคคล และชื่อหน่วยงาน
+- ส่ง JSON ตาม schema เท่านั้น ไม่ใช้ Markdown`;
+  const parts = [{text:instruction}];
+  attachments.forEach((file, index) => {
+    const name = String(file.name || `ไฟล์ ${index + 1}`).slice(0, 180);
+    const mimeType = String(file.mimeType || "").toLowerCase();
+    parts.push({text:`ไฟล์ที่ ${index + 1}: ${name}`});
+    if(mimeType === "text/plain" || mimeType === "text/csv"){
+      parts.push({text:String(file.text || "").slice(0, 120000)});
+    }else{
+      parts.push({inlineData:{mimeType, data:String(file.data || "")}});
+    }
+  });
+  return parts;
+}
+
+function validatePostAttachmentPayload(attachments=[]){
+  if(!Array.isArray(attachments) || !attachments.length) return "ไม่พบไฟล์สำหรับอ่าน";
+  if(attachments.length > 5) return "แนบได้ไม่เกิน 5 ไฟล์ต่อครั้ง";
+  for(const file of attachments){
+    const mimeType = String(file?.mimeType || "").toLowerCase();
+    if(!POST_ATTACHMENT_MIME_TYPES.has(mimeType)) return `ยังไม่รองรับไฟล์ชนิด ${mimeType || "ไม่ทราบชนิด"}`;
+    if((mimeType === "text/plain" || mimeType === "text/csv") && String(file.text || "").length > 120000) return "ไฟล์ข้อความยาวเกินกำหนด";
+    if(!mimeType.startsWith("text/") && !String(file.data || "")) return "ข้อมูลไฟล์ไม่ครบถ้วน";
+  }
+  return "";
+}
+
+function parseJsonText(text=""){
+  const clean = String(text || "").trim().replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "");
+  try{ return JSON.parse(clean); }
+  catch(_){ return null; }
+}
+
+const POST_ATTACHMENT_SCHEMA = {
+  type:"OBJECT",
+  properties:{
+    title:{type:"STRING"},
+    organization:{type:"STRING"},
+    dateTime:{type:"STRING"},
+    place:{type:"STRING"},
+    people:{type:"ARRAY", items:{type:"STRING"}},
+    summary:{type:"STRING"},
+    schedule:{type:"ARRAY", items:{type:"STRING"}},
+    lockedFacts:{type:"ARRAY", items:{type:"STRING"}},
+    uncertain:{type:"ARRAY", items:{type:"STRING"}}
+  },
+  required:["title","organization","dateTime","place","people","summary","schedule","lockedFacts","uncertain"]
+};
+
 export default {
   async fetch(request, env){
     const url = new URL(request.url);
@@ -308,19 +369,49 @@ export default {
     }
     const isGenerate = request.method === "POST" && url.pathname === "/generate";
     const isGenerateImage = request.method === "POST" && url.pathname === "/generate-image";
-    if(!isGenerate && !isGenerateImage) return json({error:"Not found"}, 404, origin);
+    const isAnalyzePostAttachments = request.method === "POST" && url.pathname === "/analyze-post-attachments";
+    if(!isGenerate && !isGenerateImage && !isAnalyzePostAttachments) return json({error:"Not found"}, 404, origin);
     if(!origin) return json({error:"เว็บไซต์นี้ไม่ได้รับอนุญาตให้เรียก AI"}, 403);
     if(!env.GEMINI_API_KEY) return json({error:"ยังไม่ได้ตั้งค่า GEMINI_API_KEY"}, 503, origin);
 
     const length = Number(request.headers.get("Content-Length") || 0);
-    if(length > (isGenerateImage ? 200000 : 40000)) return json({error:"ข้อมูลยาวเกินกำหนด"}, 413, origin);
+    const maxLength = isAnalyzePostAttachments ? 12000000 : (isGenerateImage ? 200000 : 40000);
+    if(length > maxLength) return json({error:"ข้อมูลยาวเกินกำหนด"}, 413, origin);
 
     let body;
     try{ body = await request.json(); }
     catch(_){ return json({error:"รูปแบบข้อมูลไม่ถูกต้อง"}, 400, origin); }
 
+    if(isAnalyzePostAttachments){
+      const validationError = validatePostAttachmentPayload(body.attachments);
+      if(validationError) return json({error:validationError}, validationError.includes("ยาวเกิน") ? 413 : 400, origin);
+    }
+
     const usage = await usageAllowed(request, env);
     if(!usage.ok) return json({error:`ครบโควตา AI ${usage.limit} ครั้งต่อวันแล้ว กรุณาลองใหม่วันพรุ่งนี้`}, 429, origin);
+
+    if(isAnalyzePostAttachments){
+      const attachments = Array.isArray(body.attachments) ? body.attachments : [];
+      const model = String(env.GEMINI_MODEL || "gemini-2.5-flash-lite");
+      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
+      const aiResponse = await fetch(apiUrl, {
+        method:"POST",
+        headers:{"Content-Type":"application/json", "x-goog-api-key":env.GEMINI_API_KEY},
+        body:JSON.stringify({
+          contents:[{role:"user", parts:buildPostAttachmentParts(attachments)}],
+          generationConfig:{temperature:0.1, maxOutputTokens:4096, responseMimeType:"application/json", responseSchema:POST_ATTACHMENT_SCHEMA}
+        })
+      });
+      const result = await aiResponse.json().catch(()=>({}));
+      if(!aiResponse.ok){
+        console.error("Gemini attachment error", aiResponse.status, result?.error?.message || "unknown");
+        return json({error:"AI อ่านไฟล์ยังไม่สำเร็จ กรุณาลองใหม่หรือพิมพ์ข้อมูลเอง"}, 502, origin);
+      }
+      const text = (result.candidates?.[0]?.content?.parts || []).map(part=>part.text || "").join("").trim();
+      const analysis = parseJsonText(text);
+      if(!analysis) return json({error:"AI อ่านไฟล์ได้ แต่จัดข้อมูลกลับมาไม่สมบูรณ์ กรุณาลองใหม่"}, 502, origin);
+      return json({analysis, source:"gemini-file-analysis", model, remaining:usage.remaining}, 200, origin);
+    }
 
     if(isGenerateImage){
       const imageModel = String(env.GEMINI_IMAGE_MODEL || "gemini-3.1-flash-image");

@@ -5,7 +5,7 @@ const ui = fs.readFileSync('js/ui.js','utf8');
 const prep = fs.readFileSync('js/video-editor.js','utf8');
 const css = fs.readFileSync('css/style.css','utf8');
 assert.match(index,/id="videoEditor"/);
-assert.match(index,/ui\.js\?v=12\.5\.6-post-inspection/);
+assert.match(index,/ui\.js\?v=12\.5\.6-post-files/);
 assert.doesNotMatch(index,/https:\/\/tanjai-video-studio\.onrender\.com\//);
 assert.match(index,/<button class="nav-link" data-view="createVideo"><i>✨<\/i><b>สร้างวิดีโอ<\/b><\/button>/);
 assert.doesNotMatch(index,/href="create-video\//);

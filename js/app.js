@@ -273,11 +273,32 @@ $("#albumForm").innerHTML = `
         <label>แฮชแท็ก<select id="post-hashtags"><option selected>สร้างเฉพาะที่เกี่ยวข้อง</option><option>ไม่ต้องมีแฮชแท็ก</option><option>สร้าง 3–5 แฮชแท็ก</option></select></label>
         <label class="full">ข้อมูลจริงที่ห้ามเปลี่ยน<textarea id="post-lockedFacts" placeholder="ระบุชื่อ วัน เวลา สถานที่ ตัวเลข หรือข้อความที่ต้องใช้ตามต้นฉบับ"></textarea></label>
         <label class="full">คำอ่านชื่อเฉพาะ / ข้อความที่ต้องออกเสียงให้ถูก<input id="post-pronunciation" placeholder="ระบุเฉพาะคำที่อาจอ่านผิด หากไม่มีให้เว้นว่าง"></label>
-        <label class="full">แนบรูปประกอบ / รูปเอกสาร / รูปลงพื้นที่
-          <input id="post-photos" type="file" accept="image/*" multiple>
-          <small>ระบบจะไม่เดาข้อความจากภาพ กรุณาวางสาระสำคัญจากเอกสารในช่องรายละเอียดเพื่อป้องกันข้อมูลผิด</small>
-          <div id="post-photoPreview" class="upload-preview-grid"></div>
-        </label>
+        <div class="full post-attachment-reader">
+          <label for="post-photos">แนบข้อมูลจากไฟล์</label>
+          <p>ใช้รูปเอกสาร PDF ข้อความ หรือไฟล์เสียง ระบบจะอ่านเฉพาะครั้งนี้ แล้วให้คุณตรวจข้อมูลก่อนนำไปเขียน</p>
+          <input id="post-photos" type="file" accept=".jpg,.jpeg,.png,.webp,.pdf,.txt,.csv,.mp3,.wav,.aac,.ogg,.flac,image/jpeg,image/png,image/webp,application/pdf,text/plain,text/csv,audio/mpeg,audio/wav,audio/x-wav,audio/aac,audio/ogg,audio/flac" multiple>
+          <small>รองรับ JPG, PNG, WEBP, PDF, TXT, CSV, MP3 และ WAV • สูงสุด 5 ไฟล์ • รวมไม่เกิน 8 MB</small>
+          <div id="post-photoPreview" class="post-file-list" aria-live="polite"></div>
+          <div class="post-attachment-actions">
+            <button class="btn secondary" id="analyzePostFiles" type="button" hidden>🔎 อ่านข้อมูลจากไฟล์</button>
+            <button class="btn secondary" id="clearPostFiles" type="button" hidden>เอาไฟล์ออก</button>
+          </div>
+          <div id="post-fileStatus" class="post-file-status" hidden></div>
+          <section id="post-fileReview" class="post-file-review" hidden>
+            <div class="post-file-review-head"><div><b>ข้อมูลที่อ่านได้</b><span>แก้ไขได้ก่อนนำไปใช้ ระบบจะไม่เติมข้อมูลที่ไม่พบในไฟล์</span></div><span id="post-fileReviewCount"></span></div>
+            <div class="form-grid post-file-review-fields">
+              <label>ชื่อเรื่อง / โครงการ<input id="post-fileTitle" placeholder="ไม่พบในไฟล์"></label>
+              <label>หน่วยงาน<input id="post-fileOrg" placeholder="ไม่พบในไฟล์"></label>
+              <label>วัน / เวลา<input id="post-fileDateTime" placeholder="ไม่พบในไฟล์"></label>
+              <label>สถานที่<input id="post-filePlace" placeholder="ไม่พบในไฟล์"></label>
+              <label class="full">บุคคล / หน่วยงานที่เกี่ยวข้อง<input id="post-filePeople" placeholder="ไม่พบในไฟล์"></label>
+              <label class="full">สาระสำคัญ<textarea id="post-extractedFacts" placeholder="ข้อมูลที่อ่านได้จะแสดงที่นี่"></textarea></label>
+              <label class="full">ข้อความจริงที่ควรรักษาตามต้นฉบับ<textarea id="post-fileLockedFacts" placeholder="ชื่อ วัน เวลา สถานที่ ตัวเลข หรือข้อความสำคัญจากไฟล์"></textarea></label>
+            </div>
+            <div id="post-fileUncertain" class="post-file-uncertain" hidden></div>
+            <button class="btn primary" id="applyPostFacts" type="button">นำข้อมูลนี้ไปใช้เขียนงาน</button>
+          </section>
+        </div>
         <label class="full">ข้อกำชับเพิ่มเติม<textarea id="post-extra" placeholder="บอกสิ่งที่ต้องเน้น สิ่งที่ควรหลีกเลี่ยง หรือรูปแบบที่ต้องการเพิ่มเติม"></textarea></label>
       </div>
     </div>
@@ -877,6 +898,93 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "สคริปต์�
     });
   };
 
+  const formatPostFileSize = bytes => {
+    const value = Number(bytes || 0);
+    return value < 1024 * 1024 ? `${Math.max(1, Math.round(value / 1024))} KB` : `${(value / 1024 / 1024).toFixed(1)} MB`;
+  };
+
+  const postFileIcon = mime => String(mime || "").startsWith("image/") ? "🖼️" : String(mime || "").startsWith("audio/") ? "🎧" : mime === "application/pdf" ? "📄" : "📝";
+
+  TANJAI.clearPostFileAnalysis = function({keepFiles=false}={}){
+    TANJAI.state = TANJAI.state || {};
+    TANJAI.state.postAttachmentAnalysis = null;
+    TANJAI.state.postAttachmentApplied = false;
+    const review = $("#post-fileReview");
+    const status = $("#post-fileStatus");
+    if(review) review.hidden = true;
+    if(status){ status.hidden = true; status.textContent = ""; status.className = "post-file-status"; }
+    ["fileTitle","fileOrg","fileDateTime","filePlace","filePeople","extractedFacts","fileLockedFacts"].forEach(id => {
+      const input = $(`#post-${id}`); if(input) input.value = "";
+    });
+    const uncertain = $("#post-fileUncertain");
+    if(uncertain){ uncertain.hidden = true; uncertain.replaceChildren(); }
+    if(!keepFiles){ const input = $("#post-photos"); if(input) input.value = ""; }
+  };
+
+  TANJAI.renderPostFileList = function(){
+    const input = $("#post-photos");
+    const host = $("#post-photoPreview");
+    const analyze = $("#analyzePostFiles");
+    const clear = $("#clearPostFiles");
+    if(!input || !host) return;
+    const files = Array.from(input.files || []);
+    host.replaceChildren();
+    files.forEach(file => {
+      const item = document.createElement("div");
+      item.className = "post-file-item";
+      const icon = document.createElement("span");
+      const text = document.createElement("div");
+      const name = document.createElement("b");
+      const meta = document.createElement("small");
+      icon.textContent = postFileIcon(file.type);
+      name.textContent = file.name;
+      meta.textContent = formatPostFileSize(file.size);
+      text.append(name, meta);
+      item.append(icon, text);
+      host.appendChild(item);
+    });
+    if(analyze) analyze.hidden = !files.length;
+    if(clear) clear.hidden = !files.length;
+  };
+
+  TANJAI.showPostFileStatus = function(message, type="info"){
+    const status = $("#post-fileStatus");
+    if(!status) return;
+    status.hidden = false;
+    status.className = `post-file-status ${type}`;
+    status.textContent = message;
+  };
+
+  TANJAI.renderPostFileAnalysis = function(analysis={}, count=0){
+    const set = (id, value) => { const input = $(`#post-${id}`); if(input) input.value = String(value || "").trim(); };
+    const list = value => Array.isArray(value) ? value.map(item => String(item || "").trim()).filter(Boolean) : [];
+    set("fileTitle", analysis.title || analysis.suggestedTitle);
+    set("fileOrg", analysis.organization);
+    set("fileDateTime", analysis.dateTime);
+    set("filePlace", analysis.place);
+    set("filePeople", list(analysis.people).join(", "));
+    const detailParts = [analysis.summary, ...list(analysis.schedule).map(item => `• ${item}`)].filter(Boolean);
+    set("extractedFacts", detailParts.join("\n"));
+    set("fileLockedFacts", list(analysis.lockedFacts).join("\n"));
+    const uncertain = $("#post-fileUncertain");
+    const uncertainItems = list(analysis.uncertain);
+    if(uncertain){
+      uncertain.replaceChildren();
+      uncertain.hidden = !uncertainItems.length;
+      if(uncertainItems.length){
+        const title = document.createElement("b");
+        const ul = document.createElement("ul");
+        title.textContent = "ข้อมูลที่อ่านไม่ชัดหรือควรตรวจอีกครั้ง";
+        uncertainItems.forEach(value => { const li=document.createElement("li"); li.textContent=value; ul.appendChild(li); });
+        uncertain.append(title, ul);
+      }
+    }
+    const countEl = $("#post-fileReviewCount");
+    if(countEl) countEl.textContent = `${count} ไฟล์`;
+    const review = $("#post-fileReview");
+    if(review){ review.hidden = false; review.scrollIntoView({behavior:"smooth", block:"nearest"}); }
+  };
+
   const setImageSafeChecks = (checked=true) => {
     ["safeUseMain","safeFace","safeNewPerson","safeLook","safeScene","safeAdjustOnly","safeOverlay","safeNoCover"].forEach(key=>{
       const el = $(`#image-${key}`); if(el) el.checked = checked;
@@ -1224,8 +1332,61 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "สคริปต์�
     });
   };
 
-  handlePromptAttachmentChange("post", "#post-photos", "#post-photoPreview");
   handlePromptAttachmentChange("mc", "#mc-photos", "#mc-photoPreview");
+
+  $("#post-photos")?.addEventListener("change", () => {
+    TANJAI.clearPostFileAnalysis({keepFiles:true});
+    TANJAI.renderPostFileList();
+    const checked = TANJAI.validatePostAttachments?.($("#post-photos").files);
+    if(checked && !checked.ok) TANJAI.showPostFileStatus(checked.error, "error");
+    else if(checked?.ok) TANJAI.showPostFileStatus("ไฟล์พร้อมอ่าน กด “อ่านข้อมูลจากไฟล์” แล้วตรวจข้อมูลก่อนนำไปเขียน", "ready");
+  });
+
+  $("#clearPostFiles")?.addEventListener("click", () => {
+    TANJAI.clearPostFileAnalysis();
+    TANJAI.renderPostFileList();
+    TANJAI.toast("นำไฟล์ออกแล้ว");
+  });
+
+  $("#analyzePostFiles")?.addEventListener("click", async event => {
+    const button = event.currentTarget;
+    const files = Array.from($("#post-photos")?.files || []);
+    try{
+      TANJAI.showPostFileStatus("กำลังอ่านชื่อ วัน เวลา สถานที่ บุคคล และสาระสำคัญจากไฟล์…", "loading");
+      const result = await TANJAI.analyzePostAttachments({files, button});
+      TANJAI.state = TANJAI.state || {};
+      TANJAI.state.postAttachmentAnalysis = result.analysis;
+      TANJAI.state.postAttachmentApplied = false;
+      TANJAI.renderPostFileAnalysis(result.analysis, files.length);
+      TANJAI.showPostFileStatus("อ่านไฟล์แล้ว กรุณาตรวจข้อมูลด้านล่างก่อนนำไปใช้เขียนงาน", "success");
+      window.TANJAI_AUTH?.trackUsage("post_file_analysis");
+    }catch(error){
+      console.warn("POST_FILE_ANALYSIS_ERROR", error);
+      TANJAI.clearPostFileAnalysis({keepFiles:true});
+      TANJAI.renderPostFileList();
+      TANJAI.showPostFileStatus(`${error?.message || "อ่านไฟล์ไม่สำเร็จ"} — คุณยังพิมพ์ข้อมูลเองได้ตามปกติ`, "error");
+    }
+  });
+
+  $("#applyPostFacts")?.addEventListener("click", () => {
+    const value = id => String($(`#post-${id}`)?.value || "").trim();
+    const fillIfEmpty = (id, next) => { const input=$(`#post-${id}`); if(input && !input.value.trim() && next) input.value=next; };
+    fillIfEmpty("title", value("fileTitle"));
+    fillIfEmpty("orgName", value("fileOrg"));
+    fillIfEmpty("dateTime", value("fileDateTime"));
+    fillIfEmpty("place", value("filePlace"));
+    fillIfEmpty("people", value("filePeople"));
+    const extracted = value("extractedFacts");
+    const detail = $("#post-detail");
+    if(detail && extracted && !detail.value.includes(extracted)) detail.value = [detail.value.trim(), extracted].filter(Boolean).join("\n\n");
+    const locked = value("fileLockedFacts");
+    const lockedInput = $("#post-lockedFacts");
+    if(lockedInput && locked && !lockedInput.value.includes(locked)) lockedInput.value = [lockedInput.value.trim(), locked].filter(Boolean).join("\n");
+    TANJAI.state = TANJAI.state || {};
+    TANJAI.state.postAttachmentApplied = true;
+    TANJAI.showPostFileStatus("นำข้อมูลจากไฟล์มาใช้แล้ว คุณแก้ไขต่อหรือเลือกประเภทงานเขียนได้ทันที", "success");
+    TANJAI.toast("นำข้อมูลจากไฟล์มาใส่ในงานแล้ว");
+  });
 
   document.getElementById("postModeContent")?.addEventListener("click", () => TANJAI.activateContentMode?.());
   document.getElementById("postModeMC")?.addEventListener("click", () => TANJAI.activateMCMode?.());
@@ -1455,6 +1616,13 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "สคริปต์�
   };
 
   $("#makePost").onclick = async () => {
+    const attachedFiles = Array.from($("#post-photos")?.files || []);
+    if(attachedFiles.length && !TANJAI.state?.postAttachmentApplied){
+      TANJAI.showPostFileStatus("กรุณากดอ่านไฟล์ ตรวจข้อมูล และกด “นำข้อมูลนี้ไปใช้เขียนงาน” ก่อน เพื่อไม่ให้ระบบมองข้ามไฟล์แนบ", "error");
+      $("#post-fileStatus")?.scrollIntoView({behavior:"smooth", block:"center"});
+      TANJAI.toast("ยังไม่ได้นำข้อมูลจากไฟล์มาใช้");
+      return;
+    }
     const d=TANJAI.commonData("post");
     const team=TANJAI.freeWritingTeam;
     const options=TANJAI.collectPostOptions();
@@ -1469,7 +1637,8 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "สคริปต์�
       hashtags:options.hashtags,
       lockedFacts:options.lockedFacts,
       pronunciation:options.pronunciation,
-      extra:options.extra
+      extra:options.extra,
+      attachmentFacts:TANJAI.state?.postAttachmentApplied ? String($("#post-extractedFacts")?.value || "").trim() : ""
     });
     const aiResult=await TANJAI.generateWritingWithAI({
       tool:"post", data:d,
