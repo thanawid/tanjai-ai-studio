@@ -172,80 +172,70 @@ document.addEventListener("DOMContentLoaded", () => {
   `;
 
 $("#albumForm").innerHTML = `
-    <div class="form-section"><div class="section-title"><b>1</b><h4>ใส่ภาพ (ปก 1 + ภาพรอง 3–4)</h4></div>
+    <div class="form-section album-flow-section"><div class="section-title"><b>1</b><h4>อัปโหลดภาพกิจกรรมทั้งหมด</h4></div>
       <div class="form-grid">
-        <label>โลโก้จริง / โปรไฟล์เพจ (ไม่บังคับ)
-          <input id="album-logoFile" type="file" accept="image/*">
-          <small>ถ้าไม่ใส่ ระบบจะไม่ใส่โลโก้บนภาพ</small>
+        <label class="full">ภาพกิจกรรม
+          <input id="album-allFiles" type="file" accept="image/*" multiple>
+          <small>รองรับหลายภาพ · ระบบจะไม่สร้างหรือเปลี่ยนใบหน้า และภาพที่ไม่ใช่ปกจะครอปอย่างเดียว</small>
         </label>
-        <input id="album-layoutMode" type="hidden" value="Facebook Cover + Lite + Additional Frame System">
-        <label>ภาพหน้าปกหลัก (จำเป็น)
-          <input id="album-coverFile" type="file" accept="image/*">
-          <small>ภาพแรกจะเป็นหน้าปก มีหัวข้องานใหญ่ ๆ อยู่บนภาพ</small>
+        <label>โลโก้จริง (ไม่บังคับ)
+          <input id="album-logoFile" type="file" accept="image/png,image/jpeg,image/webp">
+          <small>ใช้เฉพาะบนภาพปก ไม่ใส่ซ้ำในภาพกิจกรรม</small>
         </label>
-        <label class="full">ภาพรอง 3–4 ภาพ
-          <input id="album-supportFiles" type="file" accept="image/*" multiple>
-          <small>ภาพรองเน้นโชว์ภาพจริง มีแถบข้อความเล็ก ๆ ด้านล่าง</small>
-        </label>
+        <div class="album-cover-mode-field">
+          <span>รูปแบบภาพปก</span>
+          <div class="album-mode-buttons" role="radiogroup" aria-label="รูปแบบภาพปก">
+            <button type="button" data-cover-mode="double" class="selected"><b>ปกคู่ 2 ภาพ</b><small>แนะนำสำหรับโพสต์หลายภาพ</small></button>
+            <button type="button" data-cover-mode="single"><b>ปกเดี่ยว 1 ภาพ</b><small>เหมาะกับโพสต์ภาพน้อย</small></button>
+          </div>
+          <input id="album-coverMode" type="hidden" value="double">
+        </div>
       </div>
-      <div id="album-preview" class="album-upload-preview"></div>
+      <div id="album-photoPicker" class="album-photo-picker" hidden></div>
     </div>
-    <div class="form-section"><div class="section-title"><b>2</b><h4>บอกว่างานอะไร (กรอกแค่ที่มี)</h4></div>
+
+    <div class="form-section album-flow-section"><div class="section-title"><b>2</b><h4>ข้อมูลข่าวและแคปชั่น</h4></div>
       <div class="form-grid">
-        <label>หัวข้องาน<input id="album-title" placeholder="ระบุหัวข้อหลักของชุดภาพ"></label>
-        <label>หน่วยงาน<input id="album-orgName" placeholder="ระบุชื่อเจ้าของงาน หากต้องการให้แสดง"></label>
-        <label class="full">ใคร / ทำอะไร<textarea id="album-detail" placeholder="วางข้อมูลจริงและประเด็นสำคัญของงาน"></textarea></label>
-        <label class="full">ข้อความปิดท้าย<input id="album-footer" placeholder="ระบุข้อความปิดท้ายที่ต้องการ หากมี"></label>
-      </div>
-      <details class="quick-advanced">
-        <summary><span>ปรับละเอียด</span><small>ไม่บังคับ — วันที่ สถานที่ และข้อความบนภาพรอง</small></summary>
-        <div class="quick-advanced-body">
-          <div class="form-grid quick-advanced-grid">
-            <label>ป้ายหมวดด้านบน<input id="album-categoryLabel" placeholder="ระบุชื่อหมวด หากต้องการให้แสดง"></label>
-            <label>วันที่<input id="album-dateTime" placeholder="ระบุวันที่ตามข้อมูลจริง หากมี"></label>
-            <label>สถานที่<input id="album-place" placeholder="ระบุสถานที่หรือช่องทางตามข้อมูลจริง หากมี"></label>
-            <label class="full">ข้อความภาพ 2 (ไม่บังคับ)<input id="album-lite2" placeholder="ถ้าไม่กรอก ระบบจะสรุปจากข้อมูลหลักให้"></label>
-            <label class="full">ข้อความภาพ 3 (ไม่บังคับ)<input id="album-lite3" placeholder="ระบุประเด็นของภาพนี้ หรือเว้นว่างให้ระบบสรุป"></label>
-            <label class="full">ข้อความภาพ 4 (ไม่บังคับ)<input id="album-lite4" placeholder="ระบุประเด็นปิดท้าย หรือเว้นว่างให้ระบบสรุป"></label>
-          </div>
-        </div>
-      </details>
-    </div>
-    <div class="form-section"><div class="section-title"><b>3</b><h4>เลือกรูปแบบโพสต์ แล้วกดสร้างได้เลย</h4></div>
-      <div class="form-grid">
-        <div class="full album-preset-picker">
-          <select id="album-facebookPreset" hidden><option value="auto" selected>อัตโนมัติ</option><option value="square-grid">4 ภาพจัตุรัส</option><option value="wide-top">ปกกว้างด้านบน</option><option value="portrait-left">ปกตั้งด้านซ้าย</option><option value="pano-split">ปกพาโนรามา</option></select>
-          <div class="album-preset-cards" role="group" aria-label="เลือกรูปแบบการโพสต์ Facebook">
-            <button type="button" class="album-preset-card selected" data-album-preset="auto"><span class="preset-auto-mark">AI</span><b>อัตโนมัติ</b><small>ระบบเลือกให้ (แนะนำ)</small></button>
-            <button type="button" class="album-preset-card" data-album-preset="square-grid"><span class="preset-diagram preset-square"><i></i><i></i><i></i><i></i></span><b>4 ภาพจัตุรัส</b><small>1080x1080 ทุกภาพ</small></button>
-            <button type="button" class="album-preset-card" data-album-preset="wide-top"><span class="preset-diagram preset-wide"><i></i><i></i><i></i><i></i></span><b>ปกกว้างด้านบน</b><small>1080x800 + ภาพรอง</small></button>
-            <button type="button" class="album-preset-card" data-album-preset="portrait-left"><span class="preset-diagram preset-portrait"><i></i><i></i><i></i><i></i></span><b>ปกตั้งด้านซ้าย</b><small>1280x1920 + ภาพรอง</small></button>
-            <button type="button" class="album-preset-card" data-album-preset="pano-split"><span class="preset-diagram preset-wide"><i></i><i></i><i></i><i></i></span><b>ปกพาโนรามา</b><small>ภาพ 1-2 ต่อกันยาวบนเฟซ</small></button>
-          </div>
-        </div>
-        <div class="full album-smart-choice" id="album-smartChoice">ระบบจะสรุปขนาดและรูปแบบที่เลือกให้อีกครั้งหลังสร้างชุดภาพ</div>
-      </div>
-      <details class="quick-advanced">
-        <summary><span>ปรับละเอียด</span><small>ไม่บังคับ — สี กรอบ และสไตล์ ระบบเลือกให้เข้ากับงานอัตโนมัติ</small></summary>
-        <div class="quick-advanced-body">
-          <div class="form-grid quick-advanced-grid">
-            <label>ธีมหน้าปก<select id="album-themePreset"><option selected>Modern Clean Cover</option><option>Ribbon Civic Cover</option><option>Modern Glass Cover</option><option>Clean Civic Cover</option><option>Minimal Story Cover</option></select></label>
-            <label>โทนสี<select id="album-colorTone"><option selected>AI เลือกโทนสีให้เข้ากับงาน</option><option>ม่วง–ทอง พรีเมียม</option><option>เขียว–เหลือง–ขาว</option><option>น้ำเงิน–ขาว ทางการ</option><option>ส้ม–ทอง สดเด่น</option><option>ดำ–ทอง หรูหรา</option><option>ชมพู–ครีม อ่อนหวาน</option><option>แดงเลือดหมู–ครีม งานวัด</option><option>น้ำตาล–ครีม คาเฟ่</option><option>เขียวมิ้นต์–ขาว สะอาด</option></select></label>
-            <label>ลายกรอบตามประเภทงาน<select id="album-frameStyle"><option>ทั่วไป / หน่วยงาน / แบรนด์</option><option>ประชุม / เวทีรับฟัง / ประชาคม</option><option>ลงพื้นที่ / ภารกิจ / ติดตามงาน</option><option>ข่าวด่วน / ประกาศสำคัญ</option><option>กิจกรรม / อบรม / อีเวนต์</option><option>โรงเรียน / การศึกษา</option><option>สุขภาพ / รณรงค์ / ชุมชน</option><option>ธุรกิจ / สินค้า / โปรโมชัน</option><option>เพจ / ครีเอเตอร์ / แบรนด์ส่วนตัว</option><option>มินิมอล ขอบบาง</option></select></label>
-            <label>กรอบพิเศษ<select id="album-proFrame"><option value="Balanced Ribbon" selected>กรอบเรียบ งานประชาสัมพันธ์ (แนะนำ)</option><option value="Gold Luxury">ขอบทองหรูหรา</option><option value="None">ไม่มีกรอบพิเศษ</option><option value="Modern Neon">ขอบนีออนเรืองแสง</option><option value="Bold Corporate">ขอบสีแบรนด์</option></select></label>
-            <label>สไตล์แคปชั่น<select id="album-captionStyle"><option value="pr-ready" selected>พร้อมโพสต์ — กระชับและครบประเด็น</option><option value="official">ทางการสำหรับหน่วยงาน</option><option value="friendly">อบอุ่น เข้าถึงง่าย</option><option value="story">เล่าเรื่องกิจกรรม</option><option value="announcement">ประกาศ / แจ้งข่าว</option></select></label>
-            <label>การจัดการภาพ<select id="album-autoMode"><option>ปรับภาพ + ครอป + ใส่กรอบ</option><option>ภาพกิจกรรมเน้นภาพ / แถบเล็ก</option><option>ครอป + ใส่กรอบเท่านั้น</option><option>ปรับภาพเท่านั้น</option></select></label>
-          </div>
-        </div>
-      </details>
-      <div class="form-grid">
-        <input id="album-ratio" type="hidden" value="auto">
-        <input id="album-previewLayout" type="hidden" value="auto">
-        <input id="album-safeMode" type="checkbox" checked hidden>
-        <input id="album-makeCover" type="checkbox" checked hidden>
+        <label class="full">ข้อความพาดหัวบนปก<input id="album-title" maxlength="140" placeholder="เช่น เทศบาลเมืองบางรักน้อย เตรียมความพร้อมรับสถานการณ์น้ำ"></label>
+        <label>ชื่อเพจ / หน่วยงาน<input id="album-orgName" placeholder="เช่น เทศบาลเมืองบางรักน้อย"></label>
+        <label>วันที่<input id="album-dateTime" placeholder="เช่น วันอังคารที่ 22 กันยายน 2569"></label>
+        <label>เวลา<input id="album-time" placeholder="เช่น เวลา 09.00 น."></label>
+        <label>สถานที่<input id="album-place" placeholder="ระบุสถานที่ หากมี"></label>
+        <label class="full">ใคร / ทำอะไร<textarea id="album-detail" rows="4" placeholder="ระบุชื่อบุคคล หน่วยงาน และการดำเนินงานตามข้อมูลจริง"></textarea></label>
+        <label class="full">รายละเอียดสั้นในแถบล่างภาพปก<input id="album-coverDetail" maxlength="220" placeholder="เว้นว่างได้ ระบบจะย่อจากข้อมูล ใคร / ทำอะไร"></label>
+        <label class="full">วัตถุประสงค์หรือผลต่อประชาชน<textarea id="album-purpose" rows="3" placeholder="เช่น เพื่อป้องกันและแก้ไขปัญหาน้ำท่วมขังในพื้นที่"></textarea></label>
+        <label class="full">ข้อความปิดท้าย / เว็บไซต์ / แฮชแท็ก<input id="album-footer" placeholder="เช่น ใกล้ชิดประชาชน โปร่งใส ซื่อสัตย์ บริการด้วยใจ #เทศบาลเมืองบางรักน้อย"></label>
+        <label>สไตล์แคปชั่น<select id="album-captionStyle"><option value="official" selected>ข่าวประชาสัมพันธ์หน่วยงาน</option><option value="pr-ready">กระชับ พร้อมโพสต์</option><option value="friendly">อบอุ่น เข้าถึงง่าย</option><option value="story">เล่าเรื่องกิจกรรม</option><option value="announcement">ประกาศ / แจ้งข่าว</option></select></label>
       </div>
     </div>
-    <div class="button-row"><button class="btn primary" id="makeAlbum">สร้าง Cover + Lite Album</button><button class="btn secondary" id="albumDownloadAll">ดาวน์โหลด ZIP</button><button class="btn secondary" id="albumClear">ล้างรูป</button></div>
+
+    <div class="form-section album-flow-section"><div class="section-title"><b>3</b><h4>ออกแบบข้อความบนภาพปก</h4></div>
+      <div class="album-editor-toolbar">
+        <label>ฟอนต์<select id="album-headlineFont"><option value="Prompt" selected>Prompt</option><option value="Kanit">Kanit</option><option value="Sarabun">Sarabun</option><option value="Noto Sans Thai">Noto Sans Thai</option></select></label>
+        <label>ขนาด <span id="album-fontSizeValue">68</span><input id="album-headlineSize" type="range" min="38" max="108" value="68"></label>
+        <label>สีตัวอักษร<input id="album-headlineColor" type="color" value="#ffffff"></label>
+        <label>สีเส้นขอบ<input id="album-outlineColor" type="color" value="#24104f"></label>
+        <label>ความหนาขอบ <span id="album-outlineValue">4</span><input id="album-outlineWidth" type="range" min="0" max="12" value="4"></label>
+        <label>จัดข้อความ<select id="album-headlineAlign"><option value="center" selected>กึ่งกลาง</option><option value="left">ชิดซ้าย</option><option value="right">ชิดขวา</option></select></label>
+        <label>ตำแหน่งโลโก้<select id="album-logoPosition"><option value="left" selected>ซ้ายบน</option><option value="right">ขวาบน</option><option value="none">ไม่แสดง</option></select></label>
+        <label>สีแถบล่าง<input id="album-bandColor" type="color" value="#24104f"></label>
+        <label>ความทึบแถบ <span id="album-bandOpacityValue">82%</span><input id="album-bandOpacity" type="range" min="35" max="100" value="82"></label>
+        <label class="checkline"><input id="album-headlineShadow" type="checkbox" checked> เงาข้อความ</label>
+      </div>
+      <div class="album-editor-note">ลากข้อความพาดหัวบนภาพเพื่อเลือกตำแหน่ง · เส้นกลางคือรอยต่อของปกคู่ · ข้อความจะถูกกันไม่ให้ออกนอกขอบ</div>
+      <div id="album-coverEditor" class="album-cover-editor is-empty"><p>อัปโหลดภาพ แล้วเลือกภาพปกเพื่อเริ่มจัดวาง</p></div>
+      <div id="album-coverWarning" class="album-cover-warning" hidden></div>
+    </div>
+
+    <div class="form-section album-flow-section"><div class="section-title"><b>4</b><h4>ปรับจุดครอปและลำดับภาพที่เหลือ</h4></div>
+      <p class="album-section-help">ภาพที่เหลือจะเป็นภาพจริงขนาด 1080 × 1080 ไม่มีข้อความ ไม่มีโลโก้ เลือกภาพแล้วเลื่อนจุดครอปได้</p>
+      <div id="album-cropList" class="album-crop-list"></div>
+    </div>
+
+    <div class="form-section album-flow-section"><div class="section-title"><b>5</b><h4>สร้างและตรวจตัวอย่าง Facebook</h4></div>
+      <div class="album-smart-choice"><b>ลำดับผลลัพธ์</b><span>ปกก่อน → ภาพกิจกรรมตามลำดับ → พรีวิว 2 บน + 3 ล่าง พร้อมเครื่องหมาย +จำนวน</span></div>
+      <div class="button-row"><button class="btn primary" id="makeAlbum">สร้างชุดภาพและแคปชั่น</button><button class="btn secondary" id="albumDownloadAll">ดาวน์โหลด ZIP</button><button class="btn secondary" id="albumClear">ล้างข้อมูล</button></div>
+    </div>
   `;
 
   $("#postForm").innerHTML = TANJAI.field("post") + `
@@ -369,7 +359,7 @@ $("#albumForm").innerHTML = `
 
   // Results
   $("#imageResult").innerHTML = TANJAI.readyOutputShell("image", "Prompt ภาพพร้อมใช้ — ผู้กำกับภาพอัจฉริยะ", "สร้าง Prompt ภาพพร้อมนำไปใช้กับ ทันใจ GPT, Canva หรือเครื่องมือสร้างภาพอื่น โดย AI เติมมุมสร้างสรรค์ได้แต่ไม่เดาข้อมูลจริง", "imageOut");
-$("#albumResult").innerHTML = TANJAI.readyOutputShell("album", "ชุดภาพพร้อมโพสต์", "ปรับภาพจริง ใส่กรอบ และดาวน์โหลดเป็นภาพพร้อมลง Facebook", "albumOut");
+$("#albumResult").innerHTML = TANJAI.readyOutputShell("album", "ชุดภาพพร้อมโพสต์", "ปกเดี่ยวหรือปกคู่ + ภาพจริงครอปสะอาด + แคปชั่นพร้อมใช้", "albumOut");
 $("#postResult").innerHTML = TANJAI.readyOutputShell("post", "ผู้ช่วยเขียนงานประชาสัมพันธ์", "เลือกประเภทงาน วางข้อมูลจริง แล้วระบบจะสร้างฉบับพร้อมใช้และแยกจุดที่ต้องตรวจสอบ", "postOut") + `
   <section class="post-revision-tools" id="postRevisionTools" hidden>
     <div><b>ปรับงานต่อ</b><span id="postWordStats">ยังไม่มีผลลัพธ์</span></div>
@@ -580,7 +570,7 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "สคริปต์�
     {label:"สร้างชุดสื่อ", icon:"🧩", view:"kit", hint:"Prompt ครบชุดจากข้อมูลเดียว"},
     {label:"สร้างภาพ", icon:"🖼️", view:"image", hint:"Prompt ภาพพร้อมใช้"},
     {label:"แต่งภาพ AI", icon:"✨", view:"photoPro", hint:"ปรับแสง สี เงา ความคมชัดหลายภาพ"},
-    {label:"ชุดภาพโพสต์ Facebook", icon:"🧷", view:"album", hint:"อัปโหลดรูป ใส่กรอบ แคปชั่น ZIP"},
+    {label:"ชุดภาพโพสต์ Facebook", icon:"🧷", view:"album", hint:"ปก 1–2 ภาพ ครอปภาพจริง แคปชั่น ZIP"},
     {label:"เขียนสคริปต์และเนื้อหา", icon:"✍️", view:"post", hint:"สคริปต์ บทพากย์ ข่าว โพสต์ และแคปชั่น"},
     {label:"งานพิธีกร", icon:"🎤", view:"mc", hint:"สคริปต์พิธีกร คำเชิญประธาน คำกล่าว คำเชื่อมช่วง"},
     {label:"ทำวิดีโอ", icon:"🎬", view:"video", hint:"Storyboard / Hook / Voice Over"},
