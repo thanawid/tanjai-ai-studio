@@ -4,8 +4,8 @@ const fs = require("fs");
 const page = fs.readFileSync("index.html", "utf8");
 const css = fs.readFileSync("css/style.css", "utf8");
 
-assert.match(page, /V12\.6\.1/);
-assert.match(page, /css\/style\.css\?v=12\.6\.1-facebook-cover/);
+assert.match(page, /V12\.6\.2/);
+assert.match(page, /css\/style\.css\?v=12\.6\.2-facebook-cover/);
 assert.match(page, /class="hero-card sales-dashboard-hero">/);
 assert.doesNotMatch(page, /class="hero-card sales-dashboard-hero" style=/);
 assert.match(page, /class="user-profile-top">/);
@@ -24,7 +24,7 @@ assert.match(css, /\.topbar\{[\s\S]*?backdrop-filter:blur\(18px\)/);
 assert.match(css, /:focus-visible\{outline:3px/);
 
 console.log(JSON.stringify({
-  version: "12.6.1",
+  version: "12.6.2",
   thaiTypography: true,
   unifiedNavigation: true,
   desktopTabletMobile: true,

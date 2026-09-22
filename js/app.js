@@ -196,15 +196,15 @@ $("#albumForm").innerHTML = `
 
     <div class="form-section album-flow-section"><div class="section-title"><b>2</b><h4>ข้อมูลข่าวและแคปชั่น</h4></div>
       <div class="form-grid">
-        <label class="full">ข้อความพาดหัวบนปก<input id="album-title" maxlength="140" placeholder="เช่น เทศบาลเมืองบางรักน้อย เตรียมความพร้อมรับสถานการณ์น้ำ"></label>
-        <label>ชื่อเพจ / หน่วยงาน<input id="album-orgName" placeholder="เช่น เทศบาลเมืองบางรักน้อย"></label>
+        <label class="full">ข้อความพาดหัวบนปก<input id="album-title" maxlength="140" placeholder="เช่น ลงพื้นที่ตรวจความพร้อมรับสถานการณ์น้ำ"></label>
+        <label>ชื่อเพจ / หน่วยงาน<input id="album-orgName" placeholder="ระบุชื่อองค์กร หน่วยงาน หรือชื่อเพจ"></label>
         <label>วันที่<input id="album-dateTime" placeholder="เช่น วันอังคารที่ 22 กันยายน 2569"></label>
         <label>เวลา<input id="album-time" placeholder="เช่น เวลา 09.00 น."></label>
         <label>สถานที่<input id="album-place" placeholder="ระบุสถานที่ หากมี"></label>
-        <label class="full">ใคร / ทำอะไร<textarea id="album-detail" rows="4" placeholder="ระบุชื่อบุคคล หน่วยงาน และการดำเนินงานตามข้อมูลจริง"></textarea></label>
-        <label class="full">รายละเอียดสั้นในแถบล่างภาพปก<input id="album-coverDetail" maxlength="220" placeholder="เว้นว่างได้ ระบบจะย่อจากข้อมูล ใคร / ทำอะไร"></label>
+        <label class="full">ใคร / ทำอะไร<textarea id="album-detail" rows="4" maxlength="600" placeholder="ระบุว่าใคร ทำอะไร และดำเนินการอย่างไรตามข้อมูลจริง"></textarea></label>
+        <label class="full">ข้อความใครทำอะไรบนแถบล่างภาพปก<textarea id="album-coverDetail" rows="3" maxlength="600" placeholder="เว้นว่างได้ ระบบจะใช้ข้อความจากช่อง ใคร / ทำอะไร แบบครบถ้วน"></textarea></label>
         <label class="full">วัตถุประสงค์หรือผลต่อประชาชน<textarea id="album-purpose" rows="3" placeholder="เช่น เพื่อป้องกันและแก้ไขปัญหาน้ำท่วมขังในพื้นที่"></textarea></label>
-        <label class="full">ข้อความปิดท้าย / เว็บไซต์ / แฮชแท็ก<input id="album-footer" placeholder="เช่น ใกล้ชิดประชาชน โปร่งใส ซื่อสัตย์ บริการด้วยใจ #เทศบาลเมืองบางรักน้อย"></label>
+        <label class="full">ข้อความปิดท้าย / เว็บไซต์ / แฮชแท็ก<input id="album-footer" placeholder="ระบุข้อความปิดท้าย เว็บไซต์ หรือแฮชแท็ก หากมี"></label>
         <label>สไตล์แคปชั่น<select id="album-captionStyle"><option value="official" selected>ข่าวประชาสัมพันธ์หน่วยงาน</option><option value="pr-ready">กระชับ พร้อมโพสต์</option><option value="friendly">อบอุ่น เข้าถึงง่าย</option><option value="story">เล่าเรื่องกิจกรรม</option><option value="announcement">ประกาศ / แจ้งข่าว</option></select></label>
       </div>
     </div>

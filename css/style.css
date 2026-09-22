@@ -5645,7 +5645,7 @@ html{scroll-padding-top:108px}
   .specialist-revision-buttons{display:grid;grid-template-columns:1fr 1fr}
 }
 
-/* V12.6.1 — Facebook Cover Studio: ปก 1–2 ภาพ + ภาพจริงครอปสะอาด */
+/* V12.6.2 — Facebook Cover Studio: แสดงข้อความใครทำอะไรครบถ้วน */
 .album-flow-section{overflow:visible}
 .album-cover-mode-field{display:grid;gap:8px}.album-cover-mode-field>span{font-weight:800;color:var(--soft);font-size:13px}
 .album-mode-buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px}

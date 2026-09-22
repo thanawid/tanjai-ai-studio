@@ -1,4 +1,4 @@
-/* V12.6.1 — Facebook Cover Studio
+/* V12.6.2 — Facebook Cover Studio
    ปกเดี่ยว/ปกคู่ปรับข้อความได้ + ภาพกิจกรรมครอปสะอาด + พรีวิว 2 บน 3 ล่าง
    ทำงานในเบราว์เซอร์ ไม่สร้างภาพใหม่ ไม่แก้ใบหน้า และไม่ใช้เครดิต AI
 */
@@ -40,11 +40,11 @@
     host.innerHTML=`<div class="album-picker-head"><b>เลือกภาพที่จะใช้ทำปก</b><small>คลิกภาพหนึ่งใบ ภาพอื่นจะเป็นภาพกิจกรรมแบบไม่มีข้อความ</small></div><div class="album-picker-grid">${state.files.map((item,index)=>`<button type="button" class="album-picker-item${item.id===state.coverId?' selected':''}" data-cover-id="${item.id}"><img src="${item.url}" alt="ภาพที่ ${index+1}"><span>${item.id===state.coverId?'✓ ภาพปก':`ภาพที่ ${index+1}`}</span></button>`).join('')}</div>`;
   }
   function metaText(d){return[d.date,d.time,d.place].filter(Boolean).join(' · ');}
-  function coverDetailText(d){return short(d.coverDetail||d.detail||d.purpose,170);}
+  function coverDetailText(d){return clean(d.coverDetail||d.detail||d.purpose);}
   function detailFontSize(text,isDouble=true){
     const length=clean(text).length;
-    if(isDouble){if(length>145)return 20;if(length>105)return 22;if(length>65)return 25;return 28;}
-    if(length>145)return 19;if(length>105)return 21;if(length>65)return 23;return 26;
+    if(isDouble){if(length>320)return 14;if(length>240)return 16;if(length>170)return 18;if(length>115)return 20;if(length>70)return 23;return 27;}
+    if(length>320)return 13;if(length>240)return 15;if(length>170)return 17;if(length>115)return 19;if(length>70)return 22;return 25;
   }
   function renderCoverEditor(){
     const host=$('#album-coverEditor');if(!host)return;const cover=selectedCover(),d=formData();
@@ -58,6 +58,7 @@
   function renderWarning(){
     const host=$('#album-coverWarning');if(!host)return;const d=formData(),warnings=[];
     if(d.title.length>90)warnings.push('พาดหัวยาว อาจอ่านไม่ทันบนมือถือ');
+    if(coverDetailText(d).length>220)warnings.push('ข้อความใครทำอะไรยาวมาก ระบบจะลดขนาดตัวอักษรเพื่อแสดงให้ครบ');
     if(state.coverMode==='double'&&state.headlineX>43&&state.headlineX<57&&d.title.length>34)warnings.push('พาดหัวอยู่ใกล้รอยต่อกลาง กรุณาตรวจว่าไม่มีตัวอักษรถูกแบ่งครึ่ง');
     if(!d.title)warnings.push('ยังไม่ได้ใส่ข้อความพาดหัว');host.hidden=!warnings.length;host.textContent=warnings.join(' · ');
   }
@@ -86,7 +87,9 @@
   function cropPlacement(sw,sh,w,h,xPct=50,yPct=50,zoom=1){const base=Math.max(w/sw,h/sh),scale=base*Math.max(1,zoom),nw=sw*scale,nh=sh*scale;return{scale,nw,nh,x:(w-nw)*(Math.max(0,Math.min(100,xPct))/100),y:(h-nh)*(Math.max(0,Math.min(100,yPct))/100)};}
   function drawCrop(ctx,img,w,h,item){const p=cropPlacement(img.naturalWidth||img.width,img.naturalHeight||img.height,w,h,item.cropX,item.cropY,item.zoom);ctx.drawImage(img,p.x,p.y,p.nw,p.nh);}
   function textTokens(text){try{return Array.from(new Intl.Segmenter('th',{granularity:'word'}).segment(text)).map(x=>x.segment).filter(Boolean);}catch(_){return String(text).split(/(\s+)/).filter(Boolean);}}
-  function wrapLines(ctx,text,maxWidth,maxLines){const tokens=textTokens(clean(text)),lines=[];let line='';tokens.forEach(token=>{const trial=line+token;if(line&&ctx.measureText(trial).width>maxWidth){lines.push(line.trim());line=token;}else line=trial;});if(line.trim())lines.push(line.trim());if(lines.length>maxLines){const out=lines.slice(0,maxLines);let last=out[maxLines-1];while(last.length>1&&ctx.measureText(last+'…').width>maxWidth)last=last.slice(0,-1);out[maxLines-1]=last.trim()+'…';return out;}return lines;}
+  function wrapAllLines(ctx,text,maxWidth){const tokens=textTokens(clean(text)),lines=[];let line='';tokens.forEach(token=>{const trial=line+token;if(line&&ctx.measureText(trial).width>maxWidth){lines.push(line.trim());line=token;}else line=trial;});if(line.trim())lines.push(line.trim());return lines;}
+  function wrapLines(ctx,text,maxWidth,maxLines){const lines=wrapAllLines(ctx,text,maxWidth);if(lines.length<=maxLines)return lines;const out=lines.slice(0,maxLines);let last=out[maxLines-1];while(last.length>1&&ctx.measureText(last+'…').width>maxWidth)last=last.slice(0,-1);out[maxLines-1]=last.trim()+'…';return out;}
+  function fitDetailLines(ctx,text,maxWidth,maxLines,startSize,minSize=8){let size=startSize,lines=[];while(size>=minSize){ctx.font=`600 ${size}px "Sarabun","Noto Sans Thai",sans-serif`;lines=wrapAllLines(ctx,text,maxWidth);if(lines.length<=maxLines)return{size,lines};size--;}return{size:minSize,lines:wrapAllLines(ctx,text,maxWidth)};}
   function drawHeadline(ctx,w,h,d){
     const text=d.title||'ข้อความพาดหัว',size=d.fontSize*(w===2160?1.28:1);ctx.save();ctx.font=`900 ${Math.round(size)}px "${d.font}","Noto Sans Thai",sans-serif`;ctx.textBaseline='middle';ctx.textAlign=d.align;
     const maxWidth=w*.82,lines=wrapLines(ctx,text,maxWidth,3),lineH=size*1.18,x=w*(state.headlineX/100),centerY=h*(state.headlineY/100),startY=centerY-((lines.length-1)*lineH)/2;ctx.lineJoin='round';ctx.miterLimit=2;
@@ -96,7 +99,7 @@
   function drawContained(ctx,img,x,y,maxW,maxH){const iw=img.naturalWidth||img.width,ih=img.naturalHeight||img.height,scale=Math.min(maxW/iw,maxH/ih),w=iw*scale,h=ih*scale;ctx.drawImage(img,x+(maxW-w)/2,y+(maxH-h)/2,w,h);}
   function drawBand(ctx,w,h,d){
     const bandH=190,y=h-bandH,meta=metaText(d),detail=coverDetailText(d);ctx.save();ctx.fillStyle=rgba(d.bandColor,d.bandOpacity);ctx.fillRect(0,y,w,bandH);const line=ctx.createLinearGradient(0,0,w,0);line.addColorStop(0,'#f5c84c');line.addColorStop(1,'rgba(255,255,255,.15)');ctx.fillStyle=line;ctx.fillRect(0,y,w,8);ctx.fillStyle='#fff';ctx.textBaseline='middle';
-    if(w===2160){ctx.font='700 34px "Sarabun","Noto Sans Thai",sans-serif';ctx.textAlign='center';wrapLines(ctx,meta||'วันที่ · เวลา · สถานที่',850,2).forEach((txt,i)=>ctx.fillText(txt,540,y+72+i*46,850));const size=detailFontSize(detail,true),lineH=Math.round(size*1.28),lines=wrapLines(ctx,detail||'รายละเอียดสั้นว่าใครทำอะไร',900,3),start=y+98-((lines.length-1)*lineH)/2;ctx.font=`600 ${size}px "Sarabun","Noto Sans Thai",sans-serif`;lines.forEach((txt,i)=>ctx.fillText(txt,1620,start+i*lineH,900));ctx.fillStyle='rgba(255,255,255,.24)';ctx.fillRect(1079,y+24,2,bandH-48);}else{ctx.textAlign='left';ctx.font='700 28px "Sarabun","Noto Sans Thai",sans-serif';ctx.fillText(short(meta||'วันที่ · เวลา · สถานที่',70),54,y+48,972);const size=detailFontSize(detail,false),lineH=Math.round(size*1.28);ctx.font=`600 ${size}px "Sarabun","Noto Sans Thai",sans-serif`;wrapLines(ctx,detail||'รายละเอียดสั้นว่าใครทำอะไร',972,3).forEach((txt,i)=>ctx.fillText(txt,54,y+105+i*lineH,972));}ctx.restore();
+    if(w===2160){ctx.font='700 34px "Sarabun","Noto Sans Thai",sans-serif';ctx.textAlign='center';wrapLines(ctx,meta||'วันที่ · เวลา · สถานที่',850,2).forEach((txt,i)=>ctx.fillText(txt,540,y+72+i*46,850));const fitted=fitDetailLines(ctx,detail||'รายละเอียดว่าใครทำอะไร',900,5,detailFontSize(detail,true)),lineH=Math.round(fitted.size*1.28),start=y+98-((fitted.lines.length-1)*lineH)/2;fitted.lines.forEach((txt,i)=>ctx.fillText(txt,1620,start+i*lineH,900));ctx.fillStyle='rgba(255,255,255,.24)';ctx.fillRect(1079,y+24,2,bandH-48);}else{ctx.textAlign='left';ctx.font='700 28px "Sarabun","Noto Sans Thai",sans-serif';ctx.fillText(short(meta||'วันที่ · เวลา · สถานที่',70),54,y+48,972);const fitted=fitDetailLines(ctx,detail||'รายละเอียดว่าใครทำอะไร',972,5,detailFontSize(detail,false)),lineH=Math.round(fitted.size*1.28),start=y+120-((fitted.lines.length-1)*lineH)/2;fitted.lines.forEach((txt,i)=>ctx.fillText(txt,54,start+i*lineH,972));}ctx.restore();
   }
   function drawCoverOverlays(ctx,w,h,d){
     const top=ctx.createLinearGradient(0,0,0,h*.58);top.addColorStop(0,'rgba(0,0,0,.38)');top.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=top;ctx.fillRect(0,0,w,h*.62);
