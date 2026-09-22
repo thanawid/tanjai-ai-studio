@@ -1,4 +1,4 @@
-/* V12.6.0 — Facebook Cover Studio
+/* V12.6.1 — Facebook Cover Studio
    ปกเดี่ยว/ปกคู่ปรับข้อความได้ + ภาพกิจกรรมครอปสะอาด + พรีวิว 2 บน 3 ล่าง
    ทำงานในเบราว์เซอร์ ไม่สร้างภาพใหม่ ไม่แก้ใบหน้า และไม่ใช้เครดิต AI
 */
@@ -6,7 +6,7 @@
   'use strict';
   const $=(q,root=document)=>root.querySelector(q);
   const $$=(q,root=document)=>Array.from(root.querySelectorAll(q));
-  const state={files:[],coverId:null,coverMode:'double',logo:null,logoUrl:'',outputs:[],caption:'',headlineX:50,headlineY:30,drag:null};
+  const state={files:[],coverId:null,coverMode:'double',logo:null,logoUrl:'',outputs:[],caption:'',headlineX:50,headlineY:30,drag:null,refreshTimer:null,refreshSeq:0};
 
   function clean(value){return String(value||'').replace(/\s+/g,' ').trim();}
   function esc(value){return String(value||'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
@@ -33,7 +33,7 @@
   }
   async function loadLogo(file){
     if(state.logoUrl)URL.revokeObjectURL(state.logoUrl);state.logo=null;state.logoUrl='';
-    if(!file){renderCoverEditor();return;}state.logoUrl=URL.createObjectURL(file);state.logo=await loadImage(state.logoUrl,false);renderCoverEditor();
+    if(!file){renderCoverEditor();scheduleGeneratedRefresh();return;}state.logoUrl=URL.createObjectURL(file);state.logo=await loadImage(state.logoUrl,false);renderCoverEditor();scheduleGeneratedRefresh();
   }
   function renderPhotoPicker(){
     const host=$('#album-photoPicker');if(!host)return;if(!state.files.length){host.hidden=true;host.innerHTML='';return;}host.hidden=false;
@@ -41,12 +41,18 @@
   }
   function metaText(d){return[d.date,d.time,d.place].filter(Boolean).join(' · ');}
   function coverDetailText(d){return short(d.coverDetail||d.detail||d.purpose,170);}
+  function detailFontSize(text,isDouble=true){
+    const length=clean(text).length;
+    if(isDouble){if(length>145)return 20;if(length>105)return 22;if(length>65)return 25;return 28;}
+    if(length>145)return 19;if(length>105)return 21;if(length>65)return 23;return 26;
+  }
   function renderCoverEditor(){
     const host=$('#album-coverEditor');if(!host)return;const cover=selectedCover(),d=formData();
     if(!cover){host.className='album-cover-editor is-empty';host.innerHTML='<p>อัปโหลดภาพ แล้วเลือกภาพปกเพื่อเริ่มจัดวาง</p>';return;}
     host.className=`album-cover-editor mode-${state.coverMode}`;
     const logo=(state.logoUrl&&d.logoPosition!=='none')?`<img class="album-editor-logo ${d.logoPosition}" src="${state.logoUrl}" alt="โลโก้จริง">`:'';
-    host.innerHTML=`<div class="album-cover-stage" id="albumCoverStage"><img class="album-editor-photo" src="${cover.url}" alt="ภาพปก" style="object-position:${cover.cropX}% ${cover.cropY}%"><div class="album-editor-shade"></div>${state.coverMode==='double'?'<i class="album-editor-seam" aria-hidden="true"></i>':''}${logo}<div id="albumHeadlineDrag" class="album-headline-drag align-${d.align}" style="left:${state.headlineX}%;top:${state.headlineY}%;font-family:'${esc(d.font)}',sans-serif;font-size:${Math.max(20,d.fontSize/2)}px;color:${d.color};-webkit-text-stroke:${Math.max(0,d.outlineWidth/2)}px ${d.outlineColor};text-shadow:${d.shadow?'0 3px 10px rgba(0,0,0,.72)':'none'}">${esc(d.title||'ข้อความพาดหัว')}</div><div class="album-editor-band" style="background:${rgba(d.bandColor,d.bandOpacity)}"><div class="album-editor-meta">${esc(metaText(d)||'วันที่ · เวลา · สถานที่')}</div><div class="album-editor-detail">${esc(coverDetailText(d)||'รายละเอียดสั้นว่าใครทำอะไร')}</div></div></div>`;
+    const isDouble=state.coverMode==='double',canvasW=isDouble?2160:1080,detail=coverDetailText(d)||'รายละเอียดสั้นว่าใครทำอะไร',headlineSourceSize=d.fontSize*(isDouble?1.28:1),previewHeadlineSize=headlineSourceSize/canvasW*100,previewOutlineSize=d.outlineWidth*(isDouble?1.35:1)/canvasW*100,previewMetaSize=(isDouble?34:28)/canvasW*100,previewDetailSize=detailFontSize(detail,isDouble)/canvasW*100;
+    host.innerHTML=`<div class="album-cover-stage" id="albumCoverStage"><img class="album-editor-photo" src="${cover.url}" alt="ภาพปก" style="object-position:${cover.cropX}% ${cover.cropY}%"><div class="album-editor-shade"></div>${isDouble?'<i class="album-editor-seam" aria-hidden="true"></i>':''}${logo}<div id="albumHeadlineDrag" class="album-headline-drag align-${d.align}" style="left:${state.headlineX}%;top:${state.headlineY}%;font-family:'${esc(d.font)}',sans-serif;font-size:${previewHeadlineSize}cqw;color:${d.color};-webkit-text-stroke:${previewOutlineSize}cqw ${d.outlineColor};text-shadow:${d.shadow?'0 3px 10px rgba(0,0,0,.72)':'none'}">${esc(d.title||'ข้อความพาดหัว')}</div><div class="album-editor-band" style="background:${rgba(d.bandColor,d.bandOpacity)}"><div class="album-editor-meta" style="font-size:${previewMetaSize}cqw">${esc(metaText(d)||'วันที่ · เวลา · สถานที่')}</div><div class="album-editor-detail" style="font-size:${previewDetailSize}cqw">${esc(detail)}</div></div></div>`;
     bindHeadlineDrag();renderWarning();
   }
   function renderWarning(){
@@ -59,7 +65,7 @@
     const drag=$('#albumHeadlineDrag'),stage=$('#albumCoverStage');if(!drag||!stage)return;
     drag.addEventListener('pointerdown',event=>{event.preventDefault();drag.setPointerCapture?.(event.pointerId);state.drag={stage};drag.classList.add('dragging');});
     drag.addEventListener('pointermove',event=>{if(!state.drag)return;const rect=stage.getBoundingClientRect();state.headlineX=Math.max(8,Math.min(92,((event.clientX-rect.left)/rect.width)*100));state.headlineY=Math.max(10,Math.min(68,((event.clientY-rect.top)/rect.height)*100));drag.style.left=state.headlineX+'%';drag.style.top=state.headlineY+'%';renderWarning();});
-    const stop=()=>{state.drag=null;drag.classList.remove('dragging');};drag.addEventListener('pointerup',stop);drag.addEventListener('pointercancel',stop);
+    const stop=()=>{if(state.drag)scheduleGeneratedRefresh();state.drag=null;drag.classList.remove('dragging');};drag.addEventListener('pointerup',stop);drag.addEventListener('pointercancel',stop);
   }
   function renderCropList(){
     const host=$('#album-cropList');if(!host)return;const supports=supportingFiles();
@@ -90,7 +96,7 @@
   function drawContained(ctx,img,x,y,maxW,maxH){const iw=img.naturalWidth||img.width,ih=img.naturalHeight||img.height,scale=Math.min(maxW/iw,maxH/ih),w=iw*scale,h=ih*scale;ctx.drawImage(img,x+(maxW-w)/2,y+(maxH-h)/2,w,h);}
   function drawBand(ctx,w,h,d){
     const bandH=190,y=h-bandH,meta=metaText(d),detail=coverDetailText(d);ctx.save();ctx.fillStyle=rgba(d.bandColor,d.bandOpacity);ctx.fillRect(0,y,w,bandH);const line=ctx.createLinearGradient(0,0,w,0);line.addColorStop(0,'#f5c84c');line.addColorStop(1,'rgba(255,255,255,.15)');ctx.fillStyle=line;ctx.fillRect(0,y,w,8);ctx.fillStyle='#fff';ctx.textBaseline='middle';
-    if(w===2160){ctx.font='700 34px "Sarabun","Noto Sans Thai",sans-serif';ctx.textAlign='center';wrapLines(ctx,meta||'วันที่ · เวลา · สถานที่',850,2).forEach((txt,i)=>ctx.fillText(txt,540,y+72+i*46,850));ctx.font='700 35px "Sarabun","Noto Sans Thai",sans-serif';wrapLines(ctx,detail||'รายละเอียดสั้นว่าใครทำอะไร',900,2).forEach((txt,i)=>ctx.fillText(txt,1620,y+70+i*48,900));ctx.fillStyle='rgba(255,255,255,.24)';ctx.fillRect(1079,y+24,2,bandH-48);}else{ctx.textAlign='left';ctx.font='700 28px "Sarabun","Noto Sans Thai",sans-serif';ctx.fillText(short(meta||'วันที่ · เวลา · สถานที่',70),54,y+55,972);ctx.font='700 31px "Sarabun","Noto Sans Thai",sans-serif';wrapLines(ctx,detail||'รายละเอียดสั้นว่าใครทำอะไร',972,2).forEach((txt,i)=>ctx.fillText(txt,54,y+112+i*39,972));}ctx.restore();
+    if(w===2160){ctx.font='700 34px "Sarabun","Noto Sans Thai",sans-serif';ctx.textAlign='center';wrapLines(ctx,meta||'วันที่ · เวลา · สถานที่',850,2).forEach((txt,i)=>ctx.fillText(txt,540,y+72+i*46,850));const size=detailFontSize(detail,true),lineH=Math.round(size*1.28),lines=wrapLines(ctx,detail||'รายละเอียดสั้นว่าใครทำอะไร',900,3),start=y+98-((lines.length-1)*lineH)/2;ctx.font=`600 ${size}px "Sarabun","Noto Sans Thai",sans-serif`;lines.forEach((txt,i)=>ctx.fillText(txt,1620,start+i*lineH,900));ctx.fillStyle='rgba(255,255,255,.24)';ctx.fillRect(1079,y+24,2,bandH-48);}else{ctx.textAlign='left';ctx.font='700 28px "Sarabun","Noto Sans Thai",sans-serif';ctx.fillText(short(meta||'วันที่ · เวลา · สถานที่',70),54,y+48,972);const size=detailFontSize(detail,false),lineH=Math.round(size*1.28);ctx.font=`600 ${size}px "Sarabun","Noto Sans Thai",sans-serif`;wrapLines(ctx,detail||'รายละเอียดสั้นว่าใครทำอะไร',972,3).forEach((txt,i)=>ctx.fillText(txt,54,y+105+i*lineH,972));}ctx.restore();
   }
   function drawCoverOverlays(ctx,w,h,d){
     const top=ctx.createLinearGradient(0,0,0,h*.58);top.addColorStop(0,'rgba(0,0,0,.38)');top.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=top;ctx.fillRect(0,0,w,h*.62);
@@ -103,6 +109,11 @@
     const outs=[];for(let i=0;i<2;i++){const half=document.createElement('canvas');half.width=1080;half.height=1080;half.getContext('2d').drawImage(canvas,i*1080,0,1080,1080,0,0,1080,1080);const blob=await canvasBlob(half);outs.push({blob,url:URL.createObjectURL(blob),role:'cover',filename:`0${i+1}-cover-${i?'right':'left'}.jpg`,w:1080,h:1080});}return outs;
   }
   async function buildSupport(item,index,offset){const canvas=document.createElement('canvas');canvas.width=1080;canvas.height=1080;const ctx=canvas.getContext('2d'),img=await loadImage(item.file);drawCrop(ctx,img,1080,1080,item);const blob=await canvasBlob(canvas),number=String(index+offset).padStart(2,'0');return{blob,url:URL.createObjectURL(blob),role:'photo',filename:`${number}-photo.jpg`,w:1080,h:1080};}
+
+  function scheduleGeneratedRefresh(){
+    if(!state.outputs.length)return;clearTimeout(state.refreshTimer);const seq=++state.refreshSeq;
+    state.refreshTimer=setTimeout(async()=>{try{const covers=await buildCover();if(seq!==state.refreshSeq){covers.forEach(item=>URL.revokeObjectURL(item.url));return;}const photos=state.outputs.filter(item=>item.role!=='cover'),oldCovers=state.outputs.filter(item=>item.role==='cover');oldCovers.forEach(item=>URL.revokeObjectURL(item.url));state.outputs=[...covers,...photos];state.caption=captionWriter(formData());renderOutputs();}catch(error){console.error(error);}},280);
+  }
 
   function factGuardCaption(text){return String(text||'').split('\n').map(line=>line.trimEnd()).filter(line=>line&&!/undefined|null|placeholder|กรอกข้อมูล/i.test(line)).join('\n').replace(/\n{3,}/g,'\n\n').trim();}
   function captionWriter(d,style=d.captionStyle||'official'){
@@ -132,15 +143,15 @@
   function copyCaption(button){const text=$('#albumCaptionText')?.value||state.caption;if(!text)return;navigator.clipboard?.writeText(text);const old=button.textContent;button.textContent='คัดลอกแล้ว ✓';setTimeout(()=>button.textContent=old,1300);}
   function saveProject(){const d=formData(),snapshot={...d,coverMode:state.coverMode,headlineX:state.headlineX,headlineY:state.headlineY},payload=`【ข้อมูลงาน】\nหัวข้อ: ${d.title}\nหน่วยงาน: ${d.org}\nวันที่: ${d.date} ${d.time}\nสถานที่: ${d.place}\nรายละเอียด: ${d.detail}\nวัตถุประสงค์: ${d.purpose}\n\n【แคปชั่น】\n${$('#albumCaptionText')?.value||state.caption}\n\n##TANJAI_ALBUM_V126##${JSON.stringify(snapshot)}`;window.TANJAI?.saveProject?.(d.title||'ชุดภาพโพสต์ Facebook',payload,'ชุดภาพโพสต์ Facebook');}
   function clearAll(){revokeFiles();revokeOutputs();if(state.logoUrl)URL.revokeObjectURL(state.logoUrl);state.files=[];state.coverId=null;state.logo=null;state.logoUrl='';state.caption='';state.headlineX=50;state.headlineY=30;['album-allFiles','album-logoFile'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});renderPhotoPicker();renderCoverEditor();renderCropList();renderEmptyResult();progress(false);}
-  function setCoverMode(mode){state.coverMode=mode==='single'?'single':'double';const input=$('#album-coverMode');if(input)input.value=state.coverMode;$$('[data-cover-mode]').forEach(button=>button.classList.toggle('selected',button.dataset.coverMode===state.coverMode));renderCoverEditor();}
+  function setCoverMode(mode){state.coverMode=mode==='single'?'single':'double';const input=$('#album-coverMode');if(input)input.value=state.coverMode;$$('[data-cover-mode]').forEach(button=>button.classList.toggle('selected',button.dataset.coverMode===state.coverMode));renderCoverEditor();scheduleGeneratedRefresh();}
 
   document.addEventListener('DOMContentLoaded',()=>{
     renderCropList();renderEmptyResult();
-    document.addEventListener('change',event=>{if(event.target.id==='album-allFiles')ingestFiles(event.target.files);if(event.target.id==='album-logoFile')loadLogo(event.target.files?.[0]||null);if(event.target.matches('[data-crop-axis]'))updateCrop(event.target);if(['album-headlineFont','album-headlineAlign','album-logoPosition','album-captionStyle'].includes(event.target.id))renderCoverEditor();});
-    document.addEventListener('input',event=>{if(event.target.matches('[data-crop-axis]'))updateCrop(event.target);if(event.target.id==='album-headlineSize')$('#album-fontSizeValue').textContent=event.target.value;if(event.target.id==='album-outlineWidth')$('#album-outlineValue').textContent=event.target.value;if(event.target.id==='album-bandOpacity')$('#album-bandOpacityValue').textContent=event.target.value+'%';if(/^album-(title|orgName|dateTime|time|place|detail|coverDetail|headline|outline|band)/.test(event.target.id)||event.target.id==='album-headlineShadow')renderCoverEditor();if(event.target.id==='albumCaptionText')renderFacebookPreview();});
+    document.addEventListener('change',event=>{if(event.target.id==='album-allFiles')ingestFiles(event.target.files);if(event.target.id==='album-logoFile')loadLogo(event.target.files?.[0]||null);if(event.target.matches('[data-crop-axis]'))updateCrop(event.target);if(['album-headlineFont','album-headlineAlign','album-logoPosition','album-captionStyle'].includes(event.target.id)){renderCoverEditor();scheduleGeneratedRefresh();}});
+    document.addEventListener('input',event=>{if(event.target.matches('[data-crop-axis]'))updateCrop(event.target);if(event.target.id==='album-headlineSize')$('#album-fontSizeValue').textContent=event.target.value;if(event.target.id==='album-outlineWidth')$('#album-outlineValue').textContent=event.target.value;if(event.target.id==='album-bandOpacity')$('#album-bandOpacityValue').textContent=event.target.value+'%';if(/^album-(title|orgName|dateTime|time|place|detail|coverDetail|headline|outline|band)/.test(event.target.id)||event.target.id==='album-headlineShadow'){renderCoverEditor();scheduleGeneratedRefresh();}if(event.target.id==='albumCaptionText')renderFacebookPreview();});
     document.addEventListener('click',event=>{const mode=event.target.closest?.('[data-cover-mode]');if(mode){event.preventDefault();setCoverMode(mode.dataset.coverMode);return;}const cover=event.target.closest?.('[data-cover-id]');if(cover){event.preventDefault();state.coverId=cover.dataset.coverId;renderPhotoPicker();renderCoverEditor();renderCropList();return;}const move=event.target.closest?.('[data-move]');if(move){event.preventDefault();const card=move.closest('[data-file-id]');moveSupport(card?.dataset.fileId,move.dataset.move);return;}const id=event.target.id;if(id==='makeAlbum'){event.preventDefault();generate();}if(id==='albumDownloadAll'||id==='albumDownloadAllResult'){event.preventDefault();downloadAll();}if(id==='albumClear'){event.preventDefault();clearAll();}if(id==='albumCopyCaption'||id==='albumCopyCaptionQuick'){event.preventDefault();copyCaption(event.target);}if(id==='albumRefreshPreview'){event.preventDefault();renderFacebookPreview();}if(id==='albumSaveProject'){event.preventDefault();saveProject();}const one=event.target.closest?.('.album-one-download');if(one){event.preventDefault();downloadOne(Number(one.dataset.index));}});
   });
   window.TANJAI=window.TANJAI||{};
   window.TANJAI.applyAlbumTemplate=function(snapshot){Object.entries(snapshot||{}).forEach(([key,value])=>{const id=key.startsWith('album-')?key:`album-${key}`,el=document.getElementById(id);if(el&&typeof value!=='object')el.value=value;});if(snapshot?.coverMode)setCoverMode(snapshot.coverMode);if(Number.isFinite(snapshot?.headlineX))state.headlineX=snapshot.headlineX;if(Number.isFinite(snapshot?.headlineY))state.headlineY=snapshot.headlineY;renderCoverEditor();};
-  window.TANJAI_ALBUM_PRO={generate,downloadAll,renderFacebookPreview,renderPhotoPicker,renderCropList,_test:{cropPlacement,captionWriter,factGuardCaption,short,metaText,coverDetailText}};
+  window.TANJAI_ALBUM_PRO={generate,downloadAll,renderFacebookPreview,renderPhotoPicker,renderCropList,_test:{cropPlacement,captionWriter,factGuardCaption,short,metaText,coverDetailText,detailFontSize}};
 })();

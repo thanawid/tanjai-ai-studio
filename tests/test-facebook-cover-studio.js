@@ -14,7 +14,7 @@ const context = {console,document,TextEncoder,Uint8Array,Blob,Intl,URL:{createOb
 vm.runInNewContext(source, context, {filename:'album.js'});
 const api = context.window.TANJAI_ALBUM_PRO._test;
 
-assert.match(index,/V12\.6\.0/);
+assert.match(index,/V12\.6\.1/);
 assert.match(app,/id="album-allFiles"/);
 assert.match(app,/data-cover-mode="double"/);
 assert.match(app,/data-cover-mode="single"/);
@@ -23,6 +23,8 @@ assert.match(app,/id="album-headlineColor"/);
 assert.match(app,/id="album-coverDetail"/);
 assert.match(source,/cover-\$\{i\?'right':'left'\}\.jpg/);
 assert.match(source,/fb-five-grid/);
+assert.match(source,/containerW=isDouble\?2160:1080|canvasW=isDouble\?2160:1080/);
+assert.match(source,/scheduleGeneratedRefresh/);
 assert.match(css,/grid-template-columns:repeat\(6,1fr\)/);
 assert.match(css,/\.fb-five-cell\.cell-5/);
 assert.doesNotMatch(source,/drawLiteFrame|drawAdditionalFrame/);
@@ -41,5 +43,7 @@ assert.match(caption,/22 กันยายน 2569 09\.00 น\./);
 assert.match(caption,/หมู่ 1/);
 assert.doesNotMatch(caption,/undefined|null|placeholder/i);
 assert.strictEqual(api.factGuardCaption('ข้อมูลจริง\nPLACEHOLDER\nundefined'),'ข้อมูลจริง');
+assert(api.detailFontSize('ข้อความสั้น',true)>api.detailFontSize('ก'.repeat(150),true));
+assert(api.detailFontSize('ก'.repeat(150),true)<=20);
 
-console.log(JSON.stringify({version:'12.6.0',coverModes:2,editableHeadline:true,cleanSupportPhotos:true,facebookFiveGrid:true,caption:true,status:'PASS'},null,2));
+console.log(JSON.stringify({version:'12.6.1',coverModes:2,editableHeadline:true,cleanSupportPhotos:true,facebookFiveGrid:true,caption:true,detailAutoFit:true,status:'PASS'},null,2));
