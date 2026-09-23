@@ -21,4 +21,4 @@ assert.match(index,/แต่งวิดีโอ AI/);
 assert.match(prep,/ดาวน์โหลดคลิปที่ปรับแล้ว/);
 assert.doesNotMatch(prep,/id="continueEditingBtn"/);
 assert.doesNotMatch(prep,/showAiDestinationsBtn|aiDestinations|continueAiBtn|data-destination/);
-console.log(JSON.stringify({version:'12.6.4',embeddedCreator:true,footageDownloadOnly:true,unifiedStudio:true,status:'PASS'},null,2));
+console.log(JSON.stringify({version:'12.6.5',embeddedCreator:true,footageDownloadOnly:true,unifiedStudio:true,status:'PASS'},null,2));

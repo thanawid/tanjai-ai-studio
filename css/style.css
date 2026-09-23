@@ -5645,7 +5645,7 @@ html{scroll-padding-top:108px}
   .specialist-revision-buttons{display:grid;grid-template-columns:1fr 1fr}
 }
 
-/* V12.6.4 — Facebook Cover Studio: ภาษางานประชาสัมพันธ์แบบยืดหยุ่น */
+/* V12.6.5 — Smart Facebook Post Studio: ปกสะอาด + เครื่องมือแบบเปิดเมื่อต้องใช้ */
 .album-flow-section{overflow:visible}
 .album-cover-mode-field{display:grid;gap:8px}.album-cover-mode-field>span{font-weight:800;color:var(--soft);font-size:13px}
 .album-mode-buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -5657,27 +5657,20 @@ html{scroll-padding-top:108px}
 .album-picker-item{position:relative;display:grid;gap:5px;padding:5px;border-radius:12px;border:1px solid var(--line2);background:#090d1c;color:var(--soft);min-width:0}
 .album-picker-item img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px}.album-picker-item span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11px;font-weight:800}
 .album-picker-item.selected{border-color:#f0c84b;box-shadow:0 0 0 2px rgba(240,200,75,.22);color:#ffe08a}
-.album-editor-toolbar{display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:10px;margin-bottom:12px}
+.album-quick-tools{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 8px}.album-quick-tools button{border:1px solid rgba(168,85,247,.35);background:rgba(168,85,247,.08);color:var(--text);border-radius:10px;padding:9px 12px;font-family:inherit;font-size:12px;font-weight:800;cursor:pointer}.album-quick-tools button:hover{border-color:#a855f7;background:rgba(168,85,247,.16)}
+.album-advanced-editor{margin-top:12px;border:1px solid rgba(148,163,184,.2);border-radius:14px;background:rgba(5,10,24,.26);overflow:hidden}.album-advanced-editor>summary{display:flex;align-items:center;justify-content:space-between;padding:13px 15px;cursor:pointer;list-style:none}.album-advanced-editor>summary::-webkit-details-marker{display:none}.album-advanced-editor>summary:after{content:"＋";font-weight:900;color:#c084fc}.album-advanced-editor[open]>summary:after{content:"−"}.album-advanced-editor>summary span{display:grid;gap:3px}.album-advanced-editor>summary small{color:var(--muted);font-size:11px}.album-advanced-editor .album-editor-toolbar{padding:2px 14px 14px}
+.album-editor-toolbar{display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:10px;margin-bottom:0}
 .album-editor-toolbar label{display:grid;gap:7px;color:var(--soft);font-size:12px;font-weight:800}.album-editor-toolbar input[type="range"]{width:100%;accent-color:#a855f7}.album-editor-toolbar input[type="color"]{width:100%;height:39px;padding:4px;border-radius:10px}
 .album-editor-toolbar .checkline{align-content:center;grid-template-columns:auto 1fr;align-items:center;padding-top:18px}.album-editor-note,.album-section-help{margin:8px 0 12px;color:var(--muted);font-size:12px;line-height:1.55}
 .album-cover-editor{width:100%;padding:10px;border-radius:18px;border:1px solid rgba(167,139,250,.35);background:#050712;box-shadow:inset 0 0 0 1px rgba(255,255,255,.025)}
 .album-cover-editor.is-empty{min-height:220px;display:grid;place-items:center;color:var(--muted)}
 .album-cover-stage{position:relative;width:100%;aspect-ratio:2/1;overflow:hidden;border-radius:12px;background:#0b1020;user-select:none;touch-action:none;container-type:inline-size}
 .album-cover-editor.mode-single .album-cover-stage{aspect-ratio:1/1;max-width:600px;margin:auto}
-.album-editor-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.album-editor-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.42),transparent 58%,rgba(0,0,0,.15))}
+.album-editor-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.album-editor-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.18) 0%,rgba(36,16,79,.06) 42%,rgba(36,16,79,.78) 100%)}.album-cover-stage.style-gradient .album-editor-shade{background:linear-gradient(180deg,rgba(0,0,0,.18),rgba(0,0,0,.08) 42%,rgba(0,0,0,.72))}.album-cover-stage.style-minimal .album-editor-shade{background:linear-gradient(180deg,rgba(0,0,0,.2),rgba(0,0,0,.08))}
 .album-editor-seam{position:absolute;z-index:5;top:0;bottom:0;left:50%;width:2px;background:rgba(255,255,255,.82);box-shadow:0 0 0 1px rgba(0,0,0,.55);pointer-events:none}
 .album-editor-seam:before{content:"รอยต่อ";position:absolute;top:8px;left:6px;padding:3px 6px;border-radius:6px;background:rgba(0,0,0,.72);font:700 10px Tahoma;color:#fff;white-space:nowrap}
 .album-editor-logo{position:absolute;z-index:7;height:auto;max-height:28%;object-fit:contain;filter:drop-shadow(0 4px 8px rgba(0,0,0,.55));cursor:grab;touch-action:none}.album-editor-logo.dragging{cursor:grabbing;outline:2px dashed rgba(255,255,255,.75);border-radius:50%}
-.album-headline-drag{position:absolute;z-index:6;width:min(84%,1200px);transform:translate(-50%,-50%);line-height:1.08;cursor:grab;overflow-wrap:anywhere;padding:8px;text-align:center;letter-spacing:-.025em}.album-headline-drag.is-italic{font-style:italic}.album-headline-drag.dragging{cursor:grabbing;outline:2px dashed rgba(255,255,255,.72);border-radius:8px}.album-headline-drag.align-left{text-align:left}.album-headline-drag.align-right{text-align:right}
-.album-editor-band{position:absolute;z-index:4;left:0;right:0;bottom:0;height:23.15%;min-height:0;color:#fff;text-shadow:0 2px 5px rgba(0,0,0,.55);overflow:hidden;background:var(--album-band)}
-.album-cover-stage.style-gradient .album-editor-band{height:34%;background:linear-gradient(180deg,transparent 0%,color-mix(in srgb,var(--album-band) 68%,transparent) 34%,var(--album-band) 100%)}
-.album-cover-stage.style-minimal .album-editor-band{height:13.9%;background:color-mix(in srgb,var(--album-band) 58%,transparent)}
-.album-editor-divider{position:absolute;left:8%;right:8%;top:7%;height:3px;background:linear-gradient(90deg,transparent,#f5c84c 12%,#f5c84c 88%,transparent)}.album-editor-divider.is-hidden{display:none}
-.album-editor-facts{position:absolute;inset:16% 0 0;display:grid;grid-template-columns:1fr 1fr;align-items:center}
-.album-editor-facts.meta-only,.album-editor-facts.detail-only{grid-template-columns:1fr;text-align:center;padding-inline:8%}.album-editor-facts.meta-only .album-editor-meta{border-right:0}.album-editor-facts.detail-only .album-editor-detail{text-align:center}.album-editor-facts.is-empty{display:none}
-.album-editor-meta,.album-editor-detail{padding:7px 18px;font-family:"Sarabun","Noto Sans Thai",sans-serif;line-height:1.28}.album-editor-meta{font-weight:700;text-align:center;border-right:1px solid rgba(255,255,255,.25)}.album-editor-detail{font-weight:600;overflow-wrap:anywhere;white-space:normal}
-.mode-single .album-editor-facts{grid-template-columns:1fr}.mode-single .album-editor-meta{text-align:left;border-right:0;border-bottom:1px solid rgba(255,255,255,.18);padding-bottom:4px}.mode-single .album-editor-detail{padding-top:4px}
-.style-minimal .album-editor-divider{top:5%}.style-minimal .album-editor-facts{inset:19% 0 0}
+.album-headline-drag{position:absolute;z-index:6;width:min(84%,1200px);transform:translate(-50%,-50%);line-height:1.08;cursor:grab;overflow-wrap:anywhere;white-space:pre-wrap;padding:8px;text-align:center;letter-spacing:-.025em}.album-headline-drag.is-italic{font-style:italic}.album-headline-drag.dragging{cursor:grabbing;outline:2px dashed rgba(255,255,255,.72);border-radius:8px}.album-headline-drag.align-left{text-align:left}.album-headline-drag.align-right{text-align:right}
 .album-cover-warning{margin-top:9px;padding:10px 12px;border-radius:10px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.35);color:#fde68a;font-size:12px;line-height:1.5}
 .album-crop-list{display:grid;gap:10px}.album-empty-note{padding:18px;border:1px dashed var(--line2);border-radius:14px;text-align:center;color:var(--muted)}
 .album-crop-card{display:grid;grid-template-columns:150px minmax(0,1fr);gap:14px;padding:10px;border-radius:15px;border:1px solid var(--line);background:rgba(7,10,21,.58)}

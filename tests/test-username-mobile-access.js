@@ -8,8 +8,8 @@ const proofread = fs.readFileSync(path.join(root,"js","proofread.js"),"utf8");
 const css = fs.readFileSync(path.join(root,"css","style.css"),"utf8");
 const pkg = JSON.parse(fs.readFileSync(path.join(root,"package.json"),"utf8"));
 
-assert.strictEqual(pkg.version, "12.6.4");
-assert.match(index, /V12\.6\.4/);
+assert.strictEqual(pkg.version, "12.6.5");
+assert.match(index, /V12\.6\.5/);
 assert.doesNotMatch(index, /login-version-badge|app-version-badge/);
 assert.match(app, /data-fab-view="router"/);
 assert.match(app, /data-fab-view="createVideo"/);
@@ -27,4 +27,4 @@ assert.match(proofread, /openProofreadNav/);
 assert.match(proofread, /make\[A-Z\]/);
 assert.match(proofread, /พ\.ศ\. \$1/);
 
-console.log(JSON.stringify({version:"12.6.4",hiddenVersion:true,hiddenSpecialist:true,proofreadNav:true,status:"PASS"},null,2));
+console.log(JSON.stringify({version:"12.6.5",hiddenVersion:true,hiddenSpecialist:true,proofreadNav:true,status:"PASS"},null,2));
