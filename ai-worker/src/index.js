@@ -16,6 +16,19 @@ const SMART_FILL_POLICY = `นโยบายช่วยคิดอย่า�
 - แยกส่วน "AI เติมให้อย่างปลอดภัย" และ "ข้อมูลที่ต้องยืนยัน" เมื่อเหมาะสม
 - งานต้องดูขายได้ ใช้จริงได้ ภาษาไทยเป็นธรรมชาติ ไม่เหมือนคำตอบทดลอง`;
 
+const CONTEXT_POLICY = `ระบบบริบทของทันใจ:
+- บริบทองค์กร ใช้กำหนดน้ำเสียง กลุ่มผู้รับสาร คำเรียก และข้อห้ามประจำองค์กรเท่านั้น
+- บริบทโครงการ ใช้เชื่อมข้อมูลของงานเดียวกัน เช่น ชื่องาน วัน เวลา สถานที่ บุคคล และข้อเท็จจริงที่ยืนยันแล้ว
+- บริบทงานปัจจุบันมีลำดับสูงสุด หากขัดกับบริบทที่บันทึกไว้ ให้ยึดข้อมูลที่ผู้ใช้กรอกในงานปัจจุบัน
+- ห้ามนำข้อมูลจากคนละโครงการมาปะปน ห้ามเติมช่องว่างด้วยความทรงจำหรือบริบทเก่า
+- ค่าใน lockedFacts และ protectedTerms ต้องคงเดิมทุกตัวอักษร
+- ถ้าบริบทขัดกันหรือไม่แน่ใจ ให้ระบุเฉพาะจุดที่ต้องตรวจ ห้ามเลือกคำตอบแทนผู้ใช้`;
+
+function contextBlock(data = {}){
+  const context = data.sharedContext && typeof data.sharedContext === "object" ? data.sharedContext : {};
+  return `${CONTEXT_POLICY}\n\nบริบทที่อนุญาตให้ใช้ในงานนี้:\n${JSON.stringify(context, null, 2)}`;
+}
+
 function json(data, status=200, origin=""){
   const headers = {"Content-Type":"application/json; charset=utf-8", "Vary":"Origin"};
   if(origin){
@@ -155,6 +168,8 @@ function buildSpecialistPrompt(tool, data = {}, options = {}){
 
 ${SMART_FILL_POLICY}
 
+${contextBlock(data)}
+
 กติกาสำคัญ:
 - วิเคราะห์เจตนาและสร้างผลงานเต็มฉบับ ไม่สะท้อนข้อความสั้นของผู้ใช้กลับมาเฉย ๆ
 - ใช้ภาษาไทยเป็นธรรมชาติ เหมาะกับผู้ฟังและช่องทาง
@@ -201,6 +216,8 @@ function buildPostPrompt(data = {}, options = {}){
 ${revisionRule}
 
 ${SMART_FILL_POLICY}
+
+${contextBlock(data)}
 
 หลักการเขียนของเมนูนี้:
 - งานเขียนต้องช่วยคิด ไม่ใช่เพียงย้ายข้อความของผู้ใช้มาเรียงใหม่
@@ -336,6 +353,113 @@ function parseJsonText(text=""){
   catch(_){ return null; }
 }
 
+function openRouterHeaders(env){
+  return {
+    "Content-Type":"application/json",
+    "Authorization":`Bearer ${env.OPENROUTER_API_KEY}`,
+    "HTTP-Referer":"https://thanawid.github.io",
+    "X-OpenRouter-Title":"Tanjai AI Studio"
+  };
+}
+
+async function tryOpenRouterText(prompt, env, {temperature=0.55}={}){
+  if(!env.OPENROUTER_API_KEY) return null;
+  try{
+    const model = String(env.OPENROUTER_MODEL || "openrouter/auto");
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method:"POST",
+      headers:openRouterHeaders(env),
+      body:JSON.stringify({
+        model,
+        messages:[{role:"user", content:prompt}],
+        max_tokens:4096,
+        temperature
+      })
+    });
+    const result = await response.json().catch(()=>({}));
+    if(!response.ok){
+      console.error("OpenRouter text error", response.status, result?.error?.message || "unknown");
+      return null;
+    }
+    const text = String(result?.choices?.[0]?.message?.content || "").trim();
+    return text ? {text, model, source:"openrouter"} : null;
+  }catch(_){
+    console.error("OpenRouter text fetch failed");
+    return null;
+  }
+}
+
+function audioFormat(mimeType=""){
+  if(/wav/.test(mimeType)) return "wav";
+  if(/flac/.test(mimeType)) return "flac";
+  if(/ogg/.test(mimeType)) return "ogg";
+  if(/aac/.test(mimeType)) return "aac";
+  return "mp3";
+}
+
+function buildOpenRouterAttachmentContent(attachments=[]){
+  const geminiParts = buildPostAttachmentParts(attachments);
+  const instruction = geminiParts[0]?.text || "อ่านไฟล์และคืน JSON ตามข้อมูลจริง";
+  const content = [{type:"text", text:instruction}];
+  attachments.forEach((file, index) => {
+    const name = String(file.name || `ไฟล์ ${index + 1}`).slice(0, 180);
+    const mimeType = String(file.mimeType || "").toLowerCase();
+    content.push({type:"text", text:`ไฟล์ที่ ${index + 1}: ${name}`});
+    if(mimeType === "text/plain" || mimeType === "text/csv"){
+      content.push({type:"text", text:String(file.text || "").slice(0, 120000)});
+    }else if(mimeType.startsWith("image/")){
+      content.push({type:"image_url", image_url:{url:`data:${mimeType};base64,${String(file.data || "")}`}});
+    }else if(mimeType === "application/pdf"){
+      content.push({type:"file", file:{filename:name, file_data:`data:${mimeType};base64,${String(file.data || "")}`}});
+    }else if(mimeType.startsWith("audio/")){
+      content.push({type:"input_audio", input_audio:{data:String(file.data || ""), format:audioFormat(mimeType)}});
+    }
+  });
+  return content;
+}
+
+const OPENROUTER_POST_ATTACHMENT_SCHEMA = {
+  type:"object",
+  additionalProperties:false,
+  properties:{
+    title:{type:"string"}, organization:{type:"string"}, dateTime:{type:"string"}, place:{type:"string"},
+    people:{type:"array", items:{type:"string"}}, summary:{type:"string"},
+    schedule:{type:"array", items:{type:"string"}}, lockedFacts:{type:"array", items:{type:"string"}},
+    uncertain:{type:"array", items:{type:"string"}}
+  },
+  required:["title","organization","dateTime","place","people","summary","schedule","lockedFacts","uncertain"]
+};
+
+async function tryOpenRouterAttachments(attachments, env){
+  if(!env.OPENROUTER_API_KEY) return null;
+  try{
+    const model = String(env.OPENROUTER_FILE_MODEL || env.OPENROUTER_MODEL || "openrouter/auto");
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method:"POST",
+      headers:openRouterHeaders(env),
+      body:JSON.stringify({
+        model,
+        messages:[{role:"user", content:buildOpenRouterAttachmentContent(attachments)}],
+        max_tokens:4096,
+        temperature:0.1,
+        response_format:{type:"json_schema", json_schema:{name:"post_attachment_analysis", strict:true, schema:OPENROUTER_POST_ATTACHMENT_SCHEMA}},
+        plugins:[{id:"response-healing"}]
+      })
+    });
+    const result = await response.json().catch(()=>({}));
+    if(!response.ok){
+      console.error("OpenRouter attachment error", response.status, result?.error?.message || "unknown");
+      return null;
+    }
+    const text = String(result?.choices?.[0]?.message?.content || "").trim();
+    const analysis = parseJsonText(text);
+    return analysis ? {analysis, model, source:"openrouter-file-analysis"} : null;
+  }catch(_){
+    console.error("OpenRouter attachment fetch failed");
+    return null;
+  }
+}
+
 const POST_ATTACHMENT_SCHEMA = {
   type:"OBJECT",
   properties:{
@@ -372,7 +496,8 @@ export default {
     const isAnalyzePostAttachments = request.method === "POST" && url.pathname === "/analyze-post-attachments";
     if(!isGenerate && !isGenerateImage && !isAnalyzePostAttachments) return json({error:"Not found"}, 404, origin);
     if(!origin) return json({error:"เว็บไซต์นี้ไม่ได้รับอนุญาตให้เรียก AI"}, 403);
-    if(!env.GEMINI_API_KEY) return json({error:"ยังไม่ได้ตั้งค่า GEMINI_API_KEY"}, 503, origin);
+    if(isGenerateImage && !env.GEMINI_API_KEY) return json({error:"ระบบสร้างภาพยังไม่พร้อมใช้งาน"}, 503, origin);
+    if(!isGenerateImage && !env.GEMINI_API_KEY && !env.OPENROUTER_API_KEY) return json({error:"ระบบ AI ยังไม่พร้อมใช้งาน"}, 503, origin);
 
     const length = Number(request.headers.get("Content-Length") || 0);
     const maxLength = isAnalyzePostAttachments ? 12000000 : (isGenerateImage ? 200000 : 40000);
@@ -392,25 +517,29 @@ export default {
 
     if(isAnalyzePostAttachments){
       const attachments = Array.isArray(body.attachments) ? body.attachments : [];
-      const model = String(env.GEMINI_MODEL || "gemini-2.5-flash-lite");
-      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
-      const aiResponse = await fetch(apiUrl, {
-        method:"POST",
-        headers:{"Content-Type":"application/json", "x-goog-api-key":env.GEMINI_API_KEY},
-        body:JSON.stringify({
-          contents:[{role:"user", parts:buildPostAttachmentParts(attachments)}],
-          generationConfig:{temperature:0.1, maxOutputTokens:4096, responseMimeType:"application/json", responseSchema:POST_ATTACHMENT_SCHEMA}
-        })
-      });
-      const result = await aiResponse.json().catch(()=>({}));
-      if(!aiResponse.ok){
-        console.error("Gemini attachment error", aiResponse.status, result?.error?.message || "unknown");
-        return json({error:"AI อ่านไฟล์ยังไม่สำเร็จ กรุณาลองใหม่หรือพิมพ์ข้อมูลเอง"}, 502, origin);
+      if(env.GEMINI_API_KEY){
+        const model = String(env.GEMINI_MODEL || "gemini-2.5-flash-lite");
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
+        const aiResponse = await fetch(apiUrl, {
+          method:"POST",
+          headers:{"Content-Type":"application/json", "x-goog-api-key":env.GEMINI_API_KEY},
+          body:JSON.stringify({
+            contents:[{role:"user", parts:buildPostAttachmentParts(attachments)}],
+            generationConfig:{temperature:0.1, maxOutputTokens:4096, responseMimeType:"application/json", responseSchema:POST_ATTACHMENT_SCHEMA}
+          })
+        });
+        const result = await aiResponse.json().catch(()=>({}));
+        if(aiResponse.ok){
+          const text = (result.candidates?.[0]?.content?.parts || []).map(part=>part.text || "").join("").trim();
+          const analysis = parseJsonText(text);
+          if(analysis) return json({analysis, source:"gemini-file-analysis", model, remaining:usage.remaining}, 200, origin);
+        }else{
+          console.error("Gemini attachment error", aiResponse.status, result?.error?.message || "unknown");
+        }
       }
-      const text = (result.candidates?.[0]?.content?.parts || []).map(part=>part.text || "").join("").trim();
-      const analysis = parseJsonText(text);
-      if(!analysis) return json({error:"AI อ่านไฟล์ได้ แต่จัดข้อมูลกลับมาไม่สมบูรณ์ กรุณาลองใหม่"}, 502, origin);
-      return json({analysis, source:"gemini-file-analysis", model, remaining:usage.remaining}, 200, origin);
+      const backup = await tryOpenRouterAttachments(attachments, env);
+      if(backup) return json({...backup, remaining:usage.remaining}, 200, origin);
+      return json({error:"ระบบยังอ่านไฟล์ชุดนี้ไม่สำเร็จ กรุณาลองใหม่หรือพิมพ์ข้อมูลเอง"}, 502, origin);
     }
 
     if(isGenerateImage){
@@ -443,23 +572,28 @@ export default {
     const tool = String(body.tool || "");
     if(!TOOL_RULES[tool]) return json({error:"ไม่รองรับประเภทงานนี้"}, 400, origin);
 
-    const model = String(env.GEMINI_MODEL || "gemini-2.5-flash-lite");
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
-    const aiResponse = await fetch(apiUrl, {
-      method:"POST",
-      headers:{"Content-Type":"application/json", "x-goog-api-key":env.GEMINI_API_KEY},
-      body:JSON.stringify({
-        contents:[{role:"user", parts:[{text:buildPrompt(tool, body.data, body.options)}]}],
-        generationConfig:{temperature:0.55, maxOutputTokens:4096}
-      })
-    });
-    const result = await aiResponse.json().catch(()=>({}));
-    if(!aiResponse.ok){
-      console.error("Gemini error", aiResponse.status, result?.error?.message || "unknown");
-      return json({error:"AI ยังไม่พร้อมใช้งาน กรุณาลองใหม่อีกครั้ง"}, 502, origin);
+    const prompt = buildPrompt(tool, body.data, body.options);
+    if(env.GEMINI_API_KEY){
+      const model = String(env.GEMINI_MODEL || "gemini-2.5-flash-lite");
+      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
+      const aiResponse = await fetch(apiUrl, {
+        method:"POST",
+        headers:{"Content-Type":"application/json", "x-goog-api-key":env.GEMINI_API_KEY},
+        body:JSON.stringify({
+          contents:[{role:"user", parts:[{text:prompt}]}],
+          generationConfig:{temperature:0.55, maxOutputTokens:4096}
+        })
+      });
+      const result = await aiResponse.json().catch(()=>({}));
+      if(aiResponse.ok){
+        const text = (result.candidates?.[0]?.content?.parts || []).map(part=>part.text || "").join("").trim();
+        if(text) return json({text, source:"gemini", model, remaining:usage.remaining}, 200, origin);
+      }else{
+        console.error("Gemini error", aiResponse.status, result?.error?.message || "unknown");
+      }
     }
-    const text = (result.candidates?.[0]?.content?.parts || []).map(part=>part.text || "").join("").trim();
-    if(!text) return json({error:"AI ไม่ได้ส่งผลงานกลับมา"}, 502, origin);
-    return json({text, source:"gemini", remaining:usage.remaining}, 200, origin);
+    const backup = await tryOpenRouterText(prompt, env, {temperature:0.55});
+    if(backup) return json({...backup, remaining:usage.remaining}, 200, origin);
+    return json({error:"ระบบ AI ยังไม่พร้อมใช้งาน กรุณาลองใหม่อีกครั้ง"}, 502, origin);
   }
 };

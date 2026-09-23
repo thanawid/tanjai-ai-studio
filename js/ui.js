@@ -189,6 +189,21 @@ TANJAI.field = function(prefix, data){
   const titleHint     = titleHints[prefix]     || "(จะใช้เป็นหัวข้อหลักใน Prompt)";
   const titlePh       = titlePlaceholders[prefix] || "ระบุหัวข้อหลักของงาน";
 
+  const contextTools = new Set(["post","mc","video","voice","deck","kit"]);
+  const contextPanel = contextTools.has(prefix) ? `
+    <div class="shared-context-bar" data-shared-context-tool="${prefix}">
+      <div class="shared-context-copy">
+        <b>บริบทโครงการร่วม</b>
+        <span id="${prefix}-sharedContextStatus">ยังไม่ได้เลือกบริบท — ข้อมูลของงานนี้จะไม่ปะปนกับงานก่อนหน้า</span>
+      </div>
+      <div class="shared-context-actions">
+        <label class="shared-context-toggle"><input id="${prefix}-useSharedContext" type="checkbox"> ให้ AI ใช้บริบทที่บันทึกไว้</label>
+        <button class="btn secondary" type="button" data-context-load="${prefix}">เติมจากงานล่าสุด</button>
+        ${prefix === "post" ? `<button class="btn secondary" type="button" data-context-save="post">บันทึกงานนี้เป็นบริบท</button>` : ""}
+        <button class="btn text-button" type="button" data-context-clear="${prefix}">ไม่ใช้บริบท</button>
+      </div>
+    </div>` : "";
+
   return `
     <div class="form-section">
       <div class="section-title"><b>1</b><h4>บอกงานให้ชัด</h4></div>
@@ -213,7 +228,8 @@ TANJAI.field = function(prefix, data){
         <label>สถานที่<input id="${prefix}-place" placeholder="ระบุสถานที่หรือช่องทางจัดงาน หากมี"></label>
         <label class="full">บุคคล / หน่วยงานที่เกี่ยวข้อง<input id="${prefix}-people" placeholder="ระบุชื่อ บุคคล ตำแหน่ง หรือหน่วยงานที่เกี่ยวข้อง หากมี"></label>
       </div>
-    </div>`;
+    </div>
+    ${contextPanel}`;
 };
 
 TANJAI.resultShell = function(tool, recommended, desc, bodyId, buttons=""){

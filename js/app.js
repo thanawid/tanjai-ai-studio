@@ -357,6 +357,124 @@ $("#albumForm").innerHTML = `
 
   TANJAI.simplifyExpertForms?.();
 
+  // V12.6.3 — บริบทโครงการร่วมสำหรับงานเขียน/เสียง/วิดีโอ/สไลด์
+  // ไม่เชื่อมเข้ากับเมนูสร้างภาพและแต่งภาพ เพื่อรักษาพฤติกรรมเดิมที่ใช้งานดีอยู่แล้ว
+  const SHARED_CONTEXT_KEY = "tanjaiSharedProjectContextV1263";
+  const contextTools = new Set(["post","mc","video","voice","deck","kit"]);
+  const rawField = (prefix, id) => String($(`#${prefix}-${id}`)?.value || "").trim();
+
+  TANJAI.getSharedContext = function(){
+    try{
+      const parsed = JSON.parse(localStorage.getItem(SHARED_CONTEXT_KEY) || "null");
+      return parsed && parsed.version === 1 && parsed.project ? parsed : null;
+    }catch(_){ return null; }
+  };
+
+  TANJAI.refreshSharedContextUI = function(){
+    const saved = TANJAI.getSharedContext();
+    contextTools.forEach(prefix => {
+      const panel = document.querySelector(`[data-shared-context-tool="${prefix}"]`);
+      const status = $(`#${prefix}-sharedContextStatus`);
+      const toggle = $(`#${prefix}-useSharedContext`);
+      const active = !!toggle?.checked && !!saved;
+      panel?.classList.toggle("context-active", active);
+      if(!status) return;
+      if(!saved){
+        status.textContent = "ยังไม่ได้บันทึกบริบท — ข้อมูลของงานนี้จะไม่ปะปนกับงานก่อนหน้า";
+      }else if(active){
+        status.textContent = `กำลังใช้: ${saved.project.title || "งานล่าสุด"} • ข้อมูลในหน้าปัจจุบันมีสิทธิ์เหนือบริบทเดิม`;
+      }else{
+        status.textContent = `มีบริบทล่าสุด: ${saved.project.title || "งานล่าสุด"} • กดเติมหรือติ๊กใช้กับ AI เมื่อต้องการ`;
+      }
+    });
+  };
+
+  TANJAI.saveSharedContext = function(prefix="post", {silent=false}={}){
+    const project = {
+      title:rawField(prefix,"title"),
+      orgName:rawField(prefix,"orgName"),
+      audience:rawField(prefix,"audience"),
+      tone:rawField(prefix,"tone"),
+      detail:rawField(prefix,"detail"),
+      dateTime:rawField(prefix,"dateTime"),
+      place:rawField(prefix,"place"),
+      people:rawField(prefix,"people"),
+      lockedFacts:prefix === "post" ? rawField("post","lockedFacts") : ""
+    };
+    const hasUsefulData = project.title || project.detail || project.orgName || project.dateTime || project.place || project.people;
+    if(!hasUsefulData){
+      if(!silent) TANJAI.toast("ใส่หัวข้อหรือรายละเอียดงานก่อนบันทึกบริบท");
+      return null;
+    }
+    const saved = {version:1, savedAt:new Date().toISOString(), sourceTool:prefix, project};
+    try{ localStorage.setItem(SHARED_CONTEXT_KEY, JSON.stringify(saved)); }
+    catch(_){ if(!silent) TANJAI.toast("เบราว์เซอร์ยังบันทึกบริบทงานนี้ไม่ได้"); return null; }
+    const toggle = $(`#${prefix}-useSharedContext`);
+    if(toggle) toggle.checked = true;
+    TANJAI.refreshSharedContextUI();
+    if(!silent) TANJAI.toast("บันทึกบริบทงานนี้แล้ว ใช้ต่อในเมนูอื่นได้");
+    return saved;
+  };
+
+  TANJAI.applySharedContext = function(prefix){
+    const saved = TANJAI.getSharedContext();
+    if(!saved){ TANJAI.toast("ยังไม่มีบริบทโครงการที่บันทึกไว้"); return false; }
+    const p = saved.project || {};
+    const fill = (id, value, {force=false}={}) => {
+      const input = $(`#${prefix}-${id}`);
+      if(!input || !value) return;
+      if(force || !String(input.value || "").trim()) input.value = value;
+    };
+    ["title","orgName","detail","dateTime","place","people"].forEach(id => fill(id, p[id]));
+    fill("audience", p.audience, {force:true});
+    fill("tone", p.tone, {force:true});
+    if(prefix === "post") fill("lockedFacts", p.lockedFacts);
+    const toggle = $(`#${prefix}-useSharedContext`);
+    if(toggle) toggle.checked = true;
+    TANJAI.refreshSharedContextUI();
+    TANJAI.toast("เติมบริบทงานล่าสุดแล้ว ตรวจข้อมูลก่อนสร้างงานได้เลย");
+    return true;
+  };
+
+  document.querySelectorAll("[data-context-save]").forEach(button => button.addEventListener("click", () => TANJAI.saveSharedContext(button.dataset.contextSave)));
+  document.querySelectorAll("[data-context-load]").forEach(button => button.addEventListener("click", () => TANJAI.applySharedContext(button.dataset.contextLoad)));
+  document.querySelectorAll("[data-context-clear]").forEach(button => button.addEventListener("click", () => {
+    const prefix = button.dataset.contextClear;
+    const toggle = $(`#${prefix}-useSharedContext`);
+    if(toggle) toggle.checked = false;
+    TANJAI.refreshSharedContextUI();
+    TANJAI.toast("งานนี้จะไม่ใช้บริบทที่บันทึกไว้");
+  }));
+  document.querySelectorAll("[id$='-useSharedContext']").forEach(toggle => toggle.addEventListener("change", TANJAI.refreshSharedContextUI));
+
+  const commonDataWithSpecialists = TANJAI.commonData;
+  TANJAI.commonData = function(prefix){
+    const data = commonDataWithSpecialists ? commonDataWithSpecialists(prefix) : {};
+    if(!contextTools.has(prefix) || !$(`#${prefix}-useSharedContext`)?.checked) return data;
+    const saved = TANJAI.getSharedContext();
+    if(!saved) return data;
+    data.sharedContext = {
+      organizationProfile:{
+        name:saved.project.orgName || "",
+        audience:saved.project.audience || "",
+        tone:saved.project.tone || ""
+      },
+      projectContext:{...saved.project},
+      currentTask:{
+        tool:prefix,
+        title:data.title || "",
+        detail:data.detail || "",
+        dateTime:data.dateTime || "",
+        place:data.place || "",
+        people:data.people || ""
+      },
+      precedence:"currentTask_over_projectContext",
+      savedAt:saved.savedAt
+    };
+    return data;
+  };
+  TANJAI.refreshSharedContextUI();
+
   // Results
   $("#imageResult").innerHTML = TANJAI.readyOutputShell("image", "Prompt ภาพพร้อมใช้ — ผู้กำกับภาพอัจฉริยะ", "สร้าง Prompt ภาพพร้อมนำไปใช้กับ ทันใจ GPT, Canva หรือเครื่องมือสร้างภาพอื่น โดย AI เติมมุมสร้างสรรค์ได้แต่ไม่เดาข้อมูลจริง", "imageOut");
 $("#albumResult").innerHTML = TANJAI.readyOutputShell("album", "ชุดภาพพร้อมโพสต์", "ปกเดี่ยวหรือปกคู่ + ภาพจริงครอปสะอาด + แคปชั่นพร้อมใช้", "albumOut");
@@ -1613,6 +1731,8 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "สคริปต์�
       TANJAI.toast("ยังไม่ได้นำข้อมูลจากไฟล์มาใช้");
       return;
     }
+    // งานที่ผู้ใช้กำลังสร้างจะเป็นบริบทล่าสุดโดยอัตโนมัติ เพื่อนำไปต่อยอดเป็นเสียง วิดีโอ หรือสไลด์
+    TANJAI.saveSharedContext?.("post", {silent:true});
     const d=TANJAI.commonData("post");
     const team=TANJAI.freeWritingTeam;
     const options=TANJAI.collectPostOptions();

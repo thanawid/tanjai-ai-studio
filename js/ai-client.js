@@ -38,7 +38,7 @@
       const text = String(payload.text || "").trim();
       if(!text) throw new Error("AI ไม่ได้ส่งข้อความกลับมา");
       if(!options.silentStatus) T.toast?.("AI API วิเคราะห์และสร้างผลงานให้แล้ว");
-      return {text, source:"ai"};
+      return {text, source:payload.source || "ai", model:payload.model || ""};
     }catch(error){
       const message = error?.name === "AbortError" ? "AI ใช้เวลานานเกินไป" : (error?.message || "เชื่อม AI ไม่สำเร็จ");
       console.warn("TANJAI AI fallback:", message);
