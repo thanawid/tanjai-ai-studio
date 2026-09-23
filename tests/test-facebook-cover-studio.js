@@ -14,13 +14,17 @@ const context = {console,document,TextEncoder,Uint8Array,Blob,Intl,URL:{createOb
 vm.runInNewContext(source, context, {filename:'album.js'});
 const api = context.window.TANJAI_ALBUM_PRO._test;
 
-assert.match(index,/V12\.6\.3/);
+assert.match(index,/V12\.6\.4/);
 assert.match(app,/id="album-allFiles"/);
 assert.match(app,/data-cover-mode="double"/);
 assert.match(app,/data-cover-mode="single"/);
 assert.match(app,/id="album-headlineFont"/);
 assert.match(app,/id="album-headlineColor"/);
 assert.match(app,/id="album-coverDetail"/);
+assert.match(app,/id="album-coverStyle"/);
+assert.match(app,/id="album-logoSize"/);
+assert.match(app,/id="album-headlineItalic"/);
+assert.match(app,/id="album-dividerLine"/);
 assert.match(source,/cover-\$\{i\?'right':'left'\}\.jpg/);
 assert.match(source,/fb-five-grid/);
 assert.match(source,/containerW=isDouble\?2160:1080|canvasW=isDouble\?2160:1080/);
@@ -49,5 +53,8 @@ const fullCoverDetail='ข้อมูลจริงว่าใครทำอ
 assert.strictEqual(api.coverDetailText({coverDetail:fullCoverDetail}),fullCoverDetail);
 assert(!api.coverDetailText({coverDetail:fullCoverDetail}).includes('…'));
 assert.doesNotMatch(app,/placeholder="[^"]*เทศบาลเมืองบางรักน้อย/);
+assert.strictEqual(api.normalizeFacts({title:'  หัวข้อ   จริง ',detail:' ใคร  ทำอะไร '} ).title,'หัวข้อ จริง');
+assert(api.headlineFontSize('หัวข้อสั้น',72,true)>api.headlineFontSize('ก'.repeat(120),72,true));
+assert.doesNotMatch(source,/detail\|\|'รายละเอียดว่าใครทำอะไร'/);
 
-console.log(JSON.stringify({version:'12.6.3',coverModes:2,editableHeadline:true,cleanSupportPhotos:true,facebookFiveGrid:true,caption:true,fullCoverDetail:true,neutralDefaults:true,status:'PASS'},null,2));
+console.log(JSON.stringify({version:'12.6.4',coverModes:2,coverStyles:3,editableHeadline:true,movableLogo:true,cleanSupportPhotos:true,facebookFiveGrid:true,caption:true,fullCoverDetail:true,neutralDefaults:true,status:'PASS'},null,2));

@@ -211,18 +211,23 @@ $("#albumForm").innerHTML = `
 
     <div class="form-section album-flow-section"><div class="section-title"><b>3</b><h4>ออกแบบข้อความบนภาพปก</h4></div>
       <div class="album-editor-toolbar">
-        <label>ฟอนต์<select id="album-headlineFont"><option value="Prompt" selected>Prompt</option><option value="Kanit">Kanit</option><option value="Sarabun">Sarabun</option><option value="Noto Sans Thai">Noto Sans Thai</option></select></label>
-        <label>ขนาด <span id="album-fontSizeValue">68</span><input id="album-headlineSize" type="range" min="38" max="108" value="68"></label>
-        <label>สีตัวอักษร<input id="album-headlineColor" type="color" value="#ffffff"></label>
+        <label>รูปแบบปก<select id="album-coverStyle"><option value="editorial" selected>แถบโปร่งใสแบบงานประชาสัมพันธ์</option><option value="gradient">ไล่สีด้านล่าง</option><option value="minimal">เรียบง่าย เน้นภาพ</option></select></label>
+        <label>ฟอนต์<select id="album-headlineFont"><option value="Kanit" selected>Kanit</option><option value="Prompt">Prompt</option><option value="Sarabun">Sarabun</option><option value="Noto Sans Thai">Noto Sans Thai</option></select></label>
+        <label>ขนาด <span id="album-fontSizeValue">72</span><input id="album-headlineSize" type="range" min="38" max="108" value="72"></label>
+        <label>สีตัวอักษร<input id="album-headlineColor" type="color" value="#f5c84c"></label>
         <label>สีเส้นขอบ<input id="album-outlineColor" type="color" value="#24104f"></label>
         <label>ความหนาขอบ <span id="album-outlineValue">4</span><input id="album-outlineWidth" type="range" min="0" max="12" value="4"></label>
+        <label>น้ำหนักตัวอักษร<select id="album-headlineWeight"><option value="900" selected>หนาพิเศษ</option><option value="800">หนา</option><option value="700">กึ่งหนา</option></select></label>
         <label>จัดข้อความ<select id="album-headlineAlign"><option value="center" selected>กึ่งกลาง</option><option value="left">ชิดซ้าย</option><option value="right">ชิดขวา</option></select></label>
         <label>ตำแหน่งโลโก้<select id="album-logoPosition"><option value="left" selected>ซ้ายบน</option><option value="right">ขวาบน</option><option value="none">ไม่แสดง</option></select></label>
+        <label>ขนาดโลโก้ <span id="album-logoSizeValue">10%</span><input id="album-logoSize" type="range" min="7" max="24" value="10"></label>
         <label>สีแถบล่าง<input id="album-bandColor" type="color" value="#24104f"></label>
         <label>ความทึบแถบ <span id="album-bandOpacityValue">82%</span><input id="album-bandOpacity" type="range" min="35" max="100" value="82"></label>
         <label class="checkline"><input id="album-headlineShadow" type="checkbox" checked> เงาข้อความ</label>
+        <label class="checkline"><input id="album-headlineItalic" type="checkbox" checked> ตัวเอียง</label>
+        <label class="checkline"><input id="album-dividerLine" type="checkbox" checked> เส้นคั่นใต้พาดหัว</label>
       </div>
-      <div class="album-editor-note">ลากข้อความพาดหัวบนภาพเพื่อเลือกตำแหน่ง · เส้นกลางคือรอยต่อของปกคู่ · ข้อความจะถูกกันไม่ให้ออกนอกขอบ</div>
+      <div class="album-editor-note">ลากพาดหัวและโลโก้เพื่อเลือกตำแหน่ง · เส้นกลางคือรอยต่อของปกคู่ · ระบบจะย่อรายละเอียดด้านล่างให้แสดงครบโดยไม่ตัดคำ</div>
       <div id="album-coverEditor" class="album-cover-editor is-empty"><p>อัปโหลดภาพ แล้วเลือกภาพปกเพื่อเริ่มจัดวาง</p></div>
       <div id="album-coverWarning" class="album-cover-warning" hidden></div>
     </div>
