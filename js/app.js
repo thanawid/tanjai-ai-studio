@@ -214,15 +214,15 @@ $("#albumForm").innerHTML = `
         <button type="button" data-album-tool="design">🎨 ปรับรายละเอียด</button>
         <button type="button" data-album-tool="reset">↺ จัดตำแหน่งใหม่</button>
       </div>
-      <div class="album-editor-note">บนปกแสดงเฉพาะโลโก้และพาดหัว · ลากทั้งสองส่วนเพื่อวางตำแหน่ง · เส้นกลางคือรอยต่อของปกคู่</div>
+      <div class="album-editor-note">ปกประชาสัมพันธ์แสดงโลโก้ พาดหัว และส่วนท้ายแบรนด์ · วัน เวลา สถานที่ และรายละเอียดกิจกรรมจะอยู่ในแคปชั่น · เส้นกลางคือรอยต่อของปกคู่</div>
       <div id="album-coverEditor" class="album-cover-editor is-empty"><p>อัปโหลดภาพ แล้วเลือกภาพปกเพื่อเริ่มจัดวาง</p></div>
       <div id="album-coverWarning" class="album-cover-warning" hidden></div>
       <details class="album-advanced-editor" id="albumAdvancedEditor">
-        <summary><span><b>🎨 ปรับรายละเอียด</b><small>ฟอนต์ สี ขอบ เงา ตำแหน่งโลโก้ และรูปแบบพื้นหลัง</small></span></summary>
+        <summary><span><b>🎨 ปรับรายละเอียด</b><small>รูปแบบปก ฟอนต์ สี โลโก้ คำขวัญ และช่องทางติดต่อ</small></span></summary>
         <div class="album-editor-toolbar">
-          <label>รูปแบบพื้นหลัง<select id="album-coverStyle"><option value="editorial" selected>ไล่สีม่วงแบบงานประชาสัมพันธ์</option><option value="gradient">ไล่สีเข้มอ่านง่าย</option><option value="minimal">เรียบง่าย เน้นภาพ</option></select></label>
+          <label>รูปแบบปก<select id="album-coverStyle"><option value="official" selected>ประชาสัมพันธ์เต็มรูปแบบ</option><option value="clean">ปกสะอาด โลโก้ + พาดหัว</option><option value="minimal">ภาพเด่น พาดหัวเบา</option></select></label>
           <label>ฟอนต์<select id="album-headlineFont"><option value="Kanit" selected>Kanit</option><option value="Prompt">Prompt</option><option value="Sarabun">Sarabun</option><option value="Noto Sans Thai">Noto Sans Thai</option></select></label>
-          <label>ขนาด <span id="album-fontSizeValue">72</span><input id="album-headlineSize" type="range" min="38" max="108" value="72"></label>
+          <label>ขนาด <span id="album-fontSizeValue">88</span><input id="album-headlineSize" type="range" min="38" max="120" value="88"></label>
           <label>สีตัวอักษร<input id="album-headlineColor" type="color" value="#f5c84c"></label>
           <label>สีเส้นขอบ<input id="album-outlineColor" type="color" value="#24104f"></label>
           <label>ความหนาขอบ <span id="album-outlineValue">4</span><input id="album-outlineWidth" type="range" min="0" max="12" value="4"></label>
@@ -232,6 +232,13 @@ $("#albumForm").innerHTML = `
           <label>ขนาดโลโก้ <span id="album-logoSizeValue">10%</span><input id="album-logoSize" type="range" min="7" max="24" value="10"></label>
           <label class="checkline"><input id="album-headlineShadow" type="checkbox" checked> เงาข้อความ</label>
           <label class="checkline"><input id="album-headlineItalic" type="checkbox" checked> ตัวเอียง</label>
+          <div class="album-brand-heading"><b>ส่วนท้ายแบรนด์</b><small>ไม่ใช่รายละเอียดกิจกรรม เปิด–ปิดได้ และบันทึกไว้ใช้ครั้งต่อไป</small></div>
+          <label class="checkline"><input id="album-brandEnabled" type="checkbox" checked> แสดงส่วนท้ายแบรนด์</label>
+          <label>คำขวัญ / ข้อความประจำองค์กร<input id="album-brandSlogan" maxlength="120" placeholder="ระบุคำขวัญหรือข้อความสั้น หากมี"></label>
+          <label>เว็บไซต์<input id="album-brandWebsite" maxlength="100" placeholder="เช่น www.example.go.th"></label>
+          <label>Facebook / ชื่อเพจ<input id="album-brandSocial" maxlength="100" placeholder="เว้นว่างเพื่อใช้ชื่อเพจด้านบน"></label>
+          <label>โทรศัพท์<input id="album-brandPhone" maxlength="50" placeholder="ระบุเฉพาะข้อมูลจริง หากมี"></label>
+          <div class="album-brand-actions"><button type="button" class="btn secondary" id="albumSaveBrandProfile">💾 บันทึกข้อมูลแบรนด์ไว้ใช้ครั้งต่อไป</button></div>
         </div>
       </details>
     </div>

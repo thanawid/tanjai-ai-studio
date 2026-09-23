@@ -14,7 +14,7 @@ const context = {console,document,TextEncoder,Uint8Array,Blob,Intl,URL:{createOb
 vm.runInNewContext(source, context, {filename:'album.js'});
 const api = context.window.TANJAI_ALBUM_PRO._test;
 
-assert.match(index,/V12\.6\.5/);
+assert.match(index,/V12\.6\.6/);
 assert.match(app,/id="album-allFiles"/);
 assert.match(app,/data-cover-mode="double"/);
 assert.match(app,/data-cover-mode="single"/);
@@ -27,6 +27,14 @@ assert.match(app,/id="album-logoSize"/);
 assert.match(app,/id="album-headlineItalic"/);
 assert.match(app,/id="albumAdvancedEditor"/);
 assert.match(app,/data-album-tool="design"/);
+assert.match(app,/value="official" selected>ประชาสัมพันธ์เต็มรูปแบบ/);
+assert.match(app,/value="clean">ปกสะอาด/);
+assert.match(app,/id="album-brandEnabled"/);
+assert.match(app,/id="album-brandSlogan"/);
+assert.match(app,/id="album-brandWebsite"/);
+assert.match(app,/id="album-brandSocial"/);
+assert.match(app,/id="album-brandPhone"/);
+assert.match(app,/id="albumSaveBrandProfile"/);
 assert.doesNotMatch(app,/id="album-dividerLine"/);
 assert.match(source,/cover-\$\{i\?'right':'left'\}\.jpg/);
 assert.match(source,/fb-five-grid/);
@@ -35,6 +43,9 @@ assert.match(source,/scheduleGeneratedRefresh/);
 assert.match(source,/generateSmartCaption/);
 assert.match(source,/AI กำลังเรียบเรียงแคปชั่นจากข้อมูลจริง/);
 assert.match(source,/albumRegenerateCaptionAI/);
+assert.match(source,/drawBrandFooter/);
+assert.match(source,/albumBrandDrag/);
+assert.match(source,/BRAND_STORAGE_KEY/);
 assert.doesNotMatch(source,/drawBand\(/);
 assert.match(css,/grid-template-columns:repeat\(6,1fr\)/);
 assert.match(css,/\.fb-five-cell\.cell-5/);
@@ -59,6 +70,9 @@ assert.doesNotMatch(app,/placeholder="[^"]*เทศบาลเมืองบ�
 assert.strictEqual(api.normalizeFacts({title:'  หัวข้อ   จริง ',detail:' ใคร  ทำอะไร '} ).title,'หัวข้อ จริง');
 assert.strictEqual(api.normalizeFacts({title:'หัวข้อบรรทัดแรก\nหัวข้อบรรทัดสอง'}).title,'หัวข้อบรรทัดแรก\nหัวข้อบรรทัดสอง');
 assert(api.headlineFontSize('หัวข้อสั้น',72,true)>api.headlineFontSize('ก'.repeat(120),72,true));
+assert.strictEqual(api.hasBrandContent({brandSlogan:'ใกล้ชิดประชาชน',brandWebsite:'',brandSocial:'',org:'',brandPhone:''}),true);
+assert.strictEqual(api.hasBrandContent({brandSlogan:'',brandWebsite:'',brandSocial:'',org:'',brandPhone:''}),false);
+assert.deepStrictEqual(Array.from(api.brandContacts({brandWebsite:'example.go.th',brandSocial:'',org:'องค์กรตัวอย่าง',brandPhone:'02-000-0000'}).map(item=>item.text)),['example.go.th','องค์กรตัวอย่าง','02-000-0000']);
 assert.doesNotMatch(source,/detail\|\|'รายละเอียดว่าใครทำอะไร'/);
 
-console.log(JSON.stringify({version:'12.6.5',coverModes:2,coverStyles:3,manualHeadlineBreaks:true,collapsedDesignTools:true,movableLogo:true,cleanSupportPhotos:true,facebookFiveGrid:true,aiCaption:true,neutralDefaults:true,status:'PASS'},null,2));
+console.log(JSON.stringify({version:'12.6.6',coverModes:2,coverStyles:3,officialBrandCover:true,reusableBrandProfile:true,movableBrandFooter:true,manualHeadlineBreaks:true,collapsedDesignTools:true,movableLogo:true,cleanSupportPhotos:true,facebookFiveGrid:true,aiCaption:true,neutralDefaults:true,status:'PASS'},null,2));
