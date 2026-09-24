@@ -238,13 +238,8 @@ $("#albumForm").innerHTML = `
           <label>จัดข้อความ<select id="album-headlineAlign"><option value="center" selected>กึ่งกลาง</option><option value="left">ชิดซ้าย</option><option value="right">ชิดขวา</option></select></label>
           <label>ตำแหน่งโลโก้<select id="album-logoPosition"><option value="left" selected>ซ้ายบน</option><option value="right">ขวาบน</option><option value="none">ไม่แสดง</option></select></label>
           <label>ขนาดโลโก้ <span id="album-logoSizeValue">10%</span><input id="album-logoSize" type="range" min="7" max="24" value="10"></label>
-          <label class="checkline"><input id="album-bandEnabled" type="checkbox" checked> แสดงแถบสีด้านล่าง</label>
+          <label>รูปแบบแถบด้านล่าง<select id="album-bandStyle"><option value="template" selected>ม่วง–ทองตามต้นแบบ</option><option value="plain">แถบสีเรียบ</option><option value="none">ไม่มีแถบ</option></select></label>
           <label>สีแถบด้านล่าง<input id="album-bandColor" type="color" value="#3b126b"></label>
-          <label>ความเข้มแถบ <span id="album-bandOpacityValue">82%</span><input id="album-bandOpacity" type="range" min="20" max="100" value="82"></label>
-          <label>ลูกเล่นแถบสี<select id="album-bandStyle"><option value="plain">เรียบ</option><option value="gold" selected>เส้นทองสุภาพ</option><option value="luxury">หรูพิเศษ</option></select></label>
-          <label>สีเส้นประดับ<input id="album-bandAccentColor" type="color" value="#e7bd55"></label>
-          <label>ความชัดเส้นทอง <span id="album-bandAccentOpacityValue">55%</span><input id="album-bandAccentOpacity" type="range" min="10" max="100" value="55"></label>
-          <label>ความหนาเส้น <span id="album-bandAccentWidthValue">2</span><input id="album-bandAccentWidth" type="range" min="1" max="6" value="2"></label>
           <label class="checkline"><input id="album-headlineShadow" type="checkbox" checked> เงาข้อความ</label>
           <label class="checkline"><input id="album-headlineItalic" type="checkbox" checked> ตัวเอียง</label>
           <div class="album-brand-heading"><b>ส่วนท้ายแบรนด์</b><small>ไม่ใช่รายละเอียดกิจกรรม เปิด–ปิดได้ และบันทึกไว้ใช้ครั้งต่อไป</small></div>
@@ -253,7 +248,6 @@ $("#albumForm").innerHTML = `
           <label>เว็บไซต์<input id="album-brandWebsite" maxlength="100" placeholder="เช่น www.example.go.th"></label>
           <label>Facebook / ชื่อเพจ<input id="album-brandSocial" maxlength="100" placeholder="เว้นว่างเพื่อใช้ชื่อเพจด้านบน"></label>
           <label>โทรศัพท์<input id="album-brandPhone" maxlength="50" placeholder="เช่น 02 193 4512-3"></label>
-          <label class="checkline"><input id="album-brandPhoneLabel" type="checkbox"> แสดงคำว่า “โทร.” หน้าหมายเลข</label>
           <div class="album-brand-actions"><button type="button" class="btn secondary" id="albumSaveBrandProfile">💾 บันทึกข้อมูลแบรนด์ไว้ใช้ครั้งต่อไป</button></div>
         </div>
       </details>

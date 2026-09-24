@@ -1,6 +1,6 @@
-# ทันใจ AI Studio V12.6.8
+# ทันใจ AI Studio V12.6.9
 
-## Facebook Cover Pack Studio V12.6.8
+## Facebook Cover Pack Studio V12.6.9
 
 - ชุด Facebook: ปกต่อกัน 2 ภาพ + ภาพกิจกรรมอย่างน้อย 3 ภาพ
 - ปกเดี่ยวเต็ม 2160 × 1080 ไม่ตัดแบ่ง
