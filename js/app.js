@@ -185,8 +185,8 @@ $("#albumForm").innerHTML = `
         <div class="album-cover-mode-field">
           <span>รูปแบบภาพปก</span>
           <div class="album-mode-buttons" role="radiogroup" aria-label="รูปแบบภาพปก">
-            <button type="button" data-cover-mode="double" class="selected"><b>ปกคู่ 2 ภาพ</b><small>แนะนำสำหรับโพสต์หลายภาพ</small></button>
-            <button type="button" data-cover-mode="single"><b>ปกเดี่ยว 1 ภาพ</b><small>เหมาะกับโพสต์ภาพน้อย</small></button>
+            <button type="button" data-cover-mode="double" class="selected"><b>ชุด Facebook 5 ภาพ</b><small>ปกต่อกัน 2 ภาพ + ภาพกิจกรรม 3 ภาพ</small></button>
+            <button type="button" data-cover-mode="single"><b>ปกเดี่ยวไม่ตัด</b><small>ดาวน์โหลดภาพปกเต็มทั้งภาพ</small></button>
           </div>
           <input id="album-coverMode" type="hidden" value="double">
         </div>
@@ -201,8 +201,7 @@ $("#albumForm").innerHTML = `
         <label>วันที่<input id="album-dateTime" placeholder="เช่น วันอังคารที่ 22 กันยายน 2569"></label>
         <label>เวลา<input id="album-time" placeholder="เช่น เวลา 09.00 น."></label>
         <label>สถานที่<input id="album-place" placeholder="ระบุสถานที่ หากมี"></label>
-        <label class="full">ใคร / ทำอะไร<textarea id="album-detail" rows="4" maxlength="600" placeholder="ระบุว่าใคร ทำอะไร และดำเนินการอย่างไรตามข้อมูลจริง"></textarea></label>
-        <label class="full">วัตถุประสงค์หรือผลต่อประชาชน<textarea id="album-purpose" rows="3" placeholder="เช่น เพื่อป้องกันและแก้ไขปัญหาน้ำท่วมขังในพื้นที่"></textarea></label>
+        <label class="full">ใคร / ทำอะไร / ผลที่เกิดขึ้น<textarea id="album-detail" rows="6" maxlength="1400" placeholder="ใส่ข้อเท็จจริงที่มี เช่น ประธาน ผู้เข้าร่วม สิ่งที่ดำเนินการ ประเด็นสำคัญ และผลที่เกิดขึ้น แล้วให้ AI เรียบเรียงเป็นแคปชั่น"></textarea><small>ไม่ต้องเขียนให้สวย ใส่ข้อมูลจริงให้ครบ ระบบจะช่วยเรียบเรียงและเติมคำเชื่อมให้</small></label>
         <label class="full">ข้อความปิดท้าย / เว็บไซต์ / แฮชแท็ก<input id="album-footer" placeholder="ระบุข้อความปิดท้าย เว็บไซต์ หรือแฮชแท็ก หากมี"></label>
         <label>สไตล์แคปชั่น<select id="album-captionStyle"><option value="official" selected>ข่าวประชาสัมพันธ์หน่วยงาน</option><option value="pr-ready">กระชับ พร้อมโพสต์</option><option value="friendly">อบอุ่น เข้าถึงง่าย</option><option value="story">เล่าเรื่องกิจกรรม</option><option value="announcement">ประกาศ / แจ้งข่าว</option></select></label>
       </div>
@@ -214,7 +213,16 @@ $("#albumForm").innerHTML = `
         <button type="button" data-album-tool="design">🎨 ปรับรายละเอียด</button>
         <button type="button" data-album-tool="reset">↺ จัดตำแหน่งใหม่</button>
       </div>
-      <div class="album-editor-note">ปกประชาสัมพันธ์แสดงโลโก้ พาดหัว และส่วนท้ายแบรนด์ · วัน เวลา สถานที่ และรายละเอียดกิจกรรมจะอยู่ในแคปชั่น · เส้นกลางคือรอยต่อของปกคู่</div>
+      <div class="album-photo-positioner">
+        <div class="album-photo-fit-buttons" role="radiogroup" aria-label="การแสดงภาพปก">
+          <button type="button" data-photo-fit="fill" class="selected">เต็มกรอบ</button>
+          <button type="button" data-photo-fit="contain">เห็นภาพเต็ม</button>
+        </div>
+        <label>ซ้าย–ขวา <span id="album-coverXValue">0</span><input id="album-coverX" type="range" min="-50" max="50" value="0"></label>
+        <label>ขึ้น–ลง <span id="album-coverYValue">0</span><input id="album-coverY" type="range" min="-50" max="50" value="0"></label>
+        <label>ขยาย–ย่อ <span id="album-coverZoomValue">100%</span><input id="album-coverZoom" type="range" min="50" max="250" value="100"></label>
+      </div>
+      <div class="album-editor-note">ลากพื้นภาพเพื่อจัดตำแหน่งได้โดยตรง · ข้อความ โลโก้ และส่วนท้ายลากแยกกันได้ · เส้นกลางคือรอยต่อของชุด Facebook</div>
       <div id="album-coverEditor" class="album-cover-editor is-empty"><p>อัปโหลดภาพ แล้วเลือกภาพปกเพื่อเริ่มจัดวาง</p></div>
       <div id="album-coverWarning" class="album-cover-warning" hidden></div>
       <details class="album-advanced-editor" id="albumAdvancedEditor">
@@ -230,6 +238,13 @@ $("#albumForm").innerHTML = `
           <label>จัดข้อความ<select id="album-headlineAlign"><option value="center" selected>กึ่งกลาง</option><option value="left">ชิดซ้าย</option><option value="right">ชิดขวา</option></select></label>
           <label>ตำแหน่งโลโก้<select id="album-logoPosition"><option value="left" selected>ซ้ายบน</option><option value="right">ขวาบน</option><option value="none">ไม่แสดง</option></select></label>
           <label>ขนาดโลโก้ <span id="album-logoSizeValue">10%</span><input id="album-logoSize" type="range" min="7" max="24" value="10"></label>
+          <label class="checkline"><input id="album-bandEnabled" type="checkbox" checked> แสดงแถบสีด้านล่าง</label>
+          <label>สีแถบด้านล่าง<input id="album-bandColor" type="color" value="#3b126b"></label>
+          <label>ความเข้มแถบ <span id="album-bandOpacityValue">82%</span><input id="album-bandOpacity" type="range" min="20" max="100" value="82"></label>
+          <label>ลูกเล่นแถบสี<select id="album-bandStyle"><option value="plain">เรียบ</option><option value="gold" selected>เส้นทองสุภาพ</option><option value="luxury">หรูพิเศษ</option></select></label>
+          <label>สีเส้นประดับ<input id="album-bandAccentColor" type="color" value="#e7bd55"></label>
+          <label>ความชัดเส้นทอง <span id="album-bandAccentOpacityValue">55%</span><input id="album-bandAccentOpacity" type="range" min="10" max="100" value="55"></label>
+          <label>ความหนาเส้น <span id="album-bandAccentWidthValue">2</span><input id="album-bandAccentWidth" type="range" min="1" max="6" value="2"></label>
           <label class="checkline"><input id="album-headlineShadow" type="checkbox" checked> เงาข้อความ</label>
           <label class="checkline"><input id="album-headlineItalic" type="checkbox" checked> ตัวเอียง</label>
           <div class="album-brand-heading"><b>ส่วนท้ายแบรนด์</b><small>ไม่ใช่รายละเอียดกิจกรรม เปิด–ปิดได้ และบันทึกไว้ใช้ครั้งต่อไป</small></div>
@@ -237,20 +252,21 @@ $("#albumForm").innerHTML = `
           <label>คำขวัญ / ข้อความประจำองค์กร<input id="album-brandSlogan" maxlength="120" placeholder="ระบุคำขวัญหรือข้อความสั้น หากมี"></label>
           <label>เว็บไซต์<input id="album-brandWebsite" maxlength="100" placeholder="เช่น www.example.go.th"></label>
           <label>Facebook / ชื่อเพจ<input id="album-brandSocial" maxlength="100" placeholder="เว้นว่างเพื่อใช้ชื่อเพจด้านบน"></label>
-          <label>โทรศัพท์<input id="album-brandPhone" maxlength="50" placeholder="ระบุเฉพาะข้อมูลจริง หากมี"></label>
+          <label>โทรศัพท์<input id="album-brandPhone" maxlength="50" placeholder="เช่น 02 193 4512-3"></label>
+          <label class="checkline"><input id="album-brandPhoneLabel" type="checkbox"> แสดงคำว่า “โทร.” หน้าหมายเลข</label>
           <div class="album-brand-actions"><button type="button" class="btn secondary" id="albumSaveBrandProfile">💾 บันทึกข้อมูลแบรนด์ไว้ใช้ครั้งต่อไป</button></div>
         </div>
       </details>
     </div>
 
     <div class="form-section album-flow-section"><div class="section-title"><b>4</b><h4>ปรับจุดครอปและลำดับภาพที่เหลือ</h4></div>
-      <p class="album-section-help">ภาพที่เหลือจะเป็นภาพจริงขนาด 1080 × 1080 ไม่มีข้อความ ไม่มีโลโก้ เลือกภาพแล้วเลื่อนจุดครอปได้</p>
+      <p class="album-section-help">โหมดชุด Facebook จะใช้ภาพกิจกรรมอย่างน้อย 3 ภาพเพื่อจัดตัวอย่าง 2 บน + 3 ล่าง ภาพที่เหลือไม่มีข้อความและไม่มีโลโก้</p>
       <div id="album-cropList" class="album-crop-list"></div>
     </div>
 
     <div class="form-section album-flow-section"><div class="section-title"><b>5</b><h4>สร้างและตรวจตัวอย่าง Facebook</h4></div>
-      <div class="album-smart-choice"><b>ลำดับผลลัพธ์</b><span>ปกก่อน → ภาพกิจกรรมตามลำดับ → พรีวิว 2 บน + 3 ล่าง พร้อมเครื่องหมาย +จำนวน</span></div>
-      <div class="button-row"><button class="btn primary" id="makeAlbum">สร้างชุดภาพและแคปชั่น</button><button class="btn secondary" id="albumDownloadAll">ดาวน์โหลด ZIP</button><button class="btn secondary" id="albumClear">ล้างข้อมูล</button></div>
+      <div class="album-smart-choice"><b>ผลลัพธ์ตามโหมด</b><span>ชุด Facebook: ปกซ้าย–ขวา + ภาพกิจกรรมอย่างน้อย 3 ภาพ · ปกเดี่ยว: ภาพเต็มไม่ตัดแบ่ง พร้อมแคปชั่น AI</span></div>
+      <div class="button-row"><button class="btn primary" id="makeAlbum">สร้างภาพและแคปชั่นด้วย AI</button><button class="btn secondary" id="albumDownloadAll">ดาวน์โหลดชุด Facebook ZIP</button><button class="btn secondary" id="albumDownloadCover">ดาวน์โหลดปกเดี่ยว</button><button class="btn secondary" id="albumClear">ล้างข้อมูล</button></div>
     </div>
   `;
 
