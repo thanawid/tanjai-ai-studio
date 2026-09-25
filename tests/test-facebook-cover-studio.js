@@ -14,7 +14,7 @@ const context = {console,document,TextEncoder,Uint8Array,Blob,Intl,URL:{createOb
 vm.runInNewContext(source, context, {filename:'album.js'});
 const api = context.window.TANJAI_ALBUM_PRO._test;
 
-assert.match(index,/V12\.7\.0/);
+assert.match(index,/V12\.7\.1/);
 assert.match(app,/id="album-allFiles"/);
 assert.match(app,/data-cover-mode="double"/);
 assert.match(app,/data-cover-mode="single"/);
@@ -30,8 +30,10 @@ assert.match(app,/data-editor-select="photo"/);
 assert.match(app,/data-editor-select="headline"/);
 assert.match(app,/data-editor-select="logo"/);
 assert.match(app,/data-editor-select="brand"/);
-assert.match(source,/data-photo-fit="fill"/);
-assert.match(source,/data-photo-fit="contain"/);
+assert.match(source,/addEventListener\('wheel'/);
+assert.match(source,/cover\.coverFit==='fill'\?'contain':'fill'/);
+assert.doesNotMatch(source,/albumPhotoSelection/);
+assert.match(source,/toggle-guide/);
 assert.match(app,/id="album-bandColor"/);
 assert.match(app,/id="album-bandStyle"/);
 assert.match(app,/value="template" selected>ม่วง–ทองตามต้นแบบ/);
@@ -58,8 +60,10 @@ assert.match(source,/fb-five-grid/);
 assert.match(source,/canvasW=2160/);
 assert.match(source,/scheduleGeneratedRefresh/);
 assert.match(source,/generateSmartCaption/);
+assert.match(source,/tool:'album'/);
+assert.match(source,/firstCaptionVariant/);
 assert.match(source,/AI กำลังเรียบเรียงแคปชั่นจากข้อมูลจริง/);
-assert.match(source,/ไม่ใช่เพียงนำช่องข้อมูลมาต่อกัน/);
+assert.match(source,/ห้ามคัดลอกข้อความรายละเอียดทั้งย่อหน้ามาวางตรง ๆ/);
 assert.match(source,/albumRegenerateCaptionAI/);
 assert.match(source,/cover-full-2160x1080\.jpg/);
 assert.match(source,/ชุด Facebook ต้องมีภาพปก 1 ภาพ และภาพกิจกรรมอย่างน้อย 3 ภาพ/);
@@ -99,6 +103,8 @@ assert.match(caption,/เทศบาลเมืองบางรักน้�
 assert.match(caption,/22 กันยายน 2569 09\.00 น\./);
 assert.match(caption,/หมู่ 1/);
 assert.doesNotMatch(caption,/undefined|null|placeholder/i);
+assert.match(caption,/ในการดำเนินงานครั้งนี้/);
+assert.strictEqual(api.firstCaptionVariant('แบบที่ 1: ข่าวพร้อมโพสต์\n-----\nแบบที่ 2: อีกแบบ'),'ข่าวพร้อมโพสต์');
 assert.strictEqual(api.factGuardCaption('ข้อมูลจริง\nPLACEHOLDER\nundefined'),'ข้อมูลจริง');
 assert.strictEqual(api.cleanMultiline(' บรรทัดหนึ่ง  \n บรรทัดสอง '),'บรรทัดหนึ่ง\nบรรทัดสอง');
 assert.doesNotMatch(app,/placeholder="[^"]*เทศบาลเมืองบางรักน้อย/);
@@ -111,4 +117,4 @@ assert.deepStrictEqual(Array.from(api.brandContacts({brandWebsite:'example.go.th
 assert.deepStrictEqual(Array.from(api.brandContacts({brandWebsite:'',brandSocial:'',org:'',brandPhone:'โทร. 02-000-0000'}).map(item=>item.text)),['โทร. 02-000-0000']);
 assert.doesNotMatch(source,/detail\|\|'รายละเอียดว่าใครทำอะไร'/);
 
-console.log(JSON.stringify({version:'12.7.0',coverModes:2,facebookFivePhotoPack:true,fullCoverDownload:true,freeCanvas:true,directObjectSelection:true,cornerResize:true,coverFitModes:2,simpleBandPresets:true,templateGoldDecor:true,phoneAsTyped:true,aiCaption:true,noPurposeField:true,officialBrandCover:true,status:'PASS'},null,2));
+console.log(JSON.stringify({version:'12.7.1',coverModes:2,facebookFivePhotoPack:true,fullCoverDownload:true,freeCanvas:true,directObjectSelection:true,wheelZoom:true,smartAlbumCaption:true,simpleBandPresets:true,templateGoldDecor:true,phoneAsTyped:true,aiCaption:true,noPurposeField:true,officialBrandCover:true,status:'PASS'},null,2));

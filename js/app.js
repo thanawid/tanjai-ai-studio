@@ -214,10 +214,9 @@ $("#albumForm").innerHTML = `
         <button type="button" data-editor-select="logo">◉ โลโก้</button>
         <button type="button" data-editor-select="brand">▤ ส่วนท้าย</button>
         <button type="button" data-album-tool="design">🎨 รายละเอียด</button>
-        <button type="button" data-album-tool="reset">↺ จัดตำแหน่งใหม่</button>
       </div>
       <div id="albumObjectToolbar" class="album-object-toolbar" aria-live="polite"></div>
-      <div class="album-editor-note">คลิกวัตถุบนปกแล้วลากได้ทันที · จับจุดมุมเพื่อย่อ–ขยาย · ดับเบิลคลิกข้อความเพื่อแก้ไข · เส้นกลางเป็นเพียงแนวตัดและไม่ติดไปกับไฟล์จริง</div>
+      <div class="album-editor-note">ลากภาพเพื่อจัดตำแหน่ง · หมุนล้อเมาส์เพื่อซูม · ลากข้อความและโลโก้ได้โดยตรง · เส้นกลางเป็นเพียงแนวตัดและไม่ติดไปกับไฟล์จริง</div>
       <div id="album-coverEditor" class="album-cover-editor is-empty"><p>อัปโหลดภาพ แล้วเลือกภาพปกเพื่อเริ่มจัดวาง</p></div>
       <div id="album-coverWarning" class="album-cover-warning" hidden></div>
       <details class="album-advanced-editor" id="albumAdvancedEditor">

@@ -1,4 +1,4 @@
-/* V12.7.0 — Smart Facebook Post Studio
+/* V12.7.1 — Smart Facebook Post Studio
    กระดานออกแบบปกแบบอิสระ + ชุด Facebook 5 ภาพ + แคปชั่น AI
    ทำงานในเบราว์เซอร์ ไม่สร้างภาพใหม่ ไม่แก้ใบหน้า และไม่แต่งข้อมูลจริงเพิ่ม
 */
@@ -6,7 +6,7 @@
   'use strict';
   const $=(q,root=document)=>root.querySelector(q);
   const $$=(q,root=document)=>Array.from(root.querySelectorAll(q));
-  const state={files:[],coverId:null,coverMode:'double',logo:null,logoUrl:'',outputs:[],fullCover:null,caption:'',captionSource:'',facts:{},headlineX:50,headlineY:57,logoX:4,logoY:5,brandY:66,selectedObject:'photo',drag:null,refreshTimer:null,refreshSeq:0};
+  const state={files:[],coverId:null,coverMode:'double',logo:null,logoUrl:'',outputs:[],fullCover:null,caption:'',captionSource:'',facts:{},headlineX:50,headlineY:57,logoX:4,logoY:5,brandY:66,selectedObject:'photo',showGuide:true,drag:null,refreshTimer:null,refreshSeq:0};
   const BRAND_STORAGE_KEY='tanjai_album_brand_v1';
 
   function clean(value){return String(value||'').replace(/\s+/g,' ').trim();}
@@ -61,14 +61,13 @@
   function renderObjectToolbar(){
     const host=$('#albumObjectToolbar');if(!host)return;const cover=selectedCover(),type=state.selectedObject,d=formData();
     $$('[data-editor-select]').forEach(button=>button.classList.toggle('selected',button.dataset.editorSelect===type));
-    if(!cover){host.innerHTML='';return;}
+    if(!cover||type==='photo'){host.innerHTML='';host.hidden=true;return;}host.hidden=false;
     const labels={photo:'ภาพพื้นหลัง',headline:'ข้อความพาดหัว',logo:'โลโก้',brand:'ส่วนท้ายแบรนด์'};
     let actions='';
-    if(type==='photo')actions=`<button type="button" data-photo-fit="fill" class="${cover.coverFit==='fill'?'selected':''}">เต็มกรอบ</button><button type="button" data-photo-fit="contain" class="${cover.coverFit==='contain'?'selected':''}">เห็นภาพเต็ม</button><button type="button" data-editor-nudge="zoom-out">− ย่อ</button><button type="button" data-editor-nudge="zoom-in">＋ ขยาย</button>`;
     if(type==='headline')actions=`<button type="button" data-album-tool="headline">✏️ แก้ข้อความ</button><button type="button" data-editor-nudge="smaller">− เล็กลง</button><button type="button" data-editor-nudge="larger">＋ ใหญ่ขึ้น</button><button type="button" data-album-tool="design">ฟอนต์และสี</button>`;
     if(type==='logo')actions=state.logoUrl?`<button type="button" data-editor-nudge="smaller">− เล็กลง</button><button type="button" data-editor-nudge="larger">＋ ใหญ่ขึ้น</button><button type="button" data-editor-action="replace-logo">เปลี่ยนโลโก้</button>`:`<button type="button" data-editor-action="replace-logo">อัปโหลดโลโก้</button>`;
     if(type==='brand')actions=`<button type="button" data-album-tool="design">แก้คำขวัญและช่องทาง</button><button type="button" data-editor-action="toggle-brand">${d.brandEnabled?'ซ่อนส่วนท้าย':'แสดงส่วนท้าย'}</button>`;
-    host.innerHTML=`<b>${labels[type]||'วัตถุ'}</b><span>ลากเพื่อย้าย · จับจุดมุมเพื่อปรับขนาด</span><div>${actions}</div>`;
+    host.innerHTML=`<b>${labels[type]||'วัตถุ'}</b><div>${actions}</div>`;
   }
   function renderCoverEditor(){
     const host=$('#album-coverEditor');if(!host)return;const cover=selectedCover(),d=formData();
@@ -82,7 +81,7 @@
     const photoStyle=`left:${50+cover.coverX}%;top:${50+cover.coverY}%;transform:translate(-50%,-50%) scale(${cover.coverZoom});object-fit:${cover.coverFit==='contain'?'contain':'cover'}`;
     const bandStyle=`background:linear-gradient(180deg,${rgba(d.bandColor,0)} 0%,${rgba(d.bandColor,Math.max(.18,d.bandOpacity/100*.72))} 28%,${rgba(d.bandColor,d.bandOpacity/100)} 100%);display:${d.bandEnabled?'block':'none'}`;
     const decorHtml=d.bandStyle==='template'?`<div class="album-band-decor style-template" style="--album-accent:${rgba(d.bandAccentColor,accentAlpha)};--album-accent-soft:${rgba(d.bandAccentColor,accentAlpha*.22)}"><i class="curve-left"></i><i class="curve-right"></i></div>`:'';
-    host.innerHTML=`<div class="album-cover-stage ${styleClass}" id="albumCoverStage"><img class="album-editor-photo-bg" src="${cover.url}" alt="" aria-hidden="true"><img id="albumPhotoDrag" data-editor-object="photo" class="album-editor-photo" src="${cover.url}" alt="ภาพปก" style="${photoStyle}"><div id="albumPhotoSelection" class="album-photo-selection album-editor-object${state.selectedObject==='photo'?' selected':''}">${resizeHandle('photo')}</div><div class="album-editor-shade"></div><div class="album-editor-band" style="${bandStyle}"></div>${decorHtml}${isDouble?'<i class="album-editor-seam" aria-hidden="true"></i>':''}${logoHtml}<div id="albumHeadlineDrag" data-editor-object="headline" class="album-headline-drag album-editor-object align-${d.align}${d.italic?' is-italic':''}${state.selectedObject==='headline'?' selected':''}" style="left:${state.headlineX}%;top:${state.headlineY}%;font-family:'${esc(d.font)}',sans-serif;font-size:${previewHeadlineSize}cqw;font-weight:${d.fontWeight};color:${d.color};-webkit-text-stroke:${previewOutlineSize}cqw ${d.outlineColor};text-shadow:${d.shadow?'0 3px 10px rgba(0,0,0,.72)':'none'}">${esc(d.title||'ข้อความพาดหัว').replace(/\n/g,'<br>')}${resizeHandle('headline')}</div>${brandHtml}</div>`;
+    host.innerHTML=`<div class="album-cover-stage ${styleClass}" id="albumCoverStage"><img class="album-editor-photo-bg" src="${cover.url}" alt="" aria-hidden="true"><img id="albumPhotoDrag" data-editor-object="photo" class="album-editor-photo" src="${cover.url}" alt="ภาพปก" style="${photoStyle}"><div class="album-editor-shade"></div><div class="album-editor-band" style="${bandStyle}"></div>${decorHtml}${isDouble&&state.showGuide?'<i class="album-editor-seam" aria-hidden="true"></i>':''}<button type="button" class="album-guide-toggle" data-editor-action="toggle-guide" title="เปิดหรือปิดแนวตัด">${state.showGuide?'◐ ซ่อนแนวตัด':'◑ แสดงแนวตัด'}</button>${logoHtml}<div id="albumHeadlineDrag" data-editor-object="headline" class="album-headline-drag album-editor-object align-${d.align}${d.italic?' is-italic':''}${state.selectedObject==='headline'?' selected':''}" style="left:${state.headlineX}%;top:${state.headlineY}%;font-family:'${esc(d.font)}',sans-serif;font-size:${previewHeadlineSize}cqw;font-weight:${d.fontWeight};color:${d.color};-webkit-text-stroke:${previewOutlineSize}cqw ${d.outlineColor};text-shadow:${d.shadow?'0 3px 10px rgba(0,0,0,.72)':'none'}">${esc(d.title||'ข้อความพาดหัว').replace(/\n/g,'<br>')}${resizeHandle('headline')}</div>${brandHtml}</div>`;
     syncCoverControls(cover);bindStageDrag();renderObjectToolbar();renderWarning();
   }
   function renderWarning(){
@@ -101,10 +100,12 @@
       const stop=()=>{if(state.drag?.type===type)scheduleGeneratedRefresh();state.drag=null;drag.classList.remove('dragging');};drag.addEventListener('pointerup',stop);drag.addEventListener('pointercancel',stop);
     });
     $('#albumHeadlineDrag')?.addEventListener('dblclick',()=>useCoverTool('headline'));
+    stage.addEventListener('wheel',event=>{const cover=selectedCover();if(!cover)return;event.preventDefault();cover.coverZoom=Math.max(.5,Math.min(2.5,cover.coverZoom+(event.deltaY<0?.06:-.06)));const photo=$('#albumPhotoDrag');if(photo)photo.style.transform=`translate(-50%,-50%) scale(${cover.coverZoom})`;scheduleGeneratedRefresh();},{passive:false});
+    $('#albumPhotoDrag')?.addEventListener('dblclick',()=>{const cover=selectedCover();if(!cover)return;cover.coverFit=cover.coverFit==='fill'?'contain':'fill';cover.coverZoom=1;cover.coverX=0;cover.coverY=0;renderCoverEditor();scheduleGeneratedRefresh();});
   }
   function resizeMove(event){const drag=state.drag;if(!drag||!drag.type.startsWith('resize-'))return;const rect=drag.stage.getBoundingClientRect(),delta=(event.clientX-drag.startX)/Math.max(1,rect.width),type=drag.type.slice(7);if(type==='photo'){const cover=selectedCover();if(cover){cover.coverZoom=Math.max(.5,Math.min(2.5,drag.coverZoom+delta*2.2));const photo=$('#albumPhotoDrag');if(photo)photo.style.transform=`translate(-50%,-50%) scale(${cover.coverZoom})`;}}else if(type==='headline'){const input=$('#album-headlineSize');if(input){input.value=Math.round(Math.max(38,Math.min(120,drag.font+delta*150)));$('#album-fontSizeValue').textContent=input.value;const node=$('#albumHeadlineDrag'),d=formData(),size=headlineFontSize(d.title,Number(input.value),true)*1.28/2160*100;if(node)node.style.fontSize=size+'cqw';}}else if(type==='logo'){const input=$('#album-logoSize');if(input){input.value=Math.round(Math.max(7,Math.min(24,drag.logo+delta*40)));$('#album-logoSizeValue').textContent=input.value+'%';const node=$('#albumLogoDrag');if(node)node.style.width=input.value+'%';}}}
   function resizeStop(event){event.currentTarget.removeEventListener('pointermove',resizeMove);state.drag=null;renderObjectToolbar();scheduleGeneratedRefresh();}
-  function selectEditorObject(type,rerender=true){if(!['photo','headline','logo','brand'].includes(type))return;state.selectedObject=type;$$('.album-editor-object').forEach(node=>node.classList.toggle('selected',node.dataset.editorObject===type||(type==='photo'&&node.id==='albumPhotoSelection')));renderObjectToolbar();if(rerender)renderCoverEditor();}
+  function selectEditorObject(type,rerender=true){if(!['photo','headline','logo','brand'].includes(type))return;state.selectedObject=type;$$('.album-editor-object').forEach(node=>node.classList.toggle('selected',node.dataset.editorObject===type));renderObjectToolbar();if(rerender)renderCoverEditor();}
   function renderCropList(){
     const host=$('#album-cropList');if(!host)return;const supports=supportingFiles();
     if(!state.files.length){host.innerHTML='<div class="album-empty-note">อัปโหลดภาพกิจกรรมก่อน</div>';return;}
@@ -171,20 +172,21 @@
   function captionWriter(d,style=d.captionStyle||'official'){
     const title=clean(d.title),org=clean(d.org),detail=clean(d.detail),footer=clean(d.footer),blocks=[],icon=style==='friendly'?'✨':style==='story'?'📷':style==='announcement'?'📣':'🎯';if(title)blocks.push(`${icon} ${title}`);
     const meta=[d.date&&`📅 ${d.date}${d.time?' '+d.time:''}`,d.place&&`📍 ${d.place}`].filter(Boolean).join('\n');if(meta)blocks.push(meta);
-    const detailParts=detail.split(/(?:\n+|(?<=[.!?])\s+)/).map(clean).filter(Boolean),body=[];if(org)body.push(org);if(detailParts.length)body.push(detailParts.join('\n\n'));if(body.length)blocks.push(body.join(' '));if(footer)blocks.push(footer);return factGuardCaption(blocks.join('\n\n'));
+    const lead=org&&title?`${org} ดำเนินกิจกรรม “${title}” โดยมุ่งสื่อสารและดำเนินงานตามรายละเอียดที่กำหนด`:(org?`${org} ดำเนินกิจกรรมตามข้อมูลที่ได้รับ`:title?`กิจกรรม “${title}” ดำเนินขึ้นตามรายละเอียดที่กำหนด`:''),body=[];if(lead)body.push(lead+'。');if(detail)body.push(`ในการดำเนินงานครั้งนี้ ${detail.replace(/[。.]$/,'')} เพื่อให้การดำเนินกิจกรรมเป็นไปอย่างต่อเนื่องและเกิดประโยชน์ตามวัตถุประสงค์。`);if(body.length)blocks.push(body.join('\n\n').replace(/。/g,'.'));if(footer)blocks.push(footer);return factGuardCaption(blocks.join('\n\n'));
   }
+  function firstCaptionVariant(text){return String(text||'').split(/\n\s*-{5}\s*\n/)[0].replace(/^\s*(?:แบบที่\s*1|แคปชั่น(?:พร้อมโพสต์)?)[\s:：-]*/i,'').trim();}
   async function generateSmartCaption(d,button=null){
     const fallback=()=>captionWriter(d,d.captionStyle),facts=[d.title,d.org,d.date,d.time,d.place,d.detail,d.footer].filter(Boolean).join('\n');
     if(!window.TANJAI?.generateWritingWithAI){state.captionSource='เรียบเรียงในเครื่อง';return fallback();}
     const result=await TANJAI.generateWritingWithAI({
-      tool:'post',button,
+      tool:'album',button,
       data:{title:clean(d.title),organization:d.org,date:d.date,time:d.time,place:d.place,detail:d.detail,footer:d.footer,lockedFacts:facts,_postStrict:true},
-      options:{channel:'โพสต์ Facebook พร้อมเผยแพร่',platform:'Facebook',purpose:'สรุปกิจกรรมและประชาสัมพันธ์',delivery:'ข่าวประชาสัมพันธ์ที่เป็นธรรมชาติ อ่านง่าย',creativity:'ช่วยคิดและแต่งให้สมบูรณ์',emoji:'ใช้เท่าที่จำเป็น',hashtags:'สร้าง 2–4 แฮชแท็กจากข้อมูลจริง',captionStyle:d.captionStyle,silentStatus:true,extra:'เขียนแคปชั่นฉบับพร้อมโพสต์ให้มีเนื้อหา ไม่ใช่เพียงนำช่องข้อมูลมาต่อกัน เริ่มด้วยพาดหัว ตามด้วยวัน เวลา สถานที่ แล้วเรียบเรียงว่าใครทำอะไร ผู้เกี่ยวข้อง ประเด็นสำคัญ และผลที่เกิดขึ้นตามข้อมูลจริง ใช้ย่อหน้าและคำเชื่อมที่เป็นธรรมชาติ เติมได้เฉพาะบริบทหรือประโยชน์ทั่วไปที่อนุมานอย่างปลอดภัยจากกิจกรรมนั้น ปิดท้ายและใส่แฮชแท็ก 2–4 แท็ก ส่งเฉพาะแคปชั่น ห้ามสร้างชื่อบุคคล ตำแหน่ง วัน เวลา สถานที่ ตัวเลข มติ ผลงาน หรือผลลัพธ์ที่ผู้ใช้ไม่ได้ให้'},
+      options:{channel:'โพสต์ Facebook พร้อมเผยแพร่',platform:'Facebook',purpose:'สรุปกิจกรรมและประชาสัมพันธ์',delivery:'ข่าวประชาสัมพันธ์ที่เป็นธรรมชาติ อ่านง่าย',creativity:'ช่วยคิดและแต่งให้สมบูรณ์',emoji:'ใช้เท่าที่จำเป็น',hashtags:'สร้าง 2–4 แฮชแท็กจากข้อมูลจริง',captionStyle:d.captionStyle,silentStatus:true,extra:'วิเคราะห์ประเภทกิจกรรมก่อนเขียน แล้วสร้างมุมเปิดเรื่องและลำดับเนื้อหาใหม่ ห้ามคัดลอกข้อความรายละเอียดทั้งย่อหน้ามาวางตรง ๆ ต้องสังเคราะห์ว่าใครทำอะไร เพื่ออะไร และประชาชนหรือผู้เกี่ยวข้องได้รับประโยชน์อย่างไร โดยประโยชน์ต้องอนุมานได้อย่างปลอดภัย แยกวัน เวลา สถานที่ให้อ่านง่าย ปิดท้ายอย่างเป็นธรรมชาติและใส่แฮชแท็ก 2–4 แท็ก ห้ามสร้างชื่อบุคคล ตำแหน่ง วัน เวลา สถานที่ ตัวเลข มติ ผลงาน หรือผลลัพธ์ที่ผู้ใช้ไม่ได้ให้'},
       fallback
     });
     window.TANJAI_AUTH?.trackUsage?.('album_caption');
     state.captionSource=result?.source==='fallback'?'เรียบเรียงในเครื่อง':'AI เรียบเรียง';
-    return factGuardCaption(result?.text)||fallback();
+    return factGuardCaption(firstCaptionVariant(result?.text))||fallback();
   }
   function progress(show,label='กำลังสร้างชุดภาพ...',percent=0){let box=$('#albumProgress');if(!box){box=document.createElement('div');box.id='albumProgress';box.className='album-progress-bar-wrap';box.innerHTML='<div class="album-progress-bar" id="albumProgressInner"></div><small id="albumProgressLabel"></small>';$('#albumResult')?.prepend(box);}box.style.display=show?'block':'none';const bar=$('#albumProgressInner'),text=$('#albumProgressLabel');if(bar)bar.style.width=percent+'%';if(text)text.textContent=label;}
   async function generate(){
@@ -230,6 +232,7 @@
   function editorAction(action){
     if(action==='replace-logo'){$('#album-logoFile')?.click();return;}
     if(action==='toggle-brand'){const input=$('#album-brandEnabled');if(input){input.checked=!input.checked;renderCoverEditor();scheduleGeneratedRefresh();}}
+    if(action==='toggle-guide'){state.showGuide=!state.showGuide;renderCoverEditor();}
   }
   async function regenerateCaption(button){
     if(!state.outputs.length)return notify('กรุณาสร้างชุดภาพก่อน');
@@ -244,5 +247,5 @@
   });
   window.TANJAI=window.TANJAI||{};
   window.TANJAI.applyAlbumTemplate=function(snapshot){Object.entries(snapshot||{}).forEach(([key,value])=>{const id=key.startsWith('album-')?key:`album-${key}`,el=document.getElementById(id);if(!el||typeof value==='object')return;if(el.type==='checkbox')el.checked=!!value;else el.value=value;});if(snapshot?.coverMode)setCoverMode(snapshot.coverMode);if(Number.isFinite(snapshot?.headlineX))state.headlineX=snapshot.headlineX;if(Number.isFinite(snapshot?.headlineY))state.headlineY=snapshot.headlineY;if(Number.isFinite(snapshot?.logoX))state.logoX=snapshot.logoX;if(Number.isFinite(snapshot?.logoY))state.logoY=snapshot.logoY;if(Number.isFinite(snapshot?.brandY))state.brandY=snapshot.brandY;const cover=selectedCover();if(cover){if(Number.isFinite(snapshot?.coverX))cover.coverX=snapshot.coverX;if(Number.isFinite(snapshot?.coverY))cover.coverY=snapshot.coverY;if(Number.isFinite(snapshot?.coverZoom))cover.coverZoom=snapshot.coverZoom;if(snapshot?.coverFit)cover.coverFit=snapshot.coverFit;}renderCoverEditor();};
-  window.TANJAI_ALBUM_PRO={generate,downloadAll,downloadCover,renderFacebookPreview,renderPhotoPicker,renderCropList,_test:{cropPlacement,coverPlacement,captionWriter,factGuardCaption,short,metaText,headlineFontSize,normalizeFacts,cleanMultiline,wrapHeadlineLines,brandContacts,hasBrandContent}};
+  window.TANJAI_ALBUM_PRO={generate,downloadAll,downloadCover,renderFacebookPreview,renderPhotoPicker,renderCropList,_test:{cropPlacement,coverPlacement,captionWriter,firstCaptionVariant,factGuardCaption,short,metaText,headlineFontSize,normalizeFacts,cleanMultiline,wrapHeadlineLines,brandContacts,hasBrandContent}};
 })();
