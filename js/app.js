@@ -209,20 +209,15 @@ $("#albumForm").innerHTML = `
 
     <div class="form-section album-flow-section"><div class="section-title"><b>3</b><h4>จัดวางภาพปก</h4></div>
       <div class="album-quick-tools" aria-label="เครื่องมือภาพปก">
-        <button type="button" data-album-tool="headline">✏️ แก้พาดหัว</button>
-        <button type="button" data-album-tool="design">🎨 ปรับรายละเอียด</button>
+        <button type="button" data-editor-select="photo" class="selected">🖼️ ภาพ</button>
+        <button type="button" data-editor-select="headline">T พาดหัว</button>
+        <button type="button" data-editor-select="logo">◉ โลโก้</button>
+        <button type="button" data-editor-select="brand">▤ ส่วนท้าย</button>
+        <button type="button" data-album-tool="design">🎨 รายละเอียด</button>
         <button type="button" data-album-tool="reset">↺ จัดตำแหน่งใหม่</button>
       </div>
-      <div class="album-photo-positioner">
-        <div class="album-photo-fit-buttons" role="radiogroup" aria-label="การแสดงภาพปก">
-          <button type="button" data-photo-fit="fill" class="selected">เต็มกรอบ</button>
-          <button type="button" data-photo-fit="contain">เห็นภาพเต็ม</button>
-        </div>
-        <label>ซ้าย–ขวา <span id="album-coverXValue">0</span><input id="album-coverX" type="range" min="-50" max="50" value="0"></label>
-        <label>ขึ้น–ลง <span id="album-coverYValue">0</span><input id="album-coverY" type="range" min="-50" max="50" value="0"></label>
-        <label>ขยาย–ย่อ <span id="album-coverZoomValue">100%</span><input id="album-coverZoom" type="range" min="50" max="250" value="100"></label>
-      </div>
-      <div class="album-editor-note">ลากพื้นภาพเพื่อจัดตำแหน่งได้โดยตรง · ข้อความ โลโก้ และส่วนท้ายลากแยกกันได้ · เส้นกลางคือรอยต่อของชุด Facebook</div>
+      <div id="albumObjectToolbar" class="album-object-toolbar" aria-live="polite"></div>
+      <div class="album-editor-note">คลิกวัตถุบนปกแล้วลากได้ทันที · จับจุดมุมเพื่อย่อ–ขยาย · ดับเบิลคลิกข้อความเพื่อแก้ไข · เส้นกลางเป็นเพียงแนวตัดและไม่ติดไปกับไฟล์จริง</div>
       <div id="album-coverEditor" class="album-cover-editor is-empty"><p>อัปโหลดภาพ แล้วเลือกภาพปกเพื่อเริ่มจัดวาง</p></div>
       <div id="album-coverWarning" class="album-cover-warning" hidden></div>
       <details class="album-advanced-editor" id="albumAdvancedEditor">
