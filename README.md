@@ -1,6 +1,6 @@
-# ทันใจ AI Studio V12.7.1
+# ทันใจ AI Studio V12.7.2
 
-## Facebook Cover Free Canvas V12.7.1
+## Facebook Cover Free Canvas V12.7.2
 
 - คลิกและลากภาพ พาดหัว โลโก้ และส่วนท้ายบนปกโดยตรง
 - จับจุดมุมเพื่อย่อ–ขยายภาพ ข้อความ และโลโก้

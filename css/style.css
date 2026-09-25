@@ -5645,9 +5645,10 @@ html{scroll-padding-top:108px}
   .specialist-revision-buttons{display:grid;grid-template-columns:1fr 1fr}
 }
 
-/* V12.7.1 — Facebook Cover Free Canvas */
+/* V12.7.2 — Context-neutral Facebook Studio */
 .album-flow-section{overflow:visible}
 .album-cover-mode-field{display:grid;gap:8px}.album-cover-mode-field>span{font-weight:800;color:var(--soft);font-size:13px}
+#album-title{min-height:72px;resize:vertical}#album-detail{min-height:150px;resize:vertical}
 .album-mode-buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .album-mode-buttons button{display:grid;gap:3px;text-align:left;padding:13px;border-radius:14px;border:1px solid var(--line2);background:rgba(7,10,21,.66);color:var(--text)}
 .album-mode-buttons button small{color:var(--muted);font-size:11px}.album-mode-buttons button.selected{border-color:#a78bfa;background:linear-gradient(135deg,rgba(124,58,237,.25),rgba(236,72,153,.12));box-shadow:0 0 0 2px rgba(139,92,246,.13)}

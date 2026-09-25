@@ -14,7 +14,7 @@ const context = {console,document,TextEncoder,Uint8Array,Blob,Intl,URL:{createOb
 vm.runInNewContext(source, context, {filename:'album.js'});
 const api = context.window.TANJAI_ALBUM_PRO._test;
 
-assert.match(index,/V12\.7\.1/);
+assert.match(index,/V12\.7\.2/);
 assert.match(app,/id="album-allFiles"/);
 assert.match(app,/data-cover-mode="double"/);
 assert.match(app,/data-cover-mode="single"/);
@@ -108,6 +108,9 @@ assert.strictEqual(api.firstCaptionVariant('แบบที่ 1: ข่าว�
 assert.strictEqual(api.factGuardCaption('ข้อมูลจริง\nPLACEHOLDER\nundefined'),'ข้อมูลจริง');
 assert.strictEqual(api.cleanMultiline(' บรรทัดหนึ่ง  \n บรรทัดสอง '),'บรรทัดหนึ่ง\nบรรทัดสอง');
 assert.doesNotMatch(app,/placeholder="[^"]*เทศบาลเมืองบางรักน้อย/);
+assert.doesNotMatch(app,/placeholder="[^"]*(?:ลงพื้นที่|ประธาน|ผู้เข้าร่วม|\.go\.th|193 4512)/);
+assert.match(app,/placeholder="พิมพ์ข้อความที่ต้องการแสดงบนภาพปก"/);
+assert.match(app,/ข้อมูลต้นทาง/);
 assert.strictEqual(api.normalizeFacts({title:'  หัวข้อ   จริง ',detail:' ใคร  ทำอะไร '} ).title,'หัวข้อ จริง');
 assert.strictEqual(api.normalizeFacts({title:'หัวข้อบรรทัดแรก\nหัวข้อบรรทัดสอง'}).title,'หัวข้อบรรทัดแรก\nหัวข้อบรรทัดสอง');
 assert(api.headlineFontSize('หัวข้อสั้น',72,true)>api.headlineFontSize('ก'.repeat(120),72,true));
@@ -117,4 +120,4 @@ assert.deepStrictEqual(Array.from(api.brandContacts({brandWebsite:'example.go.th
 assert.deepStrictEqual(Array.from(api.brandContacts({brandWebsite:'',brandSocial:'',org:'',brandPhone:'โทร. 02-000-0000'}).map(item=>item.text)),['โทร. 02-000-0000']);
 assert.doesNotMatch(source,/detail\|\|'รายละเอียดว่าใครทำอะไร'/);
 
-console.log(JSON.stringify({version:'12.7.1',coverModes:2,facebookFivePhotoPack:true,fullCoverDownload:true,freeCanvas:true,directObjectSelection:true,wheelZoom:true,smartAlbumCaption:true,simpleBandPresets:true,templateGoldDecor:true,phoneAsTyped:true,aiCaption:true,noPurposeField:true,officialBrandCover:true,status:'PASS'},null,2));
+console.log(JSON.stringify({version:'12.7.2',coverModes:2,facebookFivePhotoPack:true,fullCoverDownload:true,freeCanvas:true,directObjectSelection:true,wheelZoom:true,smartAlbumCaption:true,neutralPlaceholders:true,simpleBandPresets:true,templateGoldDecor:true,phoneAsTyped:true,aiCaption:true,noPurposeField:true,officialBrandCover:true,status:'PASS'},null,2));

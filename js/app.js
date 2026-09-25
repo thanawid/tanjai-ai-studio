@@ -194,15 +194,15 @@ $("#albumForm").innerHTML = `
       <div id="album-photoPicker" class="album-photo-picker" hidden></div>
     </div>
 
-    <div class="form-section album-flow-section"><div class="section-title"><b>2</b><h4>ข้อมูลข่าวและแคปชั่น</h4></div>
+    <div class="form-section album-flow-section"><div class="section-title"><b>2</b><h4>ข้อมูลสำหรับให้ AI เรียบเรียง</h4></div>
       <div class="form-grid">
-        <label class="full">ข้อความพาดหัวบนปก<textarea id="album-title" rows="2" maxlength="140" placeholder="เช่น ลงพื้นที่ตรวจความพร้อมรับสถานการณ์น้ำ&#10;กด Enter เพื่อกำหนดจุดขึ้นบรรทัดใหม่"></textarea><small>กด Enter เพื่อแบ่งบรรทัดเอง ระบบจะรักษาการจัดบรรทัดนี้ทั้งในตัวอย่างและไฟล์จริง</small></label>
-        <label>ชื่อเพจ / หน่วยงาน<input id="album-orgName" placeholder="ระบุชื่อองค์กร หน่วยงาน หรือชื่อเพจ"></label>
-        <label>วันที่<input id="album-dateTime" placeholder="เช่น วันอังคารที่ 22 กันยายน 2569"></label>
-        <label>เวลา<input id="album-time" placeholder="เช่น เวลา 09.00 น."></label>
+        <label class="full">ข้อมูลต้นทาง<textarea id="album-detail" rows="6" maxlength="1400" placeholder="วางข้อเท็จจริงหรือข้อความที่มีได้เลย ไม่ต้องเรียบเรียงให้สวย"></textarea><small>ระบุว่าใครทำอะไร มีประเด็นสำคัญหรือผลที่เกิดขึ้นอย่างไร เฉพาะข้อมูลจริงที่ต้องการให้ปรากฏในแคปชั่น</small></label>
+        <label>ชื่อเจ้าของโพสต์<input id="album-orgName" placeholder="ชื่อองค์กร แบรนด์ บุคคล หรือชื่อเพจ"></label>
+        <label>วันที่<input id="album-dateTime" placeholder="ระบุวันที่ หากมี"></label>
+        <label>เวลา<input id="album-time" placeholder="ระบุเวลา หากมี"></label>
         <label>สถานที่<input id="album-place" placeholder="ระบุสถานที่ หากมี"></label>
-        <label class="full">ใคร / ทำอะไร / ผลที่เกิดขึ้น<textarea id="album-detail" rows="6" maxlength="1400" placeholder="ใส่ข้อเท็จจริงที่มี เช่น ประธาน ผู้เข้าร่วม สิ่งที่ดำเนินการ ประเด็นสำคัญ และผลที่เกิดขึ้น แล้วให้ AI เรียบเรียงเป็นแคปชั่น"></textarea><small>ไม่ต้องเขียนให้สวย ใส่ข้อมูลจริงให้ครบ ระบบจะช่วยเรียบเรียงและเติมคำเชื่อมให้</small></label>
-        <label class="full">ข้อความปิดท้าย / เว็บไซต์ / แฮชแท็ก<input id="album-footer" placeholder="ระบุข้อความปิดท้าย เว็บไซต์ หรือแฮชแท็ก หากมี"></label>
+        <label class="full">ข้อความพาดหัวบนปก<textarea id="album-title" rows="2" maxlength="140" placeholder="พิมพ์ข้อความที่ต้องการแสดงบนภาพปก"></textarea><small>ต้องการกำหนดจุดขึ้นบรรทัดใหม่ ให้กด Enter ตรงตำแหน่งนั้น</small></label>
+        <label class="full">ข้อความปิดท้าย / เว็บไซต์ / แฮชแท็ก<input id="album-footer" placeholder="ใส่เฉพาะข้อมูลที่ต้องการแนบท้ายโพสต์ หากมี"></label>
         <label>สไตล์แคปชั่น<select id="album-captionStyle"><option value="official" selected>ข่าวประชาสัมพันธ์หน่วยงาน</option><option value="pr-ready">กระชับ พร้อมโพสต์</option><option value="friendly">อบอุ่น เข้าถึงง่าย</option><option value="story">เล่าเรื่องกิจกรรม</option><option value="announcement">ประกาศ / แจ้งข่าว</option></select></label>
       </div>
     </div>
@@ -239,9 +239,9 @@ $("#albumForm").innerHTML = `
           <div class="album-brand-heading"><b>ส่วนท้ายแบรนด์</b><small>ไม่ใช่รายละเอียดกิจกรรม เปิด–ปิดได้ และบันทึกไว้ใช้ครั้งต่อไป</small></div>
           <label class="checkline"><input id="album-brandEnabled" type="checkbox" checked> แสดงส่วนท้ายแบรนด์</label>
           <label>คำขวัญ / ข้อความประจำองค์กร<input id="album-brandSlogan" maxlength="120" placeholder="ระบุคำขวัญหรือข้อความสั้น หากมี"></label>
-          <label>เว็บไซต์<input id="album-brandWebsite" maxlength="100" placeholder="เช่น www.example.go.th"></label>
+          <label>เว็บไซต์<input id="album-brandWebsite" maxlength="100" placeholder="เช่น www.example.com"></label>
           <label>Facebook / ชื่อเพจ<input id="album-brandSocial" maxlength="100" placeholder="เว้นว่างเพื่อใช้ชื่อเพจด้านบน"></label>
-          <label>โทรศัพท์<input id="album-brandPhone" maxlength="50" placeholder="เช่น 02 193 4512-3"></label>
+          <label>โทรศัพท์<input id="album-brandPhone" maxlength="50" placeholder="เช่น 02-000-0000"></label>
           <div class="album-brand-actions"><button type="button" class="btn secondary" id="albumSaveBrandProfile">💾 บันทึกข้อมูลแบรนด์ไว้ใช้ครั้งต่อไป</button></div>
         </div>
       </details>
