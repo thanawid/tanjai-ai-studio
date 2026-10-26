@@ -7,7 +7,7 @@ const css = fs.readFileSync('css/style.css','utf8');
 assert.match(index,/id="videoEditor"/);
 assert.match(index,/ui\.js\?v=12\.6\.3-context-ai/);
 assert.doesNotMatch(index,/https:\/\/tanjai-video-studio\.onrender\.com\//);
-assert.match(index,/<button class="nav-link" data-view="createVideo"><i>✨<\/i><b>สร้างวิดีโอ<\/b><\/button>/);
+assert.doesNotMatch(index,/<button class="nav-link" data-view="createVideo"><i>✨<\/i><b>สร้างวิดีโอ<\/b><\/button>/);
 assert.doesNotMatch(index,/href="create-video\//);
 assert.doesNotMatch(index,/<button class="nav-link" data-view="videoEditor"><i>✂️<\/i>/);
 assert.match(ui,/"videoEditor"/);

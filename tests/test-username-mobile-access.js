@@ -12,7 +12,7 @@ assert.strictEqual(pkg.version, "12.7.2");
 assert.match(index, /V12\.7\.2/);
 assert.doesNotMatch(index, /login-version-badge|app-version-badge/);
 assert.match(app, /data-fab-view="router"/);
-assert.match(app, /data-fab-view="createVideo"/);
+assert.doesNotMatch(app, /data-fab-view="createVideo"/);
 assert.match(app, /data-fab-view="projects"/);
 assert.doesNotMatch(app, /data-fab-open="gpt"/);
 assert.match(css, /@media\(min-width:1181px\)\{\.fab-main,\.fab-menu\{display:none!important\}\}/);

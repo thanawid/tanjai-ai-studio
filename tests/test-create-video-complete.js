@@ -7,7 +7,7 @@ const css = fs.readFileSync("css/create-video-module.css", "utf8");
 const ui = fs.readFileSync("js/ui.js", "utf8");
 
 assert.match(html, /id="createVideo" class="view create-video-module"/);
-assert.match(html, /data-view="createVideo"/);
+assert.doesNotMatch(html, /data-view="(?:video|createVideo)"/);
 assert.doesNotMatch(html, /href="create-video\//);
 assert.match(ui, /"createVideo"/);
 assert.match(app, /"ข้อมูลงาน", "บทและฉาก", "เลือกวิธีสร้าง", "สร้างคลิปต่อ"/);

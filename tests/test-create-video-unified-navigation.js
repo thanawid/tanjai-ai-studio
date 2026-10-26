@@ -5,9 +5,10 @@ const redirectPage = fs.readFileSync("create-video/index.html", "utf8");
 const studioPage = fs.readFileSync("index.html", "utf8");
 const server = fs.readFileSync("server.mjs", "utf8");
 
-for (const target of ["dashboard", "router", "image", "photoPro", "album", "post", "video", "createVideo", "voice", "kit", "deck", "mc", "projects", "library", "promptHub", "destinationHub"]) {
+for (const target of ["dashboard", "router", "image", "photoPro", "album", "post", "voice", "kit", "deck", "mc", "projects", "library", "promptHub", "destinationHub"]) {
   assert.match(studioPage, new RegExp(`data-view="${target}"`));
 }
+assert.doesNotMatch(studioPage, /data-view="(?:video|createVideo)"/);
 assert.match(studioPage, /id="createVideo" class="view create-video-module"/);
 assert.match(redirectPage, /url=\.\.\/#createVideo/);
 assert.match(redirectPage, /location\.replace\("\.\.\/#createVideo"\)/);

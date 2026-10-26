@@ -5,7 +5,7 @@ const app = fs.readFileSync("create-video/app.js", "utf8");
 const server = fs.readFileSync("server.mjs", "utf8");
 const dockerignore = fs.readFileSync(".dockerignore", "utf8");
 assert.match(main, /id="createVideo" class="view create-video-module"/);
-assert.match(main, /data-view="createVideo"/);
+assert.doesNotMatch(main, /data-view="(?:video|createVideo)"/);
 assert.doesNotMatch(main, /href="create-video\//);
 assert.doesNotMatch(main, /tanjai-video-studio\.onrender\.com/);
 assert.match(app, /const API_BASE = location\.hostname\.endsWith\("github\.io"\)/);

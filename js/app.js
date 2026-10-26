@@ -711,7 +711,6 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "สคริปต์�
     {label:"ชุดภาพโพสต์ Facebook", icon:"🧷", view:"album", hint:"ปก 1–2 ภาพ ครอปภาพจริง แคปชั่น ZIP"},
     {label:"เขียนสคริปต์และเนื้อหา", icon:"✍️", view:"post", hint:"สคริปต์ บทพากย์ ข่าว โพสต์ และแคปชั่น"},
     {label:"งานพิธีกร", icon:"🎤", view:"mc", hint:"สคริปต์พิธีกร คำเชิญประธาน คำกล่าว คำเชื่อมช่วง"},
-    {label:"ทำวิดีโอ", icon:"🎬", view:"video", hint:"Storyboard / Hook / Voice Over"},
     {label:"เสียงพากย์", icon:"🎙️", view:"voice", hint:"สคริปต์เสียงอ่าน"},
     {label:"ทำสไลด์", icon:"📊", view:"deck", hint:"Outline สไลด์"},
     {label:"คลัง Prompt", icon:"⭐", view:"promptHub", hint:"คำสั่งพร้อมใช้"},
@@ -742,7 +741,6 @@ $("#mcResult").innerHTML = TANJAI.readyOutputShell("mc", "สคริปต์�
         <button data-fab-view="post" role="menuitem" title="เขียนเนื้อหา">✍️<span>เขียนเนื้อหา</span></button>
         <button data-fab-view="image" role="menuitem" title="สร้างภาพ">🖼️<span>สร้างภาพ</span></button>
         <button data-fab-view="album" role="menuitem" title="สร้างชุดภาพ Facebook">🧷<span>ชุดภาพ Facebook</span></button>
-        <button data-fab-view="createVideo" role="menuitem" title="สร้างวิดีโอ">✨<span>สร้างวิดีโอ</span></button>
         <button data-fab-view="voice" role="menuitem" title="สร้างเสียงพากย์">🎙️<span>เสียงพากย์</span></button>
         <button data-fab-view="kit" role="menuitem" title="สร้างชุดสื่อ">🧩<span>สร้างชุดสื่อ</span></button>
         <button data-fab-view="projects" role="menuitem" title="เปิดงานที่บันทึกไว้">📁<span>งานที่บันทึกไว้</span></button>
